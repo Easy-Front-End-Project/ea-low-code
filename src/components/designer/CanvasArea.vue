@@ -21,6 +21,7 @@
           :selected="selectedComponentId === component.id"
           @select="handleComponentSelect"
           @delete="handleComponentDelete"
+          @drop-to-parent="handleDropToParent"
         />
       </div>
 
@@ -93,23 +94,33 @@ function handleDrop(event) {
 
   try {
     const componentMeta = JSON.parse(data)
-    const defaultProps = {}
-
-    // 提取默认属性
-    if (componentMeta.props) {
-      componentMeta.props.forEach((prop) => {
-        defaultProps[prop.name] = prop.default
-      })
-    }
-
-    // 添加组件到画布
-    const newComponent = schemaStore.addComponent(componentMeta.type, defaultProps)
-
-    // 选中新组件
-    schemaStore.selectComponent(newComponent.id)
+    addComponentWithMeta(componentMeta)
   } catch (error) {
     console.error('拖拽放置失败:', error)
   }
+}
+
+// 处理放置到父组件
+function handleDropToParent({ componentMeta, parentId }) {
+  addComponentWithMeta(componentMeta, parentId)
+}
+
+// 添加组件（提取公共逻辑）
+function addComponentWithMeta(componentMeta, parentId = null) {
+  const defaultProps = {}
+
+  // 提取默认属性
+  if (componentMeta.props) {
+    componentMeta.props.forEach((prop) => {
+      defaultProps[prop.name] = prop.default
+    })
+  }
+
+  // 添加组件到画布（如果有 parentId 则添加到对应容器的 children 中）
+  const newComponent = schemaStore.addComponent(componentMeta.type, defaultProps, parentId)
+
+  // 选中新组件
+  schemaStore.selectComponent(newComponent.id)
 }
 
 // 点击画布空白处

@@ -4,11 +4,16 @@
     :class="{
       'is-selected': selected,
       'is-container': isContainer,
+      'is-drop-target': isDropTarget,
     }"
     :style="componentStyle"
     @click.stop="handleClick"
     @mouseover.stop="handleMouseOver"
     @mouseout.stop="handleMouseOut"
+    @dragover.stop="handleDragOver"
+    @drop.stop="handleDrop"
+    @dragenter.stop="handleDragEnter"
+    @dragleave.stop="handleDragLeave"
   >
     <!-- 组件标签 -->
     <div v-if="showLabel" class="component-label">
@@ -27,9 +32,9 @@
 
     <!-- 组件渲染 -->
     <div class="component-wrapper">
-      <component :is="componentTag" v-bind="component.props" :style="componentInnerStyle">
+      <component :is="componentTag" v-bind="componentProps" :style="componentInnerStyle">
         <!-- 默认插槽内容 -->
-        <template v-if="component.children && component.children.length > 0">
+        <template v-if="hasNestedChildren">
           <CanvasComponent
             v-for="child in component.children"
             :key="child.id"
@@ -37,7 +42,11 @@
             :selected="selectedComponentId === child.id"
             @select="$emit('select', $event)"
             @delete="$emit('delete', $event)"
+            @drop-to-parent="$emit('drop-to-parent', $event)"
           />
+        </template>
+        <template v-else-if="hasChildrenText">
+          {{ component.props.children }}
         </template>
         <template v-else-if="hasDefaultSlot">
           {{ component.props.label || component.props.title || '组件内容' }}
@@ -66,10 +75,12 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['select', 'delete'])
+const emit = defineEmits(['select', 'delete', 'drop-to-parent'])
 
 const schemaStore = useSchemaStore()
 const isHovered = ref(false)
+const isDropTarget = ref(false)
+const dragCounter = ref(0)
 
 const selectedComponentId = computed(() => schemaStore.selectedComponentId)
 const componentMeta = computed(() => getComponentMeta(props.component.type))
@@ -77,7 +88,7 @@ const componentMeta = computed(() => getComponentMeta(props.component.type))
 // 组件标签名（Web Components）
 const componentTag = computed(() => props.component.type)
 
-// 是否为容器组件
+// 是否为容器组件（可放置其他组件）
 const isContainer = computed(() => {
   const containerTypes = [
     'ea-container',
@@ -86,8 +97,32 @@ const isContainer = computed(() => {
     'ea-aside',
     'ea-main',
     'ea-dialog',
+    'ea-space',
+    'ea-row',
+    'ea-col',
+    'ea-form',
+    'ea-form-item',
+    'ea-button-group',
   ]
   return containerTypes.includes(props.component.type)
+})
+
+// 是否有嵌套子组件（数组形式的 children）
+const hasNestedChildren = computed(() => {
+  return Array.isArray(props.component.children) && props.component.children.length > 0
+})
+
+// 是否有 children 文本属性（字符串形式的 children）
+const hasChildrenText = computed(() => {
+  return (
+    typeof props.component.props?.children === 'string' && props.component.props.children.length > 0
+  )
+})
+
+// 传递给组件的 props（排除 children，因为 children 作为插槽内容）
+const componentProps = computed(() => {
+  const { children, ...rest } = props.component.props || {}
+  return rest
 })
 
 // 是否显示标签
@@ -153,6 +188,56 @@ function handleCopy() {
   // TODO: 实现复制功能
   console.log('复制组件:', props.component.id)
 }
+
+// 拖拽悬停（仅容器组件处理）
+function handleDragOver(event) {
+  if (!isContainer.value) return
+  event.preventDefault()
+  event.dataTransfer.dropEffect = 'copy'
+}
+
+// 拖拽进入
+function handleDragEnter(event) {
+  if (!isContainer.value) return
+  event.preventDefault()
+  dragCounter.value++
+  if (dragCounter.value === 1) {
+    isDropTarget.value = true
+  }
+}
+
+// 拖拽离开
+function handleDragLeave(event) {
+  if (!isContainer.value) return
+  dragCounter.value--
+  if (dragCounter.value === 0) {
+    isDropTarget.value = false
+  }
+}
+
+// 放置组件到容器
+function handleDrop(event) {
+  if (!isContainer.value) return
+  event.preventDefault()
+
+  dragCounter.value = 0
+  isDropTarget.value = false
+
+  const data = event.dataTransfer.getData('application/json')
+  if (!data) return
+
+  try {
+    const componentMeta = JSON.parse(data)
+
+    // 向上冒泡，让父组件处理放置逻辑
+    emit('drop-to-parent', {
+      componentMeta,
+      parentId: props.component.id,
+    })
+  } catch (error) {
+    console.error('拖拽放置到容器失败:', error)
+  }
+}
 </script>
 
 <style scoped>
@@ -174,6 +259,12 @@ function handleCopy() {
 .canvas-component.is-container:hover {
   border-color: #3b82f6;
   background-color: rgba(59, 130, 246, 0.05);
+}
+
+.canvas-component.is-drop-target {
+  border-color: #10b981;
+  background-color: rgba(16, 185, 129, 0.1);
+  border-style: solid;
 }
 
 .component-label {

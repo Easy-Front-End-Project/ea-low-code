@@ -5,6 +5,7 @@
       v-if="type === 'string'"
       :value="value"
       @input="handleInput($event.target.value)"
+      @ea-clear="handleClear"
       class="prop-input"
       placeholder="请输入文本"
     />
@@ -117,6 +118,10 @@ function handleJsonInput(value) {
   } catch {
     // JSON 解析失败，不更新值
   }
+}
+
+function handleClear() {
+  emit('update:value', '')
 }
 </script>
 

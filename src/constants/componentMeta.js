@@ -35,6 +35,12 @@ export const componentMetaList = [
     icon: 'Button',
     props: [
       {
+        name: 'children',
+        label: '按钮文本',
+        type: PropTypes.STRING,
+        default: '按钮',
+      },
+      {
         name: 'type',
         label: '类型',
         type: PropTypes.SELECT,
@@ -176,7 +182,7 @@ export const componentMetaList = [
     icon: 'Input',
     props: [
       {
-        name: 'modelValue',
+        name: 'value',
         label: '绑定值',
         type: PropTypes.STRING,
         default: '',
@@ -439,6 +445,12 @@ export const componentMetaList = [
       {
         name: 'header',
         label: '标题',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'footer',
+        label: '页脚',
         type: PropTypes.STRING,
         default: '',
       },
