@@ -24,6 +24,9 @@
       <ea-button text @click="handleClear" title="清空">
         <span>清空</span>
       </ea-button>
+      <ea-button text @click="handleShowTree" title="大纲">
+        <span>大纲</span>
+      </ea-button>
     </div>
 
     <!-- 右侧：预览和导出 -->
@@ -41,6 +44,9 @@
 
     <!-- 隐藏的文件输入 -->
     <input ref="fileInput" type="file" accept=".json" class="hidden" @change="handleFileChange" />
+
+    <!-- 组件大纲弹框 -->
+    <ComponentTree :visible="treeVisible" @close="treeVisible = false" />
   </div>
 </template>
 
@@ -48,9 +54,13 @@
 import { ref } from 'vue'
 import { useSchemaStore } from '@/stores/designer/schema'
 import { exportSchemaToJson, importSchemaFromJson } from '@/utils/schemaHelper'
+import ComponentTree from './ComponentTree.vue'
 
 const schemaStore = useSchemaStore()
 const fileInput = ref(null)
+
+// 组件大纲弹框显示状态
+const treeVisible = ref(false)
 
 defineOptions({
   name: 'DesignerToolbar',
@@ -66,6 +76,11 @@ function handleUndo() {
 
 function handleRedo() {
   console.log('重做')
+}
+
+// 显示组件大纲
+function handleShowTree() {
+  treeVisible.value = true
 }
 
 function handleClear() {
