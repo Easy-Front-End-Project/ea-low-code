@@ -6,7 +6,7 @@
     </div>
 
     <!-- 内容区域 -->
-    <div class="flex-1 overflow-y-auto">
+    <div class="flex-1 overflow-y-auto pb-32">
       <!-- 未选中组件时显示 -->
       <div
         v-if="!selectedComponent"

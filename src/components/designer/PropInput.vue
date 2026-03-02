@@ -13,7 +13,7 @@
     <ea-input-number
       v-else-if="type === 'number'"
       :value="value"
-      @change="handleInput($event.detail.value)"
+      @ea-change="handleInput($event.detail.currentValue)"
       class="prop-input"
     />
 

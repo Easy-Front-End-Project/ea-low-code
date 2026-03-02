@@ -9,8 +9,8 @@ import router from './router'
 const app = createApp(App)
 
 import 'easy-component-ui/icon-assets'
-
 import 'easy-component-ui'
+import './main.css'
 
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)

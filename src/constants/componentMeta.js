@@ -149,7 +149,7 @@ export const componentMetaList = [
         name: 'icon',
         label: '图标名称',
         type: PropTypes.STRING,
-        default: '',
+        default: 'icon-',
       },
       {
         name: 'size',

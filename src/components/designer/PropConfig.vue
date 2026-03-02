@@ -36,8 +36,6 @@ const emit = defineEmits(['prop-change'])
 
 // 处理属性变更
 function handlePropChange(propName, value) {
-  console.log(propName, value);
-  
   emit('prop-change', propName, value)
 }
 </script>
