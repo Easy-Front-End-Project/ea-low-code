@@ -8,8 +8,10 @@
     <!-- 内容区域 -->
     <div class="flex-1 overflow-y-auto">
       <!-- 未选中组件时显示 -->
-      <div v-if="!selectedComponent" class="flex flex-col items-center justify-center h-full text-gray-400 p-6">
-        <ea-icon name="setting" size="48" class="mb-2"></ea-icon>
+      <div
+        v-if="!selectedComponent"
+        class="flex flex-col items-center justify-center h-full text-gray-400 p-6"
+      >
         <p class="text-sm text-center">选中画布上的组件以编辑属性</p>
       </div>
 
@@ -18,7 +20,11 @@
         <!-- 组件信息 -->
         <div class="component-info pb-4 border-b border-gray-100">
           <div class="flex items-center gap-2 mb-2">
-            <ea-icon :name="getComponentIcon(selectedComponent.type)" size="20" color="#3b82f6"></ea-icon>
+            <ea-icon
+              :name="getComponentIcon(selectedComponent.type)"
+              size="20"
+              color="#3b82f6"
+            ></ea-icon>
             <span class="font-medium text-gray-800">{{ componentMeta?.name }}</span>
           </div>
           <div class="text-xs text-gray-500">
@@ -28,131 +34,28 @@
         </div>
 
         <!-- 属性配置 -->
-        <div v-if="componentMeta?.props?.length > 0" class="props-section">
-          <h4 class="section-title">属性</h4>
-          <div class="space-y-3">
-            <div
-              v-for="prop in componentMeta.props"
-              :key="prop.name"
-              class="prop-item"
-            >
-              <label class="prop-label">{{ prop.label }}</label>
-              <PropInput
-                :type="prop.type"
-                :value="selectedComponent.props[prop.name]"
-                :options="prop.options"
-                @update:value="handlePropChange(prop.name, $event)"
-              />
-            </div>
-          </div>
-        </div>
+        <PropConfig
+          :props="componentMeta?.props"
+          :component-props="selectedComponent.props"
+          @prop-change="handlePropChange"
+        />
 
         <!-- 样式配置 -->
-        <div class="props-section">
-          <h4 class="section-title">样式</h4>
-          <div class="space-y-3">
-            <div class="prop-item">
-              <label class="prop-label">宽度</label>
-              <input
-                type="text"
-                :value="selectedComponent.style?.width || ''"
-                @input="handleStyleChange('width', $event.target.value)"
-                class="prop-input"
-                placeholder="auto"
-              />
-            </div>
-            <div class="prop-item">
-              <label class="prop-label">高度</label>
-              <input
-                type="text"
-                :value="selectedComponent.style?.height || ''"
-                @input="handleStyleChange('height', $event.target.value)"
-                class="prop-input"
-                placeholder="auto"
-              />
-            </div>
-            <div class="prop-item">
-              <label class="prop-label">外边距</label>
-              <input
-                type="text"
-                :value="selectedComponent.style?.margin || ''"
-                @input="handleStyleChange('margin', $event.target.value)"
-                class="prop-input"
-                placeholder="0"
-              />
-            </div>
-            <div class="prop-item">
-              <label class="prop-label">内边距</label>
-              <input
-                type="text"
-                :value="selectedComponent.style?.padding || ''"
-                @input="handleStyleChange('padding', $event.target.value)"
-                class="prop-input"
-                placeholder="0"
-              />
-            </div>
-            <div class="prop-item">
-              <label class="prop-label">背景色</label>
-              <div class="flex gap-2">
-                <input
-                  type="color"
-                  :value="selectedComponent.style?.backgroundColor || '#ffffff'"
-                  @input="handleStyleChange('backgroundColor', $event.target.value)"
-                  class="w-10 h-8 rounded border border-gray-300 cursor-pointer"
-                />
-                <input
-                  type="text"
-                  :value="selectedComponent.style?.backgroundColor || ''"
-                  @input="handleStyleChange('backgroundColor', $event.target.value)"
-                  class="prop-input flex-1"
-                  placeholder="transparent"
-                />
-              </div>
-            </div>
-            <div class="prop-item">
-              <label class="prop-label">文字颜色</label>
-              <div class="flex gap-2">
-                <input
-                  type="color"
-                  :value="selectedComponent.style?.color || '#000000'"
-                  @input="handleStyleChange('color', $event.target.value)"
-                  class="w-10 h-8 rounded border border-gray-300 cursor-pointer"
-                />
-                <input
-                  type="text"
-                  :value="selectedComponent.style?.color || ''"
-                  @input="handleStyleChange('color', $event.target.value)"
-                  class="prop-input flex-1"
-                  placeholder="inherit"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+        <StyleConfig
+          :component-type="selectedComponent.type"
+          :component-props="selectedComponent.props"
+          :style="selectedComponent.style"
+          :css-variables="selectedComponent.cssVariables"
+          @style-change="handleStyleChange"
+          @css-variable-change="handleCssVariableChange"
+        />
 
         <!-- 事件配置 -->
-        <div v-if="componentMeta?.events?.length > 0" class="props-section">
-          <h4 class="section-title">事件</h4>
-          <div class="space-y-2">
-            <div
-              v-for="event in componentMeta.events"
-              :key="event.name"
-              class="event-item"
-            >
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-700">{{ event.label }}</span>
-                <span class="text-xs text-gray-400 font-mono">{{ event.name }}</span>
-              </div>
-              <input
-                type="text"
-                :value="getEventHandler(event.name)"
-                @input="handleEventChange(event.name, $event.target.value)"
-                class="prop-input mt-1"
-                placeholder="输入处理函数名"
-              />
-            </div>
-          </div>
-        </div>
+        <EventConfig
+          :events="componentMeta?.events"
+          :component-events="selectedComponent.events"
+          @event-change="handleEventChange"
+        />
       </div>
     </div>
   </div>
@@ -162,7 +65,9 @@
 import { computed } from 'vue'
 import { useSchemaStore } from '@/stores/designer/schema'
 import { getComponentMeta } from '@/constants/componentMeta'
-import PropInput from './PropInput.vue'
+import PropConfig from './PropConfig.vue'
+import StyleConfig from './StyleConfig.vue'
+import EventConfig from './EventConfig.vue'
 
 const schemaStore = useSchemaStore()
 
@@ -208,37 +113,24 @@ function handlePropChange(propName, value) {
 }
 
 // 样式变更
-function handleStyleChange(styleName, value) {
+function handleStyleChange(styleName, value, styleType = 'inline') {
   if (!selectedComponent.value) return
-  schemaStore.updateComponentStyle(selectedComponent.value.id, {
-    [styleName]: value,
-  })
+  schemaStore.updateComponentStyle(selectedComponent.value.id, { [styleName]: value }, styleType)
 }
 
-// 获取事件处理器
-function getEventHandler(eventName) {
-  if (!selectedComponent.value) return ''
-  const event = selectedComponent.value.events?.find((e) => e.name === eventName)
-  return event?.handler || ''
+// CSS 变量样式变更
+function handleCssVariableChange(variableName, value) {
+  if (!selectedComponent.value) return
+  schemaStore.updateComponentStyle(
+    selectedComponent.value.id,
+    { [variableName]: value },
+    'cssVariable',
+  )
 }
 
 // 事件变更
-function handleEventChange(eventName, handler) {
+function handleEventChange(events) {
   if (!selectedComponent.value) return
-
-  const events = [...(selectedComponent.value.events || [])]
-  const index = events.findIndex((e) => e.name === eventName)
-
-  if (handler) {
-    if (index > -1) {
-      events[index].handler = handler
-    } else {
-      events.push({ name: eventName, handler })
-    }
-  } else if (index > -1) {
-    events.splice(index, 1)
-  }
-
   schemaStore.updateComponentEvents(selectedComponent.value.id, events)
 }
 </script>

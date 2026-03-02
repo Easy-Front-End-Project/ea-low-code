@@ -38,14 +38,13 @@ export const componentMetaList = [
         name: 'type',
         label: '类型',
         type: PropTypes.SELECT,
-        default: 'default',
+        default: 'normal',
         options: [
-          { label: '默认', value: 'default' },
+          { label: '默认', value: 'normal' },
           { label: '主要', value: 'primary' },
           { label: '成功', value: 'success' },
           { label: '警告', value: 'warning' },
           { label: '危险', value: 'danger' },
-          { label: '信息', value: 'info' },
         ],
       },
       {
@@ -78,12 +77,67 @@ export const componentMetaList = [
         default: false,
       },
     ],
-    events: [
-      { name: 'click', label: '点击事件' },
-    ],
-    slots: [
-      { name: 'default', label: '默认插槽' },
-    ],
+    events: [{ name: 'click', label: '点击事件' }],
+    slots: [{ name: 'default', label: '默认插槽' }],
+    // CSS 变量样式配置
+    styleConfig: {
+      dynamicCssVariables: {
+        text: {
+          label: '文字颜色',
+          type: 'color',
+          template: '--ea-button-{type}-text',
+          defaultValue: {
+            normal: '#606266',
+            primary: '#ffffff',
+            success: '#ffffff',
+            info: '#ffffff',
+            warning: '#ffffff',
+            danger: '#ffffff',
+          },
+        },
+        background: {
+          label: '背景颜色',
+          type: 'color',
+          template: '--ea-button-{type}-500',
+          defaultValue: {
+            normal: '#ffffff',
+            primary: '#409eff',
+            success: '#67c23a',
+            info: '#909399',
+            warning: '#e6a23c',
+            danger: '#f56c6c',
+          },
+        },
+        border: {
+          label: '边框颜色',
+          type: 'color',
+          template: '--ea-button-{type}-border',
+          defaultValue: {
+            normal: '#dcdfe6',
+            primary: '#409eff',
+            success: '#67c23a',
+            info: '#909399',
+            warning: '#e6a23c',
+            danger: '#f56c6c',
+          },
+        },
+      },
+      cssVariables: [
+        {
+          name: '--ea-button-border-radius',
+          label: '圆角大小',
+          type: 'string',
+          default: '4px',
+        },
+      ],
+      parts: [
+        {
+          name: 'container',
+          label: '按钮容器',
+          styles: ['background-color', 'color', 'border-color', 'border-radius'],
+        },
+      ],
+    },
   },
   {
     type: 'ea-icon',
@@ -92,7 +146,7 @@ export const componentMetaList = [
     icon: 'Icon',
     props: [
       {
-        name: 'name',
+        name: 'icon',
         label: '图标名称',
         type: PropTypes.STRING,
         default: '',
@@ -209,9 +263,7 @@ export const componentMetaList = [
       { name: 'change', label: '改变事件' },
       { name: 'visible-change', label: '下拉框出现/隐藏' },
     ],
-    slots: [
-      { name: 'default', label: '选项插槽' },
-    ],
+    slots: [{ name: 'default', label: '选项插槽' }],
   },
   {
     type: 'ea-checkbox',
@@ -244,12 +296,8 @@ export const componentMetaList = [
         default: false,
       },
     ],
-    events: [
-      { name: 'change', label: '改变事件' },
-    ],
-    slots: [
-      { name: 'default', label: '默认插槽' },
-    ],
+    events: [{ name: 'change', label: '改变事件' }],
+    slots: [{ name: 'default', label: '默认插槽' }],
   },
   {
     type: 'ea-radio',
@@ -282,12 +330,8 @@ export const componentMetaList = [
         default: false,
       },
     ],
-    events: [
-      { name: 'change', label: '改变事件' },
-    ],
-    slots: [
-      { name: 'default', label: '默认插槽' },
-    ],
+    events: [{ name: 'change', label: '改变事件' }],
+    slots: [{ name: 'default', label: '默认插槽' }],
   },
   {
     type: 'ea-switch',
@@ -320,9 +364,7 @@ export const componentMetaList = [
         default: '',
       },
     ],
-    events: [
-      { name: 'change', label: '改变事件' },
-    ],
+    events: [{ name: 'change', label: '改变事件' }],
     slots: [],
   },
 
@@ -345,9 +387,7 @@ export const componentMetaList = [
       },
     ],
     events: [],
-    slots: [
-      { name: 'default', label: '默认插槽' },
-    ],
+    slots: [{ name: 'default', label: '默认插槽' }],
   },
   {
     type: 'ea-header',
@@ -363,9 +403,7 @@ export const componentMetaList = [
       },
     ],
     events: [],
-    slots: [
-      { name: 'default', label: '默认插槽' },
-    ],
+    slots: [{ name: 'default', label: '默认插槽' }],
   },
   {
     type: 'ea-aside',
@@ -381,9 +419,7 @@ export const componentMetaList = [
       },
     ],
     events: [],
-    slots: [
-      { name: 'default', label: '默认插槽' },
-    ],
+    slots: [{ name: 'default', label: '默认插槽' }],
   },
   {
     type: 'ea-main',
@@ -392,9 +428,7 @@ export const componentMetaList = [
     icon: 'Main',
     props: [],
     events: [],
-    slots: [
-      { name: 'default', label: '默认插槽' },
-    ],
+    slots: [{ name: 'default', label: '默认插槽' }],
   },
   {
     type: 'ea-card',
@@ -559,9 +593,7 @@ export const componentMetaList = [
       { name: 'open', label: '菜单展开事件' },
       { name: 'close', label: '菜单收起事件' },
     ],
-    slots: [
-      { name: 'default', label: '菜单项插槽' },
-    ],
+    slots: [{ name: 'default', label: '菜单项插槽' }],
   },
   {
     type: 'ea-tabs',
@@ -597,9 +629,7 @@ export const componentMetaList = [
       { name: 'tab-click', label: '标签点击事件' },
       { name: 'tab-remove', label: '标签移除事件' },
     ],
-    slots: [
-      { name: 'default', label: '标签页插槽' },
-    ],
+    slots: [{ name: 'default', label: '标签页插槽' }],
   },
   {
     type: 'ea-breadcrumb',
@@ -615,9 +645,7 @@ export const componentMetaList = [
       },
     ],
     events: [],
-    slots: [
-      { name: 'default', label: '面包屑项插槽' },
-    ],
+    slots: [{ name: 'default', label: '面包屑项插槽' }],
   },
 
   // Feedback 反馈
@@ -725,9 +753,7 @@ export const componentMetaList = [
         default: false,
       },
     ],
-    events: [
-      { name: 'close', label: '关闭事件' },
-    ],
+    events: [{ name: 'close', label: '关闭事件' }],
     slots: [
       { name: 'default', label: '内容插槽' },
       { name: 'title', label: '标题插槽' },

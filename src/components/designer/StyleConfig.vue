@@ -1,0 +1,219 @@
+<template>
+  <div class="props-section">
+    <h4 class="section-title">样式</h4>
+    <div class="space-y-3">
+      <!-- 基础样式 -->
+      <div class="prop-item">
+        <label class="prop-label">宽度</label>
+        <UnitInput
+          :value="style?.width || ''"
+          @update:value="handleInlineStyleChange('width', $event)"
+          placeholder="auto"
+        />
+      </div>
+      <div class="prop-item">
+        <label class="prop-label">高度</label>
+        <UnitInput
+          :value="style?.height || ''"
+          @update:value="handleInlineStyleChange('height', $event)"
+          placeholder="auto"
+        />
+      </div>
+      <div class="prop-item">
+        <label class="prop-label">外边距</label>
+        <UnitInput
+          :value="style?.margin || ''"
+          @update:value="handleInlineStyleChange('margin', $event)"
+          placeholder="0"
+        />
+      </div>
+      <div class="prop-item">
+        <label class="prop-label">内边距</label>
+        <UnitInput
+          :value="style?.padding || ''"
+          @update:value="handleInlineStyleChange('padding', $event)"
+          placeholder="0"
+        />
+      </div>
+
+      <!-- 动态 CSS 变量样式（根据 type 属性变化） -->
+      <template v-if="dynamicCssVariablesList.length > 0">
+        <div class="divider"></div>
+        <h5 class="subsection-title">组件样式 ({{ componentTypeValue }})</h5>
+        <div v-for="variable in dynamicCssVariablesList" :key="variable.name" class="prop-item">
+          <label class="prop-label">{{ variable.label }}</label>
+          <!-- 颜色类型变量 -->
+          <ea-color-picker
+            v-if="variable.type === 'color'"
+            :value="cssVariables?.[variable.name] || variable.default"
+            @change="handleCssVariableChange(variable.name, $event.detail.value)"
+            class="prop-input m-x-auto"
+          />
+          <!-- 字符串类型变量 -->
+          <ea-input
+            v-else
+            :value="cssVariables?.[variable.name] || ''"
+            @change="handleCssVariableChange(variable.name, $event.detail.value)"
+            class="prop-input"
+            :placeholder="variable.default"
+          />
+        </div>
+      </template>
+
+      <!-- 通用的 CSS 变量样式（不随 type 变化） -->
+      <template v-if="styleConfig?.cssVariables?.length > 0">
+        <div class="divider"></div>
+        <h5 class="subsection-title">通用样式</h5>
+        <div v-for="variable in styleConfig.cssVariables" :key="variable.name" class="prop-item">
+          <label class="prop-label">{{ variable.label }}</label>
+          <!-- 颜色类型变量 -->
+          <ea-color-picker
+            v-if="variable.type === 'color'"
+            :value="cssVariables?.[variable.name] || variable.default"
+            @change="handleCssVariableChange(variable.name, $event.detail.value)"
+            class="prop-input m-x-auto"
+          />
+          <!-- 带单位的变量使用 UnitInput -->
+          <UnitInput
+            v-else-if="hasUnit(variable.default)"
+            :value="cssVariables?.[variable.name] || variable.default"
+            @update:value="handleCssVariableChange(variable.name, $event)"
+            :placeholder="variable.default"
+          />
+          <!-- 普通字符串类型变量 -->
+          <ea-input
+            v-else
+            :value="cssVariables?.[variable.name] || ''"
+            @change="handleCssVariableChange(variable.name, $event.detail.value)"
+            class="prop-input"
+            :placeholder="variable.default"
+          />
+        </div>
+      </template>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { computed } from 'vue'
+import { getComponentMeta } from '@/constants/componentMeta'
+import UnitInput from './UnitInput.vue'
+
+const props = defineProps({
+  componentType: {
+    type: String,
+    default: '',
+  },
+  componentProps: {
+    type: Object,
+    default: () => ({}),
+  },
+  style: {
+    type: Object,
+    default: () => ({}),
+  },
+  cssVariables: {
+    type: Object,
+    default: () => ({}),
+  },
+})
+
+const emit = defineEmits(['style-change', 'css-variable-change'])
+
+// 获取组件的样式配置
+const styleConfig = computed(() => {
+  if (!props.componentType) return null
+  const meta = getComponentMeta(props.componentType)
+  return meta?.styleConfig || null
+})
+
+// 获取组件的 type 属性值（默认为 'normal'）
+const componentTypeValue = computed(() => {
+  const type = props.componentProps?.type
+  // EA-UI 按钮组件的默认类型是 normal（空字符串也表示 normal）
+  return type || 'normal'
+})
+
+// 动态生成 CSS 变量列表
+const dynamicCssVariablesList = computed(() => {
+  const config = styleConfig.value?.dynamicCssVariables
+  if (!config) return []
+
+  // 确保 type 有有效值，空字符串或 undefined 都使用 'normal'
+  const rawType = props.componentProps?.type
+  const type = rawType || 'normal'
+
+  return Object.entries(config).map(([key, variableConfig]) => {
+    // 替换模板中的 {type} 为实际的类型值
+    const variableName = variableConfig.template.replace('{type}', type)
+    // 获取对应类型的默认值，优先使用 type 对应的值，其次使用 normal 作为回退
+    const defaultValue =
+      variableConfig.defaultValue?.[type] || variableConfig.defaultValue?.normal || ''
+
+    return {
+      key,
+      name: variableName,
+      label: variableConfig.label,
+      type: variableConfig.type,
+      default: defaultValue,
+    }
+  })
+})
+
+// 处理内联样式变更
+function handleInlineStyleChange(styleName, value) {
+  emit('style-change', styleName, value, 'inline')
+}
+
+// 处理 CSS 变量样式变更
+function handleCssVariableChange(variableName, value) {
+  emit('css-variable-change', variableName, value)
+}
+
+// 检查值是否包含 CSS 单位
+function hasUnit(value) {
+  if (!value || typeof value !== 'string') return false
+  // 匹配常见的 CSS 单位：px, %, em, rem, vw, vh, pt, pc, in, cm, mm, ex, ch, vmin, vmax
+  return /^[\d.]+(px|%|em|rem|vw|vh|pt|pc|in|cm|mm|ex|ch|vmin|vmax)$/i.test(value)
+}
+</script>
+
+<style scoped>
+.props-section {
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.75rem;
+}
+
+.subsection-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.prop-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.prop-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.divider {
+  height: 1px;
+  background-color: #e5e7eb;
+  margin: 0.75rem 0;
+}
+</style>

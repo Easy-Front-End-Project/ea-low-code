@@ -1,0 +1,63 @@
+<template>
+  <div v-if="props?.length > 0" class="props-section">
+    <h4 class="section-title">属性</h4>
+    <div class="space-y-3">
+      <div v-for="prop in props" :key="prop.name" class="prop-item">
+        <label class="prop-label">{{ prop.label }}</label>
+        <PropInput
+          :type="prop.type"
+          :value="componentProps[prop.name]"
+          :options="prop.options"
+          @update:value="handlePropChange(prop.name, $event)"
+        />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import PropInput from './PropInput.vue'
+
+const props = defineProps({
+  props: {
+    type: Array,
+    default: () => [],
+  },
+  componentProps: {
+    type: Object,
+    default: () => ({}),
+  },
+})
+
+const emit = defineEmits(['prop-change'])
+
+// 处理属性变更
+function handlePropChange(propName, value) {
+  emit('prop-change', propName, value)
+}
+</script>
+
+<style scoped>
+.props-section {
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.75rem;
+}
+
+.prop-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.prop-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+</style>

@@ -85,10 +85,11 @@ export const useSchemaStore = defineStore('schema', () => {
    * @param {string} componentId - 组件ID
    * @param {Object} props - 新属性
    */
-  function updateComponentProps(componentId, props) {
+  function updateComponentProps(componentId, newProps) {
     const component = findComponentById(pageSchema.value.components, componentId)
     if (component) {
-      component.props = { ...component.props, ...props }
+      // 使用 Object.assign 保持对象引用不变，避免触发不必要的重新渲染
+      Object.assign(component.props, newProps)
     }
   }
 
@@ -96,11 +97,24 @@ export const useSchemaStore = defineStore('schema', () => {
    * 更新组件样式
    * @param {string} componentId - 组件ID
    * @param {Object} style - 新样式
+   * @param {string} styleType - 样式类型：'inline' | 'cssVariable'
    */
-  function updateComponentStyle(componentId, style) {
+  function updateComponentStyle(componentId, style, styleType = 'inline') {
     const component = findComponentById(pageSchema.value.components, componentId)
     if (component) {
-      component.style = { ...component.style, ...style }
+      if (styleType === 'cssVariable') {
+        // CSS 变量样式存储在单独的字段中
+        if (!component.cssVariables) {
+          component.cssVariables = {}
+        }
+        Object.assign(component.cssVariables, style)
+      } else {
+        // 普通内联样式
+        if (!component.style) {
+          component.style = {}
+        }
+        Object.assign(component.style, style)
+      }
     }
   }
 

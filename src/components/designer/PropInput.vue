@@ -1,87 +1,71 @@
 <template>
   <div class="prop-input-wrapper">
     <!-- 字符串类型 -->
-    <input
+    <ea-input
       v-if="type === 'string'"
-      type="text"
       :value="value"
-      @input="handleInput($event.target.value)"
+      @input="handleInput($event.detail.value)"
       class="prop-input"
+      placeholder="请输入文本"
     />
 
     <!-- 数字类型 -->
-    <input
+    <ea-input-number
       v-else-if="type === 'number'"
-      type="number"
       :value="value"
-      @input="handleInput(Number($event.target.value))"
+      @change="handleInput($event.detail.value)"
       class="prop-input"
     />
 
     <!-- 布尔类型 -->
-    <label
-      v-else-if="type === 'boolean'"
-      class="flex items-center gap-2 cursor-pointer"
-    >
-      <input
-        type="checkbox"
-        :checked="value"
-        @change="handleInput($event.target.checked)"
-        class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-      />
-      <span class="text-sm text-gray-600">{{ value ? '是' : '否' }}</span>
-    </label>
-
-    <!-- 选择类型 -->
-    <select
-      v-else-if="type === 'select'"
-      :value="value"
-      @change="handleInput($event.target.value)"
-      class="prop-input"
-    >
-      <option
-        v-for="option in options"
-        :key="option.value"
-        :value="option.value"
-      >
-        {{ option.label }}
-      </option>
-    </select>
-
-    <!-- 颜色类型 -->
-    <div v-else-if="type === 'color'" class="flex gap-2">
-      <input
-        type="color"
-        :value="value || '#000000'"
-        @input="handleInput($event.target.value)"
-        class="w-10 h-8 rounded border border-gray-300 cursor-pointer flex-shrink-0"
-      />
-      <input
-        type="text"
-        :value="value || ''"
-        @input="handleInput($event.target.value)"
-        class="prop-input flex-1"
-        placeholder="#000000"
+    <div v-else-if="type === 'boolean'" class="flex items-center gap-2">
+      <ea-switch
+        :value="value"
+        @change="handleInput($event.detail.value)"
+        active-text="是"
+        inactive-text="否"
       />
     </div>
 
+    <!-- 选择类型 -->
+    <ea-select
+      v-else-if="type === 'select'"
+      :value="value"
+      @change="handleInput($event.detail.value)"
+      class="prop-input"
+      placeholder="请选择"
+    >
+      <ea-option v-for="option in options" :key="option.value" :value="option.value">{{
+        option.label
+      }}</ea-option>
+    </ea-select>
+
+    <!-- 颜色类型 -->
+    <ea-color-picker
+      v-else-if="type === 'color'"
+      :value="value || '#000000'"
+      @change="handleInput($event.detail.value)"
+      class="prop-input"
+    />
+
     <!-- 对象类型（JSON 编辑器） -->
-    <textarea
+    <ea-input
       v-else-if="type === 'object' || type === 'array'"
       :value="jsonValue"
-      @input="handleJsonInput($event.target.value)"
-      class="prop-input font-mono text-xs"
+      @change="handleJsonInput($event.detail.value)"
+      type="textarea"
       rows="4"
+      class="prop-input font-mono text-xs"
       placeholder="输入 JSON 格式数据"
-    ></textarea>
+    />
 
     <!-- 默认类型 -->
-    <input
+    <ea-input
       v-else
-      type="text"
       :value="value"
-      @input="handleInput($event.target.value)"
+      @change="handleInput($event.detail.value)"
       class="prop-input"
+      placeholder="请输入"
     />
   </div>
 </template>
@@ -120,7 +104,9 @@ const jsonValue = computed(() => {
 
 // 处理输入
 function handleInput(value) {
-  emit('update:value', value)
+  if (value !== props.value) {
+    emit('update:value', value)
+  }
 }
 
 // 处理 JSON 输入

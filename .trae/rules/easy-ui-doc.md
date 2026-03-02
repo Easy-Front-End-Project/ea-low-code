@@ -330,6 +330,110 @@ ea-table::part(tbody-tr) {
 
 ---
 
+## CSS 变量样式定制
+
+### 1. CSS 变量概述
+
+CSS 变量（Custom Properties）是 EA-UI 组件样式定制的重要机制。通过修改组件暴露的 CSS 变量，可以实现全局或局部的样式主题定制，而无需直接修改组件内部样式。
+
+### 2. 使用要求
+
+当需要通过修改 EA-UI 组件的 CSS 变量来实现样式更新时，开发者必须：
+
+1. **样式文件查阅**：首先查阅并参考位于 `e:\repo\ea-low-code\ea-components\` 目录下对应组件的 SCSS 样式文件
+2. **变量定义参考**：重点关注组件样式文件中的 `:host` 选择器定义的 CSS 变量
+3. **变量使用规范**：严格按照组件定义的变量名称和默认值进行样式定制
+
+### 3. 具体实现指南
+
+#### 3.1 样式文件定位
+
+- 对于 `ea-xxx` 组件，查找 `ea-components/src/*/ea-xxx/` 目录下的 SCSS 样式文件
+- 重点关注 `index.scss` 或主要样式文件中的 `:host` 选择器定义
+
+#### 3.2 变量定义参考
+
+在组件样式文件中查找类似结构：
+
+```scss
+:host {
+  // 组件暴露的 CSS 变量定义
+  --ea-button-primary-bg-color: #409eff;
+  --ea-button-primary-text-color: #ffffff;
+  --ea-button-border-radius: 4px;
+
+  // 其他样式定义
+}
+```
+
+#### 3.3 样式定制语法
+
+```css
+/* 全局样式定制 */
+:root {
+  --ea-button-primary-bg-color: #67c23a; /* 修改主按钮背景色 */
+  --ea-button-border-radius: 8px; /* 修改按钮圆角 */
+}
+
+/* 局部样式定制 */
+.custom-theme {
+  --ea-card-background-color: #f0f9ff;
+  --ea-card-border-color: #bae0ff;
+}
+
+/* 特定组件样式定制 */
+ea-button[type='primary'] {
+  --ea-button-primary-bg-color: #ff6b6b;
+}
+```
+
+### 4. 最佳实践
+
+#### 4.1 变量命名规范
+
+- 使用 `--ea-{组件名}-{属性名}-{状态}` 的命名约定
+- 保持与组件内部变量命名的一致性
+- 避免使用过于通用的变量名
+
+#### 4.2 样式作用域控制
+
+```css
+/* ✅ 推荐：使用作用域控制样式影响范围 */
+.app-theme {
+  --ea-button-primary-bg-color: #409eff;
+}
+
+/* ❌ 避免：全局修改可能影响其他组件 */
+:root {
+  --ea-button-primary-bg-color: #ff0000; /* 可能影响所有按钮 */
+}
+```
+
+#### 4.3 变量回退机制
+
+```css
+/* 提供合理的回退值 */
+.custom-button {
+  background-color: var(--ea-button-primary-bg-color, #409eff);
+  color: var(--ea-button-primary-text-color, #ffffff);
+}
+```
+
+### 5. 验证步骤
+
+1. 确认使用的 CSS 变量名称与组件定义一致
+2. 验证样式修改在目标组件上正确生效
+3. 确保样式修改不会破坏组件的功能和行为
+4. 在不同浏览器和设备上测试样式兼容性
+
+### 6. 违规处理
+
+- 未参考组件样式文件直接修改 CSS 变量将被视为不符合规范
+- 使用未定义的 CSS 变量可能导致样式失效
+- 随意修改全局 CSS 变量可能影响其他组件
+
+---
+
 ## 最佳实践
 
 ### 1. 组件引入顺序
