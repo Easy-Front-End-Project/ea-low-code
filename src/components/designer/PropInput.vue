@@ -4,7 +4,7 @@
     <ea-input
       v-if="type === 'string'"
       :value="value"
-      @input="handleInput($event.detail.value)"
+      @input="handleInput($event.target.value)"
       class="prop-input"
       placeholder="请输入文本"
     />

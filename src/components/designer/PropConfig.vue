@@ -1,8 +1,8 @@
 <template>
-  <div v-if="props?.length > 0" class="props-section">
+  <div v-if="propList?.length > 0" class="props-section">
     <h4 class="section-title">属性</h4>
     <div class="space-y-3">
-      <div v-for="prop in props" :key="prop.name" class="prop-item">
+      <div v-for="prop in propList" :key="prop.name" class="prop-item">
         <label class="prop-label">{{ prop.label }}</label>
         <PropInput
           :type="prop.type"
@@ -16,6 +16,7 @@
 </template>
 
 <script setup>
+import { toRefs } from 'vue'
 import PropInput from './PropInput.vue'
 
 const props = defineProps({
@@ -29,10 +30,14 @@ const props = defineProps({
   },
 })
 
+const { props: propList } = toRefs(props)
+
 const emit = defineEmits(['prop-change'])
 
 // 处理属性变更
 function handlePropChange(propName, value) {
+  console.log(propName, value);
+  
   emit('prop-change', propName, value)
 }
 </script>
