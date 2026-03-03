@@ -32,6 +32,7 @@
     <div class="component-wrapper">
       <component
         :is="componentTag"
+        ref="componentRef"
         v-bind="componentProps"
         :style="componentInnerStyle"
         v-on="componentEventListeners"
@@ -61,8 +62,9 @@
 </template>
 
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
+  import { useComponentInstanceStore } from '@/stores/designer/componentInstance'
   import { getComponentMeta } from '@/constants/componentMeta'
 
   const props = defineProps({
@@ -79,9 +81,11 @@
   const emit = defineEmits(['select', 'delete', 'drop-to-parent'])
 
   const schemaStore = useSchemaStore()
+  const instanceStore = useComponentInstanceStore()
   const isHovered = ref(false)
   const isDropTarget = ref(false)
   const dragCounter = ref(0)
+  const componentRef = ref(null)
 
   const selectedComponentId = computed(() => schemaStore.selectedComponentId)
   const componentMeta = computed(() => getComponentMeta(props.component.type))
@@ -203,8 +207,18 @@
       // 执行自定义代码
       if (eventConfig.code) {
         try {
-          const fn = new Function(eventConfig.code)
-          fn(originalEvent)
+          // 注入 $component 辅助函数到代码中
+          const wrappedCode = `
+            const $component = {
+              get: (id) => instanceStore.getComponentElement(id),
+              setProp: (id, prop, value) => instanceStore.setComponentProp(id, prop, value),
+              getProp: (id, prop) => instanceStore.getComponentProp(id, prop),
+              call: (id, method, ...args) => instanceStore.callComponentMethod(id, method, ...args)
+            };
+            ${eventConfig.code}
+          `
+          const fn = new Function('event', 'instanceStore', wrappedCode)
+          fn(originalEvent, instanceStore)
         } catch (error) {
           console.error('执行自定义事件失败:', error)
           if (window.$message) {
@@ -212,8 +226,50 @@
           }
         }
       }
+    } else if (eventConfig.action === 'callMethod') {
+      // 调用组件方法
+      if (eventConfig.targetComponentId && eventConfig.methodName) {
+        instanceStore.callComponentMethod(
+          eventConfig.targetComponentId,
+          eventConfig.methodName,
+          ...(eventConfig.methodArgs || []),
+        )
+      }
+    } else if (eventConfig.action === 'setProp') {
+      // 设置组件属性
+      if (eventConfig.targetComponentId && eventConfig.propName !== undefined) {
+        instanceStore.setComponentProp(
+          eventConfig.targetComponentId,
+          eventConfig.propName,
+          eventConfig.propValue,
+        )
+      }
     }
   }
+
+  // 注册组件实例
+  onMounted(() => {
+    if (componentRef.value) {
+      // 等待 Web Components 定义完成
+      const tagName = props.component.type
+      if (tagName && tagName.startsWith('ea-')) {
+        customElements.whenDefined(tagName).then(() => {
+          // 获取实际的 DOM 元素
+          const element = componentRef.value.$el || componentRef.value
+          if (element) {
+            instanceStore.registerInstance(props.component.id, element)
+          }
+        })
+      } else {
+        instanceStore.registerInstance(props.component.id, componentRef.value)
+      }
+    }
+  })
+
+  // 注销组件实例
+  onBeforeUnmount(() => {
+    instanceStore.unregisterInstance(props.component.id)
+  })
 
   // 鼠标悬停
   function handleMouseOver() {
