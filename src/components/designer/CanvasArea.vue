@@ -1,5 +1,5 @@
 <template>
-  <div class="canvas-area p-6 flex flex-col items-center justify-center">
+  <div class="canvas-area p-6 pb-24 flex flex-col items-center justify-center">
     <!-- 画布容器 -->
     <div
       ref="canvasRef"
@@ -38,7 +38,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUpdated } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { useSchemaStore } from '@/stores/designer/schema'
 import CanvasComponent from './CanvasComponent.vue'
 
@@ -51,18 +51,22 @@ const components = computed(() => schemaStore.components)
 const selectedComponentId = computed(() => schemaStore.selectedComponentId)
 
 // 更新内容高度
-function updateContentHeight() {
+async function updateContentHeight() {
+  await nextTick()
   if (canvasContentRef.value) {
     contentHeight.value = canvasContentRef.value.scrollHeight
   }
 }
 
+// 监听组件变化，更新高度
+watch(components, updateContentHeight, { deep: true, flush: 'post' })
+
 // 画布样式
 const canvasStyle = computed(() => {
   const { viewport } = schemaStore.pageSchema.meta
-  // 计算画布高度：取视口高度和内容高度+额外空间的最大值
+
   const minHeight = viewport.height
-  const extraSpace = 100 // 额外空间，确保画布比内容多一部分
+  const extraSpace = 100
   const dynamicHeight = Math.max(minHeight, contentHeight.value + extraSpace)
 
   return {
@@ -74,10 +78,6 @@ const canvasStyle = computed(() => {
     overflow: 'auto',
   }
 })
-
-// 组件挂载和更新时重新计算高度
-onMounted(updateContentHeight)
-onUpdated(updateContentHeight)
 
 // 拖拽悬停
 function handleDragOver(event) {

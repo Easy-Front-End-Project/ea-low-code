@@ -27,4 +27,12 @@ export default defineConfig([
   ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
 
   skipFormatting,
+  
+  {
+    name: 'app/web-components-slot',
+    files: ['**/*.vue'],
+    rules: {
+      'vue/no-deprecated-slot-attribute': 'off',
+    },
+  },
 ])
