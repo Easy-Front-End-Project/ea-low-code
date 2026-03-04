@@ -228,6 +228,8 @@
       name: '$component.call(id, method, ...args)',
       desc: '调用组件方法，参数：组件ID、方法名、方法参数',
     },
+    { name: '$vars.get(name)', desc: '获取变量值，参数：变量名' },
+    { name: '$vars.set(name, value)', desc: '设置变量值，参数：变量名、变量值' },
   ])
 
   // 弹框显示状态
@@ -290,7 +292,7 @@
     } else if (action === 'custom') {
       selectedEvent.value.code =
         selectedEvent.value.code ||
-        `// 使用 $component 操作其他组件\n// 示例：设置按钮 loading\n$component.setProp('button_123', 'loading', true);\n\n// 示例：获取组件\nconst btn = $component.get('button_123');\nconsole.log(btn);`
+        `// 使用 $component 操作其他组件\n// 示例：设置按钮 loading\n$component.setProp('button_123', 'loading', true);\n\n// 示例：获取组件\nconst btn = $component.get('button_123');\nconsole.log(btn);\n\n// 使用 $vars 操作变量\n// 示例：获取变量值\nconst username = $vars.get('username');\nconsole.log(username);\n\n// 示例：设置变量值\n$vars.set('count', 100);`
     }
   }
 

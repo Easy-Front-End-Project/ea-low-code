@@ -29,8 +29,12 @@
       </ea-button>
     </div>
 
-    <!-- 右侧：预览和导出 -->
+    <!-- 右侧：变量、预览和导出 -->
     <div class="flex items-center gap-2">
+      <ea-button text @click="handleShowVariables" title="变量">
+        <span>变量</span>
+      </ea-button>
+      <div class="w-px h-6 bg-gray-300 mx-2"></div>
       <ea-button type="primary" @click="handlePreview" title="预览">
         <span>预览</span>
       </ea-button>
@@ -47,96 +51,107 @@
 
     <!-- 组件大纲弹框 -->
     <ComponentTree :visible="treeVisible" @close="treeVisible = false" />
+
+    <!-- 变量管理弹框 -->
+    <VariableManager :visible="variableVisible" @close="variableVisible = false" />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useSchemaStore } from '@/stores/designer/schema'
-import { exportSchemaToJson, importSchemaFromJson } from '@/utils/schemaHelper'
-import ComponentTree from './ComponentTree.vue'
+  import { ref } from 'vue'
+  import { useSchemaStore } from '@/stores/designer/schema'
+  import { exportSchemaToJson, importSchemaFromJson } from '@/utils/schemaHelper'
+  import ComponentTree from './ComponentTree.vue'
+  import VariableManager from './VariableManager.vue'
 
-const schemaStore = useSchemaStore()
-const fileInput = ref(null)
+  const schemaStore = useSchemaStore()
+  const fileInput = ref(null)
 
-// 组件大纲弹框显示状态
-const treeVisible = ref(false)
+  // 组件大纲弹框显示状态
+  const treeVisible = ref(false)
+  // 变量管理弹框显示状态
+  const variableVisible = ref(false)
 
-defineOptions({
-  name: 'DesignerToolbar',
-})
+  defineOptions({
+    name: 'DesignerToolbar',
+  })
 
-// 撤销/重做功能（待实现）
-const canUndo = ref(false)
-const canRedo = ref(false)
+  // 撤销/重做功能（待实现）
+  const canUndo = ref(false)
+  const canRedo = ref(false)
 
-function handleUndo() {
-  console.log('撤销')
-}
-
-function handleRedo() {
-  console.log('重做')
-}
-
-// 显示组件大纲
-function handleShowTree() {
-  treeVisible.value = true
-}
-
-function handleClear() {
-  if (confirm('确定要清空画布吗？此操作不可恢复。')) {
-    schemaStore.clearCanvas()
+  function handleUndo() {
+    console.log('撤销')
   }
-}
 
-function handlePreview() {
-  schemaStore.setPreviewMode(true)
-}
+  function handleRedo() {
+    console.log('重做')
+  }
 
-function handleExport() {
-  const schema = schemaStore.exportSchema()
-  const json = exportSchemaToJson(schema)
-  const blob = new Blob([json], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = `schema-${Date.now()}.json`
-  link.click()
-  URL.revokeObjectURL(url)
-}
+  // 显示组件大纲
+  function handleShowTree() {
+    treeVisible.value = true
+  }
 
-function handleImport() {
-  fileInput.value?.click()
-}
+  // 显示变量管理
+  function handleShowVariables() {
+    variableVisible.value = true
+  }
 
-function handleFileChange(event) {
-  const file = event.target.files[0]
-  if (!file) return
-
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    try {
-      const json = e.target.result
-      const schema = importSchemaFromJson(json)
-      if (schema) {
-        schemaStore.importSchema(schema)
-        alert('Schema 导入成功！')
-      } else {
-        alert('Schema 解析失败，请检查文件格式。')
-      }
-    } catch (error) {
-      alert('文件读取失败：' + error.message)
+  function handleClear() {
+    if (confirm('确定要清空画布吗？此操作不可恢复。')) {
+      schemaStore.clearCanvas()
     }
   }
-  reader.readAsText(file)
 
-  // 重置 input
-  event.target.value = ''
-}
+  function handlePreview() {
+    schemaStore.setPreviewMode(true)
+  }
+
+  function handleExport() {
+    const schema = schemaStore.exportSchema()
+    const json = exportSchemaToJson(schema)
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `schema-${Date.now()}.json`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
+  function handleImport() {
+    fileInput.value?.click()
+  }
+
+  function handleFileChange(event) {
+    const file = event.target.files[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const json = e.target.result
+        const schema = importSchemaFromJson(json)
+        if (schema) {
+          schemaStore.importSchema(schema)
+          alert('Schema 导入成功！')
+        } else {
+          alert('Schema 解析失败，请检查文件格式。')
+        }
+      } catch (error) {
+        alert('文件读取失败：' + error.message)
+      }
+    }
+    reader.readAsText(file)
+
+    // 重置 input
+    event.target.value = ''
+  }
 </script>
 
 <style scoped>
-.designer-toolbar {
-  height: 100%;
-}
+  .designer-toolbar {
+    height: 100%;
+  }
 </style>

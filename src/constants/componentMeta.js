@@ -173,6 +173,65 @@ export const componentMetaList = [
     events: [],
     slots: [],
   },
+  {
+    type: 'ea-text',
+    name: '文本',
+    category: ComponentCategories.BASIC,
+    icon: 'Text',
+    props: [
+      {
+        name: 'children',
+        label: '文本内容',
+        type: PropTypes.STRING,
+        default: '文本',
+      },
+      {
+        name: 'type',
+        label: '类型',
+        type: PropTypes.SELECT,
+        default: 'normal',
+        options: [
+          { label: '默认', value: 'normal' },
+          { label: '主要', value: 'primary' },
+          { label: '成功', value: 'success' },
+          { label: '信息', value: 'info' },
+          { label: '警告', value: 'warning' },
+          { label: '危险', value: 'danger' },
+        ],
+      },
+      {
+        name: 'size',
+        label: '尺寸',
+        type: PropTypes.SELECT,
+        default: 'medium',
+        options: [
+          { label: '大', value: 'large' },
+          { label: '中', value: 'medium' },
+          { label: '小', value: 'small' },
+        ],
+      },
+      {
+        name: 'truncated',
+        label: '省略显示',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+      {
+        name: 'line-clamp',
+        label: '多行省略',
+        type: PropTypes.NUMBER,
+        default: 0,
+      },
+      {
+        name: 'tag',
+        label: '标签类型',
+        type: PropTypes.STRING,
+        default: 'span',
+      },
+    ],
+    events: [],
+    slots: [{ name: 'default', label: '默认插槽' }],
+  },
 
   // Form 表单组件
   {

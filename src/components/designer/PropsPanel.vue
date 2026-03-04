@@ -62,107 +62,117 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useSchemaStore } from '@/stores/designer/schema'
-import { getComponentMeta } from '@/constants/componentMeta'
-import PropConfig from './PropConfig.vue'
-import StyleConfig from './StyleConfig.vue'
-import EventConfig from './EventConfig.vue'
+  import { computed } from 'vue'
+  import { useSchemaStore } from '@/stores/designer/schema'
+  import { getComponentMeta } from '@/constants/componentMeta'
+  import PropConfig from './PropConfig.vue'
+  import StyleConfig from './StyleConfig.vue'
+  import EventConfig from './EventConfig.vue'
 
-const schemaStore = useSchemaStore()
+  const schemaStore = useSchemaStore()
 
-const selectedComponent = computed(() => schemaStore.selectedComponent)
-const componentMeta = computed(() => {
-  if (!selectedComponent.value) return null
-  return getComponentMeta(selectedComponent.value.type)
-})
-
-// 获取组件图标
-function getComponentIcon(type) {
-  const iconMap = {
-    'ea-button': 'button',
-    'ea-icon': 'star',
-    'ea-input': 'edit',
-    'ea-select': 'list',
-    'ea-checkbox': 'check-square',
-    'ea-radio': 'radio',
-    'ea-switch': 'switch',
-    'ea-container': 'container',
-    'ea-header': 'header',
-    'ea-aside': 'aside',
-    'ea-main': 'main',
-    'ea-card': 'card',
-    'ea-table': 'table',
-    'ea-pagination': 'page',
-    'ea-menu': 'menu',
-    'ea-tabs': 'tabs',
-    'ea-breadcrumb': 'breadcrumb',
-    'ea-dialog': 'dialog',
-    'ea-alert': 'alert',
-    'ea-message': 'message',
-  }
-  return iconMap[type] || 'cube'
-}
-
-// 属性变更
-function handlePropChange(propName, value) {
-  if (!selectedComponent.value) return
-  schemaStore.updateComponentProps(selectedComponent.value.id, {
-    [propName]: value,
+  const selectedComponent = computed(() => schemaStore.selectedComponent)
+  const componentMeta = computed(() => {
+    if (!selectedComponent.value) return null
+    return getComponentMeta(selectedComponent.value.type)
   })
-}
 
-// 样式变更
-function handleStyleChange(styleName, value, styleType = 'inline') {
-  if (!selectedComponent.value) return
-  schemaStore.updateComponentStyle(selectedComponent.value.id, { [styleName]: value }, styleType)
-}
+  // 获取组件图标
+  function getComponentIcon(type) {
+    const iconMap = {
+      'ea-button': 'button',
+      'ea-icon': 'star',
+      'ea-input': 'edit',
+      'ea-select': 'list',
+      'ea-checkbox': 'check-square',
+      'ea-radio': 'radio',
+      'ea-switch': 'switch',
+      'ea-container': 'container',
+      'ea-header': 'header',
+      'ea-aside': 'aside',
+      'ea-main': 'main',
+      'ea-card': 'card',
+      'ea-table': 'table',
+      'ea-pagination': 'page',
+      'ea-menu': 'menu',
+      'ea-tabs': 'tabs',
+      'ea-breadcrumb': 'breadcrumb',
+      'ea-dialog': 'dialog',
+      'ea-alert': 'alert',
+      'ea-message': 'message',
+    }
+    return iconMap[type] || 'cube'
+  }
 
-// CSS 变量样式变更
-function handleCssVariableChange(variableName, value) {
-  if (!selectedComponent.value) return
-  schemaStore.updateComponentStyle(
-    selectedComponent.value.id,
-    { [variableName]: value },
-    'cssVariable',
-  )
-}
+  // 属性变更
+  function handlePropChange(propName, value) {
+    if (!selectedComponent.value) return
 
-// 事件变更
-function handleEventChange(events) {
-  if (!selectedComponent.value) return
-  schemaStore.updateComponentEvents(selectedComponent.value.id, events)
-}
+    // 处理变量绑定格式的值
+    if (value && typeof value === 'object' && value.type === 'variable') {
+      // 变量绑定格式: { type: 'variable', value: 'varName' }
+      schemaStore.updateComponentProps(selectedComponent.value.id, {
+        [propName]: value,
+      })
+    } else {
+      // 普通值
+      schemaStore.updateComponentProps(selectedComponent.value.id, {
+        [propName]: value,
+      })
+    }
+  }
+
+  // 样式变更
+  function handleStyleChange(styleName, value, styleType = 'inline') {
+    if (!selectedComponent.value) return
+    schemaStore.updateComponentStyle(selectedComponent.value.id, { [styleName]: value }, styleType)
+  }
+
+  // CSS 变量样式变更
+  function handleCssVariableChange(variableName, value) {
+    if (!selectedComponent.value) return
+    schemaStore.updateComponentStyle(
+      selectedComponent.value.id,
+      { [variableName]: value },
+      'cssVariable',
+    )
+  }
+
+  // 事件变更
+  function handleEventChange(events) {
+    if (!selectedComponent.value) return
+    schemaStore.updateComponentEvents(selectedComponent.value.id, events)
+  }
 </script>
 
 <style scoped>
-.props-panel {
-  background-color: #fff;
-}
+  .props-panel {
+    background-color: #fff;
+  }
 
-.component-info {
-  background-color: #f9fafb;
-  padding: 12px;
-  border-radius: 8px;
-}
+  .component-info {
+    background-color: #f9fafb;
+    padding: 12px;
+    border-radius: 8px;
+  }
 
-.section-title {
-  @apply text-sm font-medium text-gray-700 mb-3;
-}
+  .section-title {
+    @apply text-sm font-medium text-gray-700 mb-3;
+  }
 
-.prop-item {
-  @apply flex flex-col gap-1;
-}
+  .prop-item {
+    @apply flex flex-col gap-1;
+  }
 
-.prop-label {
-  @apply text-xs text-gray-500;
-}
+  .prop-label {
+    @apply text-xs text-gray-500;
+  }
 
-.prop-input {
-  @apply px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
-}
+  .prop-input {
+    @apply px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  }
 
-.event-item {
-  @apply p-3 bg-gray-50 rounded-lg;
-}
+  .event-item {
+    @apply p-3 bg-gray-50 rounded-lg;
+  }
 </style>

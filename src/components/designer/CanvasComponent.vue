@@ -49,9 +49,13 @@
             @drop-to-parent="$emit('drop-to-parent', $event)"
           />
         </template>
-        <template v-else-if="hasChildrenText"> {{ component.props.children }} </template>
+        <template v-else-if="hasChildrenText">
+          <ea-text type="normal" size="medium"> {{ resolvedChildrenText }} </ea-text>
+        </template>
         <template v-else-if="hasDefaultSlot">
-          {{ component.props.label || component.props.title || '组件内容' }}
+          <ea-text type="normal" size="medium"
+            >{{ componentProps.label || componentProps.title || '组件内容' }}</ea-text
+          >
         </template>
       </component>
     </div>
@@ -65,6 +69,7 @@
   import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
   import { useComponentInstanceStore } from '@/stores/designer/componentInstance'
+  import { useVariableStore } from '@/stores/designer/variable'
   import { getComponentMeta } from '@/constants/componentMeta'
 
   const props = defineProps({
@@ -82,6 +87,7 @@
 
   const schemaStore = useSchemaStore()
   const instanceStore = useComponentInstanceStore()
+  const variableStore = useVariableStore()
   const isHovered = ref(false)
   const isDropTarget = ref(false)
   const dragCounter = ref(0)
@@ -117,18 +123,38 @@
     return Array.isArray(props.component.children) && props.component.children.length > 0
   })
 
+  // 解析值（处理变量绑定）
+  function resolveValue(value) {
+    // 如果是变量绑定格式 { type: 'variable', value: 'varName' }
+    if (value && typeof value === 'object' && value.type === 'variable') {
+      const varValue = variableStore.getVariableDefaultValue(value.value)
+      return varValue !== undefined ? varValue : ''
+    }
+    return value
+  }
+
   // 是否有 children 文本属性（字符串形式的 children）
   const hasChildrenText = computed(() => {
-    return (
-      typeof props.component.props?.children === 'string' &&
-      props.component.props.children.length > 0
-    )
+    const childrenValue = resolveValue(props.component.props?.children)
+    return typeof childrenValue === 'string' && childrenValue.length > 0
   })
 
-  // 传递给组件的 props
+  // 解析后的 children 文本
+  const resolvedChildrenText = computed(() => {
+    return resolveValue(props.component.props?.children) || ''
+  })
+
+  // 传递给组件的 props（解析变量绑定）
   const componentProps = computed(() => {
-    const { ...rest } = props.component.props || {}
-    return rest
+    const componentProps = props.component.props || {}
+    const resolvedProps = {}
+
+    // 遍历所有属性，解析变量绑定
+    for (const [key, value] of Object.entries(componentProps)) {
+      resolvedProps[key] = resolveValue(value)
+    }
+
+    return resolvedProps
   })
 
   // 是否显示标签
@@ -207,7 +233,7 @@
       // 执行自定义代码
       if (eventConfig.code) {
         try {
-          // 注入 $component 辅助函数到代码中
+          // 注入 $component 和 $vars 辅助函数到代码中
           const wrappedCode = `
             const $component = {
               get: (id) => instanceStore.getComponentElement(id),
@@ -215,10 +241,14 @@
               getProp: (id, prop) => instanceStore.getComponentProp(id, prop),
               call: (id, method, ...args) => instanceStore.callComponentMethod(id, method, ...args)
             };
+            const $vars = {
+              get: (name) => variableStore.getVariableDefaultValue(name),
+              set: (name, value) => variableStore.updateVariableByName(name, { defaultValue: value })
+            };
             ${eventConfig.code}
           `
-          const fn = new Function('event', 'instanceStore', wrappedCode)
-          fn(originalEvent, instanceStore)
+          const fn = new Function('event', 'instanceStore', 'variableStore', wrappedCode)
+          fn(originalEvent, instanceStore, variableStore)
         } catch (error) {
           console.error('执行自定义事件失败:', error)
           if (window.$message) {
@@ -238,10 +268,12 @@
     } else if (eventConfig.action === 'setProp') {
       // 设置组件属性
       if (eventConfig.targetComponentId && eventConfig.propName !== undefined) {
+        // 解析变量绑定值
+        const resolvedValue = resolveValue(eventConfig.propValue)
         instanceStore.setComponentProp(
           eventConfig.targetComponentId,
           eventConfig.propName,
-          eventConfig.propValue,
+          resolvedValue,
         )
       }
     }

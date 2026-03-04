@@ -1,144 +1,91 @@
 <template>
   <div class="prop-input-wrapper">
-    <!-- 字符串类型 -->
-    <ea-input
-      v-if="type === 'string'"
+    <!-- 使用 VariableBindingInput 包装 -->
+    <VariableBindingInput
       :value="value"
-      @input="handleInput($event.target.value)"
-      @ea-clear="handleClear"
-      class="prop-input"
-      placeholder="请输入文本"
-    />
-
-    <!-- 数字类型 -->
-    <ea-input-number
-      v-else-if="type === 'number'"
-      :value="value"
-      @ea-change="handleInput($event.detail.currentValue)"
-      class="prop-input"
-    />
-
-    <!-- 布尔类型 -->
-    <div v-else-if="type === 'boolean'" class="flex items-center gap-2">
-      <ea-switch
-        :value="value"
-        @change="handleInput($event.detail.value)"
-        active-text="是"
-        inactive-text="否"
-      />
-    </div>
-
-    <!-- 选择类型 -->
-    <ea-select
-      v-else-if="type === 'select'"
-      :value="value"
-      @change="handleInput($event.detail.value)"
-      class="prop-input"
-      placeholder="请选择"
-    >
-      <ea-option v-for="option in options" :key="option.value" :value="option.value">{{
-        option.label
-      }}</ea-option>
-    </ea-select>
-
-    <!-- 颜色类型 -->
-    <ea-color-picker
-      v-else-if="type === 'color'"
-      :value="value || '#000000'"
-      @change="handleInput($event.detail.value)"
-      class="prop-input"
-    />
-
-    <!-- 对象类型（JSON 编辑器） -->
-    <ea-input
-      v-else-if="type === 'object' || type === 'array'"
-      :value="jsonValue"
-      @change="handleJsonInput($event.detail.value)"
-      type="textarea"
-      rows="4"
-      class="prop-input font-mono text-xs"
-      placeholder="输入 JSON 格式数据"
-    />
-
-    <!-- 默认类型 -->
-    <ea-input
-      v-else
-      :value="value"
-      @change="handleInput($event.detail.value)"
-      class="prop-input"
-      placeholder="请输入"
+      :input-type="getInputType()"
+      :options="options"
+      :placeholder="getPlaceholder()"
+      @update:value="handleValueUpdate"
     />
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+  import VariableBindingInput from './VariableBindingInput.vue'
 
-const props = defineProps({
-  type: {
-    type: String,
-    required: true,
-  },
-  value: {
-    type: [String, Number, Boolean, Object, Array],
-    default: '',
-  },
-  options: {
-    type: Array,
-    default: () => [],
-  },
-})
+  const props = defineProps({
+    type: {
+      type: String,
+      required: true,
+    },
+    value: {
+      type: [String, Number, Boolean, Object, Array],
+      default: '',
+    },
+    options: {
+      type: Array,
+      default: () => [],
+    },
+  })
 
-const emit = defineEmits(['update:value'])
+  const emit = defineEmits(['update:value'])
 
-// 对象/数组类型的 JSON 表示
-const jsonValue = computed(() => {
-  if (props.type === 'object' || props.type === 'array') {
-    try {
-      return JSON.stringify(props.value, null, 2)
-    } catch {
-      return ''
+  // 获取输入类型
+  function getInputType() {
+    if (props.type === 'select' || props.type === 'boolean') {
+      return 'select'
     }
+    return 'input'
   }
-  return props.value
-})
 
-// 处理输入
-function handleInput(value) {
-  if (value !== props.value) {
-    emit('update:value', value)
+  // 获取占位符
+  function getPlaceholder() {
+    const placeholders = {
+      string: '请输入文本',
+      number: '请输入数字',
+      color: '请选择颜色',
+      object: '输入 JSON 格式数据',
+      array: '输入 JSON 格式数据',
+    }
+    return placeholders[props.type] || '请输入'
   }
-}
 
-// 处理 JSON 输入
-function handleJsonInput(value) {
-  try {
-    const parsed = JSON.parse(value)
-    emit('update:value', parsed)
-  } catch {
-    // JSON 解析失败，不更新值
+  // 处理值更新
+  function handleValueUpdate(value) {
+    // 如果是变量绑定，直接传递
+    if (value && typeof value === 'object' && value.type === 'variable') {
+      emit('update:value', value)
+      return
+    }
+
+    // 根据类型转换值
+    let convertedValue = value
+    switch (props.type) {
+      case 'number':
+        convertedValue = Number(value) || 0
+        break
+      case 'boolean':
+        convertedValue = value === 'true' || value === true
+        break
+      case 'object':
+      case 'array':
+        try {
+          if (typeof value === 'string') {
+            convertedValue = JSON.parse(value)
+          }
+        } catch {
+          convertedValue = props.type === 'array' ? [] : {}
+        }
+        break
+    }
+
+    emit('update:value', convertedValue)
   }
-}
-
-function handleClear() {
-  emit('update:value', '')
-}
 </script>
 
 <style scoped>
-.prop-input-wrapper {
-  width: 100%;
-}
-
-.prop-input {
-  @apply w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
-}
-
-select.prop-input {
-  @apply cursor-pointer;
-}
-
-textarea.prop-input {
-  @apply resize-y;
-}
+  .prop-input-wrapper {
+    width: 100%;
+  }
 </style>
