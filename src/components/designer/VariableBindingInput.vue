@@ -18,7 +18,7 @@
           v-model="inputValue"
           size="small"
           :placeholder="placeholder"
-          @change="handleInputChange"
+          @input="handleInputChange"
         />
         <EaSelect
           v-else-if="inputType === 'select'"

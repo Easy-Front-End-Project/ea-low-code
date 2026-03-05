@@ -16,7 +16,9 @@
     @dragleave.stop="handleDragLeave"
   >
     <!-- 组件标签 -->
-    <div v-if="showLabel" class="component-label">{{ componentMeta?.name || component.type }}</div>
+    <div v-if="showLabel" class="component-label">
+      {{ componentMeta?.name || (isRemoteComponent ? '远程组件' : component.type) }}
+    </div>
 
     <!-- 选中时的操作按钮 -->
     <div v-if="selected" class="component-actions">
@@ -66,11 +68,12 @@
 </template>
 
 <script setup>
-  import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
+  import { computed, ref, onMounted, onBeforeUnmount, defineAsyncComponent, shallowRef } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
   import { useComponentInstanceStore } from '@/stores/designer/componentInstance'
   import { useVariableStore } from '@/stores/designer/variable'
-  import { getComponentMeta } from '@/constants/componentMeta'
+  import { getComponentMeta, getRemoteComponentMetaList } from '@/constants/componentMeta'
+  import { loadRemoteComponent } from '@/utils/loadRemoteComponent'
 
   const props = defineProps({
     component: {
@@ -92,12 +95,72 @@
   const isDropTarget = ref(false)
   const dragCounter = ref(0)
   const componentRef = ref(null)
+  const remoteComponentLoader = shallowRef(null)
 
   const selectedComponentId = computed(() => schemaStore.selectedComponentId)
   const componentMeta = computed(() => getComponentMeta(props.component.type))
 
-  // 组件标签名（Web Components）
-  const componentTag = computed(() => props.component.type)
+  // 是否为远程组件
+  const isRemoteComponent = computed(() => {
+    return props.component.type?.startsWith('remote-') || props.component.remoteConfig
+  })
+
+  // 获取远程组件配置
+  const remoteConfig = computed(() => {
+    if (props.component.remoteConfig) {
+      return props.component.remoteConfig
+    }
+    // 从本地存储查找
+    const remoteMetaList = getRemoteComponentMetaList()
+    const remoteMeta = remoteMetaList.find((m) => m.type === props.component.type)
+    return remoteMeta?.remoteConfig
+  })
+
+  // 组件标签名（Web Components 或远程组件）
+  const componentTag = computed(() => {
+    if (isRemoteComponent.value && remoteComponentLoader.value) {
+      return remoteComponentLoader.value
+    }
+    return props.component.type
+  })
+
+  // 加载远程组件样式
+  function loadRemoteComponentStyle(styleUrl) {
+    if (!styleUrl) return
+    // 检查样式是否已加载
+    const existingLink = document.querySelector(`link[data-remote-style="${styleUrl}"]`)
+    if (existingLink) return
+
+    const link = document.createElement('link')
+    link.rel = 'stylesheet'
+    link.href = styleUrl
+    link.setAttribute('data-remote-style', styleUrl)
+    document.head.appendChild(link)
+  }
+
+  // 加载远程组件
+  async function loadRemoteComponentAsync() {
+    if (!isRemoteComponent.value || !remoteConfig.value) return
+
+    try {
+      const { url, exportName, styleUrl } = remoteConfig.value
+      
+      if (styleUrl) {
+        loadRemoteComponentStyle(styleUrl)
+      }
+      const loadedComponent = await loadRemoteComponent(url, exportName)
+      remoteComponentLoader.value = loadedComponent
+    } catch (error) {
+      console.error('加载远程组件失败:', error)
+    }
+  }
+
+  // 如果是远程组件，加载它
+  onMounted(() => {
+    if (isRemoteComponent.value) {
+      loadRemoteComponentAsync()
+    }
+  })
 
   // 是否为容器组件（可放置其他组件）
   const isContainer = computed(() => {

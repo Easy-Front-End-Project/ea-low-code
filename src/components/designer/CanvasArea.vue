@@ -38,128 +38,134 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue'
-import { useSchemaStore } from '@/stores/designer/schema'
-import CanvasComponent from './CanvasComponent.vue'
+  import { ref, computed, watch, nextTick } from 'vue'
+  import { useSchemaStore } from '@/stores/designer/schema'
+  import CanvasComponent from './CanvasComponent.vue'
 
-const schemaStore = useSchemaStore()
-const canvasRef = ref(null)
-const canvasContentRef = ref(null)
-const contentHeight = ref(0)
+  const schemaStore = useSchemaStore()
+  const canvasRef = ref(null)
+  const canvasContentRef = ref(null)
+  const contentHeight = ref(0)
 
-const components = computed(() => schemaStore.components)
-const selectedComponentId = computed(() => schemaStore.selectedComponentId)
+  const components = computed(() => schemaStore.components)
+  const selectedComponentId = computed(() => schemaStore.selectedComponentId)
 
-// 更新内容高度
-async function updateContentHeight() {
-  await nextTick()
-  if (canvasContentRef.value) {
-    contentHeight.value = canvasContentRef.value.scrollHeight
-  }
-}
-
-// 监听组件变化，更新高度
-watch(components, updateContentHeight, { deep: true, flush: 'post' })
-
-// 画布样式
-const canvasStyle = computed(() => {
-  const { viewport } = schemaStore.pageSchema.meta
-
-  const minHeight = viewport.height
-  const extraSpace = 100
-  const dynamicHeight = Math.max(minHeight, contentHeight.value + extraSpace)
-
-  return {
-    width: `${viewport.width}px`,
-    height: `${dynamicHeight}px`,
-    minWidth: 'auto',
-    minHeight: `${minHeight}px`,
-    maxWidth: '100%',
-    overflow: 'auto',
-  }
-})
-
-// 拖拽悬停
-function handleDragOver(event) {
-  event.preventDefault()
-  event.dataTransfer.dropEffect = 'copy'
-}
-
-// 放置组件
-function handleDrop(event) {
-  event.preventDefault()
-
-  const data = event.dataTransfer.getData('application/json')
-  if (!data) return
-
-  try {
-    const componentMeta = JSON.parse(data)
-    addComponentWithMeta(componentMeta)
-  } catch (error) {
-    console.error('拖拽放置失败:', error)
-  }
-}
-
-// 处理放置到父组件
-function handleDropToParent({ componentMeta, parentId }) {
-  addComponentWithMeta(componentMeta, parentId)
-}
-
-// 添加组件（提取公共逻辑）
-function addComponentWithMeta(componentMeta, parentId = null) {
-  const defaultProps = {}
-
-  // 提取默认属性
-  if (componentMeta.props) {
-    componentMeta.props.forEach((prop) => {
-      defaultProps[prop.name] = prop.default
-    })
+  // 更新内容高度
+  async function updateContentHeight() {
+    await nextTick()
+    if (canvasContentRef.value) {
+      contentHeight.value = canvasContentRef.value.scrollHeight
+    }
   }
 
-  // 添加组件到画布（如果有 parentId 则添加到对应容器的 children 中）
-  const newComponent = schemaStore.addComponent(componentMeta.type, defaultProps, parentId)
+  // 监听组件变化，更新高度
+  watch(components, updateContentHeight, { deep: true, flush: 'post' })
 
-  // 选中新组件
-  schemaStore.selectComponent(newComponent.id)
-}
+  // 画布样式
+  const canvasStyle = computed(() => {
+    const { viewport } = schemaStore.pageSchema.meta
 
-// 点击画布空白处
-function handleCanvasClick(event) {
-  if (event.target === canvasRef.value || event.target.classList.contains('canvas-content')) {
-    schemaStore.clearSelection()
+    const minHeight = viewport.height
+    const extraSpace = 100
+    const dynamicHeight = Math.max(minHeight, contentHeight.value + extraSpace)
+
+    return {
+      width: `${viewport.width}px`,
+      height: `${dynamicHeight}px`,
+      minWidth: 'auto',
+      minHeight: `${minHeight}px`,
+      maxWidth: '100%',
+      overflow: 'auto',
+    }
+  })
+
+  // 拖拽悬停
+  function handleDragOver(event) {
+    event.preventDefault()
+    event.dataTransfer.dropEffect = 'copy'
   }
-}
 
-// 选中组件
-function handleComponentSelect(componentId) {
-  schemaStore.selectComponent(componentId)
-}
+  // 放置组件
+  function handleDrop(event) {
+    event.preventDefault()
 
-// 删除组件
-function handleComponentDelete(componentId) {
-  schemaStore.removeComponent(componentId)
-}
+    const data = event.dataTransfer.getData('application/json')
+    if (!data) return
+
+    try {
+      const componentMeta = JSON.parse(data)
+      addComponentWithMeta(componentMeta)
+    } catch (error) {
+      console.error('拖拽放置失败:', error)
+    }
+  }
+
+  // 处理放置到父组件
+  function handleDropToParent({ componentMeta, parentId }) {
+    addComponentWithMeta(componentMeta, parentId)
+  }
+
+  // 添加组件（提取公共逻辑）
+  function addComponentWithMeta(componentMeta, parentId = null) {
+    const defaultProps = {}
+
+    // 提取默认属性
+    if (componentMeta.props) {
+      componentMeta.props.forEach((prop) => {
+        defaultProps[prop.name] = prop.default
+      })
+    }
+
+    // 添加组件到画布（如果有 parentId 则添加到对应容器的 children 中）
+    const newComponent = schemaStore.addComponent(componentMeta.type, defaultProps, parentId)
+
+    // 如果是远程组件，保存远程配置
+    if (componentMeta.isRemote && componentMeta.remoteConfig) {
+      newComponent.isRemote = true
+      newComponent.remoteConfig = componentMeta.remoteConfig
+    }
+
+    // 选中新组件
+    schemaStore.selectComponent(newComponent.id)
+  }
+
+  // 点击画布空白处
+  function handleCanvasClick(event) {
+    if (event.target === canvasRef.value || event.target.classList.contains('canvas-content')) {
+      schemaStore.clearSelection()
+    }
+  }
+
+  // 选中组件
+  function handleComponentSelect(componentId) {
+    schemaStore.selectComponent(componentId)
+  }
+
+  // 删除组件
+  function handleComponentDelete(componentId) {
+    schemaStore.removeComponent(componentId)
+  }
 </script>
 
 <style scoped>
-.canvas-area {
-  flex: 1;
-  background-color: #f5f7fa;
-  height: auto;
-}
+  .canvas-area {
+    flex: 1;
+    background-color: #f5f7fa;
+    height: auto;
+  }
 
-.canvas-container {
-  position: relative;
-}
+  .canvas-container {
+    position: relative;
+  }
 
-.grid-background {
-  background-image:
-    linear-gradient(to right, #e5e7eb 1px, transparent 1px),
-    linear-gradient(to bottom, #e5e7eb 1px, transparent 1px);
-  background-size: 20px 20px;
-}
+  .grid-background {
+    background-image:
+      linear-gradient(to right, #e5e7eb 1px, transparent 1px),
+      linear-gradient(to bottom, #e5e7eb 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
 
-.canvas-content {
-  min-height: 100%;
-}
+  .canvas-content {
+    min-height: 100%;
+  }
 </style>

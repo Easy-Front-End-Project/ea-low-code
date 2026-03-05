@@ -20,7 +20,7 @@
                 v-model="variable.name"
                 size="small"
                 placeholder="变量名"
-                @change="(val) => handleUpdate(variable.id, 'name', val)"
+                @input="(val) => handleUpdate(variable.id, 'name', val)"
               />
             </div>
             <div class="col-type">
@@ -41,7 +41,7 @@
                 v-model="variable.defaultValue"
                 size="small"
                 placeholder="默认值"
-                @change="(val) => handleUpdate(variable.id, 'defaultValue', val)"
+                @input="(val) => handleUpdate(variable.id, 'defaultValue', val)"
               />
             </div>
             <div class="col-remark">
@@ -49,7 +49,7 @@
                 v-model="variable.remark"
                 size="small"
                 placeholder="备注"
-                @change="(val) => handleUpdate(variable.id, 'remark', val)"
+                @input="(val) => handleUpdate(variable.id, 'remark', val)"
               />
             </div>
             <div class="col-action">

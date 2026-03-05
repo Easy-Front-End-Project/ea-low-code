@@ -1,0 +1,104 @@
+<template>
+  <ea-switch
+    ref="switchRef"
+    :value="modelValue"
+    :name="name"
+    :size="size"
+    :disabled="disabled"
+    :active-text="activeText"
+    :inactive-text="inactiveText"
+    :active-value="activeValue || true"
+    :inactive-value="inactiveValue || false"
+    :active-color="activeColor"
+    :inactive-color="inactiveColor"
+    @change="handleChange"
+  >
+    <template v-if="$slots.active" slot="active">
+      <slot name="active"></slot>
+    </template>
+    <template v-if="$slots.inactive" slot="inactive">
+      <slot name="inactive"></slot>
+    </template>
+  </ea-switch>
+</template>
+
+<script setup>
+  import { ref, watch } from 'vue'
+
+  const props = defineProps({
+    modelValue: {
+      type: [Boolean, String, Number],
+      default: false,
+    },
+    name: {
+      type: String,
+      default: '',
+    },
+    size: {
+      type: String,
+      default: 'default',
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    activeText: {
+      type: String,
+      default: '',
+    },
+    inactiveText: {
+      type: String,
+      default: '',
+    },
+    activeValue: {
+      type: [Boolean, String, Number],
+      default: true,
+    },
+    inactiveValue: {
+      type: [Boolean, String, Number],
+      default: false,
+    },
+    activeColor: {
+      type: String,
+      default: '',
+    },
+    inactiveColor: {
+      type: String,
+      default: '',
+    },
+  })
+
+  const emit = defineEmits(['update:modelValue', 'change'])
+
+  const switchRef = ref(null)
+  const localValue = ref(props.modelValue)
+
+  // 监听外部值变化
+  watch(
+    () => props.modelValue,
+    (newVal) => {
+      if (newVal !== localValue.value) {
+        localValue.value = newVal
+      }
+    },
+    { immediate: true },
+  )
+
+  // 处理 change 事件
+  function handleChange(event) {
+    let value = event.detail?.value
+    typeof value === 'string' && value === 'undefined' ? (value = false) : value
+    typeof value === 'string' && value === 'true' ? (value = true) : value
+
+    if (value !== localValue.value) {
+      localValue.value = value
+      emit('update:modelValue', value)
+      emit('change', value)
+    }
+  }
+
+  // 暴露方法
+  defineExpose({
+    focus: () => switchRef.value?.focus(),
+  })
+</script>

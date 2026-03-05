@@ -3,12 +3,7 @@
     <!-- 搜索框 -->
     <div class="p-3 border-b border-gray-200">
       <div class="relative">
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="搜索组件..."
-          class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        />
+        <EaInput v-model="searchQuery" placeholder="搜索组件..." prefix-icon="icon-search" />
         <ea-icon
           name="icon-search"
           size="16"
@@ -18,8 +13,9 @@
     </div>
 
     <!-- 组件分类列表 -->
-    <div class="flex-1 overflow-y-auto">
+    <div class="flex-1 overflow-y-auto px-3">
       <ea-collapse :active="expandedCategories" @change="handleCollapseChange">
+        <!-- 普通组件分类 -->
         <ea-collapse-item
           v-for="category in filteredCategories"
           :key="category.key"
@@ -40,6 +36,27 @@
             </div>
           </div>
         </ea-collapse-item>
+
+        <!-- 远程组件单独渲染 -->
+        <ea-collapse-item
+          v-if="remoteStore.enabledCount > 0"
+          name="remote"
+          :title="'远程组件 (' + remoteStore.enabledCount + ')'"
+        >
+          <div class="component-grid">
+            <div
+              v-for="component in remoteStore.enabledComponentMetaList"
+              :key="component.type"
+              class="component-item is-remote"
+              draggable="true"
+              @dragstart="handleDragStart($event, component)"
+              @click="handleClick(component)"
+            >
+              <span class="component-name">{{ component.name }}</span>
+              <span class="remote-badge">远程</span>
+            </div>
+          </div>
+        </ea-collapse-item>
       </ea-collapse>
     </div>
 
@@ -49,108 +66,152 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { getCategories, getComponentsByCategory } from '@/constants/componentMeta'
+  import { ref, computed, onMounted } from 'vue'
+  import {
+    getCategories,
+    getComponentsByCategory,
+    ComponentCategories,
+  } from '@/constants/componentMeta'
+  import { useRemoteComponentStore } from '@/stores/designer/remoteComponent'
+  import EaInput from '../ea-ui-wrap/EaInput.vue'
 
-const searchQuery = ref('')
-const expandedCategories = ref([])
+  const searchQuery = ref('')
+  const expandedCategories = ref([])
+  const remoteStore = useRemoteComponentStore()
 
-// 获取分类和组件
-const categories = computed(() => {
-  const cats = getCategories()
-  return cats.map((cat) => ({
-    ...cat,
-    components: getComponentsByCategory(cat.value),
-  }))
-})
+  // 获取普通分类（排除远程组件）
+  const categories = computed(() => {
+    const cats = getCategories().filter((cat) => cat.value !== ComponentCategories.REMOTE)
+    return cats.map((cat) => ({
+      ...cat,
+      components: getComponentsByCategory(cat.value),
+    }))
+  })
 
-// 过滤后的分类和组件
-const filteredCategories = computed(() => {
-  if (!searchQuery.value.trim()) {
-    expandedCategories.value = categories.value.map((cat) => cat.key)
-    return categories.value
+  // 过滤后的分类和组件
+  const filteredCategories = computed(() => {
+    if (!searchQuery.value.trim()) {
+      const allKeys = categories.value.map((cat) => cat.key)
+      if (remoteStore.enabledCount > 0) {
+        allKeys.push('remote')
+      }
+      expandedCategories.value = allKeys
+      return categories.value
+    }
+
+    const query = searchQuery.value.toLowerCase()
+    const filtered = categories.value
+      .map((cat) => ({
+        ...cat,
+        components: cat.components.filter(
+          (comp) =>
+            comp.name.toLowerCase().includes(query) || comp.type.toLowerCase().includes(query),
+        ),
+      }))
+      .filter((cat) => cat.components.length > 0)
+
+    // 搜索时自动展开包含结果的分组
+    expandedCategories.value = filtered.map((cat) => cat.key)
+
+    return filtered
+  })
+
+  // 处理折叠面板变化
+  function handleCollapseChange(e) {
+    expandedCategories.value = e.detail.active
   }
 
-  const query = searchQuery.value.toLowerCase()
-  return categories.value
-    .map((cat) => ({
-      ...cat,
-      components: cat.components.filter(
-        (comp) =>
-          comp.name.toLowerCase().includes(query) || comp.type.toLowerCase().includes(query),
-      ),
-    }))
-    .filter((cat) => cat.components.length > 0)
-})
+  /**
+   * 拖拽开始
+   * @param event 拖拽事件
+   * @param component 组件
+   */
+  function handleDragStart(event, component) {
+    event.dataTransfer.setData('application/json', JSON.stringify(component))
+    event.dataTransfer.effectAllowed = 'copy'
+  }
 
-// 处理折叠面板变化
-function handleCollapseChange(e) {
-  expandedCategories.value = e.detail.active
-}
+  // 点击组件
+  function handleClick(component) {
+    console.log('点击组件:', component)
+  }
 
-/**
- * 拖拽开始
- * @param event 拖拽事件
- * @param component 组件
- */
-function handleDragStart(event, component) {
-  event.dataTransfer.setData('application/json', JSON.stringify(component))
-  event.dataTransfer.effectAllowed = 'copy'
-}
+  onMounted(() => {
+    // 初始化加载远程组件配置
+    if (!remoteStore.isLoaded) {
+      remoteStore.loadConfig()
+    }
 
-// 点击组件
-function handleClick(component) {
-  console.log('点击组件:', component)
-}
-
-onMounted(() => {
-  expandedCategories.value = categories.value.map((cat) => cat.key)
-})
+    // 设置默认展开的类别
+    const allKeys = categories.value.map((cat) => cat.key)
+    if (remoteStore.enabledCount > 0) {
+      allKeys.push('remote')
+    }
+    expandedCategories.value = allKeys
+  })
 </script>
 
 <style scoped>
-.component-panel {
-  background-color: #fff;
-}
+  .component-panel {
+    background-color: #fff;
+  }
 
-ea-collapse {
-  display: block;
-}
+  ea-collapse {
+    display: block;
+  }
 
-ea-collapse-item {
-  display: block;
-}
+  ea-collapse-item {
+    display: block;
+  }
 
-.component-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.5rem;
-  padding: 0.75rem;
-  background-color: #f9fafb;
-}
+  .component-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    padding: 0.75rem;
+  }
 
-.component-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.25rem;
-  padding: 0.75rem;
-  background-color: #ffffff;
-  border-radius: 0.5rem;
-  border: 1px solid #e5e7eb;
-  cursor: move;
-  transition: all 0.2s;
-}
+  .component-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    cursor: move;
+    transition: all 0.2s;
+    position: relative;
+  }
 
-.component-item:hover {
-  border-color: #3b82f6;
-  background-color: #eff6ff;
-}
+  .component-item:hover {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+  }
 
-.component-name {
-  font-size: 0.75rem;
-  color: #4b5563;
-  text-align: center;
-}
+  .component-item.is-remote {
+    border-color: #8b5cf6;
+    background-color: #f5f3ff;
+  }
+
+  .component-item.is-remote:hover {
+    border-color: #7c3aed;
+    background-color: #ede9fe;
+  }
+
+  .component-name {
+    font-size: 0.75rem;
+    color: #4b5563;
+    text-align: center;
+  }
+
+  .remote-badge {
+    font-size: 0.625rem;
+    color: #8b5cf6;
+    background-color: #ede9fe;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+  }
 </style>

@@ -27,12 +27,16 @@
       <ea-button text @click="handleShowTree" title="大纲">
         <span>大纲</span>
       </ea-button>
+      <div class="w-px h-6 bg-gray-300 mx-2"></div>
     </div>
 
     <!-- 右侧：变量、预览和导出 -->
     <div class="flex items-center gap-2">
       <ea-button text @click="handleShowVariables" title="变量">
         <span>变量</span>
+      </ea-button>
+      <ea-button text @click="handleShowRemoteConfig" title="远程组件">
+        <span>远程组件</span>
       </ea-button>
       <div class="w-px h-6 bg-gray-300 mx-2"></div>
       <ea-button type="primary" @click="handlePreview" title="预览">
@@ -54,6 +58,9 @@
 
     <!-- 变量管理弹框 -->
     <VariableManager :visible="variableVisible" @close="variableVisible = false" />
+
+    <!-- 远程组件配置弹框 -->
+    <RemoteComponentManager :visible="remoteConfigVisible" @close="remoteConfigVisible = false" />
   </div>
 </template>
 
@@ -63,6 +70,7 @@
   import { exportSchemaToJson, importSchemaFromJson } from '@/utils/schemaHelper'
   import ComponentTree from './ComponentTree.vue'
   import VariableManager from './VariableManager.vue'
+  import RemoteComponentManager from './RemoteComponentManager.vue'
 
   const schemaStore = useSchemaStore()
   const fileInput = ref(null)
@@ -71,14 +79,16 @@
   const treeVisible = ref(false)
   // 变量管理弹框显示状态
   const variableVisible = ref(false)
-
-  defineOptions({
-    name: 'DesignerToolbar',
-  })
+  // 远程组件配置弹框显示状态
+  const remoteConfigVisible = ref(false)
 
   // 撤销/重做功能（待实现）
   const canUndo = ref(false)
   const canRedo = ref(false)
+
+  defineOptions({
+    name: 'DesignerToolbar',
+  })
 
   function handleUndo() {
     console.log('撤销')
@@ -96,6 +106,11 @@
   // 显示变量管理
   function handleShowVariables() {
     variableVisible.value = true
+  }
+
+  // 显示远程组件配置
+  function handleShowRemoteConfig() {
+    remoteConfigVisible.value = true
   }
 
   function handleClear() {

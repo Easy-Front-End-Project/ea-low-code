@@ -64,7 +64,7 @@
 <script setup>
   import { computed } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
-  import { getComponentMeta } from '@/constants/componentMeta'
+  import { getComponentMeta, getRemoteComponentMetaList } from '@/constants/componentMeta'
   import PropConfig from './PropConfig.vue'
   import StyleConfig from './StyleConfig.vue'
   import EventConfig from './EventConfig.vue'
@@ -74,11 +74,27 @@
   const selectedComponent = computed(() => schemaStore.selectedComponent)
   const componentMeta = computed(() => {
     if (!selectedComponent.value) return null
+
+    // 检查是否是远程组件
+    const isRemote =
+      selectedComponent.value.type?.startsWith('remote-') || selectedComponent.value.isRemote
+    if (isRemote) {
+      // 从远程组件列表中查找
+      const remoteMetaList = getRemoteComponentMetaList()
+      const remoteMeta = remoteMetaList.find((m) => m.type === selectedComponent.value.type)
+      if (remoteMeta) return remoteMeta
+    }
+
     return getComponentMeta(selectedComponent.value.type)
   })
 
   // 获取组件图标
   function getComponentIcon(type) {
+    // 远程组件使用 link 图标
+    if (type?.startsWith('remote-')) {
+      return 'link'
+    }
+
     const iconMap = {
       'ea-button': 'button',
       'ea-icon': 'star',
