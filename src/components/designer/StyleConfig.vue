@@ -127,13 +127,6 @@
     return meta?.styleConfig || null
   })
 
-  // 获取组件的 type 属性值（默认为 'normal'）
-  const componentTypeValue = computed(() => {
-    const type = props.componentProps?.type
-    // EA-UI 按钮组件的默认类型是 normal（空字符串也表示 normal）
-    return type || 'normal'
-  })
-
   // 动态生成 CSS 变量列表
   const dynamicCssVariablesList = computed(() => {
     const config = styleConfig.value?.dynamicCssVariables

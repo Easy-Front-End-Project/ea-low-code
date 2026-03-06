@@ -1,14 +1,14 @@
 <template>
   <ea-switch
     ref="switchRef"
-    :value="modelValue"
+    :value="localValue"
     :name="name"
     :size="size"
     :disabled="disabled"
     :active-text="activeText"
     :inactive-text="inactiveText"
-    :active-value="activeValue || true"
-    :inactive-value="inactiveValue || false"
+    :active-value="activeValue ?? true"
+    :inactive-value="inactiveValue ?? false"
     :active-color="activeColor"
     :inactive-color="inactiveColor"
     @change="handleChange"
@@ -71,7 +71,7 @@
   const emit = defineEmits(['update:modelValue', 'change'])
 
   const switchRef = ref(null)
-  const localValue = ref(props.modelValue)
+  const localValue = ref(props.modelValue || false)
 
   // 监听外部值变化
   watch(
@@ -87,14 +87,20 @@
   // 处理 change 事件
   function handleChange(event) {
     let value = event.detail?.value
-    typeof value === 'string' && value === 'undefined' ? (value = false) : value
-    typeof value === 'string' && value === 'true' ? (value = true) : value
 
-    if (value !== localValue.value) {
-      localValue.value = value
-      emit('update:modelValue', value)
-      emit('change', value)
+    // 处理字符串类型的值
+    if (typeof value === 'string') {
+      if (value === 'true') value = false
+      else if (value === 'false') value = true
+      else if (value === 'undefined') value = true
     }
+
+    // 更新本地值
+    localValue.value = value
+
+    // 触发事件
+    emit('update:modelValue', value)
+    emit('change', value)
   }
 
   // 暴露方法

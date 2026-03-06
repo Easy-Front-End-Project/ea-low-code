@@ -54,12 +54,18 @@
   async function updateContentHeight() {
     await nextTick()
     if (canvasContentRef.value) {
-      contentHeight.value = canvasContentRef.value.scrollHeight
+      const newHeight = canvasContentRef.value.scrollHeight
+      contentHeight.value = newHeight
     }
   }
 
-  // 监听组件变化，更新高度
-  watch(components, updateContentHeight, { deep: true, flush: 'post' })
+  // 监听组件数量变化和结构变化（增删、移动），不监听属性变化
+  watch(
+    () =>
+      components.value.map((c) => ({ id: c.id, children: c.children?.map((child) => child.id) })),
+    updateContentHeight,
+    { deep: false, flush: 'post' },
+  )
 
   // 画布样式
   const canvasStyle = computed(() => {

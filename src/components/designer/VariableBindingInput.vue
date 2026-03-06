@@ -30,6 +30,11 @@
             >{{ option.label }}</ea-option
           >
         </EaSelect>
+        <EaSwitch
+          v-else-if="inputType === 'switch'"
+          v-model="switchValue"
+          @change="handleSwitchChange"
+        />
       </template>
 
       <!-- 绑定变量按钮 -->
@@ -58,6 +63,7 @@
   import VariableSelector from './VariableSelector.vue'
   import EaInput from '../ea-ui-wrap/EaInput.vue'
   import EaSelect from '../ea-ui-wrap/EaSelect.vue'
+  import EaSwitch from '../ea-ui-wrap/EaSwitch.vue'
 
   const props = defineProps({
     value: {
@@ -66,7 +72,7 @@
     },
     inputType: {
       type: String,
-      default: 'input', // input | select
+      default: 'input', // input | select | switch
     },
     options: {
       type: Array,
@@ -103,9 +109,22 @@
     return props.value
   })
 
+  // Switch 组件的值
+  const switchValue = computed(() => {
+    if (isVariable.value) {
+      return false
+    }
+    return props.value === true || props.value === 'true'
+  })
+
   // 处理输入变化
   function handleInputChange(event) {
     const value = event.detail?.value !== undefined ? event.detail.value : event
+    emit('update:value', value)
+  }
+
+  // 处理 Switch 变化
+  function handleSwitchChange(value) {
     emit('update:value', value)
   }
 

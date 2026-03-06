@@ -27,7 +27,7 @@
               <EaSelect
                 v-model="variable.type"
                 size="small"
-                @change="(val) => {handleUpdate(variable.id, 'type', val); console.log(val)}"
+                @change="(val) => handleTypeChange(variable.id, val)"
               >
                 <ea-option value="string">字符串</ea-option>
                 <ea-option value="number">数字</ea-option>
@@ -37,7 +37,29 @@
               </EaSelect>
             </div>
             <div class="col-default">
+              <!-- 布尔值类型使用 EaSelect -->
+              <EaSelect
+                v-if="variable.type === 'boolean'"
+                :value="variable.defaultValue || false"
+                size="small"
+                @change="(val) => handleUpdate(variable.id, 'defaultValue', val)"
+              >
+                <ea-option :value="true">true</ea-option>
+                <ea-option :value="false">false</ea-option>
+              </EaSelect>
+              <!-- 数组/对象类型使用按钮打开编辑器 -->
+              <ea-button
+                v-else-if="variable.type === 'array' || variable.type === 'object'"
+                class="w-full text-center"
+                type="primary"
+                size="small"
+                icon="icon-edit"
+                @click="handleOpenEditor(variable)"
+                >编辑
+              </ea-button>
+              <!-- 其他类型使用 EaInput -->
               <EaInput
+                v-else
                 v-model="variable.defaultValue"
                 size="small"
                 placeholder="默认值"
@@ -53,17 +75,23 @@
               />
             </div>
             <div class="col-action">
-              <ea-button type="text" size="small" @click="handleDeleteVariable(variable.id)">
-                <ea-icon icon="icon-cancel" size="14" class="text-red-500"></ea-icon>
+              <ea-button
+                icon="icon-cancel"
+                type="danger"
+                size="small"
+                text
+                @click="handleDeleteVariable(variable.id)"
+              >
               </ea-button>
             </div>
           </div>
 
           <!-- 空状态 -->
-          <div v-if="localVariables.length === 0" class="empty-state">
-            <ea-icon icon="icon-inbox" size="32" class="text-gray-300"></ea-icon>
-            <p class="text-gray-400 text-sm mt-2">暂无变量，点击添加变量按钮创建</p>
-          </div>
+          <ea-empty
+            v-if="localVariables.length === 0"
+            class="empty-state"
+            description="暂无变量，点击添加变量按钮创建"
+          ></ea-empty>
         </form>
       </div>
     </div>
@@ -78,14 +106,31 @@
         <ea-button @click="handleClose">关闭</ea-button>
       </div>
     </div>
+
+    <!-- MonacoEditor 弹窗 -->
+    <ea-dialog
+      :visible="editorVisible"
+      :title="editorTitle"
+      width="600px"
+      @close="handleCloseEditor"
+    >
+      <div class="editor-content">
+        <MonacoEditor v-model="editorValue" language="json" height="300px" />
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <ea-button @click="handleCloseEditor">取消</ea-button>
+        <ea-button type="primary" @click="handleSaveEditor">保存</ea-button>
+      </div>
+    </ea-dialog>
   </ea-dialog>
 </template>
 
 <script setup>
-  import { ref, watch } from 'vue'
+  import { ref, watch, computed } from 'vue'
   import { useVariableStore } from '@/stores/designer/variable'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
+  import MonacoEditor from './MonacoEditor.vue'
 
   const props = defineProps({
     visible: {
@@ -100,6 +145,17 @@
 
   // 本地变量列表（避免直接操作 store）
   const localVariables = ref([])
+
+  // MonacoEditor 弹窗状态
+  const editorVisible = ref(false)
+  const editorValue = ref('')
+  const editingVariableId = ref(null)
+  const editingVariableType = ref('')
+
+  // 编辑器标题
+  const editorTitle = computed(() => {
+    return editingVariableType.value === 'array' ? '编辑数组' : '编辑对象'
+  })
 
   // 监听 store 变化，同步到本地
   watch(
@@ -125,6 +181,44 @@
     })
   }
 
+  // 类型改变处理
+  function handleTypeChange(id, newType) {
+    handleUpdate(id, 'type', newType)
+
+    // 根据新类型设置默认值
+    const variable = variableStore.variables.find((v) => v.id === id)
+    if (!variable) return
+
+    let newDefaultValue
+    switch (newType) {
+      case 'number':
+        newDefaultValue = 0
+        break
+      case 'boolean':
+        newDefaultValue = false
+        break
+      case 'string':
+        newDefaultValue = ''
+        break
+      case 'array':
+        newDefaultValue = []
+        break
+      case 'object':
+        newDefaultValue = {}
+        break
+      default:
+        newDefaultValue = ''
+    }
+
+    // 更新本地变量
+    const localVar = localVariables.value.find((v) => v.id === id)
+    if (localVar) {
+      localVar.defaultValue = newDefaultValue
+    }
+
+    variableStore.updateVariable(id, { defaultValue: newDefaultValue })
+  }
+
   // 更新变量
   function handleUpdate(id, field, value) {
     const variable = variableStore.variables.find((v) => v.id === id)
@@ -133,34 +227,69 @@
     // 检查值是否真的改变了
     if (variable[field] !== value) {
       variableStore.updateVariable(id, { [field]: value })
+    }
+  }
 
-      // 如果修改了类型，需要转换默认值
-      if (field === 'type') {
-        let newDefaultValue = variable.defaultValue
-        switch (value) {
-          case 'number':
-            newDefaultValue = Number(variable.defaultValue) || 0
-            break
-          case 'boolean':
-            newDefaultValue = Boolean(variable.defaultValue)
-            break
-          case 'string':
-            newDefaultValue = String(variable.defaultValue)
-            break
-          case 'array':
-            newDefaultValue = Array.isArray(variable.defaultValue) ? variable.defaultValue : []
-            break
-          case 'object':
-            newDefaultValue =
-              typeof variable.defaultValue === 'object' && variable.defaultValue !== null
-                ? variable.defaultValue
-                : {}
-            break
-        }
-        if (variable.defaultValue !== newDefaultValue) {
-          variableStore.updateVariable(id, { defaultValue: newDefaultValue })
-        }
+  // 打开 MonacoEditor 编辑器
+  function handleOpenEditor(variable) {
+    editingVariableId.value = variable.id
+    editingVariableType.value = variable.type
+
+    // 将值转换为 JSON 字符串显示
+    try {
+      if (typeof variable.defaultValue === 'object') {
+        editorValue.value = JSON.stringify(variable.defaultValue, null, 2)
+      } else {
+        editorValue.value = variable.type === 'array' ? '[]' : '{}'
       }
+    } catch {
+      editorValue.value = variable.type === 'array' ? '[]' : '{}'
+    }
+
+    editorVisible.value = true
+  }
+
+  // 关闭编辑器
+  function handleCloseEditor() {
+    editorVisible.value = false
+    editorValue.value = ''
+    editingVariableId.value = null
+    editingVariableType.value = ''
+  }
+
+  // 保存编辑器内容
+  function handleSaveEditor() {
+    if (!editingVariableId.value) return
+
+    try {
+      // 解析 JSON
+      const parsedValue = JSON.parse(editorValue.value)
+
+      // 验证类型
+      if (editingVariableType.value === 'array' && !Array.isArray(parsedValue)) {
+        alert('值必须是数组格式')
+        return
+      }
+      if (
+        editingVariableType.value === 'object' &&
+        (Array.isArray(parsedValue) || typeof parsedValue !== 'object' || parsedValue === null)
+      ) {
+        alert('值必须是对象格式')
+        return
+      }
+
+      // 更新本地变量
+      const localVar = localVariables.value.find((v) => v.id === editingVariableId.value)
+      if (localVar) {
+        localVar.defaultValue = parsedValue
+      }
+
+      // 更新 store
+      variableStore.updateVariable(editingVariableId.value, { defaultValue: parsedValue })
+
+      handleCloseEditor()
+    } catch (error) {
+      alert('JSON 格式错误，请检查输入')
     }
   }
 
@@ -257,5 +386,9 @@
     align-items: center;
     padding: 1rem;
     border-top: 1px solid #e5e7eb;
+  }
+
+  .editor-content {
+    padding: 1rem;
   }
 </style>

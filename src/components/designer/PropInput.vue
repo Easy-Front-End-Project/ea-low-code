@@ -33,8 +33,11 @@
 
   // 获取输入类型
   function getInputType() {
-    if (props.type === 'select' || props.type === 'boolean') {
+    if (props.type === 'select') {
       return 'select'
+    }
+    if (props.type === 'boolean') {
+      return 'switch'
     }
     return 'input'
   }
