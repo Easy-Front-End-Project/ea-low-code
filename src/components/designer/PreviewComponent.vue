@@ -1,9 +1,10 @@
 <template>
   <component
     :is="componentTag"
+    ref="componentRef"
     v-bind="componentProps"
     :style="component.style"
-    @click="handleClick"
+    v-on="componentEventListeners"
   >
     <!-- 默认插槽内容 -->
     <template v-if="hasNestedChildren">
@@ -21,9 +22,10 @@
 </template>
 
 <script setup>
-  import { computed, ref, onMounted, shallowRef } from 'vue'
+  import { computed, ref, onMounted, onBeforeUnmount, shallowRef } from 'vue'
   import { getComponentMeta, getRemoteComponentMetaList } from '@/constants/componentMeta'
   import { useVariableStore } from '@/stores/designer/variable'
+  import { useComponentInstanceStore } from '@/stores/designer/componentInstance'
   import { loadRemoteComponent } from '@/utils/loadRemoteComponent'
 
   const props = defineProps({
@@ -34,6 +36,8 @@
   })
 
   const variableStore = useVariableStore()
+  const instanceStore = useComponentInstanceStore()
+  const componentRef = ref(null)
 
   // 是否为远程组件
   const isRemoteComponent = computed(() => {
@@ -154,15 +158,112 @@
     return componentMeta.value?.slots?.some((slot) => slot.name === 'default')
   })
 
-  // 点击事件（预览模式下可以添加交互）
-  function handleClick() {
-    // 查找绑定的 click 事件
-    const clickEvent = props.component.events?.find((e) => e.name === 'click')
-    if (clickEvent?.handler) {
-      console.log(`执行事件处理器: ${clickEvent.handler}`)
-      // 在实际应用中，这里会执行对应的事件处理逻辑
+  // 组件事件监听器（动态绑定）
+  const componentEventListeners = computed(() => {
+    const listeners = {}
+    const events = props.component.events || []
+
+    events.forEach((eventConfig) => {
+      const eventType = eventConfig.type
+      if (!listeners[eventType]) {
+        listeners[eventType] = (event) => {
+          executeEvent(eventConfig, event)
+        }
+      } else {
+        // 如果已经有同类型事件，创建组合处理器
+        const existingHandler = listeners[eventType]
+        listeners[eventType] = (event) => {
+          existingHandler(event)
+          executeEvent(eventConfig, event)
+        }
+      }
+    })
+
+    return listeners
+  })
+
+  // 执行事件
+  function executeEvent(eventConfig, originalEvent) {
+    if (eventConfig.action === 'message') {
+      // 显示提示消息
+      if (window.$message && eventConfig.message) {
+        window.$message.success(eventConfig.message)
+      } else {
+        alert(eventConfig.message || '提示消息')
+      }
+    } else if (eventConfig.action === 'custom') {
+      // 执行自定义代码
+      if (eventConfig.code) {
+        try {
+          // 注入 $component 和 $vars 辅助函数到代码中
+          const wrappedCode = `
+            const $component = {
+              get: (id) => instanceStore.getComponentElement(id),
+              setProp: (id, prop, value) => instanceStore.setComponentProp(id, prop, value),
+              getProp: (id, prop) => instanceStore.getComponentProp(id, prop),
+              call: (id, method, ...args) => instanceStore.callComponentMethod(id, method, ...args)
+            };
+            const $vars = {
+              get: (name) => variableStore.getVariableDefaultValue(name),
+              set: (name, value) => variableStore.updateVariableByName(name, { defaultValue: value })
+            };
+            ${eventConfig.code}
+          `
+          const fn = new Function('event', 'instanceStore', 'variableStore', wrappedCode)
+          fn(originalEvent, instanceStore, variableStore)
+        } catch (error) {
+          console.error('执行自定义事件失败:', error)
+          if (window.$message) {
+            window.$message.error('事件执行失败: ' + error.message)
+          }
+        }
+      }
+    } else if (eventConfig.action === 'callMethod') {
+      // 调用组件方法
+      if (eventConfig.targetComponentId && eventConfig.methodName) {
+        instanceStore.callComponentMethod(
+          eventConfig.targetComponentId,
+          eventConfig.methodName,
+          ...(eventConfig.methodArgs || []),
+        )
+      }
+    } else if (eventConfig.action === 'setProp') {
+      // 设置组件属性
+      if (eventConfig.targetComponentId && eventConfig.propName !== undefined) {
+        // 解析变量绑定值
+        const resolvedValue = resolveValue(eventConfig.propValue)
+        instanceStore.setComponentProp(
+          eventConfig.targetComponentId,
+          eventConfig.propName,
+          resolvedValue,
+        )
+      }
     }
   }
+
+  // 注册组件实例
+  onMounted(() => {
+    if (componentRef.value) {
+      // 等待 Web Components 定义完成
+      const tagName = props.component.type
+      if (tagName && tagName.startsWith('ea-')) {
+        customElements.whenDefined(tagName).then(() => {
+          // 获取实际的 DOM 元素
+          const element = componentRef.value.$el || componentRef.value
+          if (element) {
+            instanceStore.registerInstance(props.component.id, element)
+          }
+        })
+      } else {
+        instanceStore.registerInstance(props.component.id, componentRef.value)
+      }
+    }
+  })
+
+  // 注销组件实例
+  onBeforeUnmount(() => {
+    instanceStore.unregisterInstance(props.component.id)
+  })
 </script>
 
 <style scoped>

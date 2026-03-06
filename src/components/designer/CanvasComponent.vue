@@ -144,7 +144,7 @@
 
     try {
       const { url, exportName, styleUrl } = remoteConfig.value
-      
+
       if (styleUrl) {
         loadRemoteComponentStyle(styleUrl)
       }
@@ -509,8 +509,12 @@
 
   .component-wrapper {
     position: relative;
+    cursor: pointer;
   }
 
+  .component-wrapper * {
+    pointer-events: none;
+  }
   .selection-border {
     position: absolute;
     inset: -2px;
