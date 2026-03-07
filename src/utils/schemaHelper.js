@@ -30,7 +30,7 @@ export function createComponentSchema(type, defaultProps = {}) {
 export function cloneComponentSchema(schema) {
   const cloned = JSON.parse(JSON.stringify(schema))
   cloned.id = uniqueId('comp_')
-  
+
   // 递归更新子组件ID
   function updateIds(components) {
     for (const comp of components) {
@@ -40,11 +40,11 @@ export function cloneComponentSchema(schema) {
       }
     }
   }
-  
+
   if (cloned.children && cloned.children.length > 0) {
     updateIds(cloned.children)
   }
-  
+
   return cloned
 }
 
@@ -55,20 +55,20 @@ export function cloneComponentSchema(schema) {
  */
 export function validateSchema(schema) {
   const errors = []
-  
+
   if (!schema) {
     errors.push('Schema 不能为空')
     return { valid: false, errors }
   }
-  
+
   if (!schema.version) {
     errors.push('Schema 缺少版本号')
   }
-  
+
   if (!Array.isArray(schema.components)) {
     errors.push('Schema 组件列表必须是数组')
   }
-  
+
   // 验证组件
   if (Array.isArray(schema.components)) {
     schema.components.forEach((comp, index) => {
@@ -76,7 +76,7 @@ export function validateSchema(schema) {
       errors.push(...compErrors)
     })
   }
-  
+
   return {
     valid: errors.length === 0,
     errors,
@@ -91,19 +91,19 @@ export function validateSchema(schema) {
  */
 function validateComponent(component, path) {
   const errors = []
-  
+
   if (!component.id) {
     errors.push(`${path}: 组件缺少 id`)
   }
-  
+
   if (!component.type) {
     errors.push(`${path}: 组件缺少 type`)
   }
-  
+
   if (!component.props || typeof component.props !== 'object') {
     errors.push(`${path}: 组件 props 必须是对象`)
   }
-  
+
   // 验证子组件
   if (component.children && Array.isArray(component.children)) {
     component.children.forEach((child, index) => {
@@ -111,7 +111,7 @@ function validateComponent(component, path) {
       errors.push(...childErrors)
     })
   }
-  
+
   return errors
 }
 
@@ -122,7 +122,7 @@ function validateComponent(component, path) {
  */
 export function flattenComponents(components) {
   const result = []
-  
+
   function flatten(list) {
     for (const comp of list) {
       result.push(comp)
@@ -131,7 +131,7 @@ export function flattenComponents(components) {
       }
     }
   }
-  
+
   flatten(components)
   return result
 }
@@ -143,7 +143,7 @@ export function flattenComponents(components) {
  */
 export function getComponentTreeDepth(components) {
   let maxDepth = 0
-  
+
   function getDepth(list, currentDepth) {
     maxDepth = Math.max(maxDepth, currentDepth)
     for (const comp of list) {
@@ -152,7 +152,7 @@ export function getComponentTreeDepth(components) {
       }
     }
   }
-  
+
   getDepth(components, 1)
   return maxDepth
 }
@@ -177,7 +177,7 @@ export function findComponentPath(components, targetId) {
     }
     return null
   }
-  
+
   return findPath(components, [])
 }
 
@@ -199,6 +199,7 @@ export function createDefaultPageSchema() {
       viewport: {
         width: 1920,
         height: 1080,
+        overflow: 'auto',
       },
     },
   }

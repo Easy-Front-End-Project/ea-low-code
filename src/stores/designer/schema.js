@@ -21,6 +21,7 @@ export const useSchemaStore = defineStore('schema', () => {
       viewport: {
         width: 1920,
         height: 1080,
+        overflow: 'auto',
       },
     },
   })
@@ -114,8 +115,7 @@ export const useSchemaStore = defineStore('schema', () => {
   function updateComponentProps(componentId, newProps) {
     const component = findComponentById(pageSchema.value.components, componentId)
     if (component) {
-      // 直接替换 props 对象，确保属性删除也能生效
-      component.props = { ...newProps }
+      component.props = { ...component.props, ...newProps }
     }
   }
 

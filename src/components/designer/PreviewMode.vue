@@ -44,6 +44,7 @@
       minHeight: '600px',
       maxWidth: '100%',
       maxHeight: '100%',
+      overflow: viewport.overflow,
     }
   })
 

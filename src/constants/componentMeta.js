@@ -26,7 +26,6 @@ export const ComponentCategories = {
   REMOTE: 'remote',
 }
 
-// P0 核心组件元数据（约20个）
 export const componentMetaList = [
   // Basic 基础组件
   {
@@ -309,14 +308,6 @@ export const componentMetaList = [
     events: [],
     slots: [{ name: 'default', label: '默认插槽' }],
     styleConfig: {
-      cssVariables: [
-        {
-          name: '--ea-text-line-clamp',
-          label: '多行省略行数',
-          type: 'number',
-          default: 0,
-        },
-      ],
       parts: [
         {
           name: 'container',
@@ -2326,72 +2317,6 @@ export const componentMetaList = [
     },
   },
   {
-    type: 'ea-scrollbar',
-    name: '滚动条',
-    category: ComponentCategories.BASIC,
-    icon: 'Scrollbar',
-    props: [
-      {
-        name: 'height',
-        label: '高度',
-        type: PropTypes.STRING,
-        default: '',
-      },
-      {
-        name: 'native',
-        label: '使用原生滚动条',
-        type: PropTypes.BOOLEAN,
-        default: false,
-      },
-      {
-        name: 'noresize',
-        label: '不响应容器尺寸变化',
-        type: PropTypes.BOOLEAN,
-        default: false,
-      },
-      {
-        name: 'always',
-        label: '滚动条总是显示',
-        type: PropTypes.BOOLEAN,
-        default: false,
-      },
-    ],
-    events: [
-      { name: 'scroll', label: '滚动事件' },
-      { name: 'end-reached', label: '滚动到底部事件' },
-    ],
-    slots: [{ name: 'default', label: '默认插槽' }],
-    styleConfig: {
-      parts: [
-        {
-          name: 'container',
-          label: '滚动条容器',
-          styles: ['background-color'],
-        },
-        {
-          name: 'view-container',
-          label: '内容容器',
-          styles: ['padding'],
-        },
-        {
-          name: 'track-horizontal',
-          label: '水平滚动轨道',
-          styles: ['background-color', 'height'],
-        },
-        {
-          name: 'track-vertical',
-          label: '垂直滚动轨道',
-          styles: ['background-color', 'width'],
-        },
-        {
-          name: 'thumb',
-          label: '滚动滑块',
-          styles: ['background-color', 'border-radius'],
-        },
-      ],
-    },
-  },
-  {
     type: 'ea-space',
     name: '间距',
     category: ComponentCategories.BASIC,
@@ -2477,94 +2402,6 @@ export const componentMetaList = [
           name: 'spacer',
           label: '分隔符',
           styles: ['color', 'font-size'],
-        },
-      ],
-    },
-  },
-  {
-    type: 'ea-splitter',
-    name: '分隔面板',
-    category: ComponentCategories.BASIC,
-    icon: 'Splitter',
-    props: [
-      {
-        name: 'layout',
-        label: '布局方向',
-        type: PropTypes.SELECT,
-        default: 'horizontal',
-        options: [
-          { label: '水平', value: 'horizontal' },
-          { label: '垂直', value: 'vertical' },
-        ],
-      },
-    ],
-    events: [
-      { name: 'panel-resize-start', label: '开始调整大小' },
-      { name: 'panel-resize', label: '调整大小中' },
-      { name: 'panel-resize-end', label: '调整大小结束' },
-    ],
-    slots: [{ name: 'default', label: '面板插槽' }],
-    styleConfig: {
-      parts: [
-        {
-          name: 'container',
-          label: '分隔面板容器',
-          styles: ['flex-direction'],
-        },
-      ],
-    },
-  },
-  {
-    type: 'ea-splitter-panel',
-    name: '分隔面板项',
-    category: ComponentCategories.BASIC,
-    icon: 'SplitterPanel',
-    props: [
-      {
-        name: 'size',
-        label: '面板大小',
-        type: PropTypes.STRING,
-        default: '',
-      },
-      {
-        name: 'min',
-        label: '最小尺寸',
-        type: PropTypes.STRING,
-        default: '',
-      },
-      {
-        name: 'layout',
-        label: '布局方向',
-        type: PropTypes.SELECT,
-        default: 'horizontal',
-        options: [
-          { label: '水平', value: 'horizontal' },
-          { label: '垂直', value: 'vertical' },
-        ],
-      },
-    ],
-    events: [],
-    slots: [{ name: 'default', label: '默认插槽' }],
-    styleConfig: {
-      cssVariables: [
-        {
-          name: '--ea-splitter-panel-size',
-          label: '面板大小',
-          type: 'string',
-          default: '',
-        },
-        {
-          name: '--ea-splitter-panel-min-size',
-          label: '最小尺寸',
-          type: 'string',
-          default: '',
-        },
-      ],
-      parts: [
-        {
-          name: 'container',
-          label: '面板容器',
-          styles: ['width', 'height', 'min-width', 'min-height'],
         },
       ],
     },
