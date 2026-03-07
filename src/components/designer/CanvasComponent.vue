@@ -441,7 +441,7 @@
 <style scoped>
   .canvas-component {
     position: relative;
-    display: inline-block;
+    display: inline-flex;
     margin: 4px;
     transition: all 0.2s ease;
   }
@@ -513,7 +513,7 @@
   }
 
   .component-wrapper * {
-    pointer-events: none;
+    /* pointer-events: none; */
   }
   .selection-border {
     position: absolute;
