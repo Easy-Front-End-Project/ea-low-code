@@ -37,6 +37,27 @@ export const useSchemaStore = defineStore('schema', () => {
 
   // Actions
   /**
+   * 查找父组件
+   * @param {string} componentId - 子组件ID
+   * @returns {Object|null} 父组件对象，如果没有找到则返回 null
+   */
+  function findParentComponent(componentId) {
+    function findParent(components, targetId, parent = null) {
+      for (const component of components) {
+        if (component.id === targetId) {
+          return parent
+        }
+        if (component.children && component.children.length > 0) {
+          const result = findParent(component.children, targetId, component)
+          if (result) return result
+        }
+      }
+      return null
+    }
+    return findParent(pageSchema.value.components, componentId)
+  }
+
+  /**
    * 添加组件
    * @param {string} type - 组件类型
    * @param {Object} props - 组件属性
@@ -44,14 +65,19 @@ export const useSchemaStore = defineStore('schema', () => {
    * @returns {Object} 创建的组件
    */
   function addComponent(type, props = {}, parentId = null) {
+    // 从 props 中提取 slot 属性，默认为 'default'
+    const { slot = 'default', ...otherProps } = props
+
+    // 只有当 slot 不是 'default' 时才添加到 props 中
+    const componentProps = slot === 'default' ? { ...otherProps } : { slot, ...otherProps }
+
     const newComponent = {
       id: uniqueId('comp_'),
       type,
-      props: { ...props },
+      props: componentProps,
       style: {},
       events: [],
       children: [],
-      slots: {},
     }
 
     if (parentId) {
@@ -88,8 +114,8 @@ export const useSchemaStore = defineStore('schema', () => {
   function updateComponentProps(componentId, newProps) {
     const component = findComponentById(pageSchema.value.components, componentId)
     if (component) {
-      // 使用 Object.assign 保持对象引用不变，避免触发不必要的重新渲染
-      Object.assign(component.props, newProps)
+      // 直接替换 props 对象，确保属性删除也能生效
+      component.props = { ...newProps }
     }
   }
 
@@ -219,6 +245,7 @@ export const useSchemaStore = defineStore('schema', () => {
       if (comp.id === id) {
         return comp
       }
+      // 在 children 中查找
       if (comp.children && comp.children.length > 0) {
         const found = findComponentById(comp.children, id)
         if (found) return found
@@ -233,6 +260,7 @@ export const useSchemaStore = defineStore('schema', () => {
         components.splice(i, 1)
         return true
       }
+      // 从 children 中删除
       if (components[i].children && components[i].children.length > 0) {
         const result = removeComponentById(components[i].children, id)
         if (result) return true
@@ -244,6 +272,7 @@ export const useSchemaStore = defineStore('schema', () => {
   function countComponents(components) {
     let count = components.length
     for (const comp of components) {
+      // 统计 children 中的组件
       if (comp.children && comp.children.length > 0) {
         count += countComponents(comp.children)
       }
@@ -274,5 +303,6 @@ export const useSchemaStore = defineStore('schema', () => {
     importSchema,
     exportSchema,
     clearCanvas,
+    findParentComponent,
   }
 })

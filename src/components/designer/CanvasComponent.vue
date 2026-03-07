@@ -39,25 +39,36 @@
         :style="componentInnerStyle"
         v-on="componentEventListeners"
       >
-        <!-- 默认插槽内容 -->
-        <template v-if="hasNestedChildren">
-          <CanvasComponent
-            v-for="child in component.children"
-            :key="child.id"
-            :component="child"
-            :selected="selectedComponentId === child.id"
-            @select="$emit('select', $event)"
-            @delete="$emit('delete', $event)"
-            @drop-to-parent="$emit('drop-to-parent', $event)"
-          />
+        <!-- 使用原生 slot 属性方式渲染子组件 -->
+        <template v-if="allChildren.length > 0">
+          <template v-for="child in allChildren" :key="child.id">
+            <!-- 如果子组件有非默认 slot 属性，使用 div 包装并设置 slot 属性 -->
+            <div
+              v-if="child.props?.slot && child.props.slot !== 'default'"
+              :slot="child.props.slot"
+              style="display: contents"
+            >
+              <CanvasComponent
+                :component="child"
+                :selected="selectedComponentId === child.id"
+                @select="$emit('select', $event)"
+                @delete="$emit('delete', $event)"
+                @drop-to-parent="$emit('drop-to-parent', $event)"
+              />
+            </div>
+            <!-- 默认插槽的子组件，不设置 slot 属性 -->
+            <CanvasComponent
+              v-else
+              :component="child"
+              :selected="selectedComponentId === child.id"
+              @select="$emit('select', $event)"
+              @delete="$emit('delete', $event)"
+              @drop-to-parent="$emit('drop-to-parent', $event)"
+            />
+          </template>
         </template>
         <template v-else-if="hasChildrenText">
-          <ea-text type="normal" size="medium"> {{ resolvedChildrenText }} </ea-text>
-        </template>
-        <template v-else-if="hasDefaultSlot">
-          <ea-text type="normal" size="medium"
-            >{{ componentProps.label || componentProps.title || '组件内容' }}</ea-text
-          >
+          <ea-text type="normal" size="medium">{{ resolvedChildrenText }}</ea-text>
         </template>
       </component>
     </div>
@@ -68,7 +79,11 @@
 </template>
 
 <script setup>
-  import { computed, ref, onMounted, onBeforeUnmount, defineAsyncComponent, shallowRef } from 'vue'
+  import { computed, ref, onMounted, onBeforeUnmount, shallowRef, defineOptions } from 'vue'
+
+  defineOptions({
+    name: 'CanvasComponent',
+  })
   import { useSchemaStore } from '@/stores/designer/schema'
   import { useComponentInstanceStore } from '@/stores/designer/componentInstance'
   import { useVariableStore } from '@/stores/designer/variable'
@@ -164,6 +179,12 @@
 
   // 是否为容器组件（可放置其他组件）
   const isContainer = computed(() => {
+    // 如果组件有 children 且有子组件，则为容器
+    if (Array.isArray(props.component.children) && props.component.children.length > 0) {
+      return true
+    }
+
+    // 预定义的容器类型
     const containerTypes = [
       'ea-container',
       'ea-card',
@@ -174,16 +195,11 @@
       'ea-space',
       'ea-row',
       'ea-col',
-      'ea-form',
+      'form',
       'ea-form-item',
       'ea-button-group',
     ]
     return containerTypes.includes(props.component.type)
-  })
-
-  // 是否有嵌套子组件（数组形式的 children）
-  const hasNestedChildren = computed(() => {
-    return Array.isArray(props.component.children) && props.component.children.length > 0
   })
 
   // 解析值（处理变量绑定）
@@ -195,17 +211,6 @@
     }
     return value
   }
-
-  // 是否有 children 文本属性（字符串形式的 children）
-  const hasChildrenText = computed(() => {
-    const childrenValue = resolveValue(props.component.props?.children)
-    return typeof childrenValue === 'string' && childrenValue.length > 0
-  })
-
-  // 解析后的 children 文本
-  const resolvedChildrenText = computed(() => {
-    return resolveValue(props.component.props?.children) || ''
-  })
 
   // 传递给组件的 props（解析变量绑定）
   const componentProps = computed(() => {
@@ -223,9 +228,22 @@
   // 是否显示标签
   const showLabel = computed(() => isHovered.value || props.selected)
 
-  // 是否有默认插槽
-  const hasDefaultSlot = computed(() => {
-    return componentMeta.value?.slots?.some((slot) => slot.name === 'default')
+  // 获取组件可用的所有插槽
+  const availableSlots = computed(() => {
+    // 从组件元数据获取插槽定义
+    const metaSlots = componentMeta.value?.slots || []
+
+    // 如果没有定义插槽，默认提供 default 插槽
+    if (metaSlots.length === 0) {
+      return [{ name: 'default', label: '默认插槽' }]
+    }
+
+    return metaSlots
+  })
+
+  // 获取所有子组件
+  const allChildren = computed(() => {
+    return props.component.children || []
   })
 
   // 组件事件监听器（动态绑定）
@@ -270,12 +288,23 @@
     const cssVariables = props.component.cssVariables || {}
     const style = props.component.style || {}
 
-    const { position, left, right, top, bottom, ...rest } = style
+    const { ...rest } = style
 
     return {
       ...rest,
       ...cssVariables,
     }
+  })
+
+  // 是否有 children 文本属性（字符串形式的 children）
+  const hasChildrenText = computed(() => {
+    const childrenValue = resolveValue(props.component.props?.children)
+    return typeof childrenValue === 'string' && childrenValue.length > 0
+  })
+
+  // 解析后的 children 文本
+  const resolvedChildrenText = computed(() => {
+    return resolveValue(props.component.props?.children) || ''
   })
 
   // 点击组件（选中）
@@ -405,7 +434,7 @@
   }
 
   // 拖拽离开
-  function handleDragLeave(event) {
+  function handleDragLeave() {
     if (!isContainer.value) return
     dragCounter.value--
     if (dragCounter.value === 0) {
@@ -427,10 +456,20 @@
     try {
       const componentMeta = JSON.parse(data)
 
+      // 获取容器的非默认插槽
+      const namedSlots = availableSlots.value.filter((slot) => slot.name !== 'default')
+
+      // 如果有非默认插槽，默认使用第一个非默认插槽
+      let targetSlot = 'default'
+      if (namedSlots.length > 0) {
+        targetSlot = namedSlots[0].name
+      }
+
       // 向上冒泡，让父组件处理放置逻辑
       emit('drop-to-parent', {
         componentMeta,
         parentId: props.component.id,
+        slotName: targetSlot,
       })
     } catch (error) {
       console.error('拖拽放置到容器失败:', error)
@@ -515,6 +554,22 @@
   .component-wrapper * {
     /* pointer-events: none; */
   }
+
+  /* 插槽内容包装器 */
+  :deep(.slot-content-wrapper) {
+    display: contents;
+  }
+
+  /* 插槽占位符样式 */
+  :deep(.slot-placeholder) {
+    color: #9ca3af;
+    font-size: 12px;
+    padding: 4px 8px;
+    background-color: rgba(0, 0, 0, 0.02);
+    border-radius: 3px;
+    display: inline-block;
+  }
+
   .selection-border {
     position: absolute;
     inset: -2px;

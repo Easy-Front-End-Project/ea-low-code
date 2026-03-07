@@ -6,9 +6,20 @@
     :style="component.style"
     v-on="componentEventListeners"
   >
-    <!-- 默认插槽内容 -->
+    <!-- 使用原生 slot 属性方式渲染子组件 -->
     <template v-if="hasNestedChildren">
-      <PreviewComponent v-for="child in component.children" :key="child.id" :component="child" />
+      <template v-for="child in component.children" :key="child.id">
+        <!-- 如果子组件有非默认 slot 属性，使用 div 包装并设置 slot 属性 -->
+        <div
+          v-if="child.props?.slot && child.props.slot !== 'default'"
+          :slot="child.props.slot"
+          style="display: contents"
+        >
+          <PreviewComponent :component="child" />
+        </div>
+        <!-- 默认插槽的子组件，不设置 slot 属性 -->
+        <PreviewComponent v-else :component="child" />
+      </template>
     </template>
     <template v-else-if="hasChildrenText">
       <ea-text type="normal" size="medium">{{ resolvedChildrenText }}</ea-text>
@@ -140,14 +151,16 @@
     return resolveValue(props.component.props?.children) || ''
   })
 
-  // 传递给组件的 props（解析变量绑定）
+  // 传递给组件的 props（解析变量绑定，过滤掉 slot 属性）
   const componentProps = computed(() => {
     const rawProps = props.component.props || {}
     const resolvedProps = {}
 
-    // 遍历所有属性，解析变量绑定
+    // 遍历所有属性，解析变量绑定，过滤掉 slot 属性
     for (const [key, value] of Object.entries(rawProps)) {
-      resolvedProps[key] = resolveValue(value)
+      if (key !== 'slot') {
+        resolvedProps[key] = resolveValue(value)
+      }
     }
 
     return resolvedProps
@@ -269,6 +282,7 @@
 <style scoped>
   /* 预览模式下组件样式 */
   :deep(*) {
+    /* display: contents; */
     pointer-events: auto;
   }
 </style>

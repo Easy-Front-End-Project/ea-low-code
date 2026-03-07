@@ -107,12 +107,12 @@
   }
 
   // 处理放置到父组件
-  function handleDropToParent({ componentMeta, parentId }) {
-    addComponentWithMeta(componentMeta, parentId)
+  function handleDropToParent({ componentMeta, parentId, slotName = 'default' }) {
+    addComponentWithMeta(componentMeta, parentId, slotName)
   }
 
   // 添加组件（提取公共逻辑）
-  function addComponentWithMeta(componentMeta, parentId = null) {
+  function addComponentWithMeta(componentMeta, parentId = null, slotName = 'default') {
     const defaultProps = {}
 
     // 提取默认属性
@@ -122,7 +122,12 @@
       })
     }
 
-    // 添加组件到画布（如果有 parentId 则添加到对应容器的 children 中）
+    // 如果指定了非默认插槽，添加到 props 中
+    if (slotName !== 'default') {
+      defaultProps.slot = slotName
+    }
+
+    // 添加组件到画布（如果有 parentId 则添加到对应容器）
     const newComponent = schemaStore.addComponent(componentMeta.type, defaultProps, parentId)
 
     // 如果是远程组件，保存远程配置

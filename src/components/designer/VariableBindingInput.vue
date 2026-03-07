@@ -22,7 +22,7 @@
         />
         <EaSelect
           v-else-if="inputType === 'select'"
-          v-model="inputValue"
+          :model-value="inputValue"
           size="small"
           @change="handleInputChange"
         >

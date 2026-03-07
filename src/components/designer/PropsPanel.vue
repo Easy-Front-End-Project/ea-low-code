@@ -33,9 +33,16 @@
           </div>
         </div>
 
+        <!-- 目标插槽配置（排在最上面） -->
+        <SlotConfig
+          :parent-slots="parentComponentMeta?.slots"
+          :slot-value="selectedComponent.props?.slot || 'default'"
+          @slot-change="handleSlotChange"
+        />
+
         <!-- 属性配置 -->
         <PropConfig
-          :props="componentMeta?.props"
+          :props="componentPropsWithoutSlot"
           :component-props="selectedComponent.props"
           @prop-change="handlePropChange"
         />
@@ -68,6 +75,7 @@
   import PropConfig from './PropConfig.vue'
   import StyleConfig from './StyleConfig.vue'
   import EventConfig from './EventConfig.vue'
+  import SlotConfig from './SlotConfig.vue'
 
   const schemaStore = useSchemaStore()
 
@@ -86,6 +94,31 @@
     }
 
     return getComponentMeta(selectedComponent.value.type)
+  })
+
+  // 过滤掉 slot 属性的 props 列表
+  const componentPropsWithoutSlot = computed(() => {
+    const props = componentMeta.value?.props || []
+    return props.filter((prop) => prop.name !== 'slot')
+  })
+
+  // 获取父组件的 meta 信息（用于显示目标插槽配置）
+  const parentComponentMeta = computed(() => {
+    if (!selectedComponent.value) return null
+
+    // 查找父组件
+    const parent = schemaStore.findParentComponent(selectedComponent.value.id)
+    if (!parent) return null
+
+    // 检查是否是远程组件
+    const isRemote = parent.type?.startsWith('remote-') || parent.isRemote
+    if (isRemote) {
+      const remoteMetaList = getRemoteComponentMetaList()
+      const remoteMeta = remoteMetaList.find((m) => m.type === parent.type)
+      if (remoteMeta) return remoteMeta
+    }
+
+    return getComponentMeta(parent.type)
   })
 
   // 获取组件图标
@@ -158,6 +191,12 @@
   function handleEventChange(events) {
     if (!selectedComponent.value) return
     schemaStore.updateComponentEvents(selectedComponent.value.id, events)
+  }
+
+  // 插槽变更
+  function handleSlotChange(slotValue) {
+    if (!selectedComponent.value) return
+    schemaStore.updateComponentProps(selectedComponent.value.id, { slot: slotValue })
   }
 </script>
 

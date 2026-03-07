@@ -219,7 +219,7 @@ export const componentMetaList = [
       },
     ],
     events: [],
-    slots: [{ name: 'default', label: '默认插槽' }],
+    slots: [],
     styleConfig: {
       cssVariables: [
         {
@@ -2603,6 +2603,7 @@ export const componentMetaList = [
     slots: [
       { name: 'default', label: '内容插槽' },
       { name: 'header', label: '标题插槽' },
+      { name: 'footer', label: '页脚插槽' },
     ],
   },
 
@@ -2774,7 +2775,7 @@ export const componentMetaList = [
         name: 'value',
         label: '指定日期',
         type: PropTypes.STRING,
-        default: '',
+        default: Date.now(),
       },
       {
         name: 'controller-type',
@@ -5879,7 +5880,16 @@ export function getComponentsByCategory(category) {
 
 // 根据类型获取组件元数据
 export function getComponentMeta(type) {
-  return componentMetaList.find((comp) => comp.type === type)
+  const meta = componentMetaList.find((comp) => comp.type === type)
+  if (!meta) return null
+
+  // 确保组件有 slots 定义，如果没有则添加默认插槽
+  const slots = meta.slots || [{ name: 'default', label: '默认插槽' }]
+
+  return {
+    ...meta,
+    slots,
+  }
 }
 
 // 获取所有分类
