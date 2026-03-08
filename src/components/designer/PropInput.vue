@@ -39,6 +39,12 @@
     if (props.type === 'boolean') {
       return 'switch'
     }
+    if (props.type === 'unit') {
+      return 'unit'
+    }
+    if (props.type === 'color') {
+      return 'color'
+    }
     return 'input'
   }
 
@@ -50,6 +56,7 @@
       color: '请选择颜色',
       object: '输入 JSON 格式数据',
       array: '输入 JSON 格式数据',
+      unit: '请输入数值',
     }
     return placeholders[props.type] || '请输入'
   }

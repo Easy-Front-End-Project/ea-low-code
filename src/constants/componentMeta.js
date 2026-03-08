@@ -13,6 +13,7 @@ export const PropTypes = {
   OBJECT: 'object',
   ARRAY: 'array',
   FUNCTION: 'function',
+  UNIT: 'unit',
 }
 
 // 组件分类
@@ -26,8 +27,8 @@ export const ComponentCategories = {
   REMOTE: 'remote',
 }
 
-export const componentMetaList = [
-  // Basic 基础组件
+// Basic 基础组件
+const basicComponents = [
   {
     type: 'ea-button',
     name: '按钮',
@@ -132,55 +133,91 @@ export const componentMetaList = [
     ],
     events: [{ name: 'click', label: '点击事件' }],
     slots: [{ name: 'default', label: '默认插槽' }],
-    // CSS 变量样式配置
     styleConfig: {
-      dynamicCssVariables: {
-        text: {
-          label: '文字颜色',
-          type: 'color',
-          template: '--ea-button-{type}-text',
-          defaultValue: {
-            normal: '#606266',
-            primary: '#ffffff',
-            success: '#ffffff',
-            info: '#ffffff',
-            warning: '#ffffff',
-            danger: '#ffffff',
-          },
-        },
-        background: {
-          label: '背景颜色',
-          type: 'color',
-          template: '--ea-button-{type}-500',
-          defaultValue: {
-            normal: '#ffffff',
-            primary: '#409eff',
-            success: '#67c23a',
-            info: '#909399',
-            warning: '#e6a23c',
-            danger: '#f56c6c',
-          },
-        },
-        border: {
-          label: '边框颜色',
-          type: 'color',
-          template: '--ea-button-{type}-border',
-          defaultValue: {
-            normal: '#dcdfe6',
-            primary: '#409eff',
-            success: '#67c23a',
-            info: '#909399',
-            warning: '#e6a23c',
-            danger: '#f56c6c',
-          },
-        },
-      },
       cssVariables: [
         {
           name: '--ea-button-border-radius',
           label: '圆角大小',
           type: 'string',
           default: '4px',
+        },
+        {
+          name: '--ea-button-normal-text',
+          label: '默认按钮文字颜色',
+          type: 'color',
+          default: '#606266',
+        },
+        {
+          name: '--ea-button-normal-background',
+          label: '默认按钮背景颜色',
+          type: 'color',
+          default: '#ffffff',
+        },
+        {
+          name: '--ea-button-normal-border',
+          label: '默认按钮边框颜色',
+          type: 'color',
+          default: '#dcdfe6',
+        },
+        {
+          name: '--ea-button-primary-500',
+          label: '主要按钮背景色',
+          type: 'color',
+          default: '#409eff',
+        },
+        {
+          name: '--ea-button-primary-text',
+          label: '主要按钮文字颜色',
+          type: 'color',
+          default: '#ffffff',
+        },
+        {
+          name: '--ea-button-success-500',
+          label: '成功按钮背景色',
+          type: 'color',
+          default: '#67c23a',
+        },
+        {
+          name: '--ea-button-success-text',
+          label: '成功按钮文字颜色',
+          type: 'color',
+          default: '#ffffff',
+        },
+        {
+          name: '--ea-button-warning-500',
+          label: '警告按钮背景色',
+          type: 'color',
+          default: '#e6a23c',
+        },
+        {
+          name: '--ea-button-warning-text',
+          label: '警告按钮文字颜色',
+          type: 'color',
+          default: '#ffffff',
+        },
+        {
+          name: '--ea-button-danger-500',
+          label: '危险按钮背景色',
+          type: 'color',
+          default: '#f56c6c',
+        },
+        {
+          name: '--ea-button-danger-text',
+          label: '危险按钮文字颜色',
+          type: 'color',
+          default: '#ffffff',
+        },
+        {
+          name: '--ea-button-info-500',
+          label: '信息按钮背景色',
+          type: 'color',
+          default: '#909399',
+        },
+        {
+          name: '--ea-button-info-text',
+          label: '信息按钮文字颜色',
+          type: 'color',
+          default: '#ffffff',
         },
       ],
       parts: [
@@ -205,12 +242,6 @@ export const componentMetaList = [
         default: 'icon-',
       },
       {
-        name: 'size',
-        label: '尺寸',
-        type: PropTypes.NUMBER,
-        default: 14,
-      },
-      {
         name: 'color',
         label: '颜色',
         type: PropTypes.COLOR,
@@ -226,12 +257,6 @@ export const componentMetaList = [
           label: '图标大小',
           type: 'string',
           default: '14px',
-        },
-        {
-          name: '--ea-icon-color',
-          label: '图标颜色',
-          type: 'color',
-          default: 'inherit',
         },
       ],
       parts: [
@@ -391,8 +416,113 @@ export const componentMetaList = [
       ],
     },
   },
+  {
+    type: 'ea-space',
+    name: '间距',
+    category: ComponentCategories.BASIC,
+    icon: 'Space',
+    props: [
+      {
+        name: 'direction',
+        label: '排列方向',
+        type: PropTypes.SELECT,
+        default: 'horizontal',
+        options: [
+          { label: '水平', value: 'horizontal' },
+          { label: '垂直', value: 'vertical' },
+        ],
+      },
+      {
+        name: 'size',
+        label: '间距大小',
+        type: PropTypes.SELECT,
+        default: 'default',
+        options: [
+          { label: '小间距', value: 'small' },
+          { label: '中间距', value: 'default' },
+          { label: '大间距', value: 'large' },
+        ],
+      },
+      {
+        name: 'wrap',
+        label: '自动换行',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+      {
+        name: 'spacer',
+        label: '分隔符',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'alignment',
+        label: '对齐方式',
+        type: PropTypes.SELECT,
+        default: '',
+        options: [
+          { label: '默认', value: '' },
+          { label: '居中对齐', value: 'center' },
+          { label: '起始对齐', value: 'flex-start' },
+          { label: '结束对齐', value: 'flex-end' },
+          { label: '基线对齐', value: 'baseline' },
+          { label: '拉伸填充', value: 'stretch' },
+        ],
+      },
+      {
+        name: 'fill',
+        label: '填充容器',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+      {
+        name: 'fill-ratio',
+        label: '填充比例',
+        type: PropTypes.NUMBER,
+        default: 100,
+      },
+    ],
+    events: [],
+    slots: [{ name: 'default', label: '默认插槽' }],
+    styleConfig: {
+      cssVariables: [
+        {
+          name: '--ea-space-gap-small',
+          label: '间距【小间距】',
+          type: 'string',
+          default: '0.5rem',
+        },
+        {
+          name: '--ea-space-gap-default',
+          label: '间距【中间距】',
+          type: 'string',
+          default: '0.75rem',
+        },
+        {
+          name: '--ea-space-gap-large',
+          label: '间距【大间距】',
+          type: 'string',
+          default: '1rem',
+        },
+      ],
+      parts: [
+        {
+          name: 'container',
+          label: '间距容器',
+          styles: ['gap', 'align-items'],
+        },
+        {
+          name: 'spacer',
+          label: '分隔符',
+          styles: ['color', 'font-size'],
+        },
+      ],
+    },
+  },
+]
 
-  // Form 表单组件
+// Form 表单组件
+const formComponents = [
   {
     type: 'ea-input',
     name: '输入框',
@@ -2192,8 +2322,10 @@ export const componentMetaList = [
       ],
     },
   },
+]
 
-  // Layout 布局组件
+// Layout 布局组件
+const layoutComponents = [
   {
     type: 'ea-container',
     name: '布局容器',
@@ -2232,7 +2364,7 @@ export const componentMetaList = [
       {
         name: 'height',
         label: '高度',
-        type: PropTypes.STRING,
+        type: PropTypes.UNIT,
         default: '60px',
       },
     ],
@@ -2257,7 +2389,7 @@ export const componentMetaList = [
       {
         name: 'width',
         label: '宽度',
-        type: PropTypes.STRING,
+        type: PropTypes.UNIT,
         default: '300px',
       },
     ],
@@ -2300,7 +2432,7 @@ export const componentMetaList = [
       {
         name: 'height',
         label: '高度',
-        type: PropTypes.STRING,
+        type: PropTypes.UNIT,
         default: '60px',
       },
     ],
@@ -2312,96 +2444,6 @@ export const componentMetaList = [
           name: 'container',
           label: '容器',
           styles: ['background-color', 'height', 'padding'],
-        },
-      ],
-    },
-  },
-  {
-    type: 'ea-space',
-    name: '间距',
-    category: ComponentCategories.BASIC,
-    icon: 'Space',
-    props: [
-      {
-        name: 'direction',
-        label: '排列方向',
-        type: PropTypes.SELECT,
-        default: 'horizontal',
-        options: [
-          { label: '水平', value: 'horizontal' },
-          { label: '垂直', value: 'vertical' },
-        ],
-      },
-      {
-        name: 'size',
-        label: '间距大小',
-        type: PropTypes.STRING,
-        default: 'default',
-      },
-      {
-        name: 'wrap',
-        label: '自动换行',
-        type: PropTypes.BOOLEAN,
-        default: false,
-      },
-      {
-        name: 'spacer',
-        label: '分隔符',
-        type: PropTypes.STRING,
-        default: '',
-      },
-      {
-        name: 'alignment',
-        label: '对齐方式',
-        type: PropTypes.STRING,
-        default: '',
-      },
-      {
-        name: 'fill',
-        label: '填充容器',
-        type: PropTypes.BOOLEAN,
-        default: false,
-      },
-      {
-        name: 'fill-ratio',
-        label: '填充比例',
-        type: PropTypes.NUMBER,
-        default: 100,
-      },
-    ],
-    events: [],
-    slots: [{ name: 'default', label: '默认插槽' }],
-    styleConfig: {
-      cssVariables: [
-        {
-          name: '--ea-space-gap',
-          label: '间距大小',
-          type: 'string',
-          default: '8px',
-        },
-        {
-          name: '--ea-space-alignment',
-          label: '对齐方式',
-          type: 'string',
-          default: 'center',
-        },
-        {
-          name: '--ea-space-fill-ratio',
-          label: '填充比例',
-          type: 'string',
-          default: '100%',
-        },
-      ],
-      parts: [
-        {
-          name: 'container',
-          label: '间距容器',
-          styles: ['gap', 'align-items'],
-        },
-        {
-          name: 'spacer',
-          label: '分隔符',
-          styles: ['color', 'font-size'],
         },
       ],
     },
@@ -2443,8 +2485,10 @@ export const componentMetaList = [
       { name: 'footer', label: '页脚插槽' },
     ],
   },
+]
 
-  // Data 数据展示
+// Data 数据展示
+const dataComponents = [
   {
     type: 'ea-avatar',
     name: '头像',
@@ -2460,7 +2504,7 @@ export const componentMetaList = [
       {
         name: 'size',
         label: '尺寸',
-        type: PropTypes.STRING,
+        type: PropTypes.UNIT,
         default: 'default',
       },
       {
@@ -2959,6 +3003,12 @@ export const componentMetaList = [
           { label: '小', value: 'small' },
         ],
       },
+      {
+        name: 'label-width',
+        label: '标签宽度',
+        type: PropTypes.UNIT,
+        default: '',
+      },
     ],
     events: [],
     slots: [
@@ -2992,6 +3042,12 @@ export const componentMetaList = [
         label: '跨度',
         type: PropTypes.NUMBER,
         default: 1,
+      },
+      {
+        name: 'label-width',
+        label: '标签宽度',
+        type: PropTypes.UNIT,
+        default: '',
       },
     ],
     events: [],
@@ -3030,8 +3086,8 @@ export const componentMetaList = [
       {
         name: 'image-size',
         label: '图片大小',
-        type: PropTypes.NUMBER,
-        default: 80,
+        type: PropTypes.UNIT,
+        default: '80px',
       },
     ],
     events: [],
@@ -3165,7 +3221,7 @@ export const componentMetaList = [
       {
         name: 'stroke-width',
         label: '进度条宽度',
-        type: PropTypes.STRING,
+        type: PropTypes.UNIT,
         default: '8px',
       },
       {
@@ -3521,13 +3577,13 @@ export const componentMetaList = [
       {
         name: 'width',
         label: '宽度',
-        type: PropTypes.STRING,
+        type: PropTypes.UNIT,
         default: '',
       },
       {
         name: 'min-width',
         label: '最小宽度',
-        type: PropTypes.STRING,
+        type: PropTypes.UNIT,
         default: '',
       },
       {
@@ -4009,8 +4065,10 @@ export const componentMetaList = [
       ],
     },
   },
+]
 
-  // Navigation 导航
+// Navigation 导航
+const navigationComponents = [
   {
     type: 'ea-backtop',
     name: '回到顶部',
@@ -4680,8 +4738,10 @@ export const componentMetaList = [
       ],
     },
   },
+]
 
-  // Feedback 反馈
+// Feedback 反馈
+const feedbackComponents = [
   {
     type: 'ea-alert',
     name: '警告提示',
@@ -4917,7 +4977,7 @@ export const componentMetaList = [
       {
         name: 'size',
         label: '尺寸',
-        type: PropTypes.STRING,
+        type: PropTypes.UNIT,
         default: '30%',
       },
       {
@@ -5062,7 +5122,7 @@ export const componentMetaList = [
       {
         name: 'spinner-size',
         label: '图标大小',
-        type: PropTypes.STRING,
+        type: PropTypes.UNIT,
         default: '16px',
       },
     ],
@@ -5387,6 +5447,12 @@ export const componentMetaList = [
         default: '',
       },
       {
+        name: 'width',
+        label: '宽度',
+        type: PropTypes.UNIT,
+        default: '150px',
+      },
+      {
         name: 'confirm-button-text',
         label: '确认按钮文本',
         type: PropTypes.STRING,
@@ -5507,9 +5573,9 @@ export const componentMetaList = [
       },
       {
         name: 'width',
-        label: '宽度(px)',
-        type: PropTypes.NUMBER,
-        default: 150,
+        label: '宽度',
+        type: PropTypes.UNIT,
+        default: '150px',
       },
       {
         name: 'placement',
@@ -5708,6 +5774,16 @@ export const componentMetaList = [
       ],
     },
   },
+]
+
+// 导出合并后的组件列表
+export const componentMetaList = [
+  ...basicComponents,
+  ...formComponents,
+  ...dataComponents,
+  ...navigationComponents,
+  ...feedbackComponents,
+  ...layoutComponents,
 ]
 
 // 根据分类获取组件

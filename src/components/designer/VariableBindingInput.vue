@@ -35,6 +35,18 @@
           v-model="switchValue"
           @change="handleSwitchChange"
         />
+        <UnitInput
+          v-else-if="inputType === 'unit'"
+          :value="inputValue"
+          :placeholder="placeholder"
+          @update:value="handleInputChange"
+        />
+        <ea-color-picker
+          v-else-if="inputType === 'color'"
+          :value="inputValue"
+          @change="handleColorChange"
+          class="prop-input flex-1"
+        />
       </template>
 
       <!-- 绑定变量按钮 -->
@@ -64,6 +76,7 @@
   import EaInput from '../ea-ui-wrap/EaInput.vue'
   import EaSelect from '../ea-ui-wrap/EaSelect.vue'
   import EaSwitch from '../ea-ui-wrap/EaSwitch.vue'
+  import UnitInput from './UnitInput.vue'
 
   const props = defineProps({
     value: {
@@ -72,7 +85,7 @@
     },
     inputType: {
       type: String,
-      default: 'input', // input | select | switch
+      default: 'input',
     },
     options: {
       type: Array,
@@ -128,6 +141,12 @@
     emit('update:value', value)
   }
 
+  // 处理颜色变化
+  function handleColorChange(event) {
+    const value = event.detail?.value
+    emit('update:value', value)
+  }
+
   // 显示变量选择器
   function handleShowVariableSelector() {
     selectorVisible.value = true
@@ -156,6 +175,7 @@
   .input-wrapper {
     display: flex;
     align-items: center;
+    text-align: center;
     gap: 0.5rem;
   }
 
