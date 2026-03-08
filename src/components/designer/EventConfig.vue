@@ -62,37 +62,66 @@
               <!-- 事件名称 -->
               <div class="config-item">
                 <label class="config-label">事件名称</label>
-                <ea-input v-model="selectedEvent.name" placeholder="如：handleClick" size="small" />
+                <EaInput v-model="selectedEvent.name" placeholder="如：handleClick" size="small" />
               </div>
 
               <!-- 事件类型 -->
               <div class="config-item">
                 <label class="config-label">事件类型</label>
-                <ea-select v-model="selectedEvent.type" size="small" class="w-full">
-                  <ea-option value="click">点击</ea-option>
-                </ea-select>
+                <div class="event-type-input flex gap-2">
+                  <EaSelect
+                    :model-value="selectedEvent.type"
+                    size="small"
+                    class="w-full"
+                    @change="handleEventTypeChange"
+                  >
+                    <!-- 组件预定义事件 -->
+                    <ea-option-group label="组件事件">
+                      <ea-option
+                        v-for="event in availableEvents"
+                        :key="event.name"
+                        :value="event.name"
+                      >
+                        {{ event.label }} ({{ event.name }})
+                      </ea-option>
+                    </ea-option-group>
+                    <!-- 常用自定义事件 -->
+                    <ea-option-group label="常用事件">
+                      <ea-option value="custom">自定义...</ea-option>
+                    </ea-option-group>
+                  </EaSelect>
+                </div>
+                <!-- 自定义事件名输入 -->
+                <EaInput
+                  v-if="selectedEvent.type === 'custom' || !isPredefinedEvent(selectedEvent.type)"
+                  :model-value="selectedEvent.customType"
+                  placeholder="输入自定义事件名，如：dblclick"
+                  size="small"
+                  class="mt-2"
+                  @change="handleCustomTypeChange"
+                />
               </div>
 
               <!-- 动作类型 -->
               <div class="config-item">
                 <label class="config-label">动作</label>
-                <ea-select
-                  :value="selectedEvent.action"
+                <EaSelect
+                  :model-value="selectedEvent.action"
                   size="small"
                   class="w-full"
-                  @change.stop="handleActionChange($event.detail.value)"
+                  @change="handleActionChange"
                 >
                   <ea-option value="message">显示提示</ea-option>
                   <ea-option value="setProp">设置组件属性</ea-option>
                   <ea-option value="callMethod">调用组件方法</ea-option>
                   <ea-option value="custom">自定义代码</ea-option>
-                </ea-select>
+                </EaSelect>
               </div>
 
               <!-- 显示提示配置 -->
               <div v-if="selectedEvent.action === 'message'" class="config-item">
                 <label class="config-label">提示内容</label>
-                <ea-input
+                <EaInput
                   v-model="selectedEvent.message"
                   placeholder="输入提示消息内容"
                   size="small"
@@ -103,7 +132,7 @@
               <template v-if="selectedEvent.action === 'setProp'">
                 <div class="config-item">
                   <label class="config-label">目标组件ID</label>
-                  <ea-input
+                  <EaInput
                     v-model="selectedEvent.targetComponentId"
                     placeholder="如：button_123"
                     size="small"
@@ -111,7 +140,7 @@
                 </div>
                 <div class="config-item">
                   <label class="config-label">属性名</label>
-                  <ea-input
+                  <EaInput
                     v-model="selectedEvent.propName"
                     placeholder="如：loading"
                     size="small"
@@ -119,15 +148,15 @@
                 </div>
                 <div class="config-item">
                   <label class="config-label">属性值</label>
-                  <ea-select
-                    :value="selectedEvent.propValue"
+                  <EaSelect
+                    :model-value="selectedEvent.propValue"
                     size="small"
                     class="w-full"
-                    @change.stop="selectedEvent.propValue = $event.detail.value"
+                    @change="(val) => selectedEvent.propValue = val"
                   >
                     <ea-option :value="true">true</ea-option>
                     <ea-option :value="false">false</ea-option>
-                  </ea-select>
+                  </EaSelect>
                 </div>
               </template>
 
@@ -135,7 +164,7 @@
               <template v-if="selectedEvent.action === 'callMethod'">
                 <div class="config-item">
                   <label class="config-label">目标组件ID</label>
-                  <ea-input
+                  <EaInput
                     v-model="selectedEvent.targetComponentId"
                     placeholder="如：button_123"
                     size="small"
@@ -143,7 +172,7 @@
                 </div>
                 <div class="config-item">
                   <label class="config-label">方法名</label>
-                  <ea-input
+                  <EaInput
                     v-model="selectedEvent.methodName"
                     placeholder="如：focus"
                     size="small"
@@ -200,8 +229,10 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  import { ref, computed } from 'vue'
   import MonacoEditor from './MonacoEditor.vue'
+  import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
+  import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
 
   const props = defineProps({
     events: {
@@ -213,6 +244,70 @@
       default: () => [],
     },
   })
+
+  // 常用自定义事件列表
+  const commonCustomEvents = [
+    { name: 'dblclick', label: '双击' },
+    { name: 'mousedown', label: '鼠标按下' },
+    { name: 'mouseup', label: '鼠标释放' },
+    { name: 'mouseenter', label: '鼠标进入' },
+    { name: 'mouseleave', label: '鼠标离开' },
+    { name: 'mouseover', label: '鼠标悬停' },
+    { name: 'mouseout', label: '鼠标移出' },
+    { name: 'mousemove', label: '鼠标移动' },
+    { name: 'keydown', label: '按键按下' },
+    { name: 'keyup', label: '按键释放' },
+    { name: 'keypress', label: '按键按压' },
+    { name: 'focus', label: '获得焦点' },
+    { name: 'blur', label: '失去焦点' },
+    { name: 'input', label: '输入' },
+    { name: 'change', label: '改变' },
+    { name: 'select', label: '选择' },
+    { name: 'scroll', label: '滚动' },
+    { name: 'resize', label: '调整大小' },
+    { name: 'load', label: '加载' },
+    { name: 'unload', label: '卸载' },
+    { name: 'error', label: '错误' },
+  ]
+
+  // 可用事件列表（组件预定义事件 + 常用自定义事件）
+  const availableEvents = computed(() => {
+    const predefinedEvents = props.events || []
+
+    const allEvents = [...predefinedEvents]
+    commonCustomEvents.forEach((event) => {
+      if (!allEvents.find((e) => e.name === event.name)) {
+        allEvents.push(event)
+      }
+    })
+    return allEvents
+  })
+
+  // 检查是否是预定义事件
+  function isPredefinedEvent(eventType) {
+    return availableEvents.value.some((e) => e.name === eventType)
+  }
+
+  // 处理事件类型改变
+  function handleEventTypeChange(value) {
+    if (!selectedEvent.value) return
+
+    if (value === 'custom') {
+      selectedEvent.value.type = 'custom'
+      selectedEvent.value.customType = ''
+    } else {
+      selectedEvent.value.type = value
+      selectedEvent.value.customType = value
+    }
+  }
+
+  // 处理自定义类型输入
+  function handleCustomTypeChange(value) {
+    if (!selectedEvent.value) return
+
+    selectedEvent.value.customType = value
+    selectedEvent.value.type = value
+  }
 
   const emit = defineEmits(['event-change'])
 
@@ -241,8 +336,14 @@
 
   // 打开弹框
   function handleOpenDialog() {
-    // 深拷贝当前事件列表
     localEvents.value = JSON.parse(JSON.stringify(props.componentEvents || []))
+
+    localEvents.value.forEach((e) => {
+      if (!e.customType) {
+        e.customType = e.type
+      }
+    })
+
     selectedEvent.value = null
     dialogVisible.value = true
   }
@@ -255,10 +356,13 @@
 
   // 添加新事件
   function handleAddNewEvent() {
+    const defaultEvent = availableEvents.value[0] || { name: 'click', label: '点击' }
+
     const newEvent = {
       id: generateId(),
       name: `event${localEvents.value.length + 1}`,
-      type: 'click',
+      type: defaultEvent.name,
+      customType: defaultEvent.name,
       action: 'message',
       message: '提示消息',
       code: `console.log('事件触发');`,
@@ -283,7 +387,7 @@
       selectedEvent.value.message = selectedEvent.value.message || '提示消息'
     } else if (action === 'setProp') {
       selectedEvent.value.targetComponentId = selectedEvent.value.targetComponentId || ''
-      selectedEvent.value.propName = selectedEvent.value.propName || 'loading'
+      selectedEvent.value.propName = selectedEvent.value.propName || ''
       selectedEvent.value.propValue =
         selectedEvent.value.propValue !== undefined ? selectedEvent.value.propValue : true
     } else if (action === 'callMethod') {
@@ -310,13 +414,35 @@
   // 编辑已有事件
   function handleEditEvent(event) {
     localEvents.value = JSON.parse(JSON.stringify(props.componentEvents || []))
+    // 为每个事件添加 customType 字段（如果不存在）
+    localEvents.value.forEach((e) => {
+      if (!e.customType) {
+        e.customType = e.type
+      }
+    })
     selectedEvent.value = localEvents.value.find((e) => e.id === event.id) || null
     dialogVisible.value = true
   }
 
   // 保存事件
   function handleSaveEvents() {
-    emit('event-change', localEvents.value)
+    // 处理事件类型，确保使用正确的类型值
+    const eventsToSave = localEvents.value.map((event) => {
+      // 确定最终的事件类型
+      let finalType = event.type
+      // 如果 type 是 'custom' 且 customType 有值，使用 customType
+      if (event.type === 'custom' && event.customType) {
+        finalType = event.customType
+      } else if (event.customType && event.customType !== event.type) {
+        // 如果 customType 存在且与 type 不同，使用 customType
+        finalType = event.customType
+      }
+      return {
+        ...event,
+        type: finalType,
+      }
+    })
+    emit('event-change', eventsToSave)
     handleCloseDialog()
   }
 

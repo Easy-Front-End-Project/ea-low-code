@@ -157,6 +157,18 @@ export const useSchemaStore = defineStore('schema', () => {
   }
 
   /**
+   * 更新组件子组件
+   * @param {string} componentId - 组件ID
+   * @param {Array} children - 新子组件列表
+   */
+  function updateComponentChildren(componentId, children) {
+    const component = findComponentById(pageSchema.value.components, componentId)
+    if (component) {
+      component.children = children
+    }
+  }
+
+  /**
    * 移动组件
    * @param {string} componentId - 组件ID
    * @param {number} newIndex - 新位置索引
@@ -295,6 +307,7 @@ export const useSchemaStore = defineStore('schema', () => {
     updateComponentProps,
     updateComponentStyle,
     updateComponentEvents,
+    updateComponentChildren,
     moveComponent,
     selectComponent,
     clearSelection,

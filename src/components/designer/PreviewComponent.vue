@@ -21,6 +21,8 @@
         <PreviewComponent v-else :component="child" />
       </template>
     </template>
+    <!-- 优先使用 childrenText 作为插槽内容 -->
+    <template v-else-if="component.childrenText"> {{ component.childrenText }} </template>
     <template v-else-if="hasChildrenText">
       <ea-text type="normal" size="medium">{{ resolvedChildrenText }}</ea-text>
     </template>

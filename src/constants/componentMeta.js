@@ -524,6 +524,66 @@ const basicComponents = [
 // Form 表单组件
 const formComponents = [
   {
+    type: 'form',
+    name: '表单',
+    category: ComponentCategories.FORM,
+    icon: 'Form',
+    props: [
+      {
+        name: 'action',
+        label: '提交地址',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'method',
+        label: '提交方法',
+        type: PropTypes.SELECT,
+        default: 'get',
+        options: [
+          { label: 'GET', value: 'get' },
+          { label: 'POST', value: 'post' },
+        ],
+      },
+      {
+        name: 'enctype',
+        label: '编码类型',
+        type: PropTypes.SELECT,
+        default: 'application/x-www-form-urlencoded',
+        options: [
+          { label: 'URL编码', value: 'application/x-www-form-urlencoded' },
+          { label: '表单数据', value: 'multipart/form-data' },
+          { label: '纯文本', value: 'text/plain' },
+        ],
+      },
+      {
+        name: 'target',
+        label: '提交目标',
+        type: PropTypes.SELECT,
+        default: '_self',
+        options: [
+          { label: '当前窗口', value: '_self' },
+          { label: '新窗口', value: '_blank' },
+          { label: '父窗口', value: '_parent' },
+          { label: '顶层窗口', value: '_top' },
+        ],
+      },
+      {
+        name: 'novalidate',
+        label: '禁用验证',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+    ],
+    events: [
+      { name: 'submit', label: '提交事件' },
+      { name: 'reset', label: '重置事件' },
+      { name: 'change', label: '改变事件' },
+      { name: 'input', label: '输入事件' },
+    ],
+    slots: [{ name: 'default', label: '表单内容' }],
+  },
+  {
     type: 'ea-input',
     name: '输入框',
     category: ComponentCategories.FORM,
@@ -532,6 +592,12 @@ const formComponents = [
       {
         name: 'value',
         label: '绑定值',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'label',
+        label: '标签文本',
         type: PropTypes.STRING,
         default: '',
       },
@@ -562,7 +628,34 @@ const formComponents = [
           { label: '文本', value: 'text' },
           { label: '密码', value: 'password' },
           { label: '数字', value: 'number' },
+          { label: '邮箱', value: 'email' },
+          { label: '电话', value: 'tel' },
+          { label: '网址', value: 'url' },
         ],
+      },
+      {
+        name: 'required',
+        label: '必填',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+      {
+        name: 'minlength',
+        label: '最小长度',
+        type: PropTypes.NUMBER,
+        default: null,
+      },
+      {
+        name: 'maxlength',
+        label: '最大长度',
+        type: PropTypes.NUMBER,
+        default: null,
+      },
+      {
+        name: 'pattern',
+        label: '正则表达式',
+        type: PropTypes.STRING,
+        default: '',
       },
     ],
     events: [
@@ -583,8 +676,14 @@ const formComponents = [
     icon: 'Select',
     props: [
       {
-        name: 'modelValue',
-        label: '绑定值',
+        name: 'value',
+        label: '当前值',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'label',
+        label: '标签文本',
         type: PropTypes.STRING,
         default: '',
       },
@@ -612,12 +711,23 @@ const formComponents = [
         type: PropTypes.BOOLEAN,
         default: false,
       },
+      {
+        name: 'required',
+        label: '必填',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
     ],
     events: [
       { name: 'change', label: '改变事件' },
       { name: 'visible-change', label: '下拉框出现/隐藏' },
     ],
     slots: [{ name: 'default', label: '选项插槽' }],
+    childComponents: ['ea-option', 'ea-option-group'],
+    specialConfig: {
+      type: 'selectOptions',
+      propName: 'optionsConfig',
+    },
   },
   {
     type: 'ea-checkbox',
@@ -726,6 +836,12 @@ const formComponents = [
         default: [],
       },
       {
+        name: 'label',
+        label: '标签文本',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
         name: 'size',
         label: '尺寸',
         type: PropTypes.SELECT,
@@ -763,6 +879,7 @@ const formComponents = [
     ],
     events: [{ name: 'change', label: '改变事件' }],
     slots: [{ name: 'default', label: '复选框插槽' }],
+    childComponents: ['ea-checkbox'],
     styleConfig: {
       parts: [
         {
@@ -782,6 +899,12 @@ const formComponents = [
       {
         name: 'value',
         label: '绑定值',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'label',
+        label: '标签文本',
         type: PropTypes.STRING,
         default: '',
       },
@@ -1076,6 +1199,12 @@ const formComponents = [
         default: '',
       },
       {
+        name: 'label',
+        label: '标签文本',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
         name: 'disabled',
         label: '整体禁用',
         type: PropTypes.BOOLEAN,
@@ -1101,6 +1230,7 @@ const formComponents = [
     ],
     events: [{ name: 'change', label: '选中值改变' }],
     slots: [{ name: 'default', label: '单选框插槽' }],
+    childComponents: ['ea-radio'],
     styleConfig: {
       parts: [
         {
@@ -1404,6 +1534,12 @@ const formComponents = [
         default: 0,
       },
       {
+        name: 'label',
+        label: '标签文本',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
         name: 'value-on-clear',
         label: '清空时值',
         type: PropTypes.NUMBER,
@@ -1496,6 +1632,12 @@ const formComponents = [
         label: '输入模式',
         type: PropTypes.STRING,
         default: '',
+      },
+      {
+        name: 'required',
+        label: '必填',
+        type: PropTypes.BOOLEAN,
+        default: false,
       },
     ],
     events: [
@@ -1669,6 +1811,12 @@ const formComponents = [
         default: '',
       },
       {
+        name: 'label',
+        label: '显示文本',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
         name: 'disabled',
         label: '禁用',
         type: PropTypes.BOOLEAN,
@@ -1734,6 +1882,12 @@ const formComponents = [
         default: 'false',
       },
       {
+        name: 'label',
+        label: '标签文本',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
         name: 'active-value',
         label: '开启值',
         type: PropTypes.STRING,
@@ -1786,6 +1940,12 @@ const formComponents = [
         type: PropTypes.BOOLEAN,
         default: false,
       },
+      {
+        name: 'required',
+        label: '必填',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
     ],
     events: [{ name: 'change', label: '状态改变' }],
     slots: [
@@ -1833,6 +1993,12 @@ const formComponents = [
         label: '绑定值',
         type: PropTypes.NUMBER,
         default: 0,
+      },
+      {
+        name: 'label',
+        label: '标签文本',
+        type: PropTypes.STRING,
+        default: '',
       },
       {
         name: 'min',
@@ -1913,6 +2079,12 @@ const formComponents = [
           { label: '小', value: 'small' },
         ],
       },
+      {
+        name: 'required',
+        label: '必填',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
     ],
     events: [
       { name: 'change', label: '值改变' },
@@ -1973,6 +2145,12 @@ const formComponents = [
       {
         name: 'value',
         label: '日期值',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'label',
+        label: '标签文本',
         type: PropTypes.STRING,
         default: '',
       },
@@ -2045,6 +2223,12 @@ const formComponents = [
         type: PropTypes.STRING,
         default: 'en-US',
       },
+      {
+        name: 'required',
+        label: '必填',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
     ],
     events: [
       { name: 'change', label: '日期改变' },
@@ -2102,6 +2286,12 @@ const formComponents = [
         default: '',
       },
       {
+        name: 'label',
+        label: '标签文本',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
         name: 'width',
         label: '宽度',
         type: PropTypes.STRING,
@@ -2141,6 +2331,12 @@ const formComponents = [
         label: '限制结束时间',
         type: PropTypes.STRING,
         default: '23:59:59',
+      },
+      {
+        name: 'required',
+        label: '必填',
+        type: PropTypes.BOOLEAN,
+        default: false,
       },
     ],
     events: [{ name: 'change', label: '时间改变' }],
@@ -2193,6 +2389,12 @@ const formComponents = [
         default: 0,
       },
       {
+        name: 'label',
+        label: '标签文本',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
         name: 'max',
         label: '最大评分',
         type: PropTypes.NUMBER,
@@ -2218,6 +2420,12 @@ const formComponents = [
       {
         name: 'disabled',
         label: '禁用',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+      {
+        name: 'required',
+        label: '必填',
         type: PropTypes.BOOLEAN,
         default: false,
       },
@@ -2256,6 +2464,12 @@ const formComponents = [
         default: [],
       },
       {
+        name: 'label',
+        label: '标签文本',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
         name: 'disabled',
         label: '禁用',
         type: PropTypes.BOOLEAN,
@@ -2284,6 +2498,12 @@ const formComponents = [
         label: '按钮文本',
         type: PropTypes.ARRAY,
         default: [],
+      },
+      {
+        name: 'required',
+        label: '必填',
+        type: PropTypes.BOOLEAN,
+        default: false,
       },
     ],
     events: [
@@ -2321,6 +2541,59 @@ const formComponents = [
         },
       ],
     },
+  },
+  // Select 专用子组件
+  {
+    type: 'ea-option',
+    name: '选项',
+    category: ComponentCategories.FORM,
+    icon: 'Option',
+    isChildComponent: true,
+    parentComponents: ['ea-select'],
+    props: [
+      {
+        name: 'value',
+        label: '选项值',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'label',
+        label: '显示文本',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'disabled',
+        label: '禁用',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+    ],
+    events: [],
+    slots: [{ name: 'default', label: '选项内容' }],
+  },
+  {
+    type: 'ea-option-group',
+    name: '选项分组',
+    category: ComponentCategories.FORM,
+    icon: 'OptionGroup',
+    isChildComponent: true,
+    parentComponents: ['ea-select'],
+    props: [
+      {
+        name: 'label',
+        label: '分组标签',
+        type: PropTypes.STRING,
+        default: '',
+      },
+    ],
+    events: [],
+    slots: [
+      { name: 'default', label: '选项内容' },
+      { name: 'header', label: '头部插槽' },
+    ],
+    childComponents: ['ea-option'],
   },
 ]
 
@@ -2844,6 +3117,7 @@ const dataComponents = [
     ],
     events: [{ name: 'change', label: '索引变化' }],
     slots: [{ name: 'default', label: '轮播项插槽' }],
+    childComponents: ['ea-carousel-item'],
     styleConfig: {
       parts: [
         {
@@ -2874,6 +3148,8 @@ const dataComponents = [
     name: '走马灯项',
     category: ComponentCategories.DATA,
     icon: 'CarouselItem',
+    isChildComponent: true,
+    parentComponents: ['ea-carousel'],
     props: [],
     events: [],
     slots: [{ name: 'default', label: '内容插槽' }],
@@ -2918,6 +3194,7 @@ const dataComponents = [
     ],
     events: [{ name: 'change', label: '面板变化' }],
     slots: [{ name: 'default', label: '折叠项插槽' }],
+    childComponents: ['ea-collapse-item'],
     styleConfig: {
       parts: [
         {
@@ -2933,6 +3210,8 @@ const dataComponents = [
     name: '折叠面板项',
     category: ComponentCategories.DATA,
     icon: 'CollapseItem',
+    isChildComponent: true,
+    parentComponents: ['ea-collapse'],
     props: [
       {
         name: 'title',
@@ -3015,6 +3294,7 @@ const dataComponents = [
       { name: 'default', label: '描述项插槽' },
       { name: 'title', label: '标题插槽' },
     ],
+    childComponents: ['ea-descriptions-item'],
     styleConfig: {
       parts: [
         {
@@ -3030,6 +3310,8 @@ const dataComponents = [
     name: '描述列表项',
     category: ComponentCategories.DATA,
     icon: 'DescriptionsItem',
+    isChildComponent: true,
+    parentComponents: ['ea-descriptions'],
     props: [
       {
         name: 'label',
@@ -3526,6 +3808,7 @@ const dataComponents = [
       { name: 'default', label: '列定义插槽' },
       { name: 'empty', label: '空数据插槽' },
     ],
+    childComponents: ['ea-table-column'],
     styleConfig: {
       parts: [
         {
@@ -3561,6 +3844,8 @@ const dataComponents = [
     name: '表格列',
     category: ComponentCategories.DATA,
     icon: 'TableColumn',
+    isChildComponent: true,
+    parentComponents: ['ea-table'],
     props: [
       {
         name: 'prop',
@@ -3777,6 +4062,7 @@ const dataComponents = [
     ],
     events: [],
     slots: [{ name: 'default', label: '时间线项插槽' }],
+    childComponents: ['ea-timeline-item'],
     styleConfig: {
       parts: [
         {
@@ -3792,6 +4078,8 @@ const dataComponents = [
     name: '时间线项',
     category: ComponentCategories.DATA,
     icon: 'TimelineItem',
+    isChildComponent: true,
+    parentComponents: ['ea-timeline'],
     props: [
       {
         name: 'timestamp',
@@ -4012,6 +4300,40 @@ const dataComponents = [
       { name: 'default', label: '默认插槽' },
       { name: 'template', label: '模板插槽' },
     ],
+    childComponents: ['ea-skeleton-item'],
+    styleConfig: {
+      parts: [
+        {
+          name: 'container',
+          label: '外层容器',
+          styles: ['background-color'],
+        },
+      ],
+    },
+  },
+  {
+    type: 'ea-skeleton-item',
+    name: '骨架屏项',
+    category: ComponentCategories.DATA,
+    icon: 'SkeletonItem',
+    isChildComponent: true,
+    parentComponents: ['ea-skeleton'],
+    props: [
+      {
+        name: 'variant',
+        label: '变体',
+        type: PropTypes.SELECT,
+        default: 'text',
+        options: [
+          { label: '文本', value: 'text' },
+          { label: '圆形', value: 'circle' },
+          { label: '矩形', value: 'rect' },
+          { label: '图片', value: 'image' },
+        ],
+      },
+    ],
+    events: [],
+    slots: [{ name: 'default', label: '默认插槽' }],
     styleConfig: {
       parts: [
         {
@@ -4124,6 +4446,7 @@ const navigationComponents = [
       { name: 'default', label: '默认插槽' },
       { name: 'separator', label: '分隔符插槽' },
     ],
+    childComponents: ['ea-breadcrumb-item'],
     styleConfig: {
       parts: [
         {
@@ -4139,6 +4462,8 @@ const navigationComponents = [
     name: '面包屑项',
     category: ComponentCategories.NAVIGATION,
     icon: 'BreadcrumbItem',
+    isChildComponent: true,
+    parentComponents: ['ea-breadcrumb'],
     props: [
       {
         name: 'href',
@@ -4211,6 +4536,7 @@ const navigationComponents = [
       { name: 'default', label: '内容插槽' },
       { name: 'reference', label: '触发元素插槽' },
     ],
+    childComponents: ['ea-dropdown-item', 'ea-dropdown-menu'],
     styleConfig: {
       parts: [
         {
@@ -4226,6 +4552,8 @@ const navigationComponents = [
     name: '下拉菜单项',
     category: ComponentCategories.NAVIGATION,
     icon: 'DropdownItem',
+    isChildComponent: true,
+    parentComponents: ['ea-dropdown'],
     props: [
       {
         name: 'command',
@@ -4263,9 +4591,12 @@ const navigationComponents = [
     name: '下拉菜单容器',
     category: ComponentCategories.NAVIGATION,
     icon: 'DropdownMenu',
+    isChildComponent: true,
+    parentComponents: ['ea-dropdown'],
     props: [],
     events: [],
     slots: [{ name: 'default', label: '默认插槽' }],
+    childComponents: ['ea-dropdown-item'],
     styleConfig: {
       parts: [
         {
@@ -4329,6 +4660,7 @@ const navigationComponents = [
       { name: 'close', label: '菜单收起事件' },
     ],
     slots: [{ name: 'default', label: '菜单项插槽' }],
+    childComponents: ['ea-submenu', 'ea-menu-item', 'ea-menu-item-group'],
     styleConfig: {
       parts: [
         {
@@ -4344,6 +4676,9 @@ const navigationComponents = [
     name: '子菜单',
     category: ComponentCategories.NAVIGATION,
     icon: 'Submenu',
+    isChildComponent: true,
+    parentComponents: ['ea-menu', 'ea-submenu'],
+    childComponents: ['ea-submenu', 'ea-menu-item', 'ea-menu-item-group'],
     props: [
       {
         name: 'index',
@@ -4377,6 +4712,8 @@ const navigationComponents = [
     name: '菜单项',
     category: ComponentCategories.NAVIGATION,
     icon: 'MenuItem',
+    isChildComponent: true,
+    parentComponents: ['ea-menu', 'ea-submenu', 'ea-menu-item-group'],
     props: [
       {
         name: 'index',
@@ -4402,6 +4739,9 @@ const navigationComponents = [
     name: '菜单项分组',
     category: ComponentCategories.NAVIGATION,
     icon: 'MenuItemGroup',
+    isChildComponent: true,
+    parentComponents: ['ea-menu', 'ea-submenu'],
+    childComponents: ['ea-menu-item'],
     props: [
       {
         name: 'title',
@@ -4540,6 +4880,7 @@ const navigationComponents = [
     ],
     events: [],
     slots: [{ name: 'default', label: '步骤项插槽' }],
+    childComponents: ['ea-step'],
     styleConfig: {
       parts: [
         {
@@ -4555,6 +4896,8 @@ const navigationComponents = [
     name: '步骤项',
     category: ComponentCategories.NAVIGATION,
     icon: 'Step',
+    isChildComponent: true,
+    parentComponents: ['ea-steps'],
     props: [
       {
         name: 'title',
@@ -4656,6 +4999,7 @@ const navigationComponents = [
       { name: 'default', label: '默认插槽' },
       { name: 'nav', label: '标签栏插槽' },
     ],
+    childComponents: ['ea-tab', 'ea-tab-panel'],
     styleConfig: {
       parts: [
         {
@@ -4681,6 +5025,8 @@ const navigationComponents = [
     name: '标签',
     category: ComponentCategories.NAVIGATION,
     icon: 'Tab',
+    isChildComponent: true,
+    parentComponents: ['ea-tabs'],
     props: [
       {
         name: 'panel',
@@ -4712,6 +5058,8 @@ const navigationComponents = [
     name: '标签面板',
     category: ComponentCategories.NAVIGATION,
     icon: 'TabPanel',
+    isChildComponent: true,
+    parentComponents: ['ea-tabs'],
     props: [
       {
         name: 'name',
@@ -5073,77 +5421,6 @@ const feedbackComponents = [
           name: 'footer',
           label: '底部区域',
           styles: ['background-color', 'border-color'],
-        },
-      ],
-    },
-  },
-  {
-    type: 'ea-loading',
-    name: '加载',
-    category: ComponentCategories.FEEDBACK,
-    icon: 'Loading',
-    props: [
-      {
-        name: 'loading',
-        label: '显示加载动画',
-        type: PropTypes.BOOLEAN,
-        default: false,
-      },
-      {
-        name: 'fullscreen',
-        label: '全屏',
-        type: PropTypes.BOOLEAN,
-        default: false,
-      },
-      {
-        name: 'lock',
-        label: '锁定页面',
-        type: PropTypes.BOOLEAN,
-        default: false,
-      },
-      {
-        name: 'background',
-        label: '背景颜色',
-        type: PropTypes.COLOR,
-        default: 'hsla(0, 0%, 100%, 0.9)',
-      },
-      {
-        name: 'text',
-        label: '加载文案',
-        type: PropTypes.STRING,
-        default: '',
-      },
-      {
-        name: 'spinner',
-        label: '加载图标',
-        type: PropTypes.STRING,
-        default: '',
-      },
-      {
-        name: 'spinner-size',
-        label: '图标大小',
-        type: PropTypes.UNIT,
-        default: '16px',
-      },
-    ],
-    events: [],
-    slots: [{ name: 'default', label: '默认插槽' }],
-    styleConfig: {
-      parts: [
-        {
-          name: 'container',
-          label: '外层容器',
-          styles: ['background-color'],
-        },
-        {
-          name: 'mask-wrap',
-          label: '遮罩层',
-          styles: ['background-color'],
-        },
-        {
-          name: 'icon',
-          label: '加载图标',
-          styles: ['color'],
         },
       ],
     },

@@ -2,9 +2,10 @@
   <div
     class="canvas-component"
     :class="{
-      'is-selected': selected,
-      'is-container': isContainer,
-      'is-drop-target': isDropTarget,
+      'is-selected': selected && !isNonSelectable,
+      'is-container': isContainer && !isNonSelectable,
+      'is-drop-target': isDropTarget && !isNonSelectable,
+      'is-non-selectable': isNonSelectable,
     }"
     :style="componentStyle"
     @click.stop="handleClick"
@@ -16,12 +17,12 @@
     @dragleave.stop="handleDragLeave"
   >
     <!-- 组件标签 -->
-    <div v-if="showLabel" class="component-label">
+    <div v-if="showLabel && !isNonSelectable" class="component-label">
       {{ componentMeta?.name || (isRemoteComponent ? '远程组件' : component.type) }}
     </div>
 
     <!-- 选中时的操作按钮 -->
-    <div v-if="selected" class="component-actions">
+    <div v-if="selected && !isNonSelectable" class="component-actions">
       <button class="action-btn" @click.stop="handleDelete" title="删除">
         <ea-icon icon="icon-trash-empty" size="14"></ea-icon>
       </button>
@@ -42,9 +43,31 @@
         <!-- 使用原生 slot 属性方式渲染子组件 -->
         <template v-if="allChildren.length > 0">
           <template v-for="child in allChildren" :key="child.id">
-            <!-- 如果子组件有非默认 slot 属性，使用 div 包装并设置 slot 属性 -->
+            <template v-if="isNonSelectableType(child.type)">
+              <component
+                :is="child.type"
+                v-bind="getChildComponentProps(child)"
+                style="display: block"
+              >
+                <template v-if="child.childrenText"> {{ child.childrenText }} </template>
+
+                <template v-if="child.children && child.children.length > 0">
+                  <component
+                    v-for="grandChild in child.children"
+                    :key="grandChild.id"
+                    :is="grandChild.type"
+                    v-bind="getChildComponentProps(grandChild)"
+                    style="display: block"
+                  >
+                    <template v-if="grandChild.childrenText">
+                      {{ grandChild.childrenText }}
+                    </template>
+                  </component>
+                </template>
+              </component>
+            </template>
             <div
-              v-if="child.props?.slot && child.props.slot !== 'default'"
+              v-else-if="child.props?.slot && child.props.slot !== 'default'"
               :slot="child.props.slot"
               style="display: contents"
             >
@@ -74,7 +97,7 @@
     </div>
 
     <!-- 选中边框 -->
-    <div v-if="selected" class="selection-border"></div>
+    <div v-if="selected && !isNonSelectable" class="selection-border"></div>
   </div>
 </template>
 
@@ -114,6 +137,34 @@
 
   const selectedComponentId = computed(() => schemaStore.selectedComponentId)
   const componentMeta = computed(() => getComponentMeta(props.component.type))
+
+  // 不可选中的组件类型（如 select 的子组件）
+  const nonSelectableTypes = ['ea-option', 'ea-option-group']
+
+  // 是否为不可选中的组件
+  const isNonSelectable = computed(() => {
+    return nonSelectableTypes.includes(props.component.type)
+  })
+
+  // 检查组件类型是否为不可选中类型
+  function isNonSelectableType(type) {
+    return nonSelectableTypes.includes(type)
+  }
+
+  // 获取子组件的 props（解析变量绑定）
+  function getChildComponentProps(child) {
+    const childProps = child.props || {}
+    const resolvedProps = {}
+
+    // 遍历所有属性，解析变量绑定
+    for (const [key, value] of Object.entries(childProps)) {
+      // 跳过 slot 属性
+      if (key === 'slot') continue
+      resolvedProps[key] = resolveValue(value)
+    }
+
+    return resolvedProps
+  }
 
   // 是否为远程组件
   const isRemoteComponent = computed(() => {
@@ -199,7 +250,19 @@
       'ea-form-item',
       'ea-button-group',
     ]
-    return containerTypes.includes(props.component.type)
+
+    // 如果组件类型在预定义容器列表中，直接返回 true
+    if (containerTypes.includes(props.component.type)) {
+      return true
+    }
+
+    // 如果组件有 slots 定义（除了空的 slots 数组），也视为容器
+    const metaSlots = componentMeta.value?.slots
+    if (metaSlots && metaSlots.length > 0) {
+      return true
+    }
+
+    return false
   })
 
   // 解析值（处理变量绑定）
@@ -309,6 +372,10 @@
 
   // 点击组件（选中）
   function handleClick() {
+    // 如果是不可选中的组件，不触发选中
+    if (isNonSelectable.value) {
+      return
+    }
     emit('select', props.component.id)
   }
 
@@ -418,14 +485,14 @@
 
   // 拖拽悬停（仅容器组件处理）
   function handleDragOver(event) {
-    if (!isContainer.value) return
+    if (!isContainer.value || isNonSelectable.value) return
     event.preventDefault()
     event.dataTransfer.dropEffect = 'copy'
   }
 
   // 拖拽进入
   function handleDragEnter(event) {
-    if (!isContainer.value) return
+    if (!isContainer.value || isNonSelectable.value) return
     event.preventDefault()
     dragCounter.value++
     if (dragCounter.value === 1) {
@@ -435,7 +502,7 @@
 
   // 拖拽离开
   function handleDragLeave() {
-    if (!isContainer.value) return
+    if (!isContainer.value || isNonSelectable.value) return
     dragCounter.value--
     if (dragCounter.value === 0) {
       isDropTarget.value = false
@@ -444,7 +511,7 @@
 
   // 放置组件到容器
   function handleDrop(event) {
-    if (!isContainer.value) return
+    if (!isContainer.value || isNonSelectable.value) return
     event.preventDefault()
 
     dragCounter.value = 0
@@ -454,20 +521,31 @@
     if (!data) return
 
     try {
-      const componentMeta = JSON.parse(data)
+      const droppedComponentMeta = JSON.parse(data)
 
-      // 获取容器的非默认插槽
-      const namedSlots = availableSlots.value.filter((slot) => slot.name !== 'default')
+      // 获取容器的所有插槽
+      const allSlots = availableSlots.value
+      const namedSlots = allSlots.filter((slot) => slot.name !== 'default')
 
-      // 如果有非默认插槽，默认使用第一个非默认插槽
+      // 确定目标插槽
       let targetSlot = 'default'
-      if (namedSlots.length > 0) {
+
+      // 1. 检查拖放的组件是否是当前组件的专用子组件
+      const allowedChildTypes = componentMeta.value?.childComponents || []
+      const isDedicatedChild = allowedChildTypes.includes(droppedComponentMeta.type)
+
+      // 2. 如果是专用子组件，优先放入 default 插槽
+      if (isDedicatedChild) {
+        targetSlot = 'default'
+      }
+      // 3. 如果有非默认插槽且不是专用子组件，默认使用第一个非默认插槽
+      else if (namedSlots.length > 0) {
         targetSlot = namedSlots[0].name
       }
 
       // 向上冒泡，让父组件处理放置逻辑
       emit('drop-to-parent', {
-        componentMeta,
+        componentMeta: droppedComponentMeta,
         parentId: props.component.id,
         slotName: targetSlot,
       })
@@ -585,5 +663,16 @@
     inset: -4px;
     border: 1px dashed rgba(59, 130, 246, 0.3);
     border-radius: 6px;
+  }
+
+  /* 不可选中的组件样式 */
+  .canvas-component.is-non-selectable {
+    pointer-events: none;
+    display: contents;
+  }
+
+  .canvas-component.is-non-selectable .component-wrapper {
+    pointer-events: auto;
+    display: contents;
   }
 </style>
