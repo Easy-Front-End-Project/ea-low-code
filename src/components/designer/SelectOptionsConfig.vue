@@ -2,15 +2,14 @@
   <div class="select-options-config">
     <div class="config-header">
       <span class="config-title">选项配置</span>
-      <button class="config-btn" @click="openDialog">
-        <span class="btn-icon">⚙️</span>
-        配置选项
-      </button>
+      <ea-button icon="icon-cog" type="primary" size="small" @click="openDialog">
+        <span>配置选项</span>
+      </ea-button>
     </div>
 
     <!-- 选项预览 -->
     <div class="options-preview">
-      <div v-if="optionsData.length === 0" class="empty-text">暂无选项</div>
+      <ea-empty v-if="optionsData.length === 0" description="暂无选项"></ea-empty>
       <div v-else class="preview-list">
         <div
           v-for="(item, index) in flatOptions"
@@ -25,137 +24,164 @@
     </div>
 
     <!-- 配置弹窗 -->
-    <div v-if="dialogVisible" class="dialog-overlay" @click.self="closeDialog">
-      <div class="dialog-container" style="width: 600px">
-        <div class="dialog-header">
-          <span class="dialog-title">配置 Select 选项</span>
-          <button class="close-btn" @click="closeDialog">×</button>
+    <ea-dialog :visible="dialogVisible" title="配置 Select 选项" width="600px" @close="closeDialog">
+      <div class="dialog-content">
+        <!-- 工具栏 -->
+        <div class="toolbar">
+          <ea-button icon="icon-plus" type="primary" text size="small" @click="addOption">
+            添加选项
+          </ea-button>
+          <ea-button
+            icon="icon-folder-empty"
+            type="normal"
+            text
+            size="small"
+            @click="addOptionGroup"
+          >
+            添加分组
+          </ea-button>
         </div>
 
-        <div class="dialog-body">
-          <!-- 工具栏 -->
-          <div class="toolbar">
-            <button class="toolbar-btn primary" @click="addOption">
-              <span class="btn-icon">+</span>
-              添加选项
-            </button>
-            <button class="toolbar-btn" @click="addOptionGroup">
-              <span class="btn-icon">📁</span>
-              添加分组
-            </button>
-          </div>
-
-          <!-- 树形结构 -->
-          <div class="tree-container">
-            <div v-if="treeData.length === 0" class="tree-empty">暂无数据，请点击上方按钮添加</div>
-            <div v-else class="tree-list">
-              <!-- 分组节点 -->
-              <div v-for="node in groupNodes" :key="node.id" class="tree-node is-group">
-                <div class="node-content">
-                  <span class="node-icon">📂</span>
-                  <span class="node-label">{{ node.label || '未命名分组' }}</span>
-                  <div class="node-actions">
-                    <button class="action-btn" @click="addOptionToGroup(node)">添加选项</button>
-                    <button class="action-btn" @click="editGroup(node)">编辑</button>
-                    <button class="action-btn danger" @click="removeNodeById(node.id)">删除</button>
-                  </div>
+        <!-- 树形结构 -->
+        <div class="tree-container">
+          <ea-empty
+            v-if="treeData.length === 0"
+            description="暂无数据，请点击上方按钮添加"
+          ></ea-empty>
+          <div v-else class="tree-list">
+            <!-- 分组节点 -->
+            <div v-for="node in groupNodes" :key="node.id" class="tree-node is-group">
+              <div class="node-content">
+                <ea-icon icon="icon-folder-empty" size="14" class="node-icon"></ea-icon>
+                <span class="node-label">{{ node.label || '未命名分组' }}</span>
+                <div class="node-actions">
+                  <ea-button type="primary" text size="small" @click="addOptionToGroup(node)">
+                    添加选项
+                  </ea-button>
+                  <ea-button type="primary" text size="small" @click="editGroup(node)">
+                    编辑
+                  </ea-button>
+                  <ea-button type="danger" text size="small" @click="removeNodeById(node.id)">
+                    删除
+                  </ea-button>
                 </div>
-                <!-- 子选项 -->
-                <div class="tree-children">
-                  <div
-                    v-for="(child, childIndex) in node.children"
-                    :key="child.id"
-                    class="tree-node is-option"
-                  >
-                    <div class="node-content">
-                      <span class="node-icon">○</span>
-                      <span class="node-label">{{ child.label || '未命名选项' }}</span>
-                      <span class="node-value">值: {{ child.value }}</span>
-                      <div class="node-actions">
-                        <button class="action-btn" @click="editOption(child, node)">编辑</button>
-                        <button
-                          class="action-btn danger"
-                          @click="removeChildNode(node, childIndex)"
-                        >
-                          删除
-                        </button>
-                      </div>
+              </div>
+              <!-- 子选项 -->
+              <div class="tree-children">
+                <div
+                  v-for="(child, childIndex) in node.children"
+                  :key="child.id"
+                  class="tree-node is-option"
+                >
+                  <div class="node-content">
+                    <ea-icon icon="icon-folder-empty" size="12" class="node-icon"></ea-icon>
+                    <span class="node-label">{{ child.label || '未命名选项' }}</span>
+                    <span class="node-value">值: {{ child.value }}</span>
+                    <div class="node-actions">
+                      <ea-button type="primary" text size="small" @click="editOption(child, node)">
+                        编辑
+                      </ea-button>
+                      <ea-button
+                        type="danger"
+                        text
+                        icon="icon-trash-empty"
+                        size="small"
+                        @click="removeChildNode(node, childIndex)"
+                      >
+                        删除
+                      </ea-button>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- 普通选项节点 -->
-              <div v-for="node in optionNodes" :key="node.id" class="tree-node is-option">
-                <div class="node-content">
-                  <span class="node-icon">○</span>
-                  <span class="node-label">{{ node.label || '未命名选项' }}</span>
-                  <span class="node-value">值: {{ node.value }}</span>
-                  <div class="node-actions">
-                    <button class="action-btn" @click="editOption(node)">编辑</button>
-                    <button class="action-btn danger" @click="removeNodeById(node.id)">删除</button>
-                  </div>
+            <!-- 普通选项节点 -->
+            <div v-for="node in optionNodes" :key="node.id" class="tree-node is-option">
+              <div class="node-content">
+                <ea-icon icon="icon-cog" size="12" class="node-icon"></ea-icon>
+                <span class="node-label">{{ node.label || '未命名选项' }}</span>
+                <span class="node-value">值: {{ node.value }}</span>
+                <div class="node-actions">
+                  <ea-button
+                    icon="icon-pencil"
+                    type="primary"
+                    text
+                    size="small"
+                    @click="editOption(node)"
+                  >
+                    编辑
+                  </ea-button>
+                  <ea-button
+                    type="danger"
+                    text
+                    size="small"
+                    icon="icon-trash-empty"
+                    @click="removeNodeById(node.id)"
+                  >
+                    删除
+                  </ea-button>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
-        <div class="dialog-footer">
-          <button class="footer-btn" @click="closeDialog">取消</button>
-          <button class="footer-btn primary" @click="saveOptions">确定</button>
-        </div>
       </div>
-    </div>
+
+      <!-- 底部按钮 -->
+      <div slot="footer" class="dialog-footer">
+        <ea-button @click="closeDialog">取消</ea-button>
+        <ea-button type="primary" @click="saveOptions">确定</ea-button>
+      </div>
+    </ea-dialog>
 
     <!-- 编辑选项弹窗 -->
-    <div v-if="optionDialogVisible" class="dialog-overlay" @click.self="closeOptionDialog">
-      <div class="dialog-container" style="width: 400px">
-        <div class="dialog-header">
-          <span class="dialog-title">{{ optionDialogTitle }}</span>
-          <button class="close-btn" @click="closeOptionDialog">×</button>
+    <ea-dialog
+      :visible="optionDialogVisible"
+      :title="optionDialogTitle"
+      width="400px"
+      @close="closeOptionDialog"
+    >
+      <div class="form-content">
+        <div class="form-item">
+          <label class="form-label">显示文本</label>
+          <EaInput v-model="editingOption.label" placeholder="请输入显示文本" size="small" />
         </div>
-        <div class="dialog-body">
-          <div class="form-item">
-            <label class="form-label">显示文本</label>
-            <input v-model="editingOption.label" class="form-input" placeholder="请输入显示文本" />
-          </div>
-          <div class="form-item">
-            <label class="form-label">选项值</label>
-            <input v-model="editingOption.value" class="form-input" placeholder="请输入选项值" />
-          </div>
-        </div>
-        <div class="dialog-footer">
-          <button class="footer-btn" @click="closeOptionDialog">取消</button>
-          <button class="footer-btn primary" @click="saveOption">确定</button>
+        <div class="form-item">
+          <label class="form-label">选项值</label>
+          <EaInput v-model="editingOption.value" placeholder="请输入选项值" size="small" />
         </div>
       </div>
-    </div>
+      <div slot="footer" class="dialog-footer">
+        <ea-button @click="closeOptionDialog">取消</ea-button>
+        <ea-button type="primary" @click="saveOption">确定</ea-button>
+      </div>
+    </ea-dialog>
 
     <!-- 编辑分组弹窗 -->
-    <div v-if="groupDialogVisible" class="dialog-overlay" @click.self="closeGroupDialog">
-      <div class="dialog-container" style="width: 400px">
-        <div class="dialog-header">
-          <span class="dialog-title">编辑分组</span>
-          <button class="close-btn" @click="closeGroupDialog">×</button>
-        </div>
-        <div class="dialog-body">
-          <div class="form-item">
-            <label class="form-label">分组标签</label>
-            <input v-model="editingGroup.label" class="form-input" placeholder="请输入分组标签" />
-          </div>
-        </div>
-        <div class="dialog-footer">
-          <button class="footer-btn" @click="closeGroupDialog">取消</button>
-          <button class="footer-btn primary" @click="saveGroup">确定</button>
+    <ea-dialog
+      :visible="groupDialogVisible"
+      title="编辑分组"
+      width="400px"
+      @close="closeGroupDialog"
+    >
+      <div class="form-content">
+        <div class="form-item">
+          <label class="form-label">分组标签</label>
+          <EaInput v-model="editingGroup.label" placeholder="请输入分组标签" size="small" />
         </div>
       </div>
-    </div>
+      <div slot="footer" class="dialog-footer">
+        <ea-button @click="closeGroupDialog">取消</ea-button>
+        <ea-button type="primary" @click="saveGroup">确定</ea-button>
+      </div>
+    </ea-dialog>
   </div>
 </template>
 
 <script setup>
   import { ref, computed, watch } from 'vue'
+  import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
   const props = defineProps({
     modelValue: {
@@ -363,7 +389,7 @@
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .select-options-config {
     margin-bottom: 1rem;
   }
@@ -381,39 +407,11 @@
     color: #374151;
   }
 
-  .config-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.375rem 0.75rem;
-    font-size: 0.75rem;
-    color: #fff;
-    background-color: #3b82f6;
-    border: none;
-    border-radius: 0.25rem;
-    cursor: pointer;
-  }
-
-  .config-btn:hover {
-    background-color: #2563eb;
-  }
-
-  .btn-icon {
-    font-size: 0.75rem;
-  }
-
   .options-preview {
     background-color: #f9fafb;
     border-radius: 0.375rem;
     padding: 0.5rem;
     min-height: 40px;
-  }
-
-  .empty-text {
-    font-size: 0.75rem;
-    color: #9ca3af;
-    text-align: center;
-    padding: 0.5rem;
   }
 
   .preview-list {
@@ -445,91 +443,16 @@
     color: #9ca3af;
   }
 
-  /* 弹窗样式 */
-  .dialog-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-
-  .dialog-container {
-    background-color: #fff;
-    border-radius: 0.5rem;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    max-height: 80vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .dialog-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    border-bottom: 1px solid #e5e7eb;
-  }
-
-  .dialog-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #111827;
-  }
-
-  .close-btn {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: #6b7280;
-    cursor: pointer;
-    line-height: 1;
-  }
-
-  .close-btn:hover {
-    color: #374151;
-  }
-
-  .dialog-body {
-    flex: 1;
+  /* 弹窗内容 */
+  .dialog-content {
+    max-height: 400px;
     overflow-y: auto;
-    padding: 1rem;
   }
 
   .dialog-footer {
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;
-    padding: 1rem;
-    border-top: 1px solid #e5e7eb;
-  }
-
-  .footer-btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    border: 1px solid #d1d5db;
-    background-color: #fff;
-    border-radius: 0.375rem;
-    cursor: pointer;
-  }
-
-  .footer-btn:hover {
-    background-color: #f9fafb;
-  }
-
-  .footer-btn.primary {
-    background-color: #3b82f6;
-    color: #fff;
-    border-color: #3b82f6;
-  }
-
-  .footer-btn.primary:hover {
-    background-color: #2563eb;
   }
 
   /* 工具栏 */
@@ -541,42 +464,9 @@
     border-bottom: 1px solid #e5e7eb;
   }
 
-  .toolbar-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.375rem 0.75rem;
-    font-size: 0.75rem;
-    background-color: #f3f4f6;
-    border: 1px solid #d1d5db;
-    border-radius: 0.25rem;
-    cursor: pointer;
-  }
-
-  .toolbar-btn:hover {
-    background-color: #e5e7eb;
-  }
-
-  .toolbar-btn.primary {
-    background-color: #3b82f6;
-    color: #fff;
-    border-color: #3b82f6;
-  }
-
-  .toolbar-btn.primary:hover {
-    background-color: #2563eb;
-  }
-
   /* 树形结构 */
   .tree-container {
     min-height: 200px;
-  }
-
-  .tree-empty {
-    text-align: center;
-    color: #9ca3af;
-    padding: 2rem;
-    font-size: 0.875rem;
   }
 
   .tree-list {
@@ -610,7 +500,6 @@
   .node-icon {
     color: #6b7280;
     flex-shrink: 0;
-    font-size: 0.875rem;
   }
 
   .tree-node.is-group .node-icon {
@@ -642,20 +531,7 @@
     opacity: 1;
   }
 
-  .action-btn {
-    padding: 0.125rem 0.375rem;
-    font-size: 0.75rem;
-    color: #3b82f6;
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-
-  .action-btn:hover {
-    text-decoration: underline;
-  }
-
-  .action-btn.danger {
+  .node-actions ea-button.danger {
     color: #ef4444;
   }
 
@@ -665,13 +541,21 @@
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-  }
 
-  .tree-children .tree-node {
-    margin-right: 0.5rem;
+    .tree-node {
+      margin-right: 0.5rem;
+    }
+
+    &:empty {
+      display: none;
+    }
   }
 
   /* 表单样式 */
+  .form-content {
+    padding: 0.5rem 0;
+  }
+
   .form-item {
     margin-bottom: 1rem;
   }
@@ -682,19 +566,5 @@
     font-weight: 500;
     color: #374151;
     margin-bottom: 0.5rem;
-  }
-
-  .form-input {
-    width: 100%;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.875rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
-    outline: none;
-  }
-
-  .form-input:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
 </style>

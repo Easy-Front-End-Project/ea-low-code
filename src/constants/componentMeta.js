@@ -722,7 +722,7 @@ const formComponents = [
       { name: 'change', label: '改变事件' },
       { name: 'visible-change', label: '下拉框出现/隐藏' },
     ],
-    slots: [{ name: 'default', label: '选项插槽' }],
+    slots: [{ name: 'default', label: '选项插槽', isContentSlot: false }],
     childComponents: ['ea-option', 'ea-option-group'],
     specialConfig: {
       type: 'selectOptions',
@@ -878,7 +878,7 @@ const formComponents = [
       },
     ],
     events: [{ name: 'change', label: '改变事件' }],
-    slots: [{ name: 'default', label: '复选框插槽' }],
+    slots: [{ name: 'default', label: '复选框插槽', isContentSlot: false }],
     childComponents: ['ea-checkbox'],
     styleConfig: {
       parts: [
@@ -1229,7 +1229,7 @@ const formComponents = [
       },
     ],
     events: [{ name: 'change', label: '选中值改变' }],
-    slots: [{ name: 'default', label: '单选框插槽' }],
+    slots: [{ name: 'default', label: '单选框插槽', isContentSlot: false }],
     childComponents: ['ea-radio'],
     styleConfig: {
       parts: [
@@ -1850,7 +1850,7 @@ const formComponents = [
     ],
     events: [],
     slots: [
-      { name: 'default', label: '选项插槽' },
+      { name: 'default', label: '选项插槽', isContentSlot: false },
       { name: 'header', label: '标题插槽' },
     ],
     styleConfig: {
@@ -3116,7 +3116,7 @@ const dataComponents = [
       },
     ],
     events: [{ name: 'change', label: '索引变化' }],
-    slots: [{ name: 'default', label: '轮播项插槽' }],
+    slots: [{ name: 'default', label: '轮播项插槽', isContentSlot: false }],
     childComponents: ['ea-carousel-item'],
     styleConfig: {
       parts: [
@@ -3193,7 +3193,7 @@ const dataComponents = [
       },
     ],
     events: [{ name: 'change', label: '面板变化' }],
-    slots: [{ name: 'default', label: '折叠项插槽' }],
+    slots: [{ name: 'default', label: '折叠项插槽', isContentSlot: false }],
     childComponents: ['ea-collapse-item'],
     styleConfig: {
       parts: [
@@ -4061,7 +4061,7 @@ const dataComponents = [
       },
     ],
     events: [],
-    slots: [{ name: 'default', label: '时间线项插槽' }],
+    slots: [{ name: 'default', label: '时间线项插槽', isContentSlot: false }],
     childComponents: ['ea-timeline-item'],
     styleConfig: {
       parts: [
@@ -4996,7 +4996,7 @@ const navigationComponents = [
       { name: 'tab-remove', label: '标签移除事件' },
     ],
     slots: [
-      { name: 'default', label: '默认插槽' },
+      { name: 'default', label: '默认插槽', isContentSlot: false },
       { name: 'nav', label: '标签栏插槽' },
     ],
     childComponents: ['ea-tab', 'ea-tab-panel'],

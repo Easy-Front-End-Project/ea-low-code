@@ -6,10 +6,8 @@
     :style="component.style"
     v-on="componentEventListeners"
   >
-    <!-- 使用原生 slot 属性方式渲染子组件 -->
     <template v-if="hasNestedChildren">
       <template v-for="child in component.children" :key="child.id">
-        <!-- 如果子组件有非默认 slot 属性，使用 div 包装并设置 slot 属性 -->
         <div
           v-if="child.props?.slot && child.props.slot !== 'default'"
           :slot="child.props.slot"
@@ -17,19 +15,18 @@
         >
           <PreviewComponent :component="child" />
         </div>
-        <!-- 默认插槽的子组件，不设置 slot 属性 -->
+
         <PreviewComponent v-else :component="child" />
       </template>
     </template>
-    <!-- 优先使用 childrenText 作为插槽内容 -->
     <template v-else-if="component.childrenText"> {{ component.childrenText }} </template>
     <template v-else-if="hasChildrenText">
       <ea-text type="normal" size="medium">{{ resolvedChildrenText }}</ea-text>
     </template>
     <template v-else-if="hasDefaultSlot">
-      <ea-text type="normal" size="medium"
-        >{{ componentProps.label || componentProps.title || '' }}</ea-text
-      >
+      <ea-text type="normal" size="medium">
+        {{ componentProps.label || componentProps.title || '' }}
+      </ea-text>
     </template>
   </component>
 </template>
@@ -168,9 +165,10 @@
     return resolvedProps
   })
 
-  // 是否有默认插槽
+  // 是否有默认插槽（且该插槽用于内容显示，而非子组件）
   const hasDefaultSlot = computed(() => {
-    return componentMeta.value?.slots?.some((slot) => slot.name === 'default')
+    const defaultSlot = componentMeta.value?.slots?.find((slot) => slot.name === 'default')
+    return defaultSlot && defaultSlot.isContentSlot !== false
   })
 
   // 组件事件监听器（动态绑定）
