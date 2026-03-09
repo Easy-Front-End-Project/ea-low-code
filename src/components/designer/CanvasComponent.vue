@@ -147,20 +147,15 @@
   const selectedComponentId = computed(() => schemaStore.selectedComponentId)
   const componentMeta = computed(() => getComponentMeta(props.component.type))
 
-  // 不可选中的组件类型（如 select 的子组件）
-  const nonSelectableTypes = ['ea-option', 'ea-option-group']
+  // 不可选中的组件类型
+  const nonSelectableTypes = ['ea-option', 'ea-option-group', 'ea-checkbox', 'ea-radio']
+
+  // 非容器组件类型
+  const nonContainerTypes = ['ea-checkbox-group', 'ea-radio-group']
 
   // 是否为不可选中的组件
   const isNonSelectable = computed(() => {
-    // 基础不可选中类型
     if (nonSelectableTypes.includes(props.component.type)) {
-      return true
-    }
-    // ea-checkbox 在 ea-checkbox-group 内不可选中
-    if (
-      props.component.type === 'ea-checkbox' &&
-      props.parentComponent?.type === 'ea-checkbox-group'
-    ) {
       return true
     }
 
@@ -255,8 +250,8 @@
 
   // 是否为容器组件（可放置其他组件）
   const isContainer = computed(() => {
-    // ea-checkbox-group 不是容器，只能通过配置生成子组件
-    if (props.component.type === 'ea-checkbox-group') {
+    // 非容器组件类型，不能放置其他组件
+    if (nonContainerTypes.includes(props.component.type)) {
       return false
     }
 

@@ -14,6 +14,7 @@
   import { computed } from 'vue'
   import SelectOptionsConfig from '@/components/configs/special/SelectOptionsConfig.vue'
   import CheckboxGroupConfig from '@/components/configs/special/CheckboxGroupConfig.vue'
+  import RadioGroupConfig from '@/components/configs/special/RadioGroupConfig.vue'
 
   /**
    * 特殊配置渲染器
@@ -35,7 +36,7 @@
   const configMap = {
     selectOptions: SelectOptionsConfig,
     checkboxGroupOptions: CheckboxGroupConfig,
-    // radioGroupOptions: RadioGroupConfig,
+    radioGroupOptions: RadioGroupConfig,
   }
 
   // 根据类型获取对应的配置组件

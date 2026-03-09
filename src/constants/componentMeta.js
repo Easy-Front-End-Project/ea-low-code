@@ -1235,6 +1235,10 @@ const formComponents = [
     events: [{ name: 'change', label: '选中值改变' }],
     slots: [{ name: 'default', label: '单选框插槽', isContentSlot: false }],
     childComponents: ['ea-radio'],
+    specialConfig: {
+      type: 'radioGroupOptions',
+      propName: 'optionsConfig',
+    },
     styleConfig: {
       parts: [
         {
