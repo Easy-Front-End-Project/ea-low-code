@@ -40,11 +40,11 @@
           @slot-change="handleSlotChange"
         />
 
-        <!-- 特殊配置：根据组件类型动态渲染对应的配置组件 -->
-        <SpecialConfigRenderer
-          v-if="hasSpecialConfig"
-          :component="selectedComponent"
-          :special-config="componentMeta?.specialConfig"
+        <!-- 特殊配置：Select 选项配置 -->
+        <SelectOptionsConfig
+          v-if="hasSelectOptionsConfig"
+          v-model="selectOptionsData"
+          @change="handleSelectOptionsChange"
         />
 
         <!-- 属性配置 -->
@@ -76,14 +76,14 @@
 </template>
 
 <script setup>
-  import { computed } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
   import { getComponentMeta, getRemoteComponentMetaList } from '@/constants/componentMeta'
-  import PropConfig from '@/components/configs/PropConfig.vue'
-  import StyleConfig from '@/components/configs/StyleConfig.vue'
-  import EventConfig from '@/components/configs/EventConfig.vue'
-  import SlotConfig from '@/components/configs/SlotConfig.vue'
-  import SpecialConfigRenderer from '@/components/configs/SpecialConfig.vue'
+  import PropConfig from '../configs/PropConfig.vue'
+  import StyleConfig from '../configs/StyleConfig.vue'
+  import EventConfig from '../configs/EventConfig.vue'
+  import SlotConfig from '../configs/SlotConfig.vue'
+  import SelectOptionsConfig from '../configs/special/SelectOptionsConfig.vue'
 
   const schemaStore = useSchemaStore()
 
@@ -110,10 +110,98 @@
     return props.filter((prop) => prop.name !== 'slot')
   })
 
-  // 是否有特殊配置
-  const hasSpecialConfig = computed(() => {
-    return !!selectedComponent.value && !!componentMeta.value?.specialConfig?.type
+  // 是否显示 Select 选项配置
+  const hasSelectOptionsConfig = computed(() => {
+    return componentMeta.value?.specialConfig?.type === 'selectOptions'
   })
+
+  // Select 选项配置数据
+  const selectOptionsData = ref([])
+
+  // 监听选中组件变化，更新选项数据
+  watch(
+    () => selectedComponent.value,
+    (newComp) => {
+      if (newComp && hasSelectOptionsConfig.value) {
+        const configPropName = componentMeta.value?.specialConfig?.propName || 'optionsConfig'
+        selectOptionsData.value = newComp.props?.[configPropName] || []
+      } else {
+        selectOptionsData.value = []
+      }
+    },
+    { immediate: true },
+  )
+
+  // 处理 Select 选项配置变更
+  function handleSelectOptionsChange(data) {
+    if (!selectedComponent.value) return
+    const configPropName = componentMeta.value?.specialConfig?.propName || 'optionsConfig'
+    schemaStore.updateComponentProps(selectedComponent.value.id, {
+      [configPropName]: data,
+    })
+    // 同时更新子组件
+    updateSelectChildren(data)
+  }
+
+  // 更新 Select 的子组件
+  function updateSelectChildren(optionsData) {
+    if (!selectedComponent.value) return
+
+    // 移除现有的 option 和 option-group 子组件
+    const existingChildren = selectedComponent.value.children || []
+    const nonOptionChildren = existingChildren.filter(
+      (child) => child.type !== 'ea-option' && child.type !== 'ea-option-group',
+    )
+
+    // 根据配置生成新的子组件
+    const newChildren = []
+    optionsData.forEach((item) => {
+      if (item.type === 'group') {
+        // 创建 option-group
+        const groupComponent = {
+          id: 'comp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+          type: 'ea-option-group',
+          props: {
+            label: item.label,
+            slot: 'default',
+          },
+          children: [],
+        }
+        // 添加子选项
+        item.children?.forEach((child) => {
+          groupComponent.children.push({
+            id: 'comp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+            type: 'ea-option',
+            props: {
+              value: child.value,
+              slot: 'default',
+            },
+            // 使用 childrenText 作为默认插槽内容
+            childrenText: child.label,
+          })
+        })
+        newChildren.push(groupComponent)
+      } else {
+        // 创建普通 option
+        newChildren.push({
+          id: 'comp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+          type: 'ea-option',
+          props: {
+            value: item.value,
+            slot: 'default',
+          },
+          // 使用 childrenText 作为默认插槽内容
+          childrenText: item.label,
+        })
+      }
+    })
+
+    // 更新组件的子组件
+    schemaStore.updateComponentChildren(selectedComponent.value.id, [
+      ...nonOptionChildren,
+      ...newChildren,
+    ])
+  }
 
   // 获取父组件的 meta 信息（用于显示目标插槽配置）
   const parentComponentMeta = computed(() => {
@@ -147,7 +235,6 @@
       'ea-input': 'edit',
       'ea-select': 'list',
       'ea-checkbox': 'check-square',
-      'ea-checkbox-group': 'check-square',
       'ea-radio': 'radio',
       'ea-switch': 'switch',
       'ea-container': 'container',

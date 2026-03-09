@@ -111,17 +111,24 @@
 
 <script setup>
   import { ref, computed, watch } from 'vue'
+  import { useSchemaStore } from '@/stores/designer/schema'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaCheckbox from '@/components/ea-ui-wrap/EaCheckbox.vue'
 
   const props = defineProps({
-    modelValue: {
-      type: Array,
-      default: () => [],
+    // 当前选中的组件
+    component: {
+      type: Object,
+      default: null,
+    },
+    // 配置属性名
+    propName: {
+      type: String,
+      default: 'optionsConfig',
     },
   })
 
-  const emit = defineEmits(['update:modelValue', 'change'])
+  const schemaStore = useSchemaStore()
 
   // 弹窗显示状态
   const dialogVisible = ref(false)
@@ -146,7 +153,7 @@
 
   // 监听外部数据变化
   watch(
-    () => props.modelValue,
+    () => props.component?.props?.[props.propName],
     (newVal) => {
       if (newVal && newVal.length > 0) {
         optionsData.value = JSON.parse(JSON.stringify(newVal))
@@ -222,11 +229,48 @@
     optionsData.value.splice(index, 1)
   }
 
-  // 保存所有选项
+  // 保存所有选项并更新组件
   function saveOptions() {
-    emit('update:modelValue', optionsData.value)
-    emit('change', optionsData.value)
+    if (!props.component) return
+
+    const data = optionsData.value
+
+    // 更新组件 props
+    schemaStore.updateComponentProps(props.component.id, {
+      [props.propName]: data,
+    })
+
+    // 更新子组件
+    updateCheckboxGroupChildren(data)
+
     dialogVisible.value = false
+  }
+
+  // 更新复选框组的子组件
+  function updateCheckboxGroupChildren(optionsData) {
+    if (!props.component) return
+
+    // 移除现有的 ea-checkbox 子组件
+    const existingChildren = props.component.children || []
+    const nonCheckboxChildren = existingChildren.filter((child) => child.type !== 'ea-checkbox')
+
+    // 根据配置生成新的子组件
+    const newChildren = optionsData.map((item) => ({
+      id: 'comp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+      type: 'ea-checkbox',
+      props: {
+        value: item.value,
+        label: item.label,
+        disabled: item.disabled,
+        slot: 'default',
+      },
+    }))
+
+    // 更新组件的子组件
+    schemaStore.updateComponentChildren(props.component.id, [
+      ...nonCheckboxChildren,
+      ...newChildren,
+    ])
   }
 </script>
 
@@ -301,18 +345,11 @@
     overflow-y: auto;
   }
 
-  .dialog-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem;
-  }
-
-  /* 工具栏 */
   .toolbar {
     display: flex;
     gap: 0.5rem;
     margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
     border-bottom: 1px solid #e5e7eb;
   }
 
@@ -328,22 +365,20 @@
   }
 
   .option-item {
-    border-radius: 0.375rem;
-    overflow: hidden;
-    background-color: #f9fafb;
+    background-color: #fff;
     border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    padding: 0.5rem;
   }
 
   .option-item.is-disabled {
-    background-color: #f3f4f6;
-    border-color: #d1d5db;
+    background-color: #f9fafb;
   }
 
   .option-content {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
   }
 
   .option-icon {
@@ -351,50 +386,34 @@
     flex-shrink: 0;
   }
 
-  .option-item.is-disabled .option-icon {
-    color: #9ca3af;
-  }
-
   .option-label {
-    flex: 1;
     font-size: 0.875rem;
     color: #374151;
-  }
-
-  .option-item.is-disabled .option-label {
-    color: #9ca3af;
+    flex: 1;
   }
 
   .option-value {
     font-size: 0.75rem;
-    color: #6b7280;
-    background-color: #e5e7eb;
-    padding: 0.125rem 0.375rem;
-    border-radius: 0.25rem;
+    color: #9ca3af;
+    margin-right: 0.5rem;
   }
 
   .option-actions {
     display: flex;
     gap: 0.25rem;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
-  .option-item:hover .option-actions {
-    opacity: 1;
-  }
-
-  .option-actions ea-button.danger {
-    color: #ef4444;
   }
 
   /* 表单样式 */
   .form-content {
-    padding: 0.5rem 0;
+    padding: 1rem 0;
   }
 
   .form-item {
     margin-bottom: 1rem;
+  }
+
+  .form-item:last-child {
+    margin-bottom: 0;
   }
 
   .form-label {
@@ -403,5 +422,11 @@
     font-weight: 500;
     color: #374151;
     margin-bottom: 0.5rem;
+  }
+
+  .dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
   }
 </style>

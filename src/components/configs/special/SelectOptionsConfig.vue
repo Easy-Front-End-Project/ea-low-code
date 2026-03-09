@@ -181,16 +181,23 @@
 
 <script setup>
   import { ref, computed, watch } from 'vue'
+  import { useSchemaStore } from '@/stores/designer/schema'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
   const props = defineProps({
-    modelValue: {
-      type: Array,
-      default: () => [],
+    // 当前选中的组件
+    component: {
+      type: Object,
+      default: null,
+    },
+    // 配置属性名
+    propName: {
+      type: String,
+      default: 'optionsConfig',
     },
   })
 
-  const emit = defineEmits(['update:modelValue', 'change'])
+  const schemaStore = useSchemaStore()
 
   // 弹窗显示状态
   const dialogVisible = ref(false)
@@ -236,7 +243,7 @@
 
   // 监听外部数据变化
   watch(
-    () => props.modelValue,
+    () => props.component?.props?.[props.propName],
     (newVal) => {
       if (newVal && newVal.length > 0) {
         treeData.value = JSON.parse(JSON.stringify(newVal))
@@ -381,11 +388,78 @@
     parent.children?.splice(childIndex, 1)
   }
 
-  // 保存所有选项
+  // 保存所有选项并更新组件
   function saveOptions() {
-    emit('update:modelValue', treeData.value)
-    emit('change', treeData.value)
+    if (!props.component) return
+
+    const data = treeData.value
+
+    // 更新组件 props
+    schemaStore.updateComponentProps(props.component.id, {
+      [props.propName]: data,
+    })
+
+    // 更新子组件
+    updateSelectChildren(data)
+
     dialogVisible.value = false
+  }
+
+  // 更新 Select 的子组件
+  function updateSelectChildren(optionsData) {
+    if (!props.component) return
+
+    // 移除现有的 option 和 option-group 子组件
+    const existingChildren = props.component.children || []
+    const nonOptionChildren = existingChildren.filter(
+      (child) => child.type !== 'ea-option' && child.type !== 'ea-option-group',
+    )
+
+    // 根据配置生成新的子组件
+    const newChildren = []
+    optionsData.forEach((item) => {
+      if (item.type === 'group') {
+        // 创建 option-group
+        const groupComponent = {
+          id: 'comp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+          type: 'ea-option-group',
+          props: {
+            label: item.label,
+            slot: 'default',
+          },
+          children: [],
+        }
+        // 添加子选项
+        item.children?.forEach((child) => {
+          groupComponent.children.push({
+            id: 'comp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+            type: 'ea-option',
+            props: {
+              value: child.value,
+              slot: 'default',
+            },
+            // 使用 childrenText 作为默认插槽内容
+            childrenText: child.label,
+          })
+        })
+        newChildren.push(groupComponent)
+      } else {
+        // 创建普通 option
+        newChildren.push({
+          id: 'comp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+          type: 'ea-option',
+          props: {
+            value: item.value,
+            slot: 'default',
+          },
+          // 使用 childrenText 作为默认插槽内容
+          childrenText: item.label,
+        })
+      }
+    })
+
+    // 更新组件的子组件
+    schemaStore.updateComponentChildren(props.component.id, [...nonOptionChildren, ...newChildren])
   }
 </script>
 
@@ -421,6 +495,9 @@
   }
 
   .preview-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
     font-size: 0.75rem;
     color: #4b5563;
     padding: 0.25rem 0.5rem;
@@ -449,18 +526,11 @@
     overflow-y: auto;
   }
 
-  .dialog-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem;
-  }
-
-  /* 工具栏 */
   .toolbar {
     display: flex;
     gap: 0.5rem;
     margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
     border-bottom: 1px solid #e5e7eb;
   }
 
@@ -477,16 +547,15 @@
 
   .tree-node {
     border-radius: 0.375rem;
-    overflow: hidden;
   }
 
   .tree-node.is-group {
-    background-color: #f0f9ff;
-    border: 1px solid #bae6fd;
+    background-color: #f3f4f6;
+    padding: 0.5rem;
   }
 
   .tree-node.is-option {
-    background-color: #f9fafb;
+    background-color: #fff;
     border: 1px solid #e5e7eb;
   }
 
@@ -494,7 +563,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
+    padding: 0.375rem;
   }
 
   .node-icon {
@@ -507,57 +576,41 @@
   }
 
   .node-label {
-    flex: 1;
     font-size: 0.875rem;
     color: #374151;
+    flex: 1;
   }
 
   .node-value {
     font-size: 0.75rem;
-    color: #6b7280;
-    background-color: #e5e7eb;
-    padding: 0.125rem 0.375rem;
-    border-radius: 0.25rem;
+    color: #9ca3af;
+    margin-right: 0.5rem;
   }
 
   .node-actions {
     display: flex;
     gap: 0.25rem;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
-  .tree-node:hover .node-actions {
-    opacity: 1;
-  }
-
-  .node-actions ea-button.danger {
-    color: #ef4444;
   }
 
   .tree-children {
-    padding-left: 1.5rem;
-    padding-bottom: 0.5rem;
+    margin-left: 1.5rem;
+    margin-top: 0.25rem;
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-
-    .tree-node {
-      margin-right: 0.5rem;
-    }
-
-    &:empty {
-      display: none;
-    }
   }
 
   /* 表单样式 */
   .form-content {
-    padding: 0.5rem 0;
+    padding: 1rem 0;
   }
 
   .form-item {
     margin-bottom: 1rem;
+  }
+
+  .form-item:last-child {
+    margin-bottom: 0;
   }
 
   .form-label {
@@ -566,5 +619,11 @@
     font-weight: 500;
     color: #374151;
     margin-bottom: 0.5rem;
+  }
+
+  .dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
   }
 </style>
