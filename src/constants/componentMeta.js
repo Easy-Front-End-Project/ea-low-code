@@ -880,6 +880,10 @@ const formComponents = [
     events: [{ name: 'change', label: '改变事件' }],
     slots: [{ name: 'default', label: '复选框插槽', isContentSlot: false }],
     childComponents: ['ea-checkbox'],
+    specialConfig: {
+      type: 'checkboxGroupOptions',
+      propName: 'optionsConfig',
+    },
     styleConfig: {
       parts: [
         {

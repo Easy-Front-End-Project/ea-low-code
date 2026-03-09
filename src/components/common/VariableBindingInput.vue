@@ -72,11 +72,11 @@
 
 <script setup>
   import { ref, computed } from 'vue'
-  import VariableSelector from './VariableSelector.vue'
-  import EaInput from '../ea-ui-wrap/EaInput.vue'
-  import EaSelect from '../ea-ui-wrap/EaSelect.vue'
-  import EaSwitch from '../ea-ui-wrap/EaSwitch.vue'
-  import UnitInput from '../common/UnitInput.vue'
+  import VariableSelector from '@/components/designer/VariableSelector.vue'
+  import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
+  import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
+  import EaSwitch from '@/components/ea-ui-wrap/EaSwitch.vue'
+  import UnitInput from '@/components/common/UnitInput.vue'
 
   const props = defineProps({
     value: {

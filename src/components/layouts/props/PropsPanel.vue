@@ -47,6 +47,13 @@
           @change="handleSelectOptionsChange"
         />
 
+        <!-- 特殊配置：复选框组选项配置 -->
+        <CheckboxGroupConfig
+          v-if="hasCheckboxGroupConfig"
+          v-model="checkboxGroupOptionsData"
+          @change="handleCheckboxGroupOptionsChange"
+        />
+
         <!-- 属性配置 -->
         <PropConfig
           :props="componentPropsWithoutSlot"
@@ -84,6 +91,7 @@
   import EventConfig from '@/components/configs/EventConfig.vue'
   import SlotConfig from '@/components/configs/SlotConfig.vue'
   import SelectOptionsConfig from '@/components/configs/SelectOptionsConfig.vue'
+import CheckboxGroupConfig from '@/components/configs/CheckboxGroupConfig.vue'
 
   const schemaStore = useSchemaStore()
 
@@ -115,8 +123,16 @@
     return componentMeta.value?.specialConfig?.type === 'selectOptions'
   })
 
+  // 是否显示复选框组选项配置
+  const hasCheckboxGroupConfig = computed(() => {
+    return componentMeta.value?.specialConfig?.type === 'checkboxGroupOptions'
+  })
+
   // Select 选项配置数据
   const selectOptionsData = ref([])
+
+  // 复选框组选项配置数据
+  const checkboxGroupOptionsData = ref([])
 
   // 监听选中组件变化，更新选项数据
   watch(
@@ -127,6 +143,13 @@
         selectOptionsData.value = newComp.props?.[configPropName] || []
       } else {
         selectOptionsData.value = []
+      }
+
+      if (newComp && hasCheckboxGroupConfig.value) {
+        const configPropName = componentMeta.value?.specialConfig?.propName || 'optionsConfig'
+        checkboxGroupOptionsData.value = newComp.props?.[configPropName] || []
+      } else {
+        checkboxGroupOptionsData.value = []
       }
     },
     { immediate: true },
@@ -203,6 +226,46 @@
     ])
   }
 
+  // 处理复选框组选项配置变更
+  function handleCheckboxGroupOptionsChange(data) {
+    if (!selectedComponent.value) return
+    const configPropName = componentMeta.value?.specialConfig?.propName || 'optionsConfig'
+    schemaStore.updateComponentProps(selectedComponent.value.id, {
+      [configPropName]: data,
+    })
+    // 同时更新子组件
+    updateCheckboxGroupChildren(data)
+  }
+
+  // 更新复选框组的子组件
+  function updateCheckboxGroupChildren(optionsData) {
+    if (!selectedComponent.value) return
+
+    // 移除现有的 ea-checkbox 子组件
+    const existingChildren = selectedComponent.value.children || []
+    const nonCheckboxChildren = existingChildren.filter(
+      (child) => child.type !== 'ea-checkbox',
+    )
+
+    // 根据配置生成新的子组件
+    const newChildren = optionsData.map((item) => ({
+      id: 'comp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+      type: 'ea-checkbox',
+      props: {
+        value: item.value,
+        label: item.label,
+        disabled: item.disabled,
+        slot: 'default',
+      },
+    }))
+
+    // 更新组件的子组件
+    schemaStore.updateComponentChildren(selectedComponent.value.id, [
+      ...nonCheckboxChildren,
+      ...newChildren,
+    ])
+  }
+
   // 获取父组件的 meta 信息（用于显示目标插槽配置）
   const parentComponentMeta = computed(() => {
     if (!selectedComponent.value) return null
@@ -235,6 +298,7 @@
       'ea-input': 'edit',
       'ea-select': 'list',
       'ea-checkbox': 'check-square',
+      'ea-checkbox-group': 'check-square',
       'ea-radio': 'radio',
       'ea-switch': 'switch',
       'ea-container': 'container',

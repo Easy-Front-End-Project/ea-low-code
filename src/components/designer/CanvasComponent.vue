@@ -23,12 +23,15 @@
 
     <!-- 选中时的操作按钮 -->
     <div v-if="selected && !isNonSelectable" class="component-actions">
-      <button class="action-btn" @click.stop="handleDelete" title="删除">
-        <ea-icon icon="icon-trash-empty" size="14"></ea-icon>
-      </button>
-      <button class="action-btn" @click.stop="handleCopy" title="复制">
-        <ea-icon icon="icon-link" size="14"></ea-icon>
-      </button>
+      <ea-button
+        icon="icon-trash-empty"
+        type="danger"
+        size="small"
+        @click.stop="handleDelete"
+        title="删除"
+      >
+      </ea-button>
+      <ea-button icon="icon-link" size="small" @click.stop="handleCopy" title="复制"> </ea-button>
     </div>
 
     <!-- 组件渲染 -->
@@ -74,6 +77,7 @@
               <CanvasComponent
                 :component="child"
                 :selected="selectedComponentId === child.id"
+                :parent-component="props.component"
                 @select="$emit('select', $event)"
                 @delete="$emit('delete', $event)"
                 @drop-to-parent="$emit('drop-to-parent', $event)"
@@ -84,6 +88,7 @@
               v-else
               :component="child"
               :selected="selectedComponentId === child.id"
+              :parent-component="props.component"
               @select="$emit('select', $event)"
               @delete="$emit('delete', $event)"
               @drop-to-parent="$emit('drop-to-parent', $event)"
@@ -122,6 +127,10 @@
       type: Boolean,
       default: false,
     },
+    parentComponent: {
+      type: Object,
+      default: null,
+    },
   })
 
   const emit = defineEmits(['select', 'delete', 'drop-to-parent'])
@@ -143,12 +152,28 @@
 
   // 是否为不可选中的组件
   const isNonSelectable = computed(() => {
-    return nonSelectableTypes.includes(props.component.type)
+    // 基础不可选中类型
+    if (nonSelectableTypes.includes(props.component.type)) {
+      return true
+    }
+    // ea-checkbox 在 ea-checkbox-group 内不可选中
+    if (
+      props.component.type === 'ea-checkbox' &&
+      props.parentComponent?.type === 'ea-checkbox-group'
+    ) {
+      return true
+    }
+
+    return false
   })
 
   // 检查组件类型是否为不可选中类型
   function isNonSelectableType(type) {
-    return nonSelectableTypes.includes(type)
+    if (nonSelectableTypes.includes(type)) {
+      return true
+    }
+
+    return false
   }
 
   // 获取子组件的 props（解析变量绑定）
@@ -230,6 +255,11 @@
 
   // 是否为容器组件（可放置其他组件）
   const isContainer = computed(() => {
+    // ea-checkbox-group 不是容器，只能通过配置生成子组件
+    if (props.component.type === 'ea-checkbox-group') {
+      return false
+    }
+
     // 如果组件有 children 且有子组件，则为容器
     if (Array.isArray(props.component.children) && props.component.children.length > 0) {
       return true
@@ -554,30 +584,33 @@
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .canvas-component {
     position: relative;
     display: inline-flex;
     margin: 4px;
     transition: all 0.2s ease;
-  }
 
-  .canvas-component.is-container {
-    display: block;
-    padding: 8px;
-    border: 1px dashed #d1d5db;
-    border-radius: 4px;
-  }
+    min-width: 15px;
+    min-height: 15px;
 
-  .canvas-component.is-container:hover {
-    border-color: #3b82f6;
-    background-color: rgba(59, 130, 246, 0.05);
-  }
+    &.is-container {
+      display: block;
+      padding: 8px;
+      border: 1px dashed #d1d5db;
+      border-radius: 4px;
 
-  .canvas-component.is-drop-target {
-    border-color: #10b981;
-    background-color: rgba(16, 185, 129, 0.1);
-    border-style: solid;
+      &:hover {
+        border-color: #3b82f6;
+        background-color: rgba(59, 130, 246, 0.05);
+      }
+    }
+
+    &.is-drop-target {
+      border-color: #10b981;
+      background-color: rgba(16, 185, 129, 0.1);
+      border-style: solid;
+    }
   }
 
   .component-label {
@@ -600,26 +633,6 @@
     display: flex;
     gap: 4px;
     z-index: 10;
-  }
-
-  .action-btn {
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 12px;
-    color: #6b7280;
-  }
-
-  .action-btn:hover {
-    background-color: #fee2e2;
-    border-color: #ef4444;
-    color: #ef4444;
   }
 
   .component-wrapper {
