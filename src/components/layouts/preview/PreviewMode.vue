@@ -28,7 +28,7 @@
 <script setup>
   import { computed } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
-  import PreviewComponent from './PreviewComponent.vue'
+  import PreviewComponent from '../../designer/PreviewComponent.vue'
 
   const schemaStore = useSchemaStore()
 

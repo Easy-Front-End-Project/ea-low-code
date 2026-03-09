@@ -8,7 +8,7 @@
       'is-non-selectable': isNonSelectable,
     }"
     :style="componentStyle"
-    @click.stop="handleClick"
+    @click.stop.prevent="handleClick"
     @mouseover.stop="handleMouseOver"
     @mouseout.stop="handleMouseOut"
     @dragover.stop="handleDragOver"
@@ -372,7 +372,6 @@
 
   // 点击组件（选中）
   function handleClick() {
-    // 如果是不可选中的组件，不触发选中
     if (isNonSelectable.value) {
       return
     }
@@ -565,7 +564,6 @@
 
   .canvas-component.is-container {
     display: block;
-    min-height: 60px;
     padding: 8px;
     border: 1px dashed #d1d5db;
     border-radius: 4px;

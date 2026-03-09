@@ -8,8 +8,8 @@
 <script setup>
   import { computed } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
-  import DesignerLayout from '@/components/designer/DesignerLayout.vue'
-  import PreviewMode from '@/components/designer/PreviewMode.vue'
+  import DesignerLayout from '@/components/layouts/DesignerLayout.vue'
+  import PreviewMode from '@/components/layouts/preview/PreviewMode.vue'
 
   const schemaStore = useSchemaStore()
   const isPreviewMode = computed(() => schemaStore.isPreviewMode)

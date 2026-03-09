@@ -40,7 +40,7 @@
 <script setup>
   import { ref, computed, watch, nextTick } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
-  import CanvasComponent from './CanvasComponent.vue'
+  import CanvasComponent from '../../designer/CanvasComponent.vue'
 
   const schemaStore = useSchemaStore()
   const canvasRef = ref(null)

@@ -81,46 +81,46 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import Toolbar from './Toolbar.vue'
-import ComponentPanel from './ComponentPanel.vue'
-import CanvasArea from './CanvasArea.vue'
-import PropsPanel from './PropsPanel.vue'
+  import { ref } from 'vue'
+  import Toolbar from './header/Toolbar.vue'
+  import ComponentPanel from './material/ComponentPanel.vue'
+  import CanvasArea from './canvas/CanvasArea.vue'
+  import PropsPanel from './props/PropsPanel.vue'
 
-// 左侧边栏展开/收起状态
-const leftAsideCollapsed = ref(false)
-// 右侧边栏展开/收起状态
-const rightAsideCollapsed = ref(false)
+  // 左侧边栏展开/收起状态
+  const leftAsideCollapsed = ref(false)
+  // 右侧边栏展开/收起状态
+  const rightAsideCollapsed = ref(false)
 
-// 切换左侧边栏
-function toggleLeftAside() {
-  leftAsideCollapsed.value = !leftAsideCollapsed.value
-}
+  // 切换左侧边栏
+  function toggleLeftAside() {
+    leftAsideCollapsed.value = !leftAsideCollapsed.value
+  }
 
-// 切换右侧边栏
-function toggleRightAside() {
-  rightAsideCollapsed.value = !rightAsideCollapsed.value
-}
+  // 切换右侧边栏
+  function toggleRightAside() {
+    rightAsideCollapsed.value = !rightAsideCollapsed.value
+  }
 </script>
 
 <style scoped>
-ea-container {
-  height: 100%;
-}
+  ea-container {
+    height: 100%;
+  }
 
-ea-main {
-  height: 100%;
-}
+  ea-main {
+    height: 100%;
+  }
 
-ea-aside {
-  height: 100%;
-}
+  ea-aside {
+    height: 100%;
+  }
 
-ea-aside::part(container) {
-  align-items: center;
-}
+  ea-aside::part(container) {
+    align-items: center;
+  }
 
-ea-main::part(container) {
-  padding: 0;
-}
+  ea-main::part(container) {
+    padding: 0;
+  }
 </style>

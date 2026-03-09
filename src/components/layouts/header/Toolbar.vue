@@ -68,9 +68,9 @@
   import { ref } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
   import { exportSchemaToJson, importSchemaFromJson } from '@/utils/schemaHelper'
-  import ComponentTree from './ComponentTree.vue'
-  import VariableManager from './VariableManager.vue'
-  import RemoteComponentManager from './RemoteComponentManager.vue'
+  import ComponentTree from '@/components/designer/ComponentTree.vue'
+  import VariableManager from '@/components/designer/VariableManager.vue'
+  import RemoteComponentManager from '@/components/designer/RemoteComponentManager.vue'
 
   const schemaStore = useSchemaStore()
   const fileInput = ref(null)

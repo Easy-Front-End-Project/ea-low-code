@@ -99,7 +99,7 @@
     ComponentCategories,
   } from '@/constants/componentMeta'
   import { useRemoteComponentStore } from '@/stores/designer/remoteComponent'
-  import EaInput from '../ea-ui-wrap/EaInput.vue'
+  import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
   const searchQuery = ref('')
   const expandedCategories = ref([])

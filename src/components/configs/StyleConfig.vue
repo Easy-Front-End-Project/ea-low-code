@@ -97,7 +97,7 @@
 <script setup>
   import { computed } from 'vue'
   import { getComponentMeta } from '@/constants/componentMeta'
-  import UnitInput from './UnitInput.vue'
+  import UnitInput from '../common/UnitInput.vue'
 
   const props = defineProps({
     componentType: {

@@ -130,7 +130,7 @@
   import { useVariableStore } from '@/stores/designer/variable'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
-  import MonacoEditor from './MonacoEditor.vue'
+  import MonacoEditor from '../common/MonacoEditor.vue'
 
   const props = defineProps({
     visible: {

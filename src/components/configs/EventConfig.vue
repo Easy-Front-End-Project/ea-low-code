@@ -230,7 +230,7 @@
 
 <script setup>
   import { ref, computed } from 'vue'
-  import MonacoEditor from './MonacoEditor.vue'
+  import MonacoEditor from '../common/MonacoEditor.vue'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
 

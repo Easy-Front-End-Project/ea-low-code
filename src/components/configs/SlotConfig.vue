@@ -16,7 +16,7 @@
 
 <script setup>
   import { computed } from 'vue'
-  import VariableBindingInput from './VariableBindingInput.vue'
+  import VariableBindingInput from '../common/VariableBindingInput.vue'
 
   const props = defineProps({
     // 父组件的插槽定义

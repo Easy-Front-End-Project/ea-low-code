@@ -79,11 +79,11 @@
   import { computed, ref, watch } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
   import { getComponentMeta, getRemoteComponentMetaList } from '@/constants/componentMeta'
-  import PropConfig from './PropConfig.vue'
-  import StyleConfig from './StyleConfig.vue'
-  import EventConfig from './EventConfig.vue'
-  import SlotConfig from './SlotConfig.vue'
-  import SelectOptionsConfig from './SelectOptionsConfig.vue'
+  import PropConfig from '@/components/configs/PropConfig.vue'
+  import StyleConfig from '@/components/configs/StyleConfig.vue'
+  import EventConfig from '@/components/configs/EventConfig.vue'
+  import SlotConfig from '@/components/configs/SlotConfig.vue'
+  import SelectOptionsConfig from '@/components/configs/SelectOptionsConfig.vue'
 
   const schemaStore = useSchemaStore()
 

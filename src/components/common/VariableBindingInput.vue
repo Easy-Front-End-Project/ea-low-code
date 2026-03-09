@@ -76,7 +76,7 @@
   import EaInput from '../ea-ui-wrap/EaInput.vue'
   import EaSelect from '../ea-ui-wrap/EaSelect.vue'
   import EaSwitch from '../ea-ui-wrap/EaSwitch.vue'
-  import UnitInput from './UnitInput.vue'
+  import UnitInput from '../common/UnitInput.vue'
 
   const props = defineProps({
     value: {
