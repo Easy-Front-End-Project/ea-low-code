@@ -19,13 +19,23 @@
       <div v-else class="p-4 space-y-6">
         <!-- 组件信息 -->
         <div class="component-info pb-4 border-b border-gray-100">
-          <div class="flex items-center gap-2 mb-2">
-            <ea-icon
-              :name="getComponentIcon(selectedComponent.type)"
-              size="20"
-              color="#3b82f6"
-            ></ea-icon>
-            <span class="font-medium text-gray-800">{{ componentMeta?.name }}</span>
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <ea-icon
+                :name="getComponentIcon(selectedComponent.type)"
+                size="20"
+                color="#3b82f6"
+              ></ea-icon>
+              <span class="font-medium text-gray-800">{{ componentMeta?.name }}</span>
+            </div>
+            <ea-button
+              type="danger"
+              size="small"
+              icon="icon-trash-empty"
+              @click="handleDeleteComponent"
+            >
+              删除
+            </ea-button>
           </div>
           <div class="text-xs text-gray-500">
             <p>类型: {{ selectedComponent.type }}</p>
@@ -211,6 +221,14 @@
   function handleSlotChange(slotValue) {
     if (!selectedComponent.value) return
     schemaStore.updateComponentProps(selectedComponent.value.id, { slot: slotValue })
+  }
+
+  // 删除组件
+  function handleDeleteComponent() {
+    if (!selectedComponent.value) return
+    if (confirm('确定要删除这个组件吗？')) {
+      schemaStore.removeComponent(selectedComponent.value.id)
+    }
   }
 </script>
 

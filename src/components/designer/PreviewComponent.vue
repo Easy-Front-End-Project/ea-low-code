@@ -23,11 +23,6 @@
     <template v-else-if="hasChildrenText">
       <ea-text type="normal" size="medium">{{ resolvedChildrenText }}</ea-text>
     </template>
-    <template v-else-if="hasDefaultSlot">
-      <ea-text type="normal" size="medium">
-        {{ componentProps.label || componentProps.title || '' }}
-      </ea-text>
-    </template>
   </component>
 </template>
 
@@ -163,12 +158,6 @@
     }
 
     return resolvedProps
-  })
-
-  // 是否有默认插槽（且该插槽用于内容显示，而非子组件）
-  const hasDefaultSlot = computed(() => {
-    const defaultSlot = componentMeta.value?.slots?.find((slot) => slot.name === 'default')
-    return defaultSlot && defaultSlot.isContentSlot !== false
   })
 
   // 组件事件监听器（动态绑定）
