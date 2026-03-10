@@ -93,8 +93,8 @@
   import {
     getCategories,
     getComponentsByCategory,
-    ComponentCategories,
   } from '@/constants/componentMeta'
+  import { ComponentCategories } from '@/constants/types'
   import { useRemoteComponentStore } from '@/stores/designer/remoteComponent'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 

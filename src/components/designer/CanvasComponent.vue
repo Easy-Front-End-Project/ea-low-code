@@ -706,7 +706,7 @@
     ea-select,
     ea-rate,
     ea-switch,
-    ea-transfer {
+    ea-transfer{
       pointer-events: none;
     }
   }

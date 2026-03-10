@@ -1,0 +1,495 @@
+import { ComponentCategories, PropTypes } from '../types'
+
+// Basic 基础组件
+export const basicComponents = [
+  {
+    type: 'ea-button',
+    name: '按钮',
+    category: ComponentCategories.BASIC,
+    icon: 'Button',
+    props: [
+      {
+        name: 'children',
+        label: '按钮文本',
+        type: PropTypes.STRING,
+        default: '按钮',
+      },
+      {
+        name: 'type',
+        label: '类型',
+        type: PropTypes.SELECT,
+        default: 'normal',
+        options: [
+          { label: '默认', value: 'normal' },
+          { label: '主要', value: 'primary' },
+          { label: '成功', value: 'success' },
+          { label: '警告', value: 'warning' },
+          { label: '危险', value: 'danger' },
+        ],
+      },
+      {
+        name: 'size',
+        label: '尺寸',
+        type: PropTypes.SELECT,
+        default: 'medium',
+        options: [
+          { label: '大', value: 'large' },
+          { label: '中', value: 'medium' },
+          { label: '小', value: 'small' },
+        ],
+      },
+      {
+        name: 'disabled',
+        label: '禁用',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+      {
+        name: 'loading',
+        label: '加载中',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+      {
+        name: 'plain',
+        label: '朴素按钮',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+      {
+        name: 'round',
+        label: '圆角按钮',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+      {
+        name: 'circle',
+        label: '圆形按钮',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+      {
+        name: 'text',
+        label: '文字按钮',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+      {
+        name: 'link',
+        label: '链接按钮',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+      {
+        name: 'href',
+        label: '链接地址',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'icon',
+        label: '图标类名',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'button-type',
+        label: '原生按钮类型',
+        type: PropTypes.SELECT,
+        default: 'button',
+        options: [
+          { label: '普通按钮', value: 'button' },
+          { label: '提交按钮', value: 'submit' },
+          { label: '重置按钮', value: 'reset' },
+        ],
+      },
+    ],
+    events: [{ name: 'click', label: '点击事件' }],
+    slots: [{ name: 'default', label: '默认插槽' }],
+    styleConfig: {
+      cssVariables: [
+        {
+          name: '--ea-button-border-radius',
+          label: '圆角大小',
+          type: 'string',
+          default: '4px',
+        },
+        {
+          name: '--ea-button-normal-text',
+          label: '默认按钮文字颜色',
+          type: 'color',
+          default: '#606266',
+        },
+        {
+          name: '--ea-button-normal-background',
+          label: '默认按钮背景颜色',
+          type: 'color',
+          default: '#ffffff',
+        },
+        {
+          name: '--ea-button-normal-border',
+          label: '默认按钮边框颜色',
+          type: 'color',
+          default: '#dcdfe6',
+        },
+        {
+          name: '--ea-button-primary-500',
+          label: '主要按钮背景色',
+          type: 'color',
+          default: '#409eff',
+        },
+        {
+          name: '--ea-button-primary-text',
+          label: '主要按钮文字颜色',
+          type: 'color',
+          default: '#ffffff',
+        },
+        {
+          name: '--ea-button-success-500',
+          label: '成功按钮背景色',
+          type: 'color',
+          default: '#67c23a',
+        },
+        {
+          name: '--ea-button-success-text',
+          label: '成功按钮文字颜色',
+          type: 'color',
+          default: '#ffffff',
+        },
+        {
+          name: '--ea-button-warning-500',
+          label: '警告按钮背景色',
+          type: 'color',
+          default: '#e6a23c',
+        },
+        {
+          name: '--ea-button-warning-text',
+          label: '警告按钮文字颜色',
+          type: 'color',
+          default: '#ffffff',
+        },
+        {
+          name: '--ea-button-danger-500',
+          label: '危险按钮背景色',
+          type: 'color',
+          default: '#f56c6c',
+        },
+        {
+          name: '--ea-button-danger-text',
+          label: '危险按钮文字颜色',
+          type: 'color',
+          default: '#ffffff',
+        },
+        {
+          name: '--ea-button-info-500',
+          label: '信息按钮背景色',
+          type: 'color',
+          default: '#909399',
+        },
+        {
+          name: '--ea-button-info-text',
+          label: '信息按钮文字颜色',
+          type: 'color',
+          default: '#ffffff',
+        },
+      ],
+      parts: [
+        {
+          name: 'container',
+          label: '按钮容器',
+          styles: ['background-color', 'color', 'border-color', 'border-radius'],
+        },
+      ],
+    },
+  },
+  {
+    type: 'ea-icon',
+    name: '图标',
+    category: ComponentCategories.BASIC,
+    icon: 'Icon',
+    props: [
+      {
+        name: 'icon',
+        label: '图标类名',
+        type: PropTypes.STRING,
+        default: 'icon-',
+      },
+      {
+        name: 'color',
+        label: '颜色',
+        type: PropTypes.COLOR,
+        default: '',
+      },
+    ],
+    events: [],
+    slots: [],
+    styleConfig: {
+      cssVariables: [
+        {
+          name: '--ea-icon-size',
+          label: '图标大小',
+          type: 'string',
+          default: '14px',
+        },
+      ],
+      parts: [
+        {
+          name: 'container',
+          label: '图标容器',
+          styles: ['color', 'font-size'],
+        },
+      ],
+    },
+  },
+  {
+    type: 'ea-text',
+    name: '文本',
+    category: ComponentCategories.BASIC,
+    icon: 'Text',
+    props: [
+      {
+        name: 'children',
+        label: '文本内容',
+        type: PropTypes.STRING,
+        default: '文本',
+      },
+      {
+        name: 'type',
+        label: '类型',
+        type: PropTypes.SELECT,
+        default: 'normal',
+        options: [
+          { label: '默认', value: 'normal' },
+          { label: '主要', value: 'primary' },
+          { label: '成功', value: 'success' },
+          { label: '信息', value: 'info' },
+          { label: '警告', value: 'warning' },
+          { label: '危险', value: 'danger' },
+        ],
+      },
+      {
+        name: 'size',
+        label: '尺寸',
+        type: PropTypes.SELECT,
+        default: 'medium',
+        options: [
+          { label: '大', value: 'large' },
+          { label: '中', value: 'medium' },
+          { label: '小', value: 'small' },
+        ],
+      },
+      {
+        name: 'truncated',
+        label: '省略显示',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+      {
+        name: 'line-clamp',
+        label: '多行省略',
+        type: PropTypes.NUMBER,
+        default: 0,
+      },
+      {
+        name: 'tag',
+        label: '标签类型',
+        type: PropTypes.STRING,
+        default: 'span',
+      },
+      {
+        name: 'title',
+        label: '标题提示',
+        type: PropTypes.STRING,
+        default: '',
+      },
+    ],
+    events: [],
+    slots: [{ name: 'default', label: '默认插槽' }],
+    styleConfig: {
+      parts: [
+        {
+          name: 'container',
+          label: '文本容器',
+          styles: ['color', 'font-size', 'font-weight'],
+        },
+      ],
+    },
+  },
+  {
+    type: 'ea-link',
+    name: '链接',
+    category: ComponentCategories.BASIC,
+    icon: 'Link',
+    props: [
+      {
+        name: 'children',
+        label: '链接文本',
+        type: PropTypes.STRING,
+        default: '链接',
+      },
+      {
+        name: 'type',
+        label: '类型',
+        type: PropTypes.SELECT,
+        default: 'normal',
+        options: [
+          { label: '默认', value: 'normal' },
+          { label: '主要', value: 'primary' },
+          { label: '成功', value: 'success' },
+          { label: '信息', value: 'info' },
+          { label: '警告', value: 'warning' },
+          { label: '危险', value: 'danger' },
+        ],
+      },
+      {
+        name: 'disabled',
+        label: '禁用',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+      {
+        name: 'underline',
+        label: '下划线',
+        type: PropTypes.SELECT,
+        default: '',
+        options: [
+          { label: '无', value: '' },
+          { label: '总是显示', value: 'always' },
+          { label: '悬停显示', value: 'hover' },
+          { label: '从不显示', value: 'never' },
+        ],
+      },
+      {
+        name: 'href',
+        label: '链接地址',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'icon',
+        label: '图标类名',
+        type: PropTypes.STRING,
+        default: '',
+      },
+    ],
+    events: [{ name: 'click', label: '点击事件' }],
+    slots: [{ name: 'default', label: '默认插槽' }],
+    styleConfig: {
+      parts: [
+        {
+          name: 'container',
+          label: '链接容器',
+          styles: ['color', 'text-decoration'],
+        },
+        {
+          name: 'icon',
+          label: '图标',
+          styles: ['color', 'font-size'],
+        },
+      ],
+    },
+  },
+  {
+    type: 'ea-space',
+    name: '间距',
+    category: ComponentCategories.BASIC,
+    icon: 'Space',
+    props: [
+      {
+        name: 'direction',
+        label: '排列方向',
+        type: PropTypes.SELECT,
+        default: 'horizontal',
+        options: [
+          { label: '水平', value: 'horizontal' },
+          { label: '垂直', value: 'vertical' },
+        ],
+      },
+      {
+        name: 'size',
+        label: '间距大小',
+        type: PropTypes.SELECT,
+        default: 'default',
+        options: [
+          { label: '小间距', value: 'small' },
+          { label: '中间距', value: 'default' },
+          { label: '大间距', value: 'large' },
+        ],
+      },
+      {
+        name: 'wrap',
+        label: '自动换行',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+      {
+        name: 'spacer',
+        label: '分隔符',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'alignment',
+        label: '对齐方式',
+        type: PropTypes.SELECT,
+        default: '',
+        options: [
+          { label: '默认', value: '' },
+          { label: '居中对齐', value: 'center' },
+          { label: '起始对齐', value: 'flex-start' },
+          { label: '结束对齐', value: 'flex-end' },
+          { label: '基线对齐', value: 'baseline' },
+          { label: '拉伸填充', value: 'stretch' },
+        ],
+      },
+      {
+        name: 'fill',
+        label: '填充容器',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+      {
+        name: 'fill-ratio',
+        label: '填充比例',
+        type: PropTypes.NUMBER,
+        default: 100,
+      },
+    ],
+    events: [],
+    slots: [{ name: 'default', label: '默认插槽' }],
+    styleConfig: {
+      cssVariables: [
+        {
+          name: '--ea-space-gap-small',
+          label: '间距【小间距】',
+          type: 'string',
+          default: '0.5rem',
+        },
+        {
+          name: '--ea-space-gap-default',
+          label: '间距【中间距】',
+          type: 'string',
+          default: '0.75rem',
+        },
+        {
+          name: '--ea-space-gap-large',
+          label: '间距【大间距】',
+          type: 'string',
+          default: '1rem',
+        },
+      ],
+      parts: [
+        {
+          name: 'container',
+          label: '间距容器',
+          styles: ['gap', 'align-items'],
+        },
+        {
+          name: 'spacer',
+          label: '分隔符',
+          styles: ['color', 'font-size'],
+        },
+      ],
+    },
+  },
+]
