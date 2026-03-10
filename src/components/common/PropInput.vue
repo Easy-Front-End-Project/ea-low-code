@@ -45,6 +45,12 @@
     if (props.type === 'color') {
       return 'color'
     }
+    if (props.type === 'array') {
+      return 'array'
+    }
+    if (props.type === 'object') {
+      return 'object'
+    }
     return 'input'
   }
 

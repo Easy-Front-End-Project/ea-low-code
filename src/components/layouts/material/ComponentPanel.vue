@@ -31,7 +31,6 @@
               :class="{ 'is-child': component.isChildComponent }"
               draggable="true"
               @dragstart="handleDragStart($event, component)"
-              @click="handleClick(component)"
             >
               <span class="component-name">{{ component.name }}</span>
               <span v-if="component.isChildComponent" class="child-badge">子</span>
@@ -53,7 +52,6 @@
                   class="component-item is-child"
                   draggable="true"
                   @dragstart="handleDragStart($event, component)"
-                  @click="handleClick(component)"
                 >
                   <span class="component-name">{{ component.name }}</span>
                   <span class="child-badge">子</span>
@@ -76,7 +74,6 @@
               class="component-item is-remote"
               draggable="true"
               @dragstart="handleDragStart($event, component)"
-              @click="handleClick(component)"
             >
               <span class="component-name">{{ component.name }}</span>
               <span class="remote-badge">远程</span>
@@ -189,11 +186,6 @@
   function handleDragStart(event, component) {
     event.dataTransfer.setData('application/json', JSON.stringify(component))
     event.dataTransfer.effectAllowed = 'copy'
-  }
-
-  // 点击组件
-  function handleClick(component) {
-    console.log('点击组件:', component)
   }
 
   onMounted(() => {

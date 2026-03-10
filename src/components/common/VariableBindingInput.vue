@@ -47,6 +47,17 @@
           @change="handleColorChange"
           class="prop-input flex-1"
         />
+        <!-- Array/Object 类型使用按钮打开编辑器 -->
+        <ea-button
+          v-else-if="inputType === 'array' || inputType === 'object'"
+          class="w-full text-center flex-1"
+          type="primary"
+          size="small"
+          icon="icon-edit"
+          @click="handleOpenEditor"
+        >
+          {{ editorButtonText }}
+        </ea-button>
       </template>
 
       <!-- 绑定变量按钮 -->
@@ -67,6 +78,22 @@
       @select="handleSelectVariable"
       @close="selectorVisible = false"
     />
+
+    <!-- MonacoEditor 弹窗 -->
+    <ea-dialog
+      :visible="editorVisible"
+      :title="editorTitle"
+      width="600px"
+      @close="handleCloseEditor"
+    >
+      <div class="editor-content">
+        <MonacoEditor v-model="editorValue" language="json" height="300px" />
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <ea-button @click="handleCloseEditor">取消</ea-button>
+        <ea-button type="primary" @click="handleSaveEditor">保存</ea-button>
+      </div>
+    </ea-dialog>
   </div>
 </template>
 
@@ -77,6 +104,7 @@
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
   import EaSwitch from '@/components/ea-ui-wrap/EaSwitch.vue'
   import UnitInput from '@/components/common/UnitInput.vue'
+  import MonacoEditor from '@/components/common/MonacoEditor.vue'
 
   const props = defineProps({
     value: {
@@ -100,6 +128,8 @@
   const emit = defineEmits(['update:value'])
 
   const selectorVisible = ref(false)
+  const editorVisible = ref(false)
+  const editorValue = ref('')
 
   // 判断当前值是否是变量绑定
   const isVariable = computed(() => {
@@ -128,6 +158,17 @@
       return false
     }
     return props.value === true || props.value === 'true'
+  })
+
+  // 编辑器标题
+  const editorTitle = computed(() => {
+    return props.inputType === 'array' ? '编辑数组' : '编辑对象'
+  })
+
+  // 编辑器按钮文本
+  const editorButtonText = computed(() => {
+    const hasValue = props.value && Object.keys(props.value).length > 0
+    return hasValue ? '编辑' : props.inputType === 'array' ? '编辑数组' : '编辑对象'
   })
 
   // 处理输入变化
@@ -164,6 +205,53 @@
   // 清除变量绑定
   function handleClearVariable() {
     emit('update:value', '')
+  }
+
+  // 打开编辑器
+  function handleOpenEditor() {
+    // 将值转换为 JSON 字符串显示
+    try {
+      if (props.value && typeof props.value === 'object') {
+        editorValue.value = JSON.stringify(props.value, null, 2)
+      } else {
+        editorValue.value = props.inputType === 'array' ? '[]' : '{}'
+      }
+    } catch {
+      editorValue.value = props.inputType === 'array' ? '[]' : '{}'
+    }
+    editorVisible.value = true
+  }
+
+  // 关闭编辑器
+  function handleCloseEditor() {
+    editorVisible.value = false
+    editorValue.value = ''
+  }
+
+  // 保存编辑器内容
+  function handleSaveEditor() {
+    try {
+      // 解析 JSON
+      const parsedValue = JSON.parse(editorValue.value)
+
+      // 验证类型
+      if (props.inputType === 'array' && !Array.isArray(parsedValue)) {
+        alert('值必须是数组格式')
+        return
+      }
+      if (
+        props.inputType === 'object' &&
+        (Array.isArray(parsedValue) || typeof parsedValue !== 'object' || parsedValue === null)
+      ) {
+        alert('值必须是对象格式')
+        return
+      }
+
+      emit('update:value', parsedValue)
+      handleCloseEditor()
+    } catch (error) {
+      alert('JSON 格式错误，请检查输入')
+    }
   }
 </script>
 
@@ -213,5 +301,25 @@
 
   .variable-tag span {
     flex: 1;
+  }
+
+  .editor-content {
+    padding: 1rem;
+  }
+
+  .dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .w-full {
+    width: 100%;
+  }
+
+  .text-center {
+    text-align: center;
   }
 </style>

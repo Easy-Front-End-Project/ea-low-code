@@ -4,6 +4,7 @@
     :class="{
       'is-selected': selected && !isNonSelectable,
       'is-container': isContainer && !isNonSelectable,
+      'is-non-container': isNonContainer && !isNonSelectable,
       'is-drop-target': isDropTarget && !isNonSelectable,
       'is-non-selectable': isNonSelectable,
     }"
@@ -46,7 +47,7 @@
         <!-- 使用原生 slot 属性方式渲染子组件 -->
         <template v-if="allChildren.length > 0">
           <template v-for="child in allChildren" :key="child.id">
-            <template v-if="isNonSelectableType(child.type)">
+            <template v-if="isNonSelectableType(child.type, props.component.type)">
               <component
                 :is="child.type"
                 v-bind="getChildComponentProps(child)"
@@ -147,24 +148,67 @@
   const selectedComponentId = computed(() => schemaStore.selectedComponentId)
   const componentMeta = computed(() => getComponentMeta(props.component.type))
 
-  // 不可选中的组件类型
-  const nonSelectableTypes = ['ea-option', 'ea-option-group', 'ea-checkbox', 'ea-radio']
+  // 不可选中的组件类型（任何情况下都不可选中）
+  const nonSelectableTypes = ['ea-option', 'ea-option-group', 'ea-radio']
+
+  // 在特定父组件下不可选中的组件配置
+  const nonSelectableInParent = [
+    { childType: 'ea-checkbox', parentType: 'ea-checkbox-group' },
+    {
+      childType: 'ea-radio',
+      parentType: 'ea-radio-group',
+    },
+    {
+      childType: 'ea-option',
+      parentType: 'ea-option-group',
+    },
+    {
+      childType: 'ea-option-group',
+      parentType: 'ea-select',
+    },
+    {
+      childType: 'ea-option',
+      parentType: 'ea-select',
+    },
+  ]
 
   // 非容器组件类型
   const nonContainerTypes = ['ea-checkbox-group', 'ea-radio-group']
 
   // 是否为不可选中的组件
   const isNonSelectable = computed(() => {
+    // 基础不可选中类型
     if (nonSelectableTypes.includes(props.component.type)) {
+      return true
+    }
+
+    // 检查是否在特定父组件下不可选中
+    if (
+      nonSelectableInParent.some(
+        (config) =>
+          config.childType === props.component.type &&
+          config.parentType === props.parentComponent?.type,
+      )
+    ) {
       return true
     }
 
     return false
   })
 
-  // 检查组件类型是否为不可选中类型
-  function isNonSelectableType(type) {
+  // 检查组件类型是否为不可选中类型（用于渲染子组件时）
+  function isNonSelectableType(type, parentType) {
+    // 基础不可选中类型
     if (nonSelectableTypes.includes(type)) {
+      return true
+    }
+
+    // 检查是否在特定父组件下不可选中
+    if (
+      nonSelectableInParent.some(
+        (config) => config.childType === type && config.parentType === parentType,
+      )
+    ) {
       return true
     }
 
@@ -288,6 +332,11 @@
     }
 
     return false
+  })
+
+  // 是否为非容器组件（需要特殊样式处理）
+  const isNonContainer = computed(() => {
+    return nonContainerTypes.includes(props.component.type)
   })
 
   // 解析值（处理变量绑定）
@@ -416,7 +465,7 @@
       // 执行自定义代码
       if (eventConfig.code) {
         try {
-          // 注入 $component 和 $vars 辅助函数到代码中
+          // 注入 $component、$vars 和 $event 辅助函数到代码中
           const wrappedCode = `
             const $component = {
               get: (id) => instanceStore.getComponentElement(id),
@@ -428,6 +477,7 @@
               get: (name) => variableStore.getVariableDefaultValue(name),
               set: (name, value) => variableStore.updateVariableByName(name, { defaultValue: value })
             };
+            const $event = event;
             ${eventConfig.code}
           `
           const fn = new Function('event', 'instanceStore', 'variableStore', wrappedCode)
@@ -601,6 +651,20 @@
       }
     }
 
+    &.is-non-container {
+      display: block;
+      padding: 8px;
+      min-width: 120px;
+      min-height: 40px;
+      border: 1px dashed #d1d5db;
+      border-radius: 4px;
+
+      &:hover {
+        border-color: #3b82f6;
+        background-color: rgba(59, 130, 246, 0.05);
+      }
+    }
+
     &.is-drop-target {
       border-color: #10b981;
       background-color: rgba(16, 185, 129, 0.1);
@@ -635,8 +699,16 @@
     cursor: pointer;
   }
 
-  .component-wrapper * {
-    /* pointer-events: none; */
+  .component-wrapper {
+    ea-time-picker,
+    ea-date-picker,
+    ea-slider,
+    ea-select,
+    ea-rate,
+    ea-switch,
+    ea-transfer {
+      pointer-events: none;
+    }
   }
 
   /* 插槽内容包装器 */

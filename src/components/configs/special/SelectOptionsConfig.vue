@@ -409,56 +409,48 @@
   function updateSelectChildren(optionsData) {
     if (!props.component) return
 
-    // 移除现有的 option 和 option-group 子组件
     const existingChildren = props.component.children || []
     const nonOptionChildren = existingChildren.filter(
       (child) => child.type !== 'ea-option' && child.type !== 'ea-option-group',
     )
 
-    // 根据配置生成新的子组件
-    const newChildren = []
-    optionsData.forEach((item) => {
-      if (item.type === 'group') {
-        // 创建 option-group
-        const groupComponent = {
-          id: 'comp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-          type: 'ea-option-group',
-          props: {
-            label: item.label,
-            slot: 'default',
-          },
-          children: [],
-        }
-        // 添加子选项
-        item.children?.forEach((child) => {
-          groupComponent.children.push({
-            id: 'comp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-            type: 'ea-option',
-            props: {
-              value: child.value,
-              slot: 'default',
-            },
-            // 使用 childrenText 作为默认插槽内容
-            childrenText: child.label,
-          })
-        })
-        newChildren.push(groupComponent)
-      } else {
-        // 创建普通 option
-        newChildren.push({
-          id: 'comp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-          type: 'ea-option',
-          props: {
-            value: item.value,
-            slot: 'default',
-          },
-          // 使用 childrenText 作为默认插槽内容
-          childrenText: item.label,
-        })
-      }
-    })
+    // 生成唯一组件 ID
+    const generateComponentId = () => {
+      return 'comp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+    }
 
-    // 更新组件的子组件
+    // 创建 option 组件
+    const createOptionComponent = (value, label) => {
+      return {
+        id: generateComponentId(),
+        type: 'ea-option',
+        props: {
+          value,
+          slot: 'default',
+        },
+        childrenText: label,
+      }
+    }
+
+    // 创建 option-group 组件
+    const createOptionGroupComponent = (label, children) => {
+      return {
+        id: generateComponentId(),
+        type: 'ea-option-group',
+        props: {
+          label,
+          slot: 'default',
+        },
+        children: children.map((child) => createOptionComponent(child.value, child.label)),
+      }
+    }
+
+    const newChildren = optionsData.map((item) =>
+      item.type === 'group'
+        ? createOptionGroupComponent(item.label, item.children || [])
+        : createOptionComponent(item.value, item.label),
+    )
+
     schemaStore.updateComponentChildren(props.component.id, [...nonOptionChildren, ...newChildren])
   }
 </script>
