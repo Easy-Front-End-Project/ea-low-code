@@ -433,7 +433,7 @@ export const dataComponents = [
         name: 'expand-icon-position',
         label: '图标位置',
         type: PropTypes.SELECT,
-        default: 'left',
+        default: 'right',
         options: [
           { label: '左侧', value: 'left' },
           { label: '右侧', value: 'right' },

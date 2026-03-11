@@ -5,6 +5,7 @@
       'is-selected': selected && !isNonSelectable,
       'is-container': isContainer && !isNonSelectable,
       'is-non-container': isNonContainer && !isNonSelectable,
+      'is-inline-block': isInlineBlock && !isNonSelectable,
       'is-drop-target': isDropTarget && !isNonSelectable,
       'is-non-selectable': isNonSelectable,
     }"
@@ -175,6 +176,9 @@
   // 非容器组件类型
   const nonContainerTypes = ['ea-checkbox-group', 'ea-radio-group']
 
+  // 行内块级组件类型（如按钮、链接等）
+  const inlineBlockTypes = ['ea-button', 'ea-text', 'ea-link', 'ea-tag', 'ea-badge', 'ea-avatar']
+
   // 是否为不可选中的组件
   const isNonSelectable = computed(() => {
     // 基础不可选中类型
@@ -325,7 +329,6 @@
       'ea-row',
       'ea-col',
       'form',
-      'ea-form-item',
       'ea-button-group',
     ]
 
@@ -346,6 +349,11 @@
   // 是否为非容器组件（需要特殊样式处理）
   const isNonContainer = computed(() => {
     return nonContainerTypes.includes(props.component.type)
+  })
+
+  // 是否为行内块级组件
+  const isInlineBlock = computed(() => {
+    return inlineBlockTypes.includes(props.component.type)
   })
 
   // 解析值（处理变量绑定）
@@ -684,6 +692,18 @@
       }
     }
 
+    &.is-inline-block {
+      display: inline-flex;
+      padding: 4px;
+      border: 1px dashed #d1d5db;
+      border-radius: 4px;
+
+      &:hover {
+        border-color: #3b82f6;
+        background-color: rgba(59, 130, 246, 0.05);
+      }
+    }
+
     &.is-drop-target {
       border-color: #10b981;
       background-color: rgba(16, 185, 129, 0.1);
@@ -693,24 +713,28 @@
 
   .component-label {
     position: absolute;
-    top: -20px;
+    top: 0;
     left: 0;
     padding: 2px 6px;
     background-color: #3b82f6;
     color: white;
     font-size: 11px;
+    line-height: 16px;
     border-radius: 3px;
     white-space: nowrap;
-    z-index: 10;
+    transform: translate(-25%, -100%);
+    z-index: 100;
   }
 
   .component-actions {
     position: absolute;
-    top: -24px;
+    top: 0;
     right: 0;
     display: flex;
+    align-items: center;
     gap: 4px;
-    z-index: 10;
+    z-index: 100;
+    transform: translate(25%, -75%);
   }
 
   .component-wrapper {

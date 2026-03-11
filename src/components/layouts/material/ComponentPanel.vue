@@ -20,12 +20,12 @@
           v-for="category in filteredCategories"
           :key="category.key"
           :name="category.key"
-          :title="category.label + ' (' + category.components.length + ')'"
+          :title="category.label + ' (' + category.allComponents.length + ')'"
         >
-          <!-- 普通组件列表 -->
+          <!-- 组件列表（平铺显示，包含子组件） -->
           <div class="component-grid">
             <div
-              v-for="component in category.components"
+              v-for="component in category.allComponents"
               :key="component.type"
               class="component-item"
               :class="{ 'is-child': component.isChildComponent }"
@@ -33,32 +33,16 @@
               @dragstart="handleDragStart($event, component)"
             >
               <span class="component-name">{{ component.name }}</span>
-              <span v-if="component.isChildComponent" class="child-badge">子</span>
+              <ea-tag
+                v-if="component.isChildComponent"
+                size="small"
+                type="success"
+                class="child-tag"
+              >
+                子
+              </ea-tag>
             </div>
           </div>
-
-          <!-- 子组件分组显示 -->
-          <template v-if="getChildComponentGroups(category).length > 0">
-            <div
-              v-for="group in getChildComponentGroups(category)"
-              :key="group.parentType"
-              class="child-component-group"
-            >
-              <div class="child-group-title">{{ group.parentName }} 专用</div>
-              <div class="component-grid">
-                <div
-                  v-for="component in group.components"
-                  :key="component.type"
-                  class="component-item is-child"
-                  draggable="true"
-                  @dragstart="handleDragStart($event, component)"
-                >
-                  <span class="component-name">{{ component.name }}</span>
-                  <span class="child-badge">子</span>
-                </div>
-              </div>
-            </div>
-          </template>
         </ea-collapse-item>
 
         <!-- 远程组件单独渲染 -->
@@ -90,10 +74,7 @@
 
 <script setup>
   import { ref, computed, onMounted } from 'vue'
-  import {
-    getCategories,
-    getComponentsByCategory,
-  } from '@/constants/componentMeta'
+  import { getCategories, getComponentsByCategory } from '@/constants/componentMeta'
   import { ComponentCategories } from '@/constants/types'
   import { useRemoteComponentStore } from '@/stores/designer/remoteComponent'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
@@ -102,48 +83,25 @@
   const expandedCategories = ref([])
   const remoteStore = useRemoteComponentStore()
 
-  // 获取普通分类（排除远程组件）
-  const categories = computed(() => {
-    const cats = getCategories().filter((cat) => cat.value !== ComponentCategories.REMOTE)
-    return cats.map((cat) => ({
-      ...cat,
-      components: getComponentsByCategory(cat.value).filter((comp) => !comp.isChildComponent),
-    }))
-  })
-
   // 在物料区隐藏的子组件（通过特殊配置管理的）
   const hiddenChildComponentsInPanel = ['ea-option', 'ea-option-group']
 
-  // 获取子组件分组
-  function getChildComponentGroups(category) {
-    const allComponents = getComponentsByCategory(category.value)
-    // 过滤掉在物料区隐藏的子组件
-    const childComponents = allComponents.filter(
-      (comp) => comp.isChildComponent && !hiddenChildComponentsInPanel.includes(comp.type),
-    )
-
-    // 按父组件分组
-    const groups = {}
-    childComponents.forEach((comp) => {
-      const parentTypes = comp.parentComponents || []
-      parentTypes.forEach((parentType) => {
-        if (!groups[parentType]) {
-          // 查找父组件名称
-          const parentMeta = getComponentsByCategory(category.value).find(
-            (c) => c.type === parentType,
-          )
-          groups[parentType] = {
-            parentType,
-            parentName: parentMeta?.name || parentType,
-            components: [],
-          }
-        }
-        groups[parentType].components.push(comp)
-      })
+  // 获取普通分类（排除远程组件），包含所有组件（平铺显示）
+  const categories = computed(() => {
+    const cats = getCategories().filter((cat) => cat.value !== ComponentCategories.REMOTE)
+    return cats.map((cat) => {
+      const allComponents = getComponentsByCategory(cat.value)
+      // 过滤掉隐藏的子组件，但保留其他子组件用于平铺显示
+      const visibleComponents = allComponents.filter(
+        (comp) => !comp.isChildComponent || !hiddenChildComponentsInPanel.includes(comp.type),
+      )
+      return {
+        ...cat,
+        components: allComponents.filter((comp) => !comp.isChildComponent),
+        allComponents: visibleComponents,
+      }
     })
-
-    return Object.values(groups)
-  }
+  })
 
   // 过滤后的分类和组件
   const filteredCategories = computed(() => {
@@ -160,12 +118,12 @@
     const filtered = categories.value
       .map((cat) => ({
         ...cat,
-        components: cat.components.filter(
+        allComponents: cat.allComponents.filter(
           (comp) =>
             comp.name.toLowerCase().includes(query) || comp.type.toLowerCase().includes(query),
         ),
       }))
-      .filter((cat) => cat.components.length > 0)
+      .filter((cat) => cat.allComponents.length > 0)
 
     // 搜索时自动展开包含结果的分组
     expandedCategories.value = filtered.map((cat) => cat.key)
@@ -267,12 +225,10 @@
     border-radius: 0.25rem;
   }
 
-  .child-badge {
-    font-size: 0.625rem;
-    color: #059669;
-    background-color: #d1fae5;
-    padding: 0.125rem 0.375rem;
-    border-radius: 0.25rem;
+  .child-tag {
+    /* position: absolute; */
+    --ea-tag-padding: 0 4px;
+    --ea-tag-font-size: 10px;
   }
 
   .component-item.is-child {
@@ -283,30 +239,5 @@
   .component-item.is-child:hover {
     border-color: #059669;
     background-color: #d1fae5;
-  }
-
-  .child-component-group {
-    margin-top: 0.75rem;
-    padding-top: 0.75rem;
-    border-top: 1px dashed #e5e7eb;
-  }
-
-  .child-group-title {
-    font-size: 0.75rem;
-    color: #059669;
-    font-weight: 500;
-    padding: 0 0.75rem 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-
-  .child-group-title::before {
-    content: '';
-    display: inline-block;
-    width: 4px;
-    height: 4px;
-    background-color: #10b981;
-    border-radius: 50%;
   }
 </style>
