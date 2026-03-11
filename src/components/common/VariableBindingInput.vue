@@ -32,8 +32,8 @@
         </EaSelect>
         <EaSwitch
           v-else-if="inputType === 'switch'"
-          v-model="switchValue"
-          @change="handleSwitchChange"
+          :model-value="switchValue"
+          @update:modelValue="handleSwitchChange"
         />
         <UnitInput
           v-else-if="inputType === 'unit'"

@@ -279,8 +279,8 @@ export const dataComponents = [
       {
         name: 'height',
         label: '高度',
-        type: PropTypes.STRING,
-        default: '100%',
+        type: PropTypes.UNIT,
+        default: '300px',
       },
       {
         name: 'direction',
@@ -349,7 +349,7 @@ export const dataComponents = [
         type: PropTypes.SELECT,
         default: '',
         options: [
-          { label: '默认', value: '' },
+          { label: '默认', value: ' ' },
           { label: '无', value: 'none' },
           { label: '外部', value: 'outside' },
         ],
@@ -358,6 +358,14 @@ export const dataComponents = [
     events: [{ name: 'change', label: '索引变化' }],
     slots: [{ name: 'default', label: '轮播项插槽', isContentSlot: false }],
     childComponents: ['ea-carousel-item'],
+    childConfig: {
+      'ea-carousel-item': {
+        allowChildren: true,
+        allowedChildTypes: undefined,
+        allowDirectDrop: false,
+        defaultCount: 3,
+      },
+    },
     styleConfig: {
       parts: [
         {

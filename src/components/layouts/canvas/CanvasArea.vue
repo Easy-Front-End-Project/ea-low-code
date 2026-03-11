@@ -13,7 +13,11 @@
       <div class="grid-background absolute inset-0 pointer-events-none h-full"></div>
 
       <!-- 组件渲染区域 -->
-      <div ref="canvasContentRef" class="canvas-content relative w-full min-h-full p-4">
+      <div
+        ref="canvasContentRef"
+        v-if="!isPreviewMode"
+        class="canvas-content relative w-full min-h-full p-4"
+      >
         <CanvasComponent
           v-for="component in components"
           :key="component.id"
@@ -48,6 +52,7 @@
   const contentHeight = ref(0)
 
   const components = computed(() => schemaStore.components)
+  const isPreviewMode = computed(() => schemaStore.isPreviewMode)
   const selectedComponentId = computed(() => schemaStore.selectedComponentId)
 
   // 更新内容高度

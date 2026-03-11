@@ -1,7 +1,7 @@
 <template>
   <div class="app-container h-screen w-screen overflow-hidden">
     <DesignerLayout v-show="!isPreviewMode" />
-    <PreviewMode v-show="isPreviewMode" />
+    <PreviewMode v-if="isPreviewMode" />
   </div>
 </template>
 

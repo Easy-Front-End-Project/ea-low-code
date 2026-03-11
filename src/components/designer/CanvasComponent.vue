@@ -299,6 +299,15 @@
       return false
     }
 
+    // 检查父组件的 childConfig 配置
+    if (props.parentComponent) {
+      const parentMeta = getComponentMeta(props.parentComponent.type)
+      const childConfig = parentMeta?.childConfig?.[props.component.type]
+      if (childConfig && childConfig.allowChildren === false) {
+        return false
+      }
+    }
+
     // 如果组件有 children 且有子组件，则为容器
     if (Array.isArray(props.component.children) && props.component.children.length > 0) {
       return true
@@ -617,6 +626,16 @@
         targetSlot = namedSlots[0].name
       }
 
+      // 4. 检查 childConfig 中的 allowedChildTypes 限制
+      const childConfig = componentMeta.value?.childConfig?.[droppedComponentMeta.type]
+      if (childConfig?.allowedChildTypes !== undefined) {
+        const isAllowed = childConfig.allowedChildTypes.includes(droppedComponentMeta.type)
+        if (!isAllowed) {
+          console.warn(`组件 ${droppedComponentMeta.type} 不允许拖入到 ${props.component.type}`)
+          return
+        }
+      }
+
       // 向上冒泡，让父组件处理放置逻辑
       emit('drop-to-parent', {
         componentMeta: droppedComponentMeta,
@@ -708,6 +727,15 @@
     ea-switch,
     ea-transfer {
       pointer-events: none;
+    }
+
+    ea-carousel {
+      display: block;
+      & > .canvas-component {
+        width: 100%;
+        height: 100%;
+        flex: 0 0 100%;
+      }
     }
   }
 
