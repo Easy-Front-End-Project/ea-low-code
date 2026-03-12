@@ -707,7 +707,8 @@ function handleDrop(event) {
   ea-select,
   ea-rate,
   ea-switch,
-  ea-transfer {
+  ea-transfer,
+  ea-image {
     pointer-events: none;
   }
 
