@@ -500,6 +500,7 @@ export const dataComponents = [
     name: '描述列表',
     category: ComponentCategories.DATA,
     icon: 'Descriptions',
+    childComponents: ['ea-descriptions-item'],
     props: [
       {
         name: 'title',
@@ -508,10 +509,14 @@ export const dataComponents = [
         default: '',
       },
       {
-        name: 'column',
-        label: '列数',
-        type: PropTypes.NUMBER,
-        default: 3,
+        name: 'direction',
+        label: '排列方向',
+        type: PropTypes.SELECT,
+        default: 'horizontal',
+        options: [
+          { label: '水平', value: 'horizontal' },
+          { label: '垂直', value: 'vertical' },
+        ],
       },
       {
         name: 'border',
@@ -520,10 +525,16 @@ export const dataComponents = [
         default: false,
       },
       {
+        name: 'column',
+        label: '列数',
+        type: PropTypes.NUMBER,
+        default: 3,
+      },
+      {
         name: 'size',
         label: '尺寸',
         type: PropTypes.SELECT,
-        default: '',
+        default: 'default',
         options: [
           { label: '大', value: 'large' },
           { label: '中', value: 'default' },
@@ -539,16 +550,61 @@ export const dataComponents = [
     ],
     events: [],
     slots: [
-      { name: 'default', label: '描述项插槽' },
+      { name: 'default', label: '默认插槽' },
       { name: 'title', label: '标题插槽' },
+      { name: 'extra', label: '额外操作区插槽' },
     ],
-    childComponents: ['ea-descriptions-item'],
     styleConfig: {
       parts: [
         {
           name: 'container',
           label: '外层容器',
           styles: ['background-color'],
+        },
+        {
+          name: 'caption',
+          label: '标题与操作区容器',
+          styles: ['background-color', 'padding'],
+        },
+        {
+          name: 'title',
+          label: '标题区域',
+          styles: ['color', 'font-size'],
+        },
+        {
+          name: 'extra',
+          label: '额外操作区',
+          styles: ['background-color'],
+        },
+        {
+          name: 'body',
+          label: '表格主体',
+          styles: ['background-color'],
+        },
+        {
+          name: 'row',
+          label: '行',
+          styles: ['background-color'],
+        },
+        {
+          name: 'col-cell',
+          label: '单元格',
+          styles: ['background-color', 'padding'],
+        },
+        {
+          name: 'label',
+          label: '标签单元格',
+          styles: ['background-color', 'color', 'font-weight'],
+        },
+        {
+          name: 'content',
+          label: '内容单元格',
+          styles: ['background-color', 'color'],
+        },
+        {
+          name: 'cell',
+          label: '通用单元格',
+          styles: ['background-color', 'padding'],
         },
       ],
     },
@@ -557,21 +613,61 @@ export const dataComponents = [
     type: 'ea-descriptions-item',
     name: '描述列表项',
     category: ComponentCategories.DATA,
-    icon: 'DescriptionsItem',
+    icon: 'Document',
     isChildComponent: true,
     parentComponents: ['ea-descriptions'],
     props: [
       {
         name: 'label',
-        label: '标签',
+        label: '标签文本',
         type: PropTypes.STRING,
         default: '',
       },
       {
-        name: 'span',
-        label: '跨度',
+        name: 'children',
+        label: '内容',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'colspan',
+        label: '跨列数',
         type: PropTypes.NUMBER,
         default: 1,
+      },
+      {
+        name: 'rowspan',
+        label: '跨行数',
+        type: PropTypes.NUMBER,
+        default: 1,
+      },
+      {
+        name: 'align',
+        label: '对齐方式',
+        type: PropTypes.SELECT,
+        default: '',
+        options: [
+          { label: '左对齐', value: 'left' },
+          { label: '居中', value: 'center' },
+          { label: '右对齐', value: 'right' },
+        ],
+      },
+      {
+        name: 'label-align',
+        label: '标签对齐',
+        type: PropTypes.SELECT,
+        default: '',
+        options: [
+          { label: '左对齐', value: 'left' },
+          { label: '居中', value: 'center' },
+          { label: '右对齐', value: 'right' },
+        ],
+      },
+      {
+        name: 'width',
+        label: '单元格宽度',
+        type: PropTypes.UNIT,
+        default: '',
       },
       {
         name: 'label-width',
@@ -579,12 +675,21 @@ export const dataComponents = [
         type: PropTypes.UNIT,
         default: '',
       },
+      {
+        name: 'label-part',
+        label: '标签 Part',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'content-part',
+        label: '内容 Part',
+        type: PropTypes.STRING,
+        default: '',
+      },
     ],
     events: [],
-    slots: [
-      { name: 'default', label: '内容插槽' },
-      { name: 'label', label: '标签插槽' },
-    ],
+    slots: [{ name: 'default', label: '默认插槽' }],
     styleConfig: {
       parts: [
         {
@@ -841,6 +946,12 @@ export const dataComponents = [
     category: ComponentCategories.DATA,
     icon: 'Tag',
     props: [
+      {
+        name: 'children',
+        label: '标签内容',
+        type: PropTypes.STRING,
+        default: '',
+      },
       {
         name: 'type',
         label: '主题类型',
