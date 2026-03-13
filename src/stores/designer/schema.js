@@ -157,6 +157,18 @@ export const useSchemaStore = defineStore('schema', () => {
   }
 
   /**
+   * 更新组件插槽 Scope 绑定
+   * @param {string} componentId - 组件ID
+   * @param {Object} scopeBindings - Scope 绑定配置
+   */
+  function updateComponentScopeBindings(componentId, scopeBindings) {
+    const component = findComponentById(pageSchema.value.components, componentId)
+    if (component) {
+      component.scopeBindings = scopeBindings
+    }
+  }
+
+  /**
    * 更新组件子组件
    * @param {string} componentId - 组件ID
    * @param {Array} children - 新子组件列表
@@ -307,6 +319,7 @@ export const useSchemaStore = defineStore('schema', () => {
     updateComponentProps,
     updateComponentStyle,
     updateComponentEvents,
+    updateComponentScopeBindings,
     updateComponentChildren,
     moveComponent,
     selectComponent,

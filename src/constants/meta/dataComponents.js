@@ -1017,8 +1017,9 @@ export const dataComponents = [
         name: 'status',
         label: '状态',
         type: PropTypes.SELECT,
-        default: '',
+        default: ' ',
         options: [
+          { label: '默认', value: ' ' },
           { label: '成功', value: 'success' },
           { label: '警告', value: 'warning' },
           { label: '异常', value: 'exception' },
@@ -1060,9 +1061,23 @@ export const dataComponents = [
         type: PropTypes.BOOLEAN,
         default: true,
       },
+      {
+        name: 'size',
+        label: '进度条大小',
+        type: PropTypes.UNIT,
+        default: '126px',
+      },
     ],
     events: [{ name: 'change', label: '进度变化' }],
-    slots: [{ name: 'default', label: '默认插槽' }],
+    slots: [
+      {
+        name: 'default',
+        label: '默认插槽',
+        slotScope: [
+          { name: 'percentage', label: '百分比值' },
+        ],
+      },
+    ],
     styleConfig: {
       parts: [
         {
@@ -1082,8 +1097,13 @@ export const dataComponents = [
         },
         {
           name: 'percentage',
-          label: '文本容器',
+          label: '文本容器/插槽外层',
           styles: ['color'],
+        },
+        {
+          name: 'status-icon',
+          label: '状态图标',
+          styles: ['color', 'font-size'],
         },
       ],
     },

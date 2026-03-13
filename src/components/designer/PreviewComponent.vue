@@ -152,7 +152,11 @@
 
     // 遍历所有属性，解析变量绑定，过滤掉 slot 属性
     for (const [key, value] of Object.entries(rawProps)) {
-      if (key !== 'slot') {
+      if (key === 'slot') continue
+      // 处理 scope 属性，转换为 data-{scope} 形式
+      if (key === 'scope' && value) {
+        resolvedProps[`data-${value}`] = ''
+      } else {
         resolvedProps[key] = resolveValue(value)
       }
     }

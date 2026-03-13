@@ -7,6 +7,7 @@
     :disabled="disabled"
     :clearable="clearable"
     @change.stop.prevent="handleChange"
+    @ea-clear="handleClear"
   >
     <slot></slot>
   </ea-select>
@@ -46,23 +47,29 @@
   // 监听外部值变化
   watch(
     () => props.modelValue,
-    (newVal) => {
+    newVal => {
       localValue.value = newVal
     },
-    { immediate: true },
+    { immediate: true }
   )
 
   // 处理 change 事件
   function handleChange(event) {
     const value = event.detail?.value
     const options = [...event.target.querySelectorAll('ea-option')]
-    const selectedOption = options.find((o) => o.getAttribute('value') === value)
+    const selectedOption = options.find(o => o.getAttribute('value') === value)
 
-    if (value !== undefined && value !== localValue.value && selectedOption) {
+    if ((value !== undefined && value !== localValue.value && selectedOption) || value === true) {
       localValue.value = value
       emit('update:modelValue', value)
       emit('change', value)
     }
+  }
+
+  function handleClear() {
+    localValue.value = ''
+    emit('update:modelValue', '')
+    emit('change', '')
   }
 
   // 暴露方法
