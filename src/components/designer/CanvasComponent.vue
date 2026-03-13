@@ -185,7 +185,15 @@
   const nonContainerTypes = ['ea-checkbox-group', 'ea-radio-group']
 
   // 行内块级组件类型（如按钮、链接等）
-  const inlineBlockTypes = ['ea-button', 'ea-text', 'ea-link', 'ea-tag', 'ea-badge', 'ea-avatar']
+  const inlineBlockTypes = [
+    'ea-button',
+    'ea-text',
+    'ea-link',
+    'ea-tag',
+    'ea-check-tag',
+    'ea-badge',
+    'ea-avatar',
+  ]
 
   // 是否为不可选中的组件
   const isNonSelectable = computed(() => {
@@ -790,6 +798,18 @@
       &::part(low-code-component-label),
       &::part(low-code-component-actions) {
         display: none;
+      }
+    }
+
+    ea-table {
+      &::part(default-slot) {
+        display: block;
+      }
+    }
+
+    ea-tag {
+      &::part(close-icon) {
+        pointer-events: none;
       }
     }
   }

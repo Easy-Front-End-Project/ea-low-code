@@ -115,7 +115,7 @@
       @close="handleCloseEditor"
     >
       <div class="editor-content">
-        <MonacoEditor v-model="editorValue" language="json" height="300px" />
+        <MonacoEditor v-if="editorVisible" v-model="editorValue" language="json" height="300px" />
       </div>
       <div slot="footer" class="dialog-footer">
         <ea-button @click="handleCloseEditor">取消</ea-button>

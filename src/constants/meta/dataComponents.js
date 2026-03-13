@@ -1073,9 +1073,7 @@ export const dataComponents = [
       {
         name: 'default',
         label: '默认插槽',
-        slotScope: [
-          { name: 'percentage', label: '百分比值' },
-        ],
+        slotScope: [{ name: 'percentage', label: '百分比值' }],
       },
     ],
     styleConfig: {
@@ -1126,7 +1124,6 @@ export const dataComponents = [
         type: PropTypes.SELECT,
         default: 'primary',
         options: [
-          { label: '默认', value: 'default' },
           { label: '主要', value: 'primary' },
           { label: '成功', value: 'success' },
           { label: '信息', value: 'info' },
@@ -1165,14 +1162,8 @@ export const dataComponents = [
       {
         name: 'color',
         label: '自定义颜色',
-        type: PropTypes.STRING,
+        type: PropTypes.COLOR,
         default: '',
-      },
-      {
-        name: 'disabled',
-        label: '禁用',
-        type: PropTypes.BOOLEAN,
-        default: false,
       },
       {
         name: 'round',
@@ -1187,18 +1178,26 @@ export const dataComponents = [
         default: false,
       },
     ],
-    events: [{ name: 'ea-remove', label: '标签移除' }],
-    slots: [{ name: 'default', label: '默认插槽' }],
+    events: [
+      {
+        name: 'ea-remove',
+        label: '标签移除',
+        params: 'event: (被移除标签的相关信息，可包含 value)',
+      },
+    ],
+    slots: [{ name: 'default', label: '默认插槽', description: '用于放置标签文本或自定义内容' }],
     styleConfig: {
       parts: [
         {
           name: 'container',
           label: 'Tag根容器',
+          description: '包含文本与可选图标/关闭按钮',
           styles: ['background-color', 'color', 'border-color'],
         },
         {
           name: 'close-icon',
           label: '关闭图标',
+          description: '关闭图标按钮',
           styles: ['color'],
         },
       ],
@@ -1211,6 +1210,25 @@ export const dataComponents = [
     icon: 'CheckTag',
     props: [
       {
+        name: 'children',
+        label: '标签内容',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'type',
+        label: '主题类型',
+        type: PropTypes.SELECT,
+        default: 'primary',
+        options: [
+          { label: '主要', value: 'primary' },
+          { label: '成功', value: 'success' },
+          { label: '信息', value: 'info' },
+          { label: '警告', value: 'warning' },
+          { label: '危险', value: 'danger' },
+        ],
+      },
+      {
         name: 'checked',
         label: '选中状态',
         type: PropTypes.BOOLEAN,
@@ -1222,28 +1240,15 @@ export const dataComponents = [
         type: PropTypes.BOOLEAN,
         default: false,
       },
-      {
-        name: 'type',
-        label: '主题类型',
-        type: PropTypes.SELECT,
-        default: 'default',
-        options: [
-          { label: '默认', value: 'default' },
-          { label: '主要', value: 'primary' },
-          { label: '成功', value: 'success' },
-          { label: '信息', value: 'info' },
-          { label: '警告', value: 'warning' },
-          { label: '危险', value: 'danger' },
-        ],
-      },
     ],
-    events: [{ name: 'change', label: '状态改变' }],
-    slots: [{ name: 'default', label: '默认插槽' }],
+    events: [{ name: 'change', label: '状态改变', params: 'event.detail: { checked: boolean }' }],
+    slots: [{ name: 'default', label: '默认插槽', description: '用于放置标签文本或自定义内容' }],
     styleConfig: {
       parts: [
         {
           name: 'container',
-          label: '外层容器',
+          label: 'CheckTag根容器',
+          description: '包含可选图标与文本',
           styles: ['background-color', 'color', 'border-color'],
         },
       ],
@@ -1274,12 +1279,6 @@ export const dataComponents = [
         default: false,
       },
       {
-        name: 'highlight-current-row',
-        label: '高亮当前行',
-        type: PropTypes.BOOLEAN,
-        default: false,
-      },
-      {
         name: 'height',
         label: '高度',
         type: PropTypes.STRING,
@@ -1292,48 +1291,96 @@ export const dataComponents = [
         default: '',
       },
       {
-        name: 'size',
-        label: '尺寸',
-        type: PropTypes.SELECT,
-        default: '',
-        options: [
-          { label: '大', value: 'large' },
-          { label: '中', value: 'default' },
-          { label: '小', value: 'small' },
-        ],
-      },
-      {
-        name: 'fit',
-        label: '自适应宽度',
+        name: 'highlight-current-row',
+        label: '高亮当前行',
         type: PropTypes.BOOLEAN,
-        default: true,
+        default: false,
       },
       {
-        name: 'show-header',
-        label: '显示表头',
+        name: 'show-summary',
+        label: '显示合计行',
         type: PropTypes.BOOLEAN,
-        default: true,
-      },
-      {
-        name: 'empty-text',
-        label: '空数据文本',
-        type: PropTypes.STRING,
-        default: '暂无数据',
+        default: false,
       },
     ],
     events: [
-      { name: 'row-click', label: '行点击' },
-      { name: 'row-dblclick', label: '行双击' },
-      { name: 'cell-click', label: '单元格点击' },
-      { name: 'header-click', label: '表头点击' },
-      { name: 'selection-change', label: '选择改变' },
-      { name: 'select', label: '选择' },
-      { name: 'select-all', label: '全选' },
-      { name: 'sort-change', label: '排序改变' },
+      {
+        name: 'ea-select',
+        label: '选择某一行',
+        params: 'event.detail: { selection: any[], row: any }',
+      },
+      { name: 'ea-select-all', label: '全选', params: 'event.detail: { selection: any[] }' },
+      {
+        name: 'ea-selection-change',
+        label: '多选变化',
+        params: 'event.detail: { newSelection: any[] }',
+      },
+      {
+        name: 'ea-cell-mouse-enter',
+        label: '单元格鼠标进入',
+        params: 'event.detail: { row: any, column: string, cell: HTMLTableCellElement }',
+      },
+      {
+        name: 'ea-cell-mouse-leave',
+        label: '单元格鼠标离开',
+        params: 'event.detail: { row: any, column: string, cell: HTMLTableCellElement }',
+      },
+      {
+        name: 'ea-cell-click',
+        label: '单元格点击',
+        params: 'event.detail: { cell: HTMLTableCellElement, column: string, row: any }',
+      },
+      {
+        name: 'ea-cell-dblclick',
+        label: '单元格双击',
+        params: 'event.detail: { cell: HTMLTableCellElement, column: string, row: any }',
+      },
+      {
+        name: 'ea-cell-contextmenu',
+        label: '单元格右键',
+        params: 'event.detail: { cell: HTMLTableCellElement, column: string, row: any }',
+      },
+      {
+        name: 'ea-row-click',
+        label: '行点击',
+        params: 'event.detail: { target: HTMLTableRowElement, column: string, row: any }',
+      },
+      {
+        name: 'ea-row-dblclick',
+        label: '行双击',
+        params: 'event.detail: { target: HTMLTableRowElement, column: string, row: any }',
+      },
+      {
+        name: 'ea-row-contextmenu',
+        label: '行右键',
+        params: 'event.detail: { target: HTMLTableRowElement, column: string, row: any }',
+      },
+      {
+        name: 'ea-header-click',
+        label: '表头点击',
+        params: 'event.detail: { cell: HTMLTableCellElement, column: string }',
+      },
+      {
+        name: 'ea-header-contextmenu',
+        label: '表头右键',
+        params: 'event.detail: { cell: HTMLTableCellElement, column: string }',
+      },
+      {
+        name: 'ea-sort-change',
+        label: '排序变化',
+        params: 'event.detail: { prop: string, order: "ascend" | "descend" }',
+      },
+      {
+        name: 'ea-current-change',
+        label: '当前行变化',
+        params: 'event.detail: { target: HTMLTableRowElement, column: string, row: any }',
+      },
+      { name: 'ea-table-data-rendered', label: '数据渲染完成', params: '-' },
     ],
     slots: [
-      { name: 'default', label: '列定义插槽' },
-      { name: 'empty', label: '空数据插槽' },
+      { name: 'default', label: '列定义插槽', description: '仅支持 ea-table-column' },
+      { name: 'header', label: '表格外头部插槽' },
+      { name: 'empty', label: '空数据插槽', description: '表格无数据时显示' },
     ],
     childComponents: ['ea-table-column'],
     styleConfig: {
@@ -1341,27 +1388,82 @@ export const dataComponents = [
         {
           name: 'container',
           label: '外层容器',
+          description: '整个表格容器',
           styles: ['width'],
         },
         {
-          name: 'header',
+          name: 'colgroup',
+          label: '表格列组',
+          description: '表格列（colgroup）部分',
+        },
+        {
+          name: 'col',
+          label: '表格列',
+          description: '表格列（col）部分',
+        },
+        {
+          name: 'thead',
           label: '表头',
+          description: '表格头部（thead）部分',
           styles: ['background-color', 'color'],
         },
         {
-          name: 'body',
+          name: 'thead-tr',
+          label: '表头行',
+          description: '表格头部行（tr）部分',
+        },
+        {
+          name: 'thead-th',
+          label: '表头单元格',
+          description: '表格头部列（th）部分',
+        },
+        {
+          name: 'checkbox',
+          label: '复选框',
+          description: '表格复选框，当存在 type="selection" 的列时有效',
+        },
+        {
+          name: 'asc-icon',
+          label: '升序图标',
+          description: '表格排序图标，当存在 sortable="true" 的列时有效',
+        },
+        {
+          name: 'desc-icon',
+          label: '降序图标',
+          description: '表格排序图标，当存在 sortable="true" 的列时有效',
+        },
+        {
+          name: 'tbody',
           label: '表体',
+          description: '表格主体（tbody）部分',
           styles: ['background-color'],
         },
         {
-          name: 'row',
-          label: '行',
+          name: 'tbody-tr',
+          label: '表格行',
+          description: '表格行（tr）部分',
           styles: ['background-color'],
         },
         {
-          name: 'cell',
-          label: '单元格',
+          name: 'tbody-td',
+          label: '表格单元格',
+          description: '表格单元格（td）部分',
           styles: ['border-color', 'padding'],
+        },
+        {
+          name: 'tfoot',
+          label: '表尾',
+          description: '表格尾部（tfoot）部分',
+        },
+        {
+          name: 'tfoot-tr',
+          label: '表尾行',
+          description: '表格尾部行（tr）部分',
+        },
+        {
+          name: 'tfoot-td',
+          label: '表尾单元格',
+          description: '表格尾部单元格（td）部分',
         },
       ],
     },
@@ -1375,44 +1477,16 @@ export const dataComponents = [
     parentComponents: ['ea-table'],
     props: [
       {
+        name: 'label',
+        label: '表头标题',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
         name: 'prop',
         label: '字段名',
         type: PropTypes.STRING,
         default: '',
-      },
-      {
-        name: 'label',
-        label: '列标题',
-        type: PropTypes.STRING,
-        default: '',
-      },
-      {
-        name: 'width',
-        label: '宽度',
-        type: PropTypes.UNIT,
-        default: '',
-      },
-      {
-        name: 'min-width',
-        label: '最小宽度',
-        type: PropTypes.UNIT,
-        default: '',
-      },
-      {
-        name: 'fixed',
-        label: '固定列',
-        type: PropTypes.SELECT,
-        default: '',
-        options: [
-          { label: '左', value: 'left' },
-          { label: '右', value: 'right' },
-        ],
-      },
-      {
-        name: 'sortable',
-        label: '可排序',
-        type: PropTypes.BOOLEAN,
-        default: false,
       },
       {
         name: 'type',
@@ -1422,7 +1496,6 @@ export const dataComponents = [
         options: [
           { label: '选择', value: 'selection' },
           { label: '索引', value: 'index' },
-          { label: '展开', value: 'expand' },
         ],
       },
       {
@@ -1436,20 +1509,36 @@ export const dataComponents = [
           { label: '右对齐', value: 'right' },
         ],
       },
+      {
+        name: 'width',
+        label: '列宽',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'sortable',
+        label: '可排序',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+      {
+        name: 'fixed',
+        label: '固定列',
+        type: PropTypes.SELECT,
+        default: "",
+        options: [
+          { label: '左', value: 'left' },
+          { label: '右', value: 'right' },
+        ],
+      },
     ],
     events: [],
     slots: [
-      { name: 'default', label: '内容插槽' },
-      { name: 'header', label: '表头插槽' },
+      { name: 'default', label: '默认插槽', description: '用于自定义列内容' },
+      { name: 'header', label: '表头插槽', description: '用于自定义表头内容' },
     ],
     styleConfig: {
-      parts: [
-        {
-          name: 'container',
-          label: '外层容器',
-          styles: ['background-color'],
-        },
-      ],
+      parts: [],
     },
   },
   {

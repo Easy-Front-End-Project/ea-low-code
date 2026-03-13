@@ -30,11 +30,19 @@
   onMounted(async () => {
     await nextTick()
 
-    if (!editorContainer.value) return
+    if (!editorContainer.value) {
+      console.warn('[MonacoEditor] editorContainer is null, skipping initialization')
+      return
+    }
 
     try {
       // 加载 monaco-editor
       const monaco = await loader.init()
+
+      if (!editorContainer.value) {
+        console.warn('[MonacoEditor] editorContainer became null after loader.init(), skipping initialization')
+        return
+      }
 
       // 创建编辑器实例
       editor = monaco.editor.create(editorContainer.value, {

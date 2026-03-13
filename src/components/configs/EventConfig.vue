@@ -198,6 +198,7 @@
                   </div>
                 </div>
                 <MonacoEditor
+                  v-if="dialogVisible"
                   :key="selectedEvent.id + '_editor'"
                   v-model="selectedEvent.code"
                   language="javascript"
