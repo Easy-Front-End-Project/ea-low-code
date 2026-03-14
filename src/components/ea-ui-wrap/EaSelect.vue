@@ -47,7 +47,7 @@
   const emit = defineEmits(['update:modelValue', 'change'])
 
   const selectRef = ref(null)
-  const localValue = ref([...props.modelValue])
+  const localValue = ref(Array.isArray(props.modelValue) ? [...props.modelValue] : props.modelValue)
 
   // 处理 change 事件
   function handleChange(event) {

@@ -27,9 +27,9 @@
           :placeholder="resolvedPlaceholder"
           @change="handleInputChange"
         >
-          <ea-option v-for="option in options" :key="option.value" :value="option.value"
-            >{{ option.label }}</ea-option
-          >
+          <ea-option v-for="option in options" :key="option.value" :value="option.value">
+            {{ option.label }}
+          </ea-option>
         </EaSelect>
         <!-- 多选下拉框 -->
         <EaSelect

@@ -1605,7 +1605,7 @@ export const dataComponents = [
         default: 1,
       },
       {
-        name: 'hideOnSinglePage',
+        name: 'hide-on-single-page',
         label: '单页时隐藏',
         type: PropTypes.BOOLEAN,
         default: false,
@@ -1613,21 +1613,28 @@ export const dataComponents = [
       {
         name: 'size',
         label: '尺寸',
-        type: PropTypes.STRING,
-        default: '',
-        options: ['large', 'default', 'small'],
+        type: PropTypes.SELECT,
+        default: 'default',
+        options: [
+          {
+            label: '大',
+            value: 'large',
+          },
+          {
+            label: '默认',
+            value: 'default',
+          },
+          {
+            label: '小',
+            value: 'small',
+          },
+        ],
       },
       {
         name: 'disabled',
         label: '禁用',
         type: PropTypes.BOOLEAN,
         default: false,
-      },
-      {
-        name: 'pageSizes',
-        label: '每页条数选项',
-        type: PropTypes.ARRAY,
-        default: [10, 20, 30, 40, 50, 100],
       },
     ],
     events: [
