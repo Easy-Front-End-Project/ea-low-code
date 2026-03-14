@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:clean": "rimraf node_modules/.vite node_modules/.vite-temp && vite",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "run-s lint:*",
@@ -35,6 +36,7 @@
     "npm-run-all2": "^8.0.4",
     "oxlint": "~1.50.0",
     "prettier": "3.8.1",
+    "rimraf": "^6.0.1",
     "unocss": "^66.6.2",
     "vite": "^7.3.1",
     "vite-plugin-vue-devtools": "^8.0.6"

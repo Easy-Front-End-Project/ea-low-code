@@ -34,15 +34,15 @@
         <!-- 多选下拉框 -->
         <EaSelect
           v-else-if="resolvedInputType === 'multi-select'"
-          :model-value="multiSelectValue"
+          v-model="multiSelectValue"
           size="small"
           :placeholder="resolvedPlaceholder"
           multiple
           @change="handleMultiSelectChange"
         >
-          <ea-option v-for="option in options" :key="option.value" :value="option.value"
-            >{{ option.label }}</ea-option
-          >
+          <ea-option v-for="option in options" :key="option.value" :value="option.value">
+            {{ option.label }}
+          </ea-option>
         </EaSelect>
         <EaSwitch
           v-else-if="resolvedInputType === 'switch'"
@@ -287,11 +287,13 @@
 
   // 处理多选变化
   function handleMultiSelectChange(event) {
-    const value = event.detail?.value
+    const value = event.detail?.value !== undefined ? event.detail.value : event
+    if (!value) return
+
     if (Array.isArray(value)) {
-      emit('update:value', value)
+      emit('update:value', convertValue(value))
     } else {
-      emit('update:value', value ? [value] : [])
+      emit('update:value', convertValue(value ? [value] : []))
     }
   }
 
@@ -307,6 +309,7 @@
         return value === 'true' || value === true
       case 'object':
       case 'array':
+      case 'multiple':
         try {
           if (typeof value === 'string') {
             return JSON.parse(value)

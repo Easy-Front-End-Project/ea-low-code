@@ -47,16 +47,7 @@
   const emit = defineEmits(['update:modelValue', 'change'])
 
   const selectRef = ref(null)
-  const localValue = ref(props.modelValue)
-
-  // 监听外部值变化
-  watch(
-    () => props.modelValue,
-    newVal => {
-      localValue.value = newVal
-    },
-    { immediate: true }
-  )
+  const localValue = ref([...props.modelValue])
 
   // 处理 change 事件
   function handleChange(event) {
@@ -68,6 +59,15 @@
       localValue.value = value
       emit('update:modelValue', value)
       emit('change', value)
+
+      return
+    }
+
+    if (props.multiple) {
+      localValue.value = value
+      emit('update:modelValue', value)
+      emit('change', value)
+      return
     }
   }
 
