@@ -19,6 +19,10 @@
       type: String,
       default: '200px',
     },
+    extraLibs: {
+      type: Array,
+      default: () => [],
+    },
   })
 
   const emit = defineEmits(['update:modelValue'])
@@ -42,6 +46,13 @@
       if (!editorContainer.value) {
         console.warn('[MonacoEditor] editorContainer became null after loader.init(), skipping initialization')
         return
+      }
+
+      // 添加自定义类型定义（用于代码提示）
+      if (props.extraLibs && props.extraLibs.length > 0) {
+        props.extraLibs.forEach((lib) => {
+          monaco.languages.typescript.javascriptDefaults.addExtraLib(lib.content, lib.filePath)
+        })
       }
 
       // 创建编辑器实例

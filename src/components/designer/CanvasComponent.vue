@@ -27,6 +27,15 @@
       {{ componentMeta?.name || (isRemoteComponent ? '远程组件' : component.type) }}
     </div>
 
+    <!-- Slot 标签 - 当组件被放入非默认插槽时显示 -->
+    <div
+      v-if="props.component.props?.slot && props.component.props.slot !== 'default' && showLabel && !isNonSelectable"
+      class="slot-label"
+      part="low-code-slot-label"
+    >
+      slot: {{ props.component.props.slot }}
+    </div>
+
     <!-- 选中时的操作按钮 -->
     <div
       v-if="selected && !isNonSelectable"
@@ -127,6 +136,7 @@
   import { useVariableStore } from '@/stores/designer/variable'
   import { getComponentMeta, getRemoteComponentMetaList } from '@/constants/componentMeta'
   import { loadRemoteComponent } from '@/utils/loadRemoteComponent'
+  import { executeEvent } from '@/utils/eventExecutor'
 
   const props = defineProps({
     component: {
@@ -435,14 +445,14 @@
       const eventType = eventConfig.type
       if (!listeners[eventType]) {
         listeners[eventType] = event => {
-          executeEvent(eventConfig, event)
+          executeEventHandler(eventConfig, event)
         }
       } else {
         // 如果已经有同类型事件，创建组合处理器
         const existingHandler = listeners[eventType]
         listeners[eventType] = event => {
           existingHandler(event)
-          executeEvent(eventConfig, event)
+          executeEventHandler(eventConfig, event)
         }
       }
     })
@@ -496,63 +506,8 @@
   }
 
   // 执行事件
-  function executeEvent(eventConfig, originalEvent) {
-    if (eventConfig.action === 'message') {
-      // 显示提示消息
-      if (window.$message && eventConfig.message) {
-        window.$message.success(eventConfig.message)
-      } else {
-        alert(eventConfig.message || '提示消息')
-      }
-    } else if (eventConfig.action === 'custom') {
-      // 执行自定义代码
-      if (eventConfig.code) {
-        try {
-          // 注入 $component、$vars 和 $event 辅助函数到代码中
-          const wrappedCode = `
-            const $component = {
-              get: (id) => instanceStore.getComponentElement(id),
-              setProp: (id, prop, value) => instanceStore.setComponentProp(id, prop, value),
-              getProp: (id, prop) => instanceStore.getComponentProp(id, prop),
-              call: (id, method, ...args) => instanceStore.callComponentMethod(id, method, ...args)
-            };
-            const $vars = {
-              get: (name) => variableStore.getVariableDefaultValue(name),
-              set: (name, value) => variableStore.updateVariableByName(name, { defaultValue: value })
-            };
-            const $event = event;
-            ${eventConfig.code}
-          `
-          const fn = new Function('event', 'instanceStore', 'variableStore', wrappedCode)
-          fn(originalEvent, instanceStore, variableStore)
-        } catch (error) {
-          console.error('执行自定义事件失败:', error)
-          if (window.$message) {
-            window.$message.error('事件执行失败: ' + error.message)
-          }
-        }
-      }
-    } else if (eventConfig.action === 'callMethod') {
-      // 调用组件方法
-      if (eventConfig.targetComponentId && eventConfig.methodName) {
-        instanceStore.callComponentMethod(
-          eventConfig.targetComponentId,
-          eventConfig.methodName,
-          ...(eventConfig.methodArgs || [])
-        )
-      }
-    } else if (eventConfig.action === 'setProp') {
-      // 设置组件属性
-      if (eventConfig.targetComponentId && eventConfig.propName !== undefined) {
-        // 解析变量绑定值
-        const resolvedValue = resolveValue(eventConfig.propValue)
-        instanceStore.setComponentProp(
-          eventConfig.targetComponentId,
-          eventConfig.propName,
-          resolvedValue
-        )
-      }
-    }
+  function executeEventHandler(eventConfig, originalEvent) {
+    executeEvent(eventConfig, originalEvent)
   }
 
   // 注册组件实例
@@ -563,7 +518,9 @@
       if (tagName && tagName.startsWith('ea-')) {
         customElements.whenDefined(tagName).then(() => {
           // 获取实际的 DOM 元素
-          const element = componentRef.value.$el || componentRef.value
+          const ref = componentRef.value
+          if (!ref) return
+          const element = ref.$el || ref
           if (element) {
             instanceStore.registerInstance(props.component.id, element)
           }
@@ -752,6 +709,21 @@
     z-index: 100;
   }
 
+  .slot-label {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 2px 6px;
+    background-color: #10b981;
+    color: white;
+    font-size: 10px;
+    line-height: 14px;
+    border-radius: 3px;
+    white-space: nowrap;
+    transform: translate(25%, 100%);
+    z-index: 100;
+  }
+
   .component-actions {
     position: absolute;
     top: 0;
@@ -790,20 +762,16 @@
       }
     }
 
-    ea-descriptions {
+    ea-descriptions,
+    ea-table {
       &::part(default-slot) {
         display: block;
       }
 
       &::part(low-code-component-label),
-      &::part(low-code-component-actions) {
+      &::part(low-code-component-actions),
+      &::part(low-code-slot-label) {
         display: none;
-      }
-    }
-
-    ea-table {
-      &::part(default-slot) {
-        display: block;
       }
     }
 

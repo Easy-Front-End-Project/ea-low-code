@@ -181,6 +181,7 @@
 
 <script setup>
   import { ref, computed, watch } from 'vue'
+  import { generateComponentId, generateUniqueId } from '@/utils/schemaHelper'
   import { useSchemaStore } from '@/stores/designer/schema'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
@@ -215,21 +216,21 @@
 
   // 计算分组节点
   const groupNodes = computed(() => {
-    return treeData.value.filter((n) => n.type === 'group')
+    return treeData.value.filter(n => n.type === 'group')
   })
 
   // 计算普通选项节点
   const optionNodes = computed(() => {
-    return treeData.value.filter((n) => n.type !== 'group')
+    return treeData.value.filter(n => n.type !== 'group')
   })
 
   // 计算扁平化的选项列表用于预览
   const flatOptions = computed(() => {
     const result = []
-    treeData.value.forEach((node) => {
+    treeData.value.forEach(node => {
       if (node.type === 'group') {
         result.push({ type: 'group', label: node.label, value: '-' })
-        node.children?.forEach((child) => {
+        node.children?.forEach(child => {
           result.push({ type: 'option', label: child.label, value: child.value })
         })
       } else {
@@ -244,19 +245,19 @@
   // 监听外部数据变化
   watch(
     () => props.component?.props?.[props.propName],
-    (newVal) => {
+    newVal => {
       if (newVal && newVal.length > 0) {
         treeData.value = JSON.parse(JSON.stringify(newVal))
       } else {
         treeData.value = []
       }
     },
-    { immediate: true, deep: true },
+    { immediate: true, deep: true }
   )
 
   // 生成唯一ID
   function generateId() {
-    return 'option_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+    return generateUniqueId('option')
   }
 
   // 打开弹窗
@@ -333,7 +334,7 @@
       if (!editingParent.value.children) {
         editingParent.value.children = []
       }
-      const index = editingParent.value.children.findIndex((item) => item.id === newOption.id)
+      const index = editingParent.value.children.findIndex(item => item.id === newOption.id)
       if (index > -1) {
         editingParent.value.children[index] = newOption
       } else {
@@ -341,7 +342,7 @@
       }
     } else {
       // 添加到根级
-      const index = treeData.value.findIndex((item) => item.id === newOption.id)
+      const index = treeData.value.findIndex(item => item.id === newOption.id)
       if (index > -1) {
         treeData.value[index] = newOption
       } else {
@@ -365,7 +366,7 @@
       children: editingGroup.value.children || [],
     }
 
-    const index = treeData.value.findIndex((item) => item.id === newGroup.id)
+    const index = treeData.value.findIndex(item => item.id === newGroup.id)
     if (index > -1) {
       treeData.value[index] = { ...treeData.value[index], ...newGroup }
     } else {
@@ -377,7 +378,7 @@
 
   // 通过ID删除节点
   function removeNodeById(id) {
-    const index = treeData.value.findIndex((item) => item.id === id)
+    const index = treeData.value.findIndex(item => item.id === id)
     if (index > -1) {
       treeData.value.splice(index, 1)
     }
@@ -411,18 +412,18 @@
 
     const existingChildren = props.component.children || []
     const nonOptionChildren = existingChildren.filter(
-      (child) => child.type !== 'ea-option' && child.type !== 'ea-option-group',
+      child => child.type !== 'ea-option' && child.type !== 'ea-option-group'
     )
 
     // 生成唯一组件 ID
-    const generateComponentId = () => {
-      return 'comp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+    const createComponentId = () => {
+      return generateComponentId()
     }
 
     // 创建 option 组件
     const createOptionComponent = (value, label) => {
       return {
-        id: generateComponentId(),
+        id: createComponentId(),
         type: 'ea-option',
         props: {
           value,
@@ -435,20 +436,20 @@
     // 创建 option-group 组件
     const createOptionGroupComponent = (label, children) => {
       return {
-        id: generateComponentId(),
+        id: createComponentId(),
         type: 'ea-option-group',
         props: {
           label,
           slot: 'default',
         },
-        children: children.map((child) => createOptionComponent(child.value, child.label)),
+        children: children.map(child => createOptionComponent(child.value, child.label)),
       }
     }
 
-    const newChildren = optionsData.map((item) =>
+    const newChildren = optionsData.map(item =>
       item.type === 'group'
         ? createOptionGroupComponent(item.label, item.children || [])
-        : createOptionComponent(item.value, item.label),
+        : createOptionComponent(item.value, item.label)
     )
 
     schemaStore.updateComponentChildren(props.component.id, [...nonOptionChildren, ...newChildren])

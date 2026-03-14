@@ -203,6 +203,7 @@
                   v-model="selectedEvent.code"
                   language="javascript"
                   height="200px"
+                  :extra-libs="editorExtraLibs"
                 />
               </div>
             </div>
@@ -234,6 +235,7 @@
   import MonacoEditor from '../common/MonacoEditor.vue'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
+  import { generateUniqueId } from '@/utils/schemaHelper'
 
   const props = defineProps({
     events: {
@@ -271,22 +273,149 @@
     { name: 'error', label: '错误' },
   ]
 
-  // 可用事件列表（组件预定义事件 + 常用自定义事件）
+  // 代码帮助 API 配置
+  const codeHelpApis = ref([
+    { name: '$event', desc: '原始事件对象' },
+    { name: '$component.get(id)', desc: '通过ID获取组件DOM元素' },
+    { name: '$component.setProp(id, prop, value)', desc: '通过ID设置组件属性' },
+    { name: '$component.getProp(id, prop)', desc: '通过ID获取组件属性' },
+    { name: '$component.call(id, method, ...args)', desc: '通过ID调用组件方法' },
+    { name: '$vars.get(name)', desc: '获取变量值' },
+    { name: '$vars.set(name, value)', desc: '设置变量值' },
+    { name: '$alias.get(alias)', desc: '通过别名获取组件ID' },
+    { name: '$alias.find(alias)', desc: '通过别名查找组件' },
+    { name: '$alias.getElement(alias)', desc: '通过别名获取DOM元素' },
+    { name: '$alias.setProp(alias, prop, value)', desc: '通过别名设置组件属性（推荐）' },
+    { name: '$alias.getProp(alias, prop)', desc: '通过别名获取组件属性（推荐）' },
+    { name: '$alias.call(alias, method, ...args)', desc: '通过别名调用组件方法（推荐）' },
+  ])
+
+  // Monaco Editor 类型定义（用于代码提示）
+  const editorExtraLibs = [
+    {
+      filePath: 'ts:global/event-api.d.ts',
+      content: `
+        /** 事件对象 */
+        declare const $event: Event;
+
+        /** 组件操作辅助对象 */
+        declare const $component: {
+          /**
+           * 通过ID获取组件DOM元素
+           * @param {string} id - 组件ID
+           * @returns {Element|null} 组件DOM元素或null
+           */
+          get(id: string): Element | null;
+          /**
+           * 设置组件属性
+           * @param {string} id - 组件ID
+           * @param {string} prop - 属性名
+           * @param {any} value - 属性值
+           */
+          setProp(id: string, prop: string, value: any): void;
+          /**
+           * 获取组件属性
+           * @param {string} id - 组件ID
+           * @param {string} prop - 属性名
+           * @returns {any} 属性值
+           */
+          getProp(id: string, prop: string): any;
+          /**
+           * 调用组件方法
+           * @param {string} id - 组件ID
+           * @param {string} method - 方法名
+           * @param {...any} args - 方法参数
+           */
+          call(id: string, method: string, ...args: any[]): void;
+        };
+
+        /** 变量操作辅助对象 */
+        declare const $vars: {
+          /**
+           * 获取变量值
+           * @param {string} name - 变量名
+           * @returns {any} 变量值
+           */
+          get(name: string): any;
+          /**
+           * 设置变量值
+           * @param {string} name - 变量名
+           * @param {any} value - 变量值
+           */
+          set(name: string, value: any): void;
+        };
+
+        /** 别名操作辅助对象 */
+        declare const $alias: {
+          /**
+           * 通过别名获取组件ID
+           * @param {string} alias - 组件别名
+           * @returns {string|null} 组件ID或null
+           */
+          get(alias: string): string | null;
+          /**
+           * 通过别名查找组件
+           * @param {string} alias - 组件别名
+           * @returns {any|null} 组件实例或null
+           */
+          find(alias: string): any | null;
+          /**
+           * 通过别名获取DOM元素
+           * @param {string} alias - 组件别名
+           * @returns {Element|null} 组件DOM元素或null
+           */
+          getElement(alias: string): Element | null;
+          /**
+           * 通过别名设置属性
+           * @param {string} alias - 组件别名
+           * @param {string} prop - 属性名
+           * @param {any} value - 属性值
+           */
+          setProp(alias: string, prop: string, value: any): void;
+          /**
+           * 通过别名获取属性
+           * @param {string} alias - 组件别名
+           * @param {string} prop - 属性名
+           * @returns {any} 属性值
+           */
+          getProp(alias: string, prop: string): any;
+          /**
+           * 通过别名调用方法
+           * @param {string} alias - 组件别名
+           * @param {string} method - 方法名
+           * @param {...any} args - 方法参数
+           */
+          call(alias: string, method: string, ...args: any[]): void;
+        };
+      `,
+    },
+  ]
+
+  // 可用事件列表
   const availableEvents = computed(() => {
     const predefinedEvents = props.events || []
 
     const allEvents = [...predefinedEvents]
-    commonCustomEvents.forEach((event) => {
-      if (!allEvents.find((e) => e.name === event.name)) {
+    commonCustomEvents.forEach(event => {
+      if (!allEvents.find(e => e.name === event.name)) {
         allEvents.push(event)
       }
     })
     return allEvents
   })
 
+  const emit = defineEmits(['event-change'])
+
+  // 弹框显示状态
+  const dialogVisible = ref(false)
+  // 本地事件列表
+  const localEvents = ref([])
+  // 当前选中的事件
+  const selectedEvent = ref(null)
+
   // 检查是否是预定义事件
   function isPredefinedEvent(eventType) {
-    return availableEvents.value.some((e) => e.name === eventType)
+    return availableEvents.value.some(e => e.name === eventType)
   }
 
   // 处理事件类型改变
@@ -310,36 +439,11 @@
     selectedEvent.value.type = value
   }
 
-  const emit = defineEmits(['event-change'])
-
-  // 代码帮助 API 配置
-  const codeHelpApis = ref([
-    { name: '$component.get(id)', desc: '获取组件实例，参数：组件ID' },
-    {
-      name: '$component.setProp(id, prop, value)',
-      desc: '设置组件属性，参数：组件ID、属性名、属性值',
-    },
-    { name: '$component.getProp(id, prop)', desc: '获取组件属性，参数：组件ID、属性名' },
-    {
-      name: '$component.call(id, method, ...args)',
-      desc: '调用组件方法，参数：组件ID、方法名、方法参数',
-    },
-    { name: '$vars.get(name)', desc: '获取变量值，参数：变量名' },
-    { name: '$vars.set(name, value)', desc: '设置变量值，参数：变量名、变量值' },
-  ])
-
-  // 弹框显示状态
-  const dialogVisible = ref(false)
-  // 本地事件列表
-  const localEvents = ref([])
-  // 当前选中的事件
-  const selectedEvent = ref(null)
-
   // 打开弹框
   function handleOpenDialog() {
     localEvents.value = JSON.parse(JSON.stringify(props.componentEvents || []))
 
-    localEvents.value.forEach((e) => {
+    localEvents.value.forEach(e => {
       if (!e.customType) {
         e.customType = e.type
       }
@@ -403,7 +507,7 @@
 
   // 删除事件
   function handleDeleteEvent(eventId) {
-    const index = localEvents.value.findIndex((e) => e.id === eventId)
+    const index = localEvents.value.findIndex(e => e.id === eventId)
     if (index > -1) {
       localEvents.value.splice(index, 1)
       if (selectedEvent.value?.id === eventId) {
@@ -416,19 +520,19 @@
   function handleEditEvent(event) {
     localEvents.value = JSON.parse(JSON.stringify(props.componentEvents || []))
     // 为每个事件添加 customType 字段（如果不存在）
-    localEvents.value.forEach((e) => {
+    localEvents.value.forEach(e => {
       if (!e.customType) {
         e.customType = e.type
       }
     })
-    selectedEvent.value = localEvents.value.find((e) => e.id === event.id) || null
+    selectedEvent.value = localEvents.value.find(e => e.id === event.id) || null
     dialogVisible.value = true
   }
 
   // 保存事件
   function handleSaveEvents() {
     // 处理事件类型，确保使用正确的类型值
-    const eventsToSave = localEvents.value.map((event) => {
+    const eventsToSave = localEvents.value.map(event => {
       // 确定最终的事件类型
       let finalType = event.type
       // 如果 type 是 'custom' 且 customType 有值，使用 customType
@@ -449,7 +553,7 @@
 
   // 生成唯一ID
   function generateId() {
-    return 'event_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+    return generateUniqueId('event')
   }
 </script>
 

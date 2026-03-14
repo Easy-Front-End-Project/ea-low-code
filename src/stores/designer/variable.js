@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import { generateUniqueId } from '@/utils/schemaHelper'
 
 /**
  * 变量定义
@@ -21,17 +22,17 @@ export const useVariableStore = defineStore('variable', () => {
 
   // 根据ID获取变量
   const getVariableById = computed(() => {
-    return (id) => variables.value.find((v) => v.id === id)
+    return id => variables.value.find(v => v.id === id)
   })
 
   // 根据名称获取变量
   const getVariableByName = computed(() => {
-    return (name) => variables.value.find((v) => v.name === name)
+    return name => variables.value.find(v => v.name === name)
   })
 
   // 获取变量名称列表（用于下拉选择）
   const variableNames = computed(() => {
-    return variables.value.map((v) => v.name)
+    return variables.value.map(v => v.name)
   })
 
   /**
@@ -58,7 +59,7 @@ export const useVariableStore = defineStore('variable', () => {
    * @param {Object} updates - 更新的字段
    */
   function updateVariable(id, updates) {
-    const index = variables.value.findIndex((v) => v.id === id)
+    const index = variables.value.findIndex(v => v.id === id)
     if (index > -1) {
       variables.value[index] = {
         ...variables.value[index],
@@ -73,7 +74,7 @@ export const useVariableStore = defineStore('variable', () => {
    * @param {Object} updates - 更新的字段
    */
   function updateVariableByName(name, updates) {
-    const index = variables.value.findIndex((v) => v.name === name)
+    const index = variables.value.findIndex(v => v.name === name)
     if (index > -1) {
       variables.value[index] = {
         ...variables.value[index],
@@ -87,7 +88,7 @@ export const useVariableStore = defineStore('variable', () => {
    * @param {string} id - 变量ID
    */
   function removeVariable(id) {
-    const index = variables.value.findIndex((v) => v.id === id)
+    const index = variables.value.findIndex(v => v.id === id)
     if (index > -1) {
       variables.value.splice(index, 1)
     }
@@ -114,7 +115,7 @@ export const useVariableStore = defineStore('variable', () => {
    * @returns {any} 默认值
    */
   function getVariableDefaultValue(name) {
-    const variable = variables.value.find((v) => v.name === name)
+    const variable = variables.value.find(v => v.name === name)
     return variable ? variable.defaultValue : undefined
   }
 
@@ -125,7 +126,7 @@ export const useVariableStore = defineStore('variable', () => {
    * @returns {boolean}
    */
   function isVariableNameExists(name, excludeId) {
-    return variables.value.some((v) => v.name === name && v.id !== excludeId)
+    return variables.value.some(v => v.name === name && v.id !== excludeId)
   }
 
   /**
@@ -133,7 +134,7 @@ export const useVariableStore = defineStore('variable', () => {
    * @returns {string}
    */
   function generateVariableId() {
-    return 'var_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+    return generateUniqueId('var')
   }
 
   return {

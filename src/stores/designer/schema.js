@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { uniqueId } from 'lodash-es'
+import { generateComponentId } from '@/utils/schemaHelper'
 
 /**
  * Schema 管理 Store
@@ -29,8 +29,12 @@ export const useSchemaStore = defineStore('schema', () => {
   const selectedComponentId = ref(null)
   const isPreviewMode = ref(false)
 
+  // 组件别名映射：alias -> componentId
+  const componentAliasMap = ref(new Map())
+
   // Getters
   const components = computed(() => pageSchema.value.components)
+  const aliases = computed(() => Object.fromEntries(componentAliasMap.value))
   const selectedComponent = computed(() => {
     return findComponentById(pageSchema.value.components, selectedComponentId.value)
   })
@@ -73,7 +77,7 @@ export const useSchemaStore = defineStore('schema', () => {
     const componentProps = slot === 'default' ? { ...otherProps } : { slot, ...otherProps }
 
     const newComponent = {
-      id: uniqueId('comp_'),
+      id: generateComponentId(),
       type,
       props: componentProps,
       style: {},
@@ -101,6 +105,11 @@ export const useSchemaStore = defineStore('schema', () => {
    * @param {string} componentId - 组件ID
    */
   function removeComponent(componentId) {
+    // 清理别名映射
+    const alias = getComponentAlias(componentId)
+    if (alias) {
+      removeComponentAlias(alias)
+    }
     const result = removeComponentById(pageSchema.value.components, componentId)
     if (result && selectedComponentId.value === componentId) {
       selectedComponentId.value = null
@@ -245,6 +254,19 @@ export const useSchemaStore = defineStore('schema', () => {
   function importSchema(schema) {
     pageSchema.value = schema
     selectedComponentId.value = null
+    // 重建别名映射
+    componentAliasMap.value.clear()
+    function rebuildAliasMap(components) {
+      for (const comp of components) {
+        if (comp.alias) {
+          componentAliasMap.value.set(comp.alias, comp.id)
+        }
+        if (comp.children && comp.children.length > 0) {
+          rebuildAliasMap(comp.children)
+        }
+      }
+    }
+    rebuildAliasMap(schema.components || [])
   }
 
   /**
@@ -304,15 +326,81 @@ export const useSchemaStore = defineStore('schema', () => {
     return count
   }
 
+  /**
+   * 设置组件别名
+   * @param {string} componentId - 组件ID
+   * @param {string} alias - 别名
+   */
+  function setComponentAlias(componentId, alias) {
+    // 如果别名已存在，先移除旧的映射
+    for (const [key, value] of componentAliasMap.value) {
+      if (value === componentId) {
+        componentAliasMap.value.delete(key)
+        break
+      }
+    }
+    // 设置新的别名映射
+    if (alias) {
+      componentAliasMap.value.set(alias, componentId)
+    }
+    // 更新组件的 alias 字段
+    const component = findComponentById(pageSchema.value.components, componentId)
+    if (component) {
+      component.alias = alias
+    }
+  }
+
+  /**
+   * 通过别名获取组件ID
+   * @param {string} alias - 别名
+   * @returns {string|null} 组件ID
+   */
+  function getComponentIdByAlias(alias) {
+    return componentAliasMap.value.get(alias) || null
+  }
+
+  /**
+   * 通过别名查找组件
+   * @param {string} alias - 别名
+   * @returns {Object|null} 组件对象
+   */
+  function findComponentByAlias(alias) {
+    const componentId = getComponentIdByAlias(alias)
+    if (componentId) {
+      return findComponentById(pageSchema.value.components, componentId)
+    }
+    return null
+  }
+
+  /**
+   * 获取组件的别名
+   * @param {string} componentId - 组件ID
+   * @returns {string|null} 别名
+   */
+  function getComponentAlias(componentId) {
+    const component = findComponentById(pageSchema.value.components, componentId)
+    return component?.alias || null
+  }
+
+  /**
+   * 移除组件别名
+   * @param {string} alias - 别名
+   */
+  function removeComponentAlias(alias) {
+    componentAliasMap.value.delete(alias)
+  }
+
   return {
     // State
     pageSchema,
     selectedComponentId,
     isPreviewMode,
+    componentAliasMap,
     // Getters
     components,
     selectedComponent,
     componentCount,
+    aliases,
     // Actions
     addComponent,
     removeComponent,
@@ -330,5 +418,10 @@ export const useSchemaStore = defineStore('schema', () => {
     exportSchema,
     clearCanvas,
     findParentComponent,
+    setComponentAlias,
+    getComponentIdByAlias,
+    findComponentByAlias,
+    getComponentAlias,
+    removeComponentAlias,
   }
 })

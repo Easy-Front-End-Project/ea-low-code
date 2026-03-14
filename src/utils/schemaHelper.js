@@ -1,8 +1,23 @@
 /**
- * Schema 辅助工具函数
+ * 生成唯一 ID
+ * 使用当前时间戳 + 随机数，确保唯一性
+ * @param {string} prefix - ID 前缀，默认为 'id'
+ * @returns {string} 唯一 ID，格式：{prefix}_{timestamp}_{random}
  */
+export function generateUniqueId(prefix = 'id') {
+  const timestamp = Date.now()
+  const random = Math.random().toString(36).substring(2, 10)
+  return `${prefix}_${timestamp}_${random}`
+}
 
-import { uniqueId } from 'lodash-es'
+/**
+ * 生成唯一组件 ID
+ * 使用当前时间戳 + 随机数，确保唯一性
+ * @returns {string} 组件 ID，格式：comp_{timestamp}_{random}
+ */
+export function generateComponentId() {
+  return generateUniqueId('comp')
+}
 
 /**
  * 创建新的组件 Schema
@@ -12,7 +27,7 @@ import { uniqueId } from 'lodash-es'
  */
 export function createComponentSchema(type, defaultProps = {}) {
   return {
-    id: uniqueId('comp_'),
+    id: generateComponentId(),
     type,
     props: { ...defaultProps },
     style: {},
@@ -29,12 +44,12 @@ export function createComponentSchema(type, defaultProps = {}) {
  */
 export function cloneComponentSchema(schema) {
   const cloned = JSON.parse(JSON.stringify(schema))
-  cloned.id = uniqueId('comp_')
+  cloned.id = generateComponentId()
 
   // 递归更新子组件ID
   function updateIds(components) {
     for (const comp of components) {
-      comp.id = uniqueId('comp_')
+      comp.id = generateComponentId()
       if (comp.children && comp.children.length > 0) {
         updateIds(comp.children)
       }

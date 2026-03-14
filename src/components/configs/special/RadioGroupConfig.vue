@@ -111,6 +111,7 @@
 
 <script setup>
   import { ref, computed, watch } from 'vue'
+  import { generateComponentId, generateUniqueId } from '@/utils/schemaHelper'
   import { useSchemaStore } from '@/stores/designer/schema'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaCheckbox from '@/components/ea-ui-wrap/EaCheckbox.vue'
@@ -144,7 +145,7 @@
 
   // 计算扁平化的选项列表用于预览
   const flatOptions = computed(() => {
-    return optionsData.value.slice(0, 5).map((item) => ({
+    return optionsData.value.slice(0, 5).map(item => ({
       label: item.label,
       value: item.value,
       disabled: item.disabled,
@@ -154,19 +155,19 @@
   // 监听外部数据变化
   watch(
     () => props.component?.props?.[props.propName],
-    (newVal) => {
+    newVal => {
       if (newVal && newVal.length > 0) {
         optionsData.value = JSON.parse(JSON.stringify(newVal))
       } else {
         optionsData.value = []
       }
     },
-    { immediate: true, deep: true },
+    { immediate: true, deep: true }
   )
 
   // 生成唯一ID
   function generateId() {
-    return 'radio_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+    return generateUniqueId('radio')
   }
 
   // 打开弹窗
@@ -195,7 +196,7 @@
   // 编辑选项
   function editOption(option) {
     editingOption.value = { ...option }
-    editingIndex.value = optionsData.value.findIndex((item) => item.id === option.id)
+    editingIndex.value = optionsData.value.findIndex(item => item.id === option.id)
     optionDialogTitle.value = '编辑选项'
     optionDialogVisible.value = true
   }
@@ -252,11 +253,11 @@
 
     // 移除现有的 ea-radio 子组件
     const existingChildren = props.component.children || []
-    const nonRadioChildren = existingChildren.filter((child) => child.type !== 'ea-radio')
+    const nonRadioChildren = existingChildren.filter(child => child.type !== 'ea-radio')
 
     // 根据配置生成新的子组件
-    const newChildren = optionsData.map((item) => ({
-      id: 'comp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+    const newChildren = optionsData.map(item => ({
+      id: generateComponentId(),
       type: 'ea-radio',
       props: {
         value: item.value,
@@ -267,10 +268,7 @@
     }))
 
     // 更新组件的子组件
-    schemaStore.updateComponentChildren(props.component.id, [
-      ...nonRadioChildren,
-      ...newChildren,
-    ])
+    schemaStore.updateComponentChildren(props.component.id, [...nonRadioChildren, ...newChildren])
   }
 </script>
 

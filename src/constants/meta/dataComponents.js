@@ -1512,7 +1512,7 @@ export const dataComponents = [
       {
         name: 'width',
         label: '列宽',
-        type: PropTypes.STRING,
+        type: PropTypes.UNIT,
         default: '',
       },
       {
@@ -1525,7 +1525,7 @@ export const dataComponents = [
         name: 'fixed',
         label: '固定列',
         type: PropTypes.SELECT,
-        default: "",
+        default: '',
         options: [
           { label: '左', value: 'left' },
           { label: '右', value: 'right' },

@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import { generateUniqueId } from '@/utils/schemaHelper'
 
 const REMOTE_CONFIG_KEY = 'ea_lowcode_remote_config'
 
@@ -15,7 +16,7 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
 
   // Getters
   const enabledComponents = computed(() => {
-    return components.value.filter((comp) => comp.enabled !== false)
+    return components.value.filter(comp => comp.enabled !== false)
   })
 
   // 获取完整 URL（拼接 globalUrl 和相对路径）
@@ -35,7 +36,7 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
   }
 
   const enabledComponentMetaList = computed(() => {
-    return enabledComponents.value.map((comp) => ({
+    return enabledComponents.value.map(comp => ({
       type: `remote-${comp.id}`,
       name: comp.name || '远程组件',
       category: 'remote',
@@ -114,7 +115,7 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
   function addComponent(component) {
     const newComponent = {
       ...component,
-      id: Date.now().toString() + Math.random(),
+      id: generateUniqueId('remote'),
       enabled: true,
     }
     components.value.push(newComponent)
@@ -127,7 +128,7 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
    * @param {Object} data
    */
   function updateComponent(id, data) {
-    const index = components.value.findIndex((c) => c.id === id)
+    const index = components.value.findIndex(c => c.id === id)
     if (index > -1) {
       components.value[index] = { ...components.value[index], ...data }
       return true
@@ -140,7 +141,7 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
    * @param {string} id
    */
   function removeComponent(id) {
-    const index = components.value.findIndex((c) => c.id === id)
+    const index = components.value.findIndex(c => c.id === id)
     if (index > -1) {
       components.value.splice(index, 1)
       return true
@@ -154,7 +155,7 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
    * @param {boolean} enabled
    */
   function toggleComponentEnabled(id, enabled) {
-    const component = components.value.find((c) => c.id === id)
+    const component = components.value.find(c => c.id === id)
     if (component) {
       component.enabled = enabled
       return true
@@ -167,7 +168,7 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
    * @param {string} id
    */
   function getComponentById(id) {
-    return components.value.find((c) => c.id === id) || null
+    return components.value.find(c => c.id === id) || null
   }
 
   /**
