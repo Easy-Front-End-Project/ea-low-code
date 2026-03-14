@@ -21,7 +21,7 @@ onMounted(() => {
 
 ```html
 <script type="module">
-  import './node_modules/easy-component-ui/components/ea-text/index.js'
+  import "./node_modules/easy-component-ui/components/ea-text/index.js";
 </script>
 ```
 
@@ -32,7 +32,10 @@ onMounted(() => {
 :::
 
 ```html
-<link rel="stylesheet" href="./node_modules/easy-component-ui/components/ea-icon/index.css" />
+<link
+  rel="stylesheet"
+  href="./node_modules/easy-component-ui/components/ea-icon/index.css"
+/>
 ```
 
 ## 自定义样式
@@ -111,7 +114,9 @@ onMounted(() => {
 
 ```html
 <div class="row">
-  <ea-text tag="p" truncated="true" style="width: 100px;"> Self element set width 100px </ea-text>
+  <ea-text tag="p" truncated="true" style="width: 100px;">
+    Self element set width 100px
+  </ea-text>
   <ea-row style="width: 100px;">
     <ea-text tag="p" truncated="true">Squeezed by parent element</ea-text>
   </ea-row>
@@ -175,14 +180,14 @@ onMounted(() => {
 
 ### Text Attributes
 
-| **属性名** | **说明**     | **类型** | **可选值**                                           | **默认值** |
-| ---------- | ------------ | -------- | ---------------------------------------------------- | ---------- |
-| title      | 标题         | string   | —                                                    | —          |
-| type       | 文本类型     | string   | normal / primary / success / warning / danger / info | normal     |
-| size       | 文本大小     | string   | large / medium / small                               | medium     |
-| truncated  | 文本是否截断 | boolean  | —                                                    | false      |
-| line-clamp | 截断的行数   | number   | —                                                    | 0          |
-| tag        | 文本标签     | string   | —                                                    | span       |
+| **属性名** | **说明** | **类型** | **可选值** | **默认值** |
+| ---------- | -------- | -------- | ---------- | ---------- |
+| title | 标题 | string | — | — |
+| type | 文本类型 | string | normal / primary / success / warning / danger / info | normal |
+| size | 文本大小 | string | large / medium / small | medium |
+| truncated | 文本是否截断 | boolean | — | false |
+| line-clamp | 截断的行数 | number | — | 0 |
+| tag | 文本标签 | string | — | span |
 
 ### Text Slots
 

@@ -4,6 +4,7 @@ export const PropTypes = {
   NUMBER: 'number',
   BOOLEAN: 'boolean',
   SELECT: 'select',
+  MULTI_SELECT: 'multi-select',
   COLOR: 'color',
   OBJECT: 'object',
   ARRAY: 'array',

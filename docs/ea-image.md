@@ -860,7 +860,6 @@ customProgressExample.init();
 | placeholder                            | 图片未加载时的占位内容（slot="placeholder"） |
 | progress <ea-tag>preview 属性</ea-tag> | 图片加载过程中的进度（slot="progress"）      |
 | toolbar <ea-tag>preview 属性</ea-tag>  | 图片预览工具栏（slot="toolbar"）             |
-| progress <ea-tag>preview 属性</ea-tag> | 图片加载过程中的进度（slot="progress"）      |
 
 ## ImagePreview API
 
@@ -881,6 +880,13 @@ customProgressExample.init();
 | hide-on-click-modal           | 点击遮罩是否隐藏（点击不在图片/头部/底部区域时生效） | boolean | -      | true          |
 | show-progress                 | 是否显示进度（progress 区域会渲染 slot 或文本）      | boolean | -      | false         |
 | append-to-body                | 是否插入到 body                                      | boolean | -      | false         |
+
+### ImagePreview Scopes
+
+| 名称        | 说明                 |
+| ----------- | -------------------- |
+| data-active | 当前预览图片的索引值 |
+| data-total  | 预览图片的总数       |
 
 ### ImagePreview CSS Part
 

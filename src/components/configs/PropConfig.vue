@@ -4,7 +4,7 @@
     <div class="space-y-3">
       <div v-for="prop in propList" :key="prop.name" class="prop-item">
         <label class="prop-label">{{ prop.label }}</label>
-        <PropInput
+        <VariableBindingInput
           :type="prop.type"
           :value="componentProps[prop.name]"
           :options="prop.options"
@@ -17,7 +17,7 @@
 
 <script setup>
   import { toRefs } from 'vue'
-  import PropInput from '../common/PropInput.vue'
+  import VariableBindingInput from '../common/VariableBindingInput.vue'
 
   const props = defineProps({
     props: {

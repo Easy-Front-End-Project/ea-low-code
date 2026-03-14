@@ -14,36 +14,49 @@
       <!-- 普通输入框 -->
       <template v-else>
         <EaInput
-          v-if="inputType === 'input'"
+          v-if="resolvedInputType === 'input'"
           v-model="inputValue"
           size="small"
-          :placeholder="placeholder"
+          :placeholder="resolvedPlaceholder"
           @input="handleInputChange"
         />
         <EaSelect
-          v-else-if="inputType === 'select'"
+          v-else-if="resolvedInputType === 'select'"
           :model-value="inputValue"
           size="small"
-          :placeholder="placeholder"
+          :placeholder="resolvedPlaceholder"
           @change="handleInputChange"
         >
           <ea-option v-for="option in options" :key="option.value" :value="option.value"
             >{{ option.label }}</ea-option
           >
         </EaSelect>
+        <!-- 多选下拉框 -->
+        <EaSelect
+          v-else-if="resolvedInputType === 'multi-select'"
+          :model-value="multiSelectValue"
+          size="small"
+          :placeholder="resolvedPlaceholder"
+          multiple
+          @change="handleMultiSelectChange"
+        >
+          <ea-option v-for="option in options" :key="option.value" :value="option.value"
+            >{{ option.label }}</ea-option
+          >
+        </EaSelect>
         <EaSwitch
-          v-else-if="inputType === 'switch'"
+          v-else-if="resolvedInputType === 'switch'"
           :model-value="switchValue"
           @update:modelValue="handleSwitchChange"
         />
         <UnitInput
-          v-else-if="inputType === 'unit'"
+          v-else-if="resolvedInputType === 'unit'"
           :value="inputValue"
-          :placeholder="placeholder"
+          :placeholder="resolvedPlaceholder"
           @update:value="handleInputChange"
         />
         <ea-color-picker
-          v-else-if="inputType === 'color'"
+          v-else-if="resolvedInputType === 'color'"
           :value="inputValue"
           @change="handleColorChange"
           @ea-clear="handleClearVariable"
@@ -51,7 +64,7 @@
         />
         <!-- Array/Object 类型使用按钮打开编辑器 -->
         <ea-button
-          v-else-if="inputType === 'array' || inputType === 'object'"
+          v-else-if="resolvedInputType === 'array' || resolvedInputType === 'object'"
           class="w-full text-center flex-1"
           type="primary"
           size="small"
@@ -110,12 +123,17 @@
 
   const props = defineProps({
     value: {
-      type: [Object, String, Number, Boolean],
+      type: [Object, String, Number, Boolean, Array],
       default: '',
     },
     inputType: {
       type: String,
-      default: 'input',
+      default: '',
+    },
+    // PropTypes 类型（当 inputType 为空时使用）
+    type: {
+      type: String,
+      default: '',
     },
     options: {
       type: Array,
@@ -146,6 +164,70 @@
     return ''
   })
 
+  // 根据 type 获取 inputType
+  function getInputTypeFromPropType(propType) {
+    if (propType === 'select') {
+      return 'select'
+    }
+    if (propType === 'multi-select') {
+      return 'multi-select'
+    }
+    if (propType === 'boolean') {
+      return 'switch'
+    }
+    if (propType === 'unit') {
+      return 'unit'
+    }
+    if (propType === 'color') {
+      return 'color'
+    }
+    if (propType === 'array') {
+      return 'array'
+    }
+    if (propType === 'object') {
+      return 'object'
+    }
+    return 'input'
+  }
+
+  // 解析后的 inputType
+  const resolvedInputType = computed(() => {
+    // 如果直接指定了 inputType，优先使用
+    if (props.inputType) {
+      return props.inputType
+    }
+    // 否则根据 type 转换
+    if (props.type) {
+      return getInputTypeFromPropType(props.type)
+    }
+    return 'input'
+  })
+
+  // 根据 type 获取 placeholder
+  function getPlaceholderFromPropType(propType) {
+    const placeholders = {
+      string: '请输入文本',
+      number: '请输入数字',
+      color: '请选择颜色',
+      object: '输入 JSON 格式数据',
+      array: '输入 JSON 格式数据',
+      unit: '请输入数值',
+      'multi-select': '请选择',
+    }
+    return placeholders[propType] || '请输入'
+  }
+
+  // 解析后的 placeholder
+  const resolvedPlaceholder = computed(() => {
+    if (props.placeholder) {
+      return props.placeholder
+    }
+    if (props.type) {
+      return getPlaceholderFromPropType(props.type)
+    }
+    return '请输入'
+  })
+
   // 输入框显示的值
   const inputValue = computed(() => {
     if (isVariable.value) {
@@ -163,32 +245,79 @@
     return props.value === true || props.value === 'true'
   })
 
+  // 多选下拉框的值
+  const multiSelectValue = computed(() => {
+    if (isVariable.value) {
+      return []
+    }
+    // 确保返回数组
+    if (Array.isArray(props.value)) {
+      return props.value
+    }
+    return props.value ? [props.value] : []
+  })
+
   // 编辑器标题
   const editorTitle = computed(() => {
-    return props.inputType === 'array' ? '编辑数组' : '编辑对象'
+    return resolvedInputType.value === 'array' ? '编辑数组' : '编辑对象'
   })
 
   // 编辑器按钮文本
   const editorButtonText = computed(() => {
     const hasValue = props.value && Object.keys(props.value).length > 0
-    return hasValue ? '编辑' : props.inputType === 'array' ? '编辑数组' : '编辑对象'
+    return hasValue ? '编辑' : resolvedInputType.value === 'array' ? '编辑数组' : '编辑对象'
   })
 
   // 处理输入变化
   function handleInputChange(event) {
     const value = event.detail?.value !== undefined ? event.detail.value : event
-    emit('update:value', value)
+    emit('update:value', convertValue(value))
   }
 
   // 处理 Switch 变化
   function handleSwitchChange(value) {
-    emit('update:value', value)
+    emit('update:value', convertValue(value))
   }
 
   // 处理颜色变化
   function handleColorChange(event) {
     const value = event.detail?.value
-    emit('update:value', value)
+    emit('update:value', convertValue(value))
+  }
+
+  // 处理多选变化
+  function handleMultiSelectChange(event) {
+    const value = event.detail?.value
+    if (Array.isArray(value)) {
+      emit('update:value', value)
+    } else {
+      emit('update:value', value ? [value] : [])
+    }
+  }
+
+  // 根据 type 转换值
+  function convertValue(value) {
+    // 获取实际使用的 type（优先使用 props.type）
+    const propType = props.type || props.inputType
+
+    switch (propType) {
+      case 'number':
+        return Number(value) || 0
+      case 'boolean':
+        return value === 'true' || value === true
+      case 'object':
+      case 'array':
+        try {
+          if (typeof value === 'string') {
+            return JSON.parse(value)
+          }
+        } catch {
+          return propType === 'array' ? [] : {}
+        }
+        return value
+      default:
+        return value
+    }
   }
 
   // 显示变量选择器
@@ -217,10 +346,10 @@
       if (props.value && typeof props.value === 'object') {
         editorValue.value = JSON.stringify(props.value, null, 2)
       } else {
-        editorValue.value = props.inputType === 'array' ? '[]' : '{}'
+        editorValue.value = resolvedInputType.value === 'array' ? '[]' : '{}'
       }
     } catch {
-      editorValue.value = props.inputType === 'array' ? '[]' : '{}'
+      editorValue.value = resolvedInputType.value === 'array' ? '[]' : '{}'
     }
     editorVisible.value = true
   }
@@ -238,12 +367,12 @@
       const parsedValue = JSON.parse(editorValue.value)
 
       // 验证类型
-      if (props.inputType === 'array' && !Array.isArray(parsedValue)) {
+      if (resolvedInputType.value === 'array' && !Array.isArray(parsedValue)) {
         alert('值必须是数组格式')
         return
       }
       if (
-        props.inputType === 'object' &&
+        resolvedInputType.value === 'object' &&
         (Array.isArray(parsedValue) || typeof parsedValue !== 'object' || parsedValue === null)
       ) {
         alert('值必须是对象格式')
@@ -258,7 +387,7 @@
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .variable-binding-input {
     width: 100%;
   }
@@ -268,6 +397,10 @@
     align-items: center;
     text-align: center;
     gap: 0.5rem;
+
+    ea-select[multiple='true'] {
+      text-align: start;
+    }
   }
 
   .input-wrapper > *:first-child {

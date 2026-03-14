@@ -6,6 +6,7 @@
     :placeholder="placeholder"
     :disabled="disabled"
     :clearable="clearable"
+    :multiple="multiple"
     @change.stop.prevent="handleChange"
     @ea-clear="handleClear"
   >
@@ -18,7 +19,7 @@
 
   const props = defineProps({
     modelValue: {
-      type: [String, Number, Boolean, Object],
+      type: [String, Number, Boolean, Object, Array],
       default: '',
     },
     size: {
@@ -34,6 +35,10 @@
       default: false,
     },
     clearable: {
+      type: Boolean,
+      default: false,
+    },
+    multiple: {
       type: Boolean,
       default: false,
     },
