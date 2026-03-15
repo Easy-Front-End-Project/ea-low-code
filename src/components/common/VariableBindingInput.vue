@@ -15,10 +15,10 @@
       <template v-else>
         <EaInput
           v-if="resolvedInputType === 'input'"
-          v-model="inputValue"
+          :model-value="inputValue"
           size="small"
           :placeholder="resolvedPlaceholder"
-          @input="handleInputChange"
+          @update:modelValue="handleInputChange"
         />
         <EaSelect
           v-else-if="resolvedInputType === 'select'"
@@ -34,11 +34,11 @@
         <!-- 多选下拉框 -->
         <EaSelect
           v-else-if="resolvedInputType === 'multi-select'"
-          v-model="multiSelectValue"
+          :model-value="multiSelectValue"
           size="small"
           :placeholder="resolvedPlaceholder"
           multiple
-          @change="handleMultiSelectChange"
+          @update:modelValue="handleMultiSelectChange"
         >
           <ea-option v-for="option in options" :key="option.value" :value="option.value">
             {{ option.label }}
@@ -53,6 +53,13 @@
           v-else-if="resolvedInputType === 'unit'"
           :value="inputValue"
           :placeholder="resolvedPlaceholder"
+          @update:value="handleInputChange"
+        />
+        <UnitInput
+          v-else-if="resolvedInputType === 'time'"
+          :value="inputValue"
+          :placeholder="resolvedPlaceholder"
+          unit-type="time"
           @update:value="handleInputChange"
         />
         <ea-color-picker
@@ -178,6 +185,9 @@
     if (propType === 'unit') {
       return 'unit'
     }
+    if (propType === 'time') {
+      return 'time'
+    }
     if (propType === 'color') {
       return 'color'
     }
@@ -212,6 +222,7 @@
       object: '输入 JSON 格式数据',
       array: '输入 JSON 格式数据',
       unit: '请输入数值',
+      time: '请输入时间',
       'multi-select': '请选择',
     }
     return placeholders[propType] || '请输入'

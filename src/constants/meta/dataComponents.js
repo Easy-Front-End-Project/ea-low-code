@@ -358,14 +358,6 @@ export const dataComponents = [
     events: [{ name: 'change', label: '索引变化' }],
     slots: [{ name: 'default', label: '轮播项插槽', isContentSlot: false }],
     childComponents: ['ea-carousel-item'],
-    childConfig: {
-      'ea-carousel-item': {
-        allowChildren: true,
-        allowedChildTypes: undefined,
-        allowDirectDrop: false,
-        defaultCount: 3,
-      },
-    },
     styleConfig: {
       parts: [
         {
@@ -1681,19 +1673,7 @@ export const dataComponents = [
         name: 'node-key',
         label: '节点键名',
         type: PropTypes.STRING,
-        default: 'id',
-      },
-      {
-        name: 'props',
-        label: '配置项',
-        type: PropTypes.OBJECT,
-        default: {},
-      },
-      {
-        name: 'default-expand-all',
-        label: '默认展开所有',
-        type: PropTypes.BOOLEAN,
-        default: false,
+        default: '',
       },
       {
         name: 'show-checkbox',
@@ -1703,38 +1683,67 @@ export const dataComponents = [
       },
       {
         name: 'check-strictly',
-        label: '严格选择',
+        label: '严格模式（不关联父子节点）',
         type: PropTypes.BOOLEAN,
         default: false,
       },
       {
-        name: 'accordion',
-        label: '手风琴模式',
+        name: 'expand-on-icon-click',
+        label: '只在点击图标时展开/收起节点',
         type: PropTypes.BOOLEAN,
         default: false,
       },
       {
-        name: 'draggable',
-        label: '可拖拽',
-        type: PropTypes.BOOLEAN,
-        default: false,
+        name: 'dataProps',
+        label: '数据字段配置',
+        type: PropTypes.OBJECT,
+        default: { children: 'children', label: 'label', disabled: 'disabled' },
+      },
+      {
+        name: 'defaultExpandedKeys',
+        label: '默认展开的节点键值数组',
+        type: PropTypes.ARRAY,
+        default: [],
+      },
+      {
+        name: 'defaultCheckedKeys',
+        label: '默认选中的节点键值数组',
+        type: PropTypes.ARRAY,
+        default: [],
       },
     ],
     events: [
-      { name: 'node-click', label: '节点点击' },
-      { name: 'node-expand', label: '节点展开' },
-      { name: 'node-collapse', label: '节点收起' },
-      { name: 'check-change', label: '选中改变' },
-      { name: 'node-drag-start', label: '拖拽开始' },
-      { name: 'node-drag-end', label: '拖拽结束' },
+      { name: 'ea-node-click', label: '节点点击' },
+      { name: 'ea-node-contextmenu', label: '节点右键菜单' },
+      { name: 'ea-node-select', label: '节点选中' },
+      { name: 'ea-check-change', label: '复选框状态变化' },
+      { name: 'ea-check', label: '复选框选中' },
+      { name: 'ea-current-change', label: '当前选中节点变化' },
+      { name: 'ea-node-expand', label: '节点展开' },
+      { name: 'ea-node-collapse', label: '节点收起' },
     ],
     slots: [{ name: 'default', label: '默认插槽' }],
     styleConfig: {
       parts: [
         {
           name: 'container',
-          label: '外层容器',
+          label: '树容器',
           styles: ['background-color'],
+        },
+        {
+          name: 'children-wrapper',
+          label: '子节点容器',
+          styles: ['background-color'],
+        },
+        {
+          name: 'children',
+          label: '子节点',
+          styles: ['background-color'],
+        },
+        {
+          name: 'label',
+          label: '节点标签',
+          styles: ['color', 'font-size'],
         },
       ],
     },
@@ -1744,25 +1753,7 @@ export const dataComponents = [
     name: '时间线',
     category: ComponentCategories.DATA,
     icon: 'Timeline',
-    props: [
-      {
-        name: 'reverse',
-        label: '倒序',
-        type: PropTypes.BOOLEAN,
-        default: false,
-      },
-      {
-        name: 'mode',
-        label: '模式',
-        type: PropTypes.SELECT,
-        default: 'left',
-        options: [
-          { label: '左', value: 'left' },
-          { label: '右', value: 'right' },
-          { label: '交替', value: 'alternate' },
-        ],
-      },
-    ],
+    props: [],
     events: [],
     slots: [{ name: 'default', label: '时间线项插槽', isContentSlot: false }],
     childComponents: ['ea-timeline-item'],
@@ -1785,6 +1776,19 @@ export const dataComponents = [
     parentComponents: ['ea-timeline'],
     props: [
       {
+        name: 'type',
+        label: '类型',
+        type: PropTypes.SELECT,
+        default: 'info',
+        options: [
+          { label: '主要', value: 'primary' },
+          { label: '成功', value: 'success' },
+          { label: '警告', value: 'warning' },
+          { label: '危险', value: 'danger' },
+          { label: '信息', value: 'info' },
+        ],
+      },
+      {
         name: 'timestamp',
         label: '时间戳',
         type: PropTypes.STRING,
@@ -1798,44 +1802,54 @@ export const dataComponents = [
       },
       {
         name: 'placement',
-        label: '位置',
+        label: '时间戳位置',
         type: PropTypes.SELECT,
-        default: 'top',
+        default: 'bottom',
         options: [
           { label: '上', value: 'top' },
           { label: '下', value: 'bottom' },
         ],
       },
       {
-        name: 'type',
-        label: '类型',
+        name: 'size',
+        label: '节点大小',
         type: PropTypes.SELECT,
-        default: '',
+        default: 'normal',
         options: [
-          { label: '主要', value: 'primary' },
-          { label: '成功', value: 'success' },
-          { label: '警告', value: 'warning' },
-          { label: '危险', value: 'danger' },
-          { label: '信息', value: 'info' },
+          { label: '大', value: 'large' },
+          { label: '普通', value: 'normal' },
         ],
       },
       {
         name: 'color',
-        label: '颜色',
+        label: '自定义颜色',
         type: PropTypes.STRING,
         default: '',
       },
       {
+        name: 'hollow',
+        label: '空心节点',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+      {
         name: 'icon',
-        label: '图标',
+        label: '图标类名',
         type: PropTypes.STRING,
         default: '',
+      },
+      {
+        name: 'center',
+        label: '垂直居中',
+        type: PropTypes.BOOLEAN,
+        default: false,
       },
     ],
     events: [],
     slots: [
       { name: 'default', label: '内容插槽' },
       { name: 'dot', label: '圆点插槽' },
+      { name: 'timestamp', label: '时间戳插槽' },
     ],
     styleConfig: {
       parts: [
@@ -1843,6 +1857,41 @@ export const dataComponents = [
           name: 'container',
           label: '外层容器',
           styles: ['background-color'],
+        },
+        {
+          name: 'left-wrapper',
+          label: '左侧容器',
+          styles: ['background-color'],
+        },
+        {
+          name: 'dot',
+          label: '默认节点容器',
+          styles: ['background-color', 'border-color'],
+        },
+        {
+          name: 'icon-dot',
+          label: '节点图标',
+          styles: ['color'],
+        },
+        {
+          name: 'tail',
+          label: '时间线线条',
+          styles: ['background-color', 'border-color'],
+        },
+        {
+          name: 'right-wrapper',
+          label: '右侧容器',
+          styles: ['background-color'],
+        },
+        {
+          name: 'content',
+          label: '内容容器',
+          styles: ['color', 'font-size'],
+        },
+        {
+          name: 'timestamp',
+          label: '时间戳',
+          styles: ['color', 'font-size'],
         },
       ],
     },
@@ -1865,36 +1914,6 @@ export const dataComponents = [
         type: PropTypes.NUMBER,
         default: 0,
       },
-      {
-        name: 'precision',
-        label: '精度',
-        type: PropTypes.NUMBER,
-        default: 0,
-      },
-      {
-        name: 'prefix',
-        label: '前缀',
-        type: PropTypes.STRING,
-        default: '',
-      },
-      {
-        name: 'suffix',
-        label: '后缀',
-        type: PropTypes.STRING,
-        default: '',
-      },
-      {
-        name: 'separator',
-        label: '分隔符',
-        type: PropTypes.STRING,
-        default: ',',
-      },
-      {
-        name: 'group-separator',
-        label: '千分位分隔符',
-        type: PropTypes.STRING,
-        default: ',',
-      },
     ],
     events: [],
     slots: [
@@ -1907,8 +1926,109 @@ export const dataComponents = [
       parts: [
         {
           name: 'container',
-          label: '外层容器',
+          label: '组件根容器',
           styles: ['background-color'],
+        },
+        {
+          name: 'title',
+          label: '标题区域',
+          styles: ['color', 'font-size'],
+        },
+        {
+          name: 'content',
+          label: '内容区域',
+          styles: ['color', 'font-size'],
+        },
+        {
+          name: 'prefix',
+          label: '前缀',
+          styles: ['color', 'font-size'],
+        },
+        {
+          name: 'number',
+          label: '数值区域',
+          styles: ['color', 'font-size', 'font-weight'],
+        },
+        {
+          name: 'suffix',
+          label: '后缀',
+          styles: ['color', 'font-size'],
+        },
+      ],
+    },
+  },
+  {
+    type: 'ea-countdown',
+    name: '倒计时',
+    category: ComponentCategories.DATA,
+    icon: 'Clock',
+    props: [
+      {
+        name: 'title',
+        label: '标题',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'value',
+        label: '倒计时目标',
+        type: PropTypes.TIME,
+        default: '1m',
+      },
+      {
+        name: 'format',
+        label: '显示格式',
+        type: PropTypes.STRING,
+        default: 'HH:mm:ss',
+      },
+      {
+        name: 'refresh-interval',
+        label: '刷新间隔(ms)',
+        type: PropTypes.NUMBER,
+        default: 1000,
+      },
+    ],
+    events: [
+      { name: 'change', label: '倒计时变化' },
+      { name: 'ea-finish', label: '倒计时结束' },
+    ],
+    slots: [
+      { name: 'default', label: '默认插槽' },
+      { name: 'title', label: '标题插槽' },
+      { name: 'prefix', label: '前缀插槽' },
+      { name: 'suffix', label: '后缀插槽' },
+    ],
+    styleConfig: {
+      parts: [
+        {
+          name: 'container',
+          label: '组件根容器',
+          styles: ['background-color'],
+        },
+        {
+          name: 'title',
+          label: '标题区域',
+          styles: ['color', 'font-size'],
+        },
+        {
+          name: 'content',
+          label: '内容区域',
+          styles: ['color', 'font-size'],
+        },
+        {
+          name: 'prefix',
+          label: '前缀',
+          styles: ['color', 'font-size'],
+        },
+        {
+          name: 'number',
+          label: '数值区域',
+          styles: ['color', 'font-size', 'font-weight'],
+        },
+        {
+          name: 'suffix',
+          label: '后缀',
+          styles: ['color', 'font-size'],
         },
       ],
     },

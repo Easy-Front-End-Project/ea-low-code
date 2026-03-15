@@ -11,8 +11,8 @@
   }"
     :style="componentStyle"
     @click.stop.prevent="handleClick"
-    @mouseover.stop="handleMouseOver"
-    @mouseout.stop="handleMouseOut"
+    @mouseover.stop="isHovered = true"
+    @mouseout.stop="isHovered = false"
     @dragover.stop="handleDragOver"
     @drop.stop="handleDrop"
     @dragenter.stop="handleDragEnter"
@@ -27,7 +27,7 @@
       {{ componentMeta?.name || (isRemoteComponent ? '远程组件' : component.type) }}
     </div>
 
-    <!-- Slot 标签 - 当组件被放入非默认插槽时显示 -->
+    <!-- slot 标签 -->
     <div
       v-if="props.component.props?.slot && props.component.props.slot !== 'default' && showLabel && !isNonSelectable"
       class="slot-label"
@@ -36,7 +36,7 @@
       slot: {{ props.component.props.slot }}
     </div>
 
-    <!-- 选中时的操作按钮 -->
+    <!-- 操作按钮 -->
     <div
       v-if="selected && !isNonSelectable"
       class="component-actions"
@@ -53,7 +53,7 @@
       <ea-button icon="icon-link" size="small" @click.stop="handleCopy" title="复制"> </ea-button>
     </div>
 
-    <!-- 组件渲染 -->
+    <!-- 组件 -->
     <div class="component-wrapper">
       <component
         :is="componentTag"
@@ -62,35 +62,37 @@
         :style="componentInnerStyle"
         v-on="componentEventListeners"
       >
-        <!-- 使用原生 slot 属性方式渲染子组件 -->
-        <template v-if="allChildren.length > 0">
+        <!-- 文本内容 -->
+        <ea-text v-if="hasChildrenText" type="normal" size="medium">
+          {{ resolvedChildrenText }}
+        </ea-text>
+
+        <!-- 子组件 -->
+        <template v-else>
           <template v-for="child in allChildren" :key="child.id">
-            <template v-if="isNonSelectableType(child.type, props.component.type)">
+            <!-- 非可选择组件 -->
+            <component
+              v-if="isNonSelectableType(child.type, props.component.type)"
+              :is="child.type"
+              v-bind="getChildComponentProps(child)"
+              style="display: block"
+            >
+              {{ child.childrenText }}
               <component
-                :is="child.type"
-                v-bind="getChildComponentProps(child)"
+                v-for="grandChild in child.children || []"
+                :key="grandChild.id"
+                :is="grandChild.type"
+                v-bind="getChildComponentProps(grandChild)"
                 style="display: block"
               >
-                <template v-if="child.childrenText"> {{ child.childrenText }} </template>
-
-                <template v-if="child.children && child.children.length > 0">
-                  <component
-                    v-for="grandChild in child.children"
-                    :key="grandChild.id"
-                    :is="grandChild.type"
-                    v-bind="getChildComponentProps(grandChild)"
-                    style="display: block"
-                  >
-                    <template v-if="grandChild.childrenText">
-                      {{ grandChild.childrenText }}
-                    </template>
-                  </component>
-                </template>
+                {{ grandChild.childrenText }}
               </component>
-            </template>
+            </component>
+
+            <!-- 可选择组件 -->
             <div
-              v-else-if="child.props?.slot && child.props.slot !== 'default'"
-              :slot="child.props.slot"
+              v-else
+              :slot="child.props?.slot !== 'default' ? child.props.slot : undefined"
               style="display: contents"
             >
               <CanvasComponent
@@ -102,20 +104,7 @@
                 @drop-to-parent="$emit('drop-to-parent', $event)"
               />
             </div>
-            <!-- 默认插槽的子组件，不设置 slot 属性 -->
-            <CanvasComponent
-              v-else
-              :component="child"
-              :selected="selectedComponentId === child.id"
-              :parent-component="props.component"
-              @select="$emit('select', $event)"
-              @delete="$emit('delete', $event)"
-              @drop-to-parent="$emit('drop-to-parent', $event)"
-            />
           </template>
-        </template>
-        <template v-else-if="hasChildrenText">
-          <ea-text type="normal" size="medium">{{ resolvedChildrenText }}</ea-text>
         </template>
       </component>
     </div>
@@ -167,6 +156,21 @@
   const selectedComponentId = computed(() => schemaStore.selectedComponentId)
   const componentMeta = computed(() => getComponentMeta(props.component.type))
 
+  // 预定义的容器类型
+  const containerTypes = [
+    'ea-container',
+    'ea-card',
+    'ea-header',
+    'ea-aside',
+    'ea-main',
+    'ea-dialog',
+    'ea-space',
+    'ea-row',
+    'ea-col',
+    'form',
+    'ea-button-group',
+  ]
+
   // 不可选中的组件类型（任何情况下都不可选中）
   const nonSelectableTypes = ['ea-option', 'ea-option-group', 'ea-radio']
 
@@ -192,7 +196,7 @@
   ]
 
   // 非容器组件类型
-  const nonContainerTypes = ['ea-checkbox-group', 'ea-radio-group']
+  const nonContainerTypes = ['ea-checkbox-group', 'ea-radio-group', 'ea-tree']
 
   // 行内块级组件类型（如按钮、链接等）
   const inlineBlockTypes = [
@@ -245,16 +249,15 @@
     return false
   }
 
-  // 获取子组件的 props（解析变量绑定）
-  function getChildComponentProps(child) {
-    const childProps = child.props || {}
+  // 解析组件 props（解析变量绑定）
+  function resolveComponentProps(props, options = {}) {
+    const { skipSlot = false } = options
     const resolvedProps = {}
 
-    // 遍历所有属性，解析变量绑定
-    for (const [key, value] of Object.entries(childProps)) {
-      // 跳过 slot 属性
-      if (key === 'slot') continue
-      // 处理 scope 属性，转换为 data-{scope} 形式
+    for (const [key, value] of Object.entries(props)) {
+      if (skipSlot && key === 'slot') continue
+      if (key === 'children') continue
+
       if (key === 'scope' && value) {
         resolvedProps[`data-${value}`] = ''
       } else {
@@ -265,10 +268,15 @@
     return resolvedProps
   }
 
+  // 获取子组件的 props
+  function getChildComponentProps(child) {
+    return resolveComponentProps(child.props || {}, { skipSlot: true })
+  }
+
   // 是否为远程组件
-  const isRemoteComponent = computed(() => {
-    return props.component.type?.startsWith('remote-') || props.component.remoteConfig
-  })
+  const isRemoteComponent = computed(
+    () => props.component.type?.startsWith('remote-') || props.component.remoteConfig
+  )
 
   // 获取远程组件配置
   const remoteConfig = computed(() => {
@@ -282,12 +290,11 @@
   })
 
   // 组件标签名（Web Components 或远程组件）
-  const componentTag = computed(() => {
-    if (isRemoteComponent.value && remoteComponentLoader.value) {
-      return remoteComponentLoader.value
-    }
-    return props.component.type
-  })
+  const componentTag = computed(() =>
+    isRemoteComponent.value && remoteComponentLoader.value
+      ? remoteComponentLoader.value
+      : props.component.type
+  )
 
   // 加载远程组件样式
   function loadRemoteComponentStyle(styleUrl) {
@@ -334,34 +341,10 @@
       return false
     }
 
-    // 检查父组件的 childConfig 配置
-    if (props.parentComponent) {
-      const parentMeta = getComponentMeta(props.parentComponent.type)
-      const childConfig = parentMeta?.childConfig?.[props.component.type]
-      if (childConfig && childConfig.allowChildren === false) {
-        return false
-      }
-    }
-
     // 如果组件有 children 且有子组件，则为容器
     if (Array.isArray(props.component.children) && props.component.children.length > 0) {
       return true
     }
-
-    // 预定义的容器类型
-    const containerTypes = [
-      'ea-container',
-      'ea-card',
-      'ea-header',
-      'ea-aside',
-      'ea-main',
-      'ea-dialog',
-      'ea-space',
-      'ea-row',
-      'ea-col',
-      'form',
-      'ea-button-group',
-    ]
 
     // 如果组件类型在预定义容器列表中，直接返回 true
     if (containerTypes.includes(props.component.type)) {
@@ -397,44 +380,14 @@
     return value
   }
 
-  // 传递给组件的 props（解析变量绑定）
-  const componentProps = computed(() => {
-    const componentProps = props.component.props || {}
-    const resolvedProps = {}
-
-    // 遍历所有属性，解析变量绑定
-    for (const [key, value] of Object.entries(componentProps)) {
-      // 处理 scope 属性，转换为 data-{scope} 形式
-      if (key === 'scope' && value) {
-        resolvedProps[`data-${value}`] = ''
-      } else {
-        resolvedProps[key] = resolveValue(value)
-      }
-    }
-
-    return resolvedProps
-  })
+  // 传递给组件的 props
+  const componentProps = computed(() => resolveComponentProps(props.component.props || {}))
 
   // 是否显示标签
   const showLabel = computed(() => isHovered.value || props.selected)
 
-  // 获取组件可用的所有插槽
-  const availableSlots = computed(() => {
-    // 从组件元数据获取插槽定义
-    const metaSlots = componentMeta.value?.slots || []
-
-    // 如果没有定义插槽，默认提供 default 插槽
-    if (metaSlots.length === 0) {
-      return [{ name: 'default', label: '默认插槽' }]
-    }
-
-    return metaSlots
-  })
-
   // 获取所有子组件
-  const allChildren = computed(() => {
-    return props.component.children || []
-  })
+  const allChildren = computed(() => props.component.children || [])
 
   // 组件事件监听器（动态绑定）
   const componentEventListeners = computed(() => {
@@ -460,42 +413,22 @@
     return listeners
   })
 
-  const componentStyle = computed(() => {
-    const style = { ...props.component.style }
-
-    // 添加定位相关样式
-    if (style.position === 'absolute') {
-      style.position = 'absolute'
-    } else {
-      style.position = 'relative'
-    }
-
-    return style
-  })
+  const componentStyle = computed(() => ({
+    ...props.component.style,
+    position: props.component.style?.position === 'absolute' ? 'absolute' : 'relative',
+  }))
 
   // 内部 EA-UI 组件样式
-  const componentInnerStyle = computed(() => {
-    const cssVariables = props.component.cssVariables || {}
-    const style = props.component.style || {}
-
-    const { ...rest } = style
-
-    return {
-      ...rest,
-      ...cssVariables,
-    }
-  })
-
-  // 是否有 children 文本属性（字符串形式的 children）
-  const hasChildrenText = computed(() => {
-    const childrenValue = resolveValue(props.component.props?.children)
-    return typeof childrenValue === 'string' && childrenValue.length > 0
-  })
+  const componentInnerStyle = computed(() => ({
+    ...props.component.style,
+    ...props.component.cssVariables,
+  }))
 
   // 解析后的 children 文本
-  const resolvedChildrenText = computed(() => {
-    return resolveValue(props.component.props?.children) || ''
-  })
+  const resolvedChildrenText = computed(() => resolveValue(props.component.props?.children) || '')
+
+  // 是否有 children 文本属性
+  const hasChildrenText = computed(() => resolvedChildrenText.value.length > 0)
 
   // 点击组件（选中）
   function handleClick() {
@@ -535,16 +468,6 @@
   onBeforeUnmount(() => {
     instanceStore.unregisterInstance(props.component.id)
   })
-
-  // 鼠标悬停
-  function handleMouseOver() {
-    isHovered.value = true
-  }
-
-  // 鼠标离开
-  function handleMouseOut() {
-    isHovered.value = false
-  }
 
   // 删除组件
   function handleDelete() {
@@ -597,41 +520,23 @@
     try {
       const droppedComponentMeta = JSON.parse(data)
 
-      // 获取容器的所有插槽
-      const allSlots = availableSlots.value
-      const namedSlots = allSlots.filter(slot => slot.name !== 'default')
-
-      // 确定目标插槽
-      let targetSlot = 'default'
-
       // 1. 检查拖放的组件是否是当前组件的专用子组件
       const allowedChildTypes = componentMeta.value?.childComponents || []
       const isDedicatedChild = allowedChildTypes.includes(droppedComponentMeta.type)
 
-      // 2. 如果是专用子组件，优先放入 default 插槽
-      if (isDedicatedChild) {
-        targetSlot = 'default'
-      }
-      // 3. 如果有非默认插槽且不是专用子组件，默认使用第一个非默认插槽
-      else if (namedSlots.length > 0) {
-        targetSlot = namedSlots[0].name
-      }
-
-      // 4. 检查 childConfig 中的 allowedChildTypes 限制
-      const childConfig = componentMeta.value?.childConfig?.[droppedComponentMeta.type]
-      if (childConfig?.allowedChildTypes !== undefined) {
-        const isAllowed = childConfig.allowedChildTypes.includes(droppedComponentMeta.type)
-        if (!isAllowed) {
-          console.warn(`组件 ${droppedComponentMeta.type} 不允许拖入到 ${props.component.type}`)
-          return
-        }
+      // 2. 如果定义了 childComponents 列表，则只允许拖入列表中的组件类型
+      if (allowedChildTypes.length > 0 && !isDedicatedChild) {
+        console.warn(
+          `组件 ${droppedComponentMeta.type} 不允许拖入到 ${props.component.type}，只允许: ${allowedChildTypes.join(', ')}`
+        )
+        return
       }
 
       // 向上冒泡，让父组件处理放置逻辑
       emit('drop-to-parent', {
         componentMeta: droppedComponentMeta,
         parentId: props.component.id,
-        slotName: targetSlot,
+        slotName: 'default',
       })
     } catch (error) {
       console.error('拖拽放置到容器失败:', error)
@@ -649,9 +554,10 @@
     min-width: 15px;
     min-height: 15px;
 
-    &.is-container {
-      display: block;
-      padding: 8px;
+    // 基础容器样式
+    &.is-container,
+    &.is-non-container,
+    &.is-inline-block {
       border: 1px dashed #d1d5db;
       border-radius: 4px;
 
@@ -659,6 +565,11 @@
         border-color: #3b82f6;
         background-color: rgba(59, 130, 246, 0.05);
       }
+    }
+
+    &.is-container {
+      display: block;
+      padding: 8px;
     }
 
     &.is-non-container {
@@ -666,25 +577,11 @@
       padding: 8px;
       min-width: 120px;
       min-height: 40px;
-      border: 1px dashed #d1d5db;
-      border-radius: 4px;
-
-      &:hover {
-        border-color: #3b82f6;
-        background-color: rgba(59, 130, 246, 0.05);
-      }
     }
 
     &.is-inline-block {
       display: inline-flex;
       padding: 4px;
-      border: 1px dashed #d1d5db;
-      border-radius: 4px;
-
-      &:hover {
-        border-color: #3b82f6;
-        background-color: rgba(59, 130, 246, 0.05);
-      }
     }
 
     &.is-drop-target {
@@ -738,9 +635,7 @@
   .component-wrapper {
     position: relative;
     cursor: pointer;
-  }
 
-  .component-wrapper {
     ea-time-picker,
     ea-date-picker,
     ea-slider,
@@ -804,24 +699,26 @@
     border-radius: 4px;
     pointer-events: none;
     z-index: 5;
-  }
 
-  .selection-border::before {
-    content: '';
-    position: absolute;
-    inset: -4px;
-    border: 1px dashed rgba(59, 130, 246, 0.3);
-    border-radius: 6px;
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border: 1px dashed rgba(59, 130, 246, 0.3);
+      border-radius: 6px;
+    }
   }
 
   /* 不可选中的组件样式 */
-  .canvas-component.is-non-selectable {
-    pointer-events: none;
-    display: contents;
-  }
+  .canvas-component {
+    &.is-non-selectable {
+      pointer-events: none;
+      display: contents;
 
-  .canvas-component.is-non-selectable .component-wrapper {
-    pointer-events: auto;
-    display: contents;
+      .component-wrapper {
+        pointer-events: auto;
+        display: contents;
+      }
+    }
   }
 </style>

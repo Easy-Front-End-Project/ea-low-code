@@ -12,7 +12,7 @@
       @update:model-value="handleUnitChange"
       class="unit-select w-20"
     >
-      <ea-option v-for="unit in units" :key="unit" :value="unit">{{ unit }}</ea-option>
+      <ea-option v-for="unit in actualUnits" :key="unit" :value="unit">{{ unit }}</ea-option>
     </EaSelect>
   </div>
 </template>
@@ -22,6 +22,12 @@
   import EaInput from '../ea-ui-wrap/EaInput.vue'
   import EaSelect from '../ea-ui-wrap/EaSelect.vue'
 
+  // 预定义的单位类型
+  const UNIT_TYPES = {
+    css: ['px', '%', 'em', 'rem', 'vw', 'vh', 'auto'],
+    time: ['s', 'm', 'h', 'd', 'w', 'M', 'y'],
+  }
+
   const props = defineProps({
     value: {
       type: String,
@@ -29,12 +35,25 @@
     },
     units: {
       type: Array,
-      default: () => ['px', '%', 'em', 'rem', 'vw', 'vh', 'auto'],
+      default: () => [],
+    },
+    unitType: {
+      type: String,
+      default: 'css',
+      validator: value => ['css', 'time'].includes(value),
     },
     placeholder: {
       type: String,
       default: '',
     },
+  })
+
+  // 获取实际使用的单位列表
+  const actualUnits = computed(() => {
+    if (props.units && props.units.length > 0) {
+      return props.units
+    }
+    return UNIT_TYPES[props.unitType] || UNIT_TYPES.css
   })
 
   const emit = defineEmits(['update:value'])
@@ -43,14 +62,14 @@
   const parsedValue = computed(() => {
     const str = String(props.value || '')
     // 匹配数字部分和单位部分
-    const match = str.match(/^([\d.]*)(.*)$/)
+    const match = str.match(/^(\d[\d.]*)(.*)$/)
     if (match) {
       return {
         input: match[1],
-        unit: match[2] || props.units[0],
+        unit: match[2] || actualUnits.value[0],
       }
     }
-    return { input: '', unit: props.units[0] }
+    return { input: '', unit: actualUnits.value[0] }
   })
 
   const inputValue = computed(() => parsedValue.value.input)

@@ -10,6 +10,7 @@ export const PropTypes = {
   ARRAY: 'array',
   FUNCTION: 'function',
   UNIT: 'unit',
+  TIME: 'time',
 }
 
 // 组件分类
