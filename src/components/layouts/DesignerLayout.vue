@@ -10,37 +10,46 @@
       <!-- 最左侧：切换按钮 -->
       <ea-aside
         width="48px"
-        class="bg-white flex flex-col items-center py-4 gap-4 border-0 border-r-1 border-solid border-gray-200"
+        class="bg-white flex flex-col items-center py-4 gap-2 border-0 border-r-1 border-solid border-gray-200"
       >
         <div
-          title="组件"
-          class="w-10 h-10 flex items-center justify-center cursor-pointer hover:bg-gray-100 rounded text-sm font-medium"
+          v-for="item in leftPanelItems"
+          :key="item.key"
+          :title="item.title"
+          class="w-10 h-10 flex items-center justify-center cursor-pointer rounded text-sm font-medium hover:bg-gray-100"
+          :class="{'bg-blue-50 text-blue-600': activeLeftPanel === item.key }"
+          @click="switchLeftPanel(item.key)"
         >
-          组件
-        </div>
-        <div
-          title="JSON"
-          class="w-10 h-10 flex items-center justify-center cursor-pointer hover:bg-gray-100 rounded text-sm font-medium"
-        >
-          JSON
-        </div>
-        <div
-          title="AI"
-          class="w-10 h-10 flex items-center justify-center cursor-pointer hover:bg-gray-100 rounded text-sm font-medium"
-        >
-          AI
+          {{ item.label }}
         </div>
       </ea-aside>
 
       <ea-main class="flex-1 overflow-hidden">
         <ea-container class="h-full" direction="horizontal">
-          <!-- 左侧：组件库/JSON/AI面板区 -->
+          <!-- 左侧：面板区 -->
           <ea-aside
-            :width="leftAsideCollapsed ? '0px' : '250px'"
+            :width="leftAsideCollapsed ? '0px' : activeLeftPanel === 'json' ? '350px' : '280px'"
             class="bg-white border-r border-gray-200 relative transition-all duration-300"
+            :class="{'pb-18':activeLeftPanel === 'json' }"
           >
-            <div v-show="!leftAsideCollapsed" class="h-full">
-              <ComponentPanel class="h-full" />
+            <div v-show="!leftAsideCollapsed" class="w-full h-full px-3">
+              <!-- 组件面板 -->
+              <ComponentPanel v-if="activeLeftPanel === 'components'" class="h-full" />
+              <!-- 页面设置面板 -->
+              <PageSettingsPanel v-else-if="activeLeftPanel === 'page'" class="h-full" />
+              <!-- JSON 面板 -->
+
+              <MonacoEditor
+                v-else-if="activeLeftPanel === 'json'"
+                v-model="jsonContent"
+                language="json"
+                height="100%"
+              />
+
+              <!-- AI 面板 -->
+              <div v-else-if="activeLeftPanel === 'ai'" class="h-full p-4">
+                <ea-text type="info">AI 助手（待实现）</ea-text>
+              </div>
             </div>
             <!-- 左侧切换按钮 -->
             <ea-button
@@ -81,16 +90,54 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  import { ref, computed, watch } from 'vue'
+  import { useSchemaStore } from '@/stores/designer/schema'
   import Toolbar from './header/Toolbar.vue'
   import ComponentPanel from './material/ComponentPanel.vue'
+  import PageSettingsPanel from './page/PageSettingsPanel.vue'
   import CanvasArea from './canvas/CanvasArea.vue'
   import PropsPanel from './props/PropsPanel.vue'
+  import MonacoEditor from '@/components/common/MonacoEditor.vue'
 
+  const schemaStore = useSchemaStore()
+
+  // 当前激活的左侧面板
+  const activeLeftPanel = ref('components')
   // 左侧边栏展开/收起状态
   const leftAsideCollapsed = ref(false)
   // 右侧边栏展开/收起状态
   const rightAsideCollapsed = ref(false)
+
+  // JSON 编辑器内容 - 从 schema 计算得出
+  const jsonContent = computed({
+    get: () => JSON.stringify(schemaStore.pageSchema, null, 2),
+    set: value => {
+      try {
+        const parsed = JSON.parse(value)
+        schemaStore.importSchema(parsed)
+      } catch (e) {
+        // JSON 格式错误时不更新
+        console.warn('Invalid JSON:', e)
+      }
+    },
+  })
+
+  // 左侧面板配置
+  const leftPanelItems = [
+    { key: 'components', label: '组件', title: '组件库' },
+    { key: 'page', label: '页面', title: '页面设置' },
+    { key: 'json', label: 'JSON', title: 'JSON 编辑器' },
+    { key: 'ai', label: 'AI', title: 'AI 助手' },
+  ]
+
+  // 切换左侧面板
+  function switchLeftPanel(panel) {
+    activeLeftPanel.value = panel
+
+    if (leftAsideCollapsed.value) {
+      leftAsideCollapsed.value = false
+    }
+  }
 
   // 切换左侧边栏
   function toggleLeftAside() {

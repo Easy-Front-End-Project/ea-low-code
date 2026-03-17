@@ -5,10 +5,12 @@ import { feedbackComponents } from './meta/feedbackComponents'
 import { formComponents } from './meta/formComponents'
 import { layoutComponents } from './meta/layoutComponents'
 import { navigationComponents } from './meta/navigationComponents'
+import { projectComponents } from './meta/projectComponents'
 
-/**
- * 组件元数据配置
- */
+// 远程组件配置存储（本地存储）
+const REMOTE_CONFIG_KEY = 'ea_lowcode_remote_config'
+
+// 组件元数据配置
 export const componentMetaList = [
   ...basicComponents,
   ...formComponents,
@@ -18,17 +20,20 @@ export const componentMetaList = [
   ...layoutComponents,
 ]
 
+// 所有组件元数据（包含项目级组件）
+export const allComponentMetaList = [...componentMetaList, ...projectComponents]
+
 // 根据分类获取组件
 export function getComponentsByCategory(category) {
-  return componentMetaList.filter((comp) => comp.category === category)
+  return componentMetaList.filter(comp => comp.category === category)
 }
 
-// 根据类型获取组件元数据
+// 根据类型获取组件元数据（包含项目级组件）
 export function getComponentMeta(type) {
-  const meta = componentMetaList.find((comp) => comp.type === type)
+  const meta = allComponentMetaList.find(comp => comp.type === type)
+
   if (!meta) return null
 
-  // 确保组件有 slots 定义，如果没有则添加默认插槽
   const slots = meta.slots || [{ name: 'default', label: '默认插槽' }]
 
   return {
@@ -59,9 +64,6 @@ function getCategoryLabel(category) {
   }
   return labels[category] || category
 }
-
-// 远程组件配置存储（本地存储）
-const REMOTE_CONFIG_KEY = 'ea_lowcode_remote_config'
 
 /**
  * 获取完整 URL（拼接 globalUrl 和相对路径）
@@ -138,7 +140,7 @@ export function addRemoteComponent(component) {
  */
 export function removeRemoteComponent(id) {
   const config = getRemoteConfig()
-  config.components = config.components.filter((c) => c.id !== id)
+  config.components = config.components.filter(c => c.id !== id)
   localStorage.setItem(REMOTE_CONFIG_KEY, JSON.stringify(config))
 }
 
@@ -149,7 +151,7 @@ export function removeRemoteComponent(id) {
 export function getRemoteComponentMetaList() {
   const config = getRemoteConfig()
   const remoteComponents = config.components || []
-  return remoteComponents.map((comp) => ({
+  return remoteComponents.map(comp => ({
     type: `remote-${comp.id}`,
     name: comp.name || '远程组件',
     category: ComponentCategories.REMOTE,

@@ -3,43 +3,6 @@ import { ComponentCategories, PropTypes } from '../types'
 // Navigation 导航
 export const navigationComponents = [
   {
-    type: 'ea-backtop',
-    name: '回到顶部',
-    category: ComponentCategories.NAVIGATION,
-    icon: 'Backtop',
-    props: [
-      {
-        name: 'visibility-height',
-        label: '可见高度',
-        type: PropTypes.NUMBER,
-        default: 200,
-      },
-      {
-        name: 'right',
-        label: '右偏移',
-        type: PropTypes.NUMBER,
-        default: 40,
-      },
-      {
-        name: 'bottom',
-        label: '下偏移',
-        type: PropTypes.NUMBER,
-        default: 40,
-      },
-    ],
-    events: [],
-    slots: [{ name: 'default', label: '默认插槽' }],
-    styleConfig: {
-      parts: [
-        {
-          name: 'container',
-          label: '外层容器',
-          styles: ['background-color', 'color', 'border-radius'],
-        },
-      ],
-    },
-  },
-  {
     type: 'ea-breadcrumb',
     name: '面包屑',
     category: ComponentCategories.NAVIGATION,
@@ -283,42 +246,6 @@ export const navigationComponents = [
     },
   },
   {
-    type: 'ea-submenu',
-    name: '子菜单',
-    category: ComponentCategories.NAVIGATION,
-    icon: 'Submenu',
-    isChildComponent: true,
-    parentComponents: ['ea-menu', 'ea-submenu'],
-    childComponents: ['ea-submenu', 'ea-menu-item', 'ea-menu-item-group'],
-    props: [
-      {
-        name: 'index',
-        label: '索引',
-        type: PropTypes.STRING,
-        default: '',
-      },
-    ],
-    events: [],
-    slots: [
-      { name: 'default', label: '默认插槽' },
-      { name: 'title', label: '标题插槽' },
-    ],
-    styleConfig: {
-      parts: [
-        {
-          name: 'container',
-          label: '外层容器',
-          styles: ['background-color'],
-        },
-        {
-          name: 'title',
-          label: '标题容器',
-          styles: ['color'],
-        },
-      ],
-    },
-  },
-  {
     type: 'ea-menu-item',
     name: '菜单项',
     category: ComponentCategories.NAVIGATION,
@@ -369,6 +296,42 @@ export const navigationComponents = [
           name: 'container',
           label: '外层容器',
           styles: ['background-color'],
+        },
+      ],
+    },
+  },
+  {
+    type: 'ea-submenu',
+    name: '子菜单',
+    category: ComponentCategories.NAVIGATION,
+    icon: 'Submenu',
+    isChildComponent: true,
+    parentComponents: ['ea-menu', 'ea-submenu'],
+    childComponents: ['ea-submenu', 'ea-menu-item', 'ea-menu-item-group'],
+    props: [
+      {
+        name: 'index',
+        label: '索引',
+        type: PropTypes.STRING,
+        default: '',
+      },
+    ],
+    events: [],
+    slots: [
+      { name: 'default', label: '默认插槽' },
+      { name: 'title', label: '标题插槽' },
+    ],
+    styleConfig: {
+      parts: [
+        {
+          name: 'container',
+          label: '外层容器',
+          styles: ['background-color'],
+        },
+        {
+          name: 'title',
+          label: '标题容器',
+          styles: ['color'],
         },
       ],
     },
@@ -428,6 +391,63 @@ export const navigationComponents = [
           name: 'content',
           label: '内容容器',
           styles: ['color'],
+        },
+      ],
+    },
+  },
+  {
+    type: 'ea-step',
+    name: '步骤项',
+    category: ComponentCategories.NAVIGATION,
+    icon: 'Step',
+    isChildComponent: true,
+    parentComponents: ['ea-steps'],
+    props: [
+      {
+        name: 'title',
+        label: '标题',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'description',
+        label: '描述',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'icon',
+        label: '图标',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'status',
+        label: '状态',
+        type: PropTypes.SELECT,
+        default: '',
+        options: [
+          { label: '等待', value: 'wait' },
+          { label: '进行中', value: 'process' },
+          { label: '完成', value: 'finish' },
+          { label: '错误', value: 'error' },
+          { label: '成功', value: 'success' },
+        ],
+      },
+    ],
+    events: [],
+    slots: [
+      { name: 'default', label: '默认插槽' },
+      { name: 'icon', label: '图标插槽' },
+      { name: 'title', label: '标题插槽' },
+      { name: 'description', label: '描述插槽' },
+    ],
+    styleConfig: {
+      parts: [
+        {
+          name: 'container',
+          label: '外层容器',
+          styles: ['background-color'],
         },
       ],
     },
@@ -503,52 +523,61 @@ export const navigationComponents = [
     },
   },
   {
-    type: 'ea-step',
-    name: '步骤项',
+    type: 'ea-tab',
+    name: '标签',
     category: ComponentCategories.NAVIGATION,
-    icon: 'Step',
+    icon: 'Tab',
     isChildComponent: true,
-    parentComponents: ['ea-steps'],
+    parentComponents: ['ea-tabs'],
     props: [
       {
-        name: 'title',
-        label: '标题',
+        name: 'panel',
+        label: '面板标识',
         type: PropTypes.STRING,
         default: '',
       },
       {
-        name: 'description',
-        label: '描述',
-        type: PropTypes.STRING,
-        default: '',
-      },
-      {
-        name: 'icon',
-        label: '图标',
-        type: PropTypes.STRING,
-        default: '',
-      },
-      {
-        name: 'status',
-        label: '状态',
-        type: PropTypes.SELECT,
-        default: '',
-        options: [
-          { label: '等待', value: 'wait' },
-          { label: '进行中', value: 'process' },
-          { label: '完成', value: 'finish' },
-          { label: '错误', value: 'error' },
-          { label: '成功', value: 'success' },
-        ],
+        name: 'closable',
+        label: '可关闭',
+        type: PropTypes.BOOLEAN,
+        default: true,
       },
     ],
     events: [],
-    slots: [
-      { name: 'default', label: '默认插槽' },
-      { name: 'icon', label: '图标插槽' },
-      { name: 'title', label: '标题插槽' },
-      { name: 'description', label: '描述插槽' },
+    slots: [{ name: 'default', label: '默认插槽' }],
+    styleConfig: {
+      parts: [
+        {
+          name: 'container',
+          label: '外层容器',
+          styles: ['background-color', 'color'],
+        },
+      ],
+    },
+  },
+  {
+    type: 'ea-tab-panel',
+    name: '标签面板',
+    category: ComponentCategories.NAVIGATION,
+    icon: 'TabPanel',
+    isChildComponent: true,
+    parentComponents: ['ea-tabs'],
+    props: [
+      {
+        name: 'name',
+        label: '名称',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'label',
+        label: '标签文本',
+        type: PropTypes.STRING,
+        default: '',
+      },
     ],
+    events: [],
+    slots: [{ name: 'default', label: '默认插槽' }],
     styleConfig: {
       parts: [
         {
@@ -626,72 +655,6 @@ export const navigationComponents = [
         {
           name: 'content',
           label: '内容容器',
-          styles: ['background-color'],
-        },
-      ],
-    },
-  },
-  {
-    type: 'ea-tab',
-    name: '标签',
-    category: ComponentCategories.NAVIGATION,
-    icon: 'Tab',
-    isChildComponent: true,
-    parentComponents: ['ea-tabs'],
-    props: [
-      {
-        name: 'panel',
-        label: '面板标识',
-        type: PropTypes.STRING,
-        default: '',
-      },
-      {
-        name: 'closable',
-        label: '可关闭',
-        type: PropTypes.BOOLEAN,
-        default: true,
-      },
-    ],
-    events: [],
-    slots: [{ name: 'default', label: '默认插槽' }],
-    styleConfig: {
-      parts: [
-        {
-          name: 'container',
-          label: '外层容器',
-          styles: ['background-color', 'color'],
-        },
-      ],
-    },
-  },
-  {
-    type: 'ea-tab-panel',
-    name: '标签面板',
-    category: ComponentCategories.NAVIGATION,
-    icon: 'TabPanel',
-    isChildComponent: true,
-    parentComponents: ['ea-tabs'],
-    props: [
-      {
-        name: 'name',
-        label: '名称',
-        type: PropTypes.STRING,
-        default: '',
-      },
-      {
-        name: 'label',
-        label: '标签文本',
-        type: PropTypes.STRING,
-        default: '',
-      },
-    ],
-    events: [],
-    slots: [{ name: 'default', label: '默认插槽' }],
-    styleConfig: {
-      parts: [
-        {
-          name: 'container',
-          label: '外层容器',
           styles: ['background-color'],
         },
       ],

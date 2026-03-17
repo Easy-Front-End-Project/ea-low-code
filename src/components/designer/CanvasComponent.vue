@@ -675,6 +675,12 @@
         pointer-events: none;
       }
     }
+
+    ea-alert {
+      &::part(close-btn) {
+        pointer-events: none;
+      }
+    }
   }
 
   /* 插槽内容包装器 */

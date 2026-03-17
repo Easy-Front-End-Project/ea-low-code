@@ -24,6 +24,8 @@ export const useSchemaStore = defineStore('schema', () => {
         overflow: 'auto',
       },
     },
+    // 页面级设置（用于页面级组件配置，如回到顶部）
+    settings: {},
   })
 
   const selectedComponentId = ref(null)
@@ -248,6 +250,14 @@ export const useSchemaStore = defineStore('schema', () => {
   }
 
   /**
+   * 更新页面设置
+   * @param {Object} settings - 设置对象
+   */
+  function updatePageSettings(settings) {
+    pageSchema.value.settings = { ...pageSchema.value.settings, ...settings }
+  }
+
+  /**
    * 导入 Schema
    * @param {Object} schema - Schema 对象
    */
@@ -414,6 +424,7 @@ export const useSchemaStore = defineStore('schema', () => {
     clearSelection,
     setPreviewMode,
     updatePageMeta,
+    updatePageSettings,
     importSchema,
     exportSchema,
     clearCanvas,

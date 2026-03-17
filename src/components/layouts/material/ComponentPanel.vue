@@ -13,7 +13,7 @@
     </div>
 
     <!-- 组件分类列表 -->
-    <div class="flex-1 overflow-y-auto px-3">
+    <div class="flex-1 overflow-y-auto">
       <ea-collapse :active="expandedCategories" @change="handleCollapseChange">
         <!-- 普通组件分类 -->
         <ea-collapse-item
@@ -88,16 +88,16 @@
 
   // 获取普通分类（排除远程组件），包含所有组件（平铺显示）
   const categories = computed(() => {
-    const cats = getCategories().filter((cat) => cat.value !== ComponentCategories.REMOTE)
-    return cats.map((cat) => {
+    const cats = getCategories().filter(cat => cat.value !== ComponentCategories.REMOTE)
+    return cats.map(cat => {
       const allComponents = getComponentsByCategory(cat.value)
       // 过滤掉隐藏的子组件，但保留其他子组件用于平铺显示
       const visibleComponents = allComponents.filter(
-        (comp) => !comp.isChildComponent || !hiddenChildComponentsInPanel.includes(comp.type),
+        comp => !comp.isChildComponent || !hiddenChildComponentsInPanel.includes(comp.type)
       )
       return {
         ...cat,
-        components: allComponents.filter((comp) => !comp.isChildComponent),
+        components: allComponents.filter(comp => !comp.isChildComponent),
         allComponents: visibleComponents,
       }
     })
@@ -106,7 +106,7 @@
   // 过滤后的分类和组件
   const filteredCategories = computed(() => {
     if (!searchQuery.value.trim()) {
-      const allKeys = categories.value.map((cat) => cat.key)
+      const allKeys = categories.value.map(cat => cat.key)
       if (remoteStore.enabledCount > 0) {
         allKeys.push('remote')
       }
@@ -116,17 +116,16 @@
 
     const query = searchQuery.value.toLowerCase()
     const filtered = categories.value
-      .map((cat) => ({
+      .map(cat => ({
         ...cat,
         allComponents: cat.allComponents.filter(
-          (comp) =>
-            comp.name.toLowerCase().includes(query) || comp.type.toLowerCase().includes(query),
+          comp => comp.name.toLowerCase().includes(query) || comp.type.toLowerCase().includes(query)
         ),
       }))
-      .filter((cat) => cat.allComponents.length > 0)
+      .filter(cat => cat.allComponents.length > 0)
 
     // 搜索时自动展开包含结果的分组
-    expandedCategories.value = filtered.map((cat) => cat.key)
+    expandedCategories.value = filtered.map(cat => cat.key)
 
     return filtered
   })
@@ -153,7 +152,7 @@
     }
 
     // 设置默认展开的类别
-    const allKeys = categories.value.map((cat) => cat.key)
+    const allKeys = categories.value.map(cat => cat.key)
     if (remoteStore.enabledCount > 0) {
       allKeys.push('remote')
     }
