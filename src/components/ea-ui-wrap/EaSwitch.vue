@@ -11,7 +11,7 @@
     :inactive-value.attr="inactiveValue || false"
     :active-color="activeColor"
     :inactive-color="inactiveColor"
-    @change="handleChange"
+    @change.stop.prevent="handleChange"
   >
     <template v-if="$slots.active" slot="active">
       <slot name="active"></slot>
@@ -76,24 +76,28 @@
   // 监听外部值变化
   watch(
     () => props.modelValue,
-    (newVal) => {
+    newVal => {
       if (newVal !== undefined && newVal !== localValue.value) {
         localValue.value = newVal
       }
     },
-    { immediate: true },
+    { immediate: true }
   )
 
   // 处理 change 事件
   function handleChange(event) {
     let value = event.detail?.value
 
-    // 更新本地值
-    localValue.value = value
+    if (typeof value === 'string') {
+      if (value === 'true') value = true
+      else if (value === 'false') value = false
+    }
 
-    // 触发事件
-    emit('update:modelValue', value)
-    emit('change', value)
+    if (value !== undefined && value !== localValue.value) {
+      localValue.value = value
+      emit('update:modelValue', value)
+      emit('change', value)
+    }
   }
 
   // 暴露方法

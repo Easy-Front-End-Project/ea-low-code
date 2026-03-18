@@ -83,8 +83,13 @@
   const expandedCategories = ref([])
   const remoteStore = useRemoteComponentStore()
 
-  // 在物料区隐藏的子组件（通过特殊配置管理的）
-  const hiddenChildComponentsInPanel = ['ea-option', 'ea-option-group']
+  // 在物料区隐藏的子组件
+  const hiddenChildComponentsInPanel = [
+    'ea-option',
+    'ea-option-group',
+    'ea-dropdown-item',
+    'ea-dropdown-menu',
+  ]
 
   // 获取普通分类（排除远程组件），包含所有组件（平铺显示）
   const categories = computed(() => {

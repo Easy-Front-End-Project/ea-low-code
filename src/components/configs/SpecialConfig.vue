@@ -15,6 +15,7 @@
   import SelectOptionsConfig from '@/components/configs/special/SelectOptionsConfig.vue'
   import CheckboxGroupConfig from '@/components/configs/special/CheckboxGroupConfig.vue'
   import RadioGroupConfig from '@/components/configs/special/RadioGroupConfig.vue'
+  import DropdownOptionsConfig from '@/components/configs/special/DropdownOptionsConfig.vue'
 
   /**
    * 特殊配置渲染器
@@ -37,6 +38,7 @@
     selectOptions: SelectOptionsConfig,
     checkboxGroupOptions: CheckboxGroupConfig,
     radioGroupOptions: RadioGroupConfig,
+    dropdownOptions: DropdownOptionsConfig,
   }
 
   // 根据类型获取对应的配置组件

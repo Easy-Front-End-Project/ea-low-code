@@ -207,6 +207,7 @@
     'ea-check-tag',
     'ea-badge',
     'ea-avatar',
+    'ea-dropdown',
   ]
 
   // 是否为不可选中的组件
@@ -524,8 +525,11 @@
       const allowedChildTypes = componentMeta.value?.childComponents || []
       const isDedicatedChild = allowedChildTypes.includes(droppedComponentMeta.type)
 
-      // 2. 如果定义了 childComponents 列表，则只允许拖入列表中的组件类型
-      if (allowedChildTypes.length > 0 && !isDedicatedChild) {
+      // 2. 获取组件定义的 defaultSlot
+      const defaultSlot = componentMeta.value?.defaultSlot || 'default'
+
+      // 3. 如果定义了 childComponents 列表，且不是专用子组件，但组件有 defaultSlot 配置，则允许拖入到 defaultSlot
+      if (allowedChildTypes.length > 0 && !isDedicatedChild && defaultSlot === 'default') {
         console.warn(
           `组件 ${droppedComponentMeta.type} 不允许拖入到 ${props.component.type}，只允许: ${allowedChildTypes.join(', ')}`
         )
@@ -536,7 +540,7 @@
       emit('drop-to-parent', {
         componentMeta: droppedComponentMeta,
         parentId: props.component.id,
-        slotName: 'default',
+        slotName: defaultSlot,
       })
     } catch (error) {
       console.error('拖拽放置到容器失败:', error)
@@ -680,6 +684,10 @@
       &::part(close-btn) {
         pointer-events: none;
       }
+    }
+
+    ea-tab-panel {
+      display: block;
     }
   }
 

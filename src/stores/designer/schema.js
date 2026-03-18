@@ -10,11 +10,6 @@ export const useSchemaStore = defineStore('schema', () => {
   // State
   const pageSchema = ref({
     version: '1.0',
-    components: [],
-    layout: {
-      type: 'absolute', // absolute | flex | grid
-      config: {},
-    },
     meta: {
       title: '未命名页面',
       description: '',
@@ -24,8 +19,9 @@ export const useSchemaStore = defineStore('schema', () => {
         overflow: 'auto',
       },
     },
-    // 页面级设置（用于页面级组件配置，如回到顶部）
+    // 页面级设置
     settings: {},
+    components: [],
   })
 
   const selectedComponentId = ref(null)
