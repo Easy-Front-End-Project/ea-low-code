@@ -16,7 +16,7 @@
       </div>
 
       <!-- 选中组件后显示属性表单 -->
-      <div v-else class="p-4 space-y-6">
+      <div v-else class="p-4 space-y-6" :key="selectedComponent.id">
         <!-- 组件信息 -->
         <div class="component-info pb-4 border-b border-gray-100">
           <div class="flex items-center justify-between mb-2">

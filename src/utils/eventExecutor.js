@@ -105,11 +105,11 @@ export function executeCustomCode(code, context, originalEvent) {
  * @param {string} message - 消息内容
  * @param {string} type - 消息类型: 'success' | 'error' | 'warning' | 'info'
  */
-export function showMessage(message, type = 'success') {
-  if (window.$message && message) {
-    window.$message[type](message)
-  } else if (message) {
-    alert(message)
+export function showMessage(actionConfig) {
+  if (window.$message && actionConfig.message) {
+    window.$message(actionConfig)
+  } else if (actionConfig.message) {
+    alert(actionConfig.message)
   }
 }
 
@@ -151,25 +151,31 @@ export function executeEvent(eventConfig, originalEvent) {
 
   const context = createExecutionContext()
 
+  const actionConfig = eventConfig.actionConfig || {}
+
   switch (eventConfig.action) {
     case 'message':
-      showMessage(eventConfig.message, 'success')
+      showMessage(actionConfig)
       break
 
     case 'custom':
-      executeCustomCode(eventConfig.code, context, originalEvent)
+      executeCustomCode(actionConfig.code, context, originalEvent)
       break
 
     case 'callMethod':
       callComponentMethod(
-        eventConfig.targetComponentId,
-        eventConfig.methodName,
-        eventConfig.methodArgs || []
+        actionConfig.targetComponentId,
+        actionConfig.methodName,
+        actionConfig.methodArgs || []
       )
       break
 
     case 'setProp':
-      setComponentProp(eventConfig.targetComponentId, eventConfig.propName, eventConfig.propValue)
+      setComponentProp(
+        actionConfig.targetComponentId,
+        actionConfig.propName,
+        actionConfig.propValue
+      )
       break
 
     default:

@@ -161,7 +161,7 @@
     const events = props.component.events || []
 
     events.forEach(eventConfig => {
-      const eventType = eventConfig.type
+      const eventType = eventConfig.eventType || eventConfig.type
       if (!listeners[eventType]) {
         listeners[eventType] = event => {
           executeEventHandler(eventConfig, event)

@@ -16,7 +16,7 @@
         @click="handleEditEvent(event)"
       >
         <div class="flex items-center gap-2">
-          <span class="text-xs text-blue-600 font-medium">{{ event.type }}</span>
+          <span class="text-xs text-blue-600 font-medium">{{ event.eventType }}</span>
           <span class="text-sm text-gray-700">{{ event.name }}</span>
         </div>
         <ea-icon icon="icon-edit" size="12" class="text-gray-400"></ea-icon>
@@ -41,7 +41,7 @@
               @click="handleSelectEvent(event)"
             >
               <div class="flex flex-col">
-                <span class="text-xs text-gray-500">{{ event.type }}</span>
+                <span class="text-xs text-gray-500">{{ event.eventType }}</span>
                 <span class="text-sm text-gray-700">{{ event.name }}</span>
               </div>
               <ea-button type="text" size="small" @click.stop="handleDeleteEvent(event.id)">
@@ -58,7 +58,7 @@
         <!-- 右侧：事件配置 -->
         <div class="event-config flex-1 pl-4 overflow-auto">
           <template v-if="selectedEvent">
-            <div class="space-y-4">
+            <div class="space-y-4" :key="selectedEvent.id">
               <!-- 事件名称 -->
               <div class="config-item">
                 <label class="config-label">事件名称</label>
@@ -70,7 +70,7 @@
                 <label class="config-label">事件类型</label>
                 <div class="event-type-input flex gap-2">
                   <EaSelect
-                    :model-value="selectedEvent.type"
+                    :model-value="selectedEvent.eventType"
                     size="small"
                     class="w-full"
                     @change="handleEventTypeChange"
@@ -93,12 +93,11 @@
                 </div>
                 <!-- 自定义事件名输入 -->
                 <EaInput
-                  v-if="selectedEvent.type === 'custom' || !isPredefinedEvent(selectedEvent.type)"
-                  :model-value="selectedEvent.customType"
+                  v-if="selectedEvent.eventType === 'custom' || !isPredefinedEvent(selectedEvent.eventType)"
+                  v-model="selectedEvent.customEventType"
                   placeholder="输入自定义事件名，如：dblclick"
                   size="small"
                   class="mt-2"
-                  @change="handleCustomTypeChange"
                 />
               </div>
 
@@ -106,6 +105,7 @@
               <div class="config-item">
                 <label class="config-label">动作</label>
                 <EaSelect
+                  :key="selectedEvent.id"
                   :model-value="selectedEvent.action"
                   size="small"
                   class="w-full"
@@ -118,93 +118,92 @@
                 </EaSelect>
               </div>
 
-              <!-- 显示提示配置 -->
-              <div v-if="selectedEvent.action === 'message'" class="config-item">
-                <label class="config-label">提示内容</label>
-                <EaInput
-                  v-model="selectedEvent.message"
-                  placeholder="输入提示消息内容"
-                  size="small"
+              <!-- 动态配置区域 -->
+              <div class="dynamic-config-section" :key="selectedEvent.id">
+                <!-- 显示提示配置 -->
+                <MessageActionConfig
+                  v-if="selectedEvent.action === 'message'"
+                  v-model="selectedEvent.actionConfig"
                 />
-              </div>
 
-              <!-- 设置组件属性配置 -->
-              <template v-if="selectedEvent.action === 'setProp'">
-                <div class="config-item">
-                  <label class="config-label">目标组件ID</label>
-                  <EaInput
-                    v-model="selectedEvent.targetComponentId"
-                    placeholder="如：button_123"
-                    size="small"
-                  />
-                </div>
-                <div class="config-item">
-                  <label class="config-label">属性名</label>
-                  <EaInput
-                    v-model="selectedEvent.propName"
-                    placeholder="如：loading"
-                    size="small"
-                  />
-                </div>
-                <div class="config-item">
-                  <label class="config-label">属性值</label>
-                  <EaSelect
-                    :model-value="selectedEvent.propValue"
-                    size="small"
-                    class="w-full"
-                    @change="(val) => selectedEvent.propValue = val"
-                  >
-                    <ea-option :value="true">true</ea-option>
-                    <ea-option :value="false">false</ea-option>
-                  </EaSelect>
-                </div>
-              </template>
-
-              <!-- 调用组件方法配置 -->
-              <template v-if="selectedEvent.action === 'callMethod'">
-                <div class="config-item">
-                  <label class="config-label">目标组件ID</label>
-                  <EaInput
-                    v-model="selectedEvent.targetComponentId"
-                    placeholder="如：button_123"
-                    size="small"
-                  />
-                </div>
-                <div class="config-item">
-                  <label class="config-label">方法名</label>
-                  <EaInput
-                    v-model="selectedEvent.methodName"
-                    placeholder="如：focus"
-                    size="small"
-                  />
-                </div>
-              </template>
-
-              <!-- 自定义代码配置 -->
-              <div v-if="selectedEvent.action === 'custom'" class="config-item">
-                <label class="config-label">自定义代码</label>
-                <div class="code-help">
-                  <ea-icon icon="icon-info" size="12" class="code-help-icon"></ea-icon>
-                  <span class="code-help-title">可用 API：</span>
-                  <div class="code-help-list">
-                    <code
-                      v-for="api in codeHelpApis"
-                      :key="api.name"
-                      class="code-help-item"
-                      :title="api.desc"
-                    >
-                      {{ api.name }}
-                    </code>
+                <!-- 设置组件属性配置 -->
+                <template v-if="selectedEvent.action === 'setProp'">
+                  <div class="config-item">
+                    <label class="config-label">目标组件ID</label>
+                    <EaInput
+                      v-model="selectedEvent.actionConfig.targetComponentId"
+                      placeholder="如：button_123"
+                      size="small"
+                    />
                   </div>
+                  <div class="config-item">
+                    <label class="config-label">属性名</label>
+                    <EaInput
+                      v-model="selectedEvent.actionConfig.propName"
+                      placeholder="如：loading"
+                      size="small"
+                    />
+                  </div>
+                  <div class="config-item">
+                    <label class="config-label">属性值</label>
+                    <EaSelect
+                      v-model="selectedEvent.actionConfig.propValue"
+                      size="small"
+                      class="w-full"
+                    >
+                      <ea-option :value="true">true</ea-option>
+                      <ea-option :value="false">false</ea-option>
+                    </EaSelect>
+                  </div>
+                </template>
+
+                <!-- 调用组件方法配置 -->
+                <template v-if="selectedEvent.action === 'callMethod'">
+                  <div class="config-item">
+                    <label class="config-label">目标组件ID</label>
+                    <EaInput
+                      v-model="selectedEvent.actionConfig.targetComponentId"
+                      placeholder="如：button_123"
+                      size="small"
+                    />
+                  </div>
+                  <div class="config-item">
+                    <label class="config-label">方法名</label>
+                    <EaInput
+                      v-model="selectedEvent.actionConfig.methodName"
+                      placeholder="如：focus"
+                      size="small"
+                    />
+                  </div>
+                </template>
+
+                <!-- 自定义代码配置 -->
+                <div v-if="selectedEvent.action === 'custom'" class="config-item">
+                  <label class="config-label">自定义代码</label>
+                  <div class="code-help">
+                    <ea-icon icon="icon-info" size="12" class="code-help-icon"></ea-icon>
+                    <span class="code-help-title">可用 API：</span>
+                    <div class="code-help-list">
+                      <code
+                        v-for="api in codeHelpApis"
+                        :key="api.name"
+                        class="code-help-item"
+                        :title="api.desc"
+                      >
+                        {{ api.name }}
+                      </code>
+                    </div>
+                  </div>
+                  <MonacoEditor
+                    v-if="dialogVisible"
+                    v-model="selectedEvent.actionConfig.code"
+                    language="javascript"
+                    height="200px"
+                    :extra-libs="editorExtraLibs"
+                  />
                 </div>
-                <MonacoEditor
-                  v-if="dialogVisible"
-                  :key="selectedEvent.id + '_editor'"
-                  v-model="selectedEvent.code"
-                  language="javascript"
-                  height="200px"
-                  :extra-libs="editorExtraLibs"
-                />
+
+                <!-- 动态配置区域结束 -->
               </div>
             </div>
           </template>
@@ -235,6 +234,7 @@
   import MonacoEditor from '../common/MonacoEditor.vue'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
+  import MessageActionConfig from './special/MessageActionConfig.vue'
   import { generateUniqueId } from '@/utils/schemaHelper'
 
   const props = defineProps({
@@ -247,6 +247,8 @@
       default: () => [],
     },
   })
+
+  const emit = defineEmits(['event-change'])
 
   // 常用自定义事件列表
   const commonCustomEvents = [
@@ -300,91 +302,25 @@
 
         /** 组件操作辅助对象 */
         declare const $component: {
-          /**
-           * 通过ID获取组件DOM元素
-           * @param {string} id - 组件ID
-           * @returns {Element|null} 组件DOM元素或null
-           */
           get(id: string): Element | null;
-          /**
-           * 设置组件属性
-           * @param {string} id - 组件ID
-           * @param {string} prop - 属性名
-           * @param {any} value - 属性值
-           */
           setProp(id: string, prop: string, value: any): void;
-          /**
-           * 获取组件属性
-           * @param {string} id - 组件ID
-           * @param {string} prop - 属性名
-           * @returns {any} 属性值
-           */
           getProp(id: string, prop: string): any;
-          /**
-           * 调用组件方法
-           * @param {string} id - 组件ID
-           * @param {string} method - 方法名
-           * @param {...any} args - 方法参数
-           */
           call(id: string, method: string, ...args: any[]): void;
         };
 
         /** 变量操作辅助对象 */
         declare const $vars: {
-          /**
-           * 获取变量值
-           * @param {string} name - 变量名
-           * @returns {any} 变量值
-           */
           get(name: string): any;
-          /**
-           * 设置变量值
-           * @param {string} name - 变量名
-           * @param {any} value - 变量值
-           */
           set(name: string, value: any): void;
         };
 
         /** 别名操作辅助对象 */
         declare const $alias: {
-          /**
-           * 通过别名获取组件ID
-           * @param {string} alias - 组件别名
-           * @returns {string|null} 组件ID或null
-           */
           get(alias: string): string | null;
-          /**
-           * 通过别名查找组件
-           * @param {string} alias - 组件别名
-           * @returns {any|null} 组件实例或null
-           */
           find(alias: string): any | null;
-          /**
-           * 通过别名获取DOM元素
-           * @param {string} alias - 组件别名
-           * @returns {Element|null} 组件DOM元素或null
-           */
           getElement(alias: string): Element | null;
-          /**
-           * 通过别名设置属性
-           * @param {string} alias - 组件别名
-           * @param {string} prop - 属性名
-           * @param {any} value - 属性值
-           */
           setProp(alias: string, prop: string, value: any): void;
-          /**
-           * 通过别名获取属性
-           * @param {string} alias - 组件别名
-           * @param {string} prop - 属性名
-           * @returns {any} 属性值
-           */
           getProp(alias: string, prop: string): any;
-          /**
-           * 通过别名调用方法
-           * @param {string} alias - 组件别名
-           * @param {string} method - 方法名
-           * @param {...any} args - 方法参数
-           */
           call(alias: string, method: string, ...args: any[]): void;
         };
       `,
@@ -394,7 +330,6 @@
   // 可用事件列表
   const availableEvents = computed(() => {
     const predefinedEvents = props.events || []
-
     const allEvents = [...predefinedEvents]
     commonCustomEvents.forEach(event => {
       if (!allEvents.find(e => e.name === event.name)) {
@@ -403,8 +338,6 @@
     })
     return allEvents
   })
-
-  const emit = defineEmits(['event-change'])
 
   // 弹框显示状态
   const dialogVisible = ref(false)
@@ -418,37 +351,55 @@
     return availableEvents.value.some(e => e.name === eventType)
   }
 
+  // 创建默认动作配置
+  function createDefaultActionConfig(action) {
+    switch (action) {
+      case 'message':
+        return {
+          message: '提示消息',
+          type: 'info',
+          duration: 3000,
+          showClose: false,
+          dangerouslyUseHTMLString: false,
+          placement: 'top',
+          offset: 16,
+        }
+      case 'setProp':
+        return {
+          targetComponentId: '',
+          propName: '',
+          propValue: true,
+        }
+      case 'callMethod':
+        return {
+          targetComponentId: '',
+          methodName: '',
+        }
+      case 'custom':
+        return {
+          code: `// 使用 $component 操作其他组件\n// 示例：设置按钮 loading\n$component.setProp('button_123', 'loading', true);`,
+        }
+      default:
+        return {}
+    }
+  }
+
   // 处理事件类型改变
   function handleEventTypeChange(value) {
     if (!selectedEvent.value) return
 
     if (value === 'custom') {
-      selectedEvent.value.type = 'custom'
-      selectedEvent.value.customType = ''
+      selectedEvent.value.eventType = 'custom'
+      selectedEvent.value.customEventType = ''
     } else {
-      selectedEvent.value.type = value
-      selectedEvent.value.customType = value
+      selectedEvent.value.eventType = value
+      selectedEvent.value.customEventType = value
     }
-  }
-
-  // 处理自定义类型输入
-  function handleCustomTypeChange(value) {
-    if (!selectedEvent.value) return
-
-    selectedEvent.value.customType = value
-    selectedEvent.value.type = value
   }
 
   // 打开弹框
   function handleOpenDialog() {
     localEvents.value = JSON.parse(JSON.stringify(props.componentEvents || []))
-
-    localEvents.value.forEach(e => {
-      if (!e.customType) {
-        e.customType = e.type
-      }
-    })
-
     selectedEvent.value = null
     dialogVisible.value = true
   }
@@ -466,11 +417,10 @@
     const newEvent = {
       id: generateId(),
       name: `event${localEvents.value.length + 1}`,
-      type: defaultEvent.name,
-      customType: defaultEvent.name,
+      eventType: defaultEvent.name,
+      customEventType: defaultEvent.name,
       action: 'message',
-      message: '提示消息',
-      code: `console.log('事件触发');`,
+      actionConfig: createDefaultActionConfig('message'),
     }
     localEvents.value.push(newEvent)
     selectedEvent.value = newEvent
@@ -478,31 +428,14 @@
 
   // 选择事件
   function handleSelectEvent(event) {
-    selectedEvent.value = event
+    selectedEvent.value = { ...event }
   }
 
   // 动作类型改变
   function handleActionChange(action) {
     if (!selectedEvent.value) return
-
     selectedEvent.value.action = action
-
-    // 根据动作类型初始化对应字段
-    if (action === 'message') {
-      selectedEvent.value.message = selectedEvent.value.message || '提示消息'
-    } else if (action === 'setProp') {
-      selectedEvent.value.targetComponentId = selectedEvent.value.targetComponentId || ''
-      selectedEvent.value.propName = selectedEvent.value.propName || ''
-      selectedEvent.value.propValue =
-        selectedEvent.value.propValue !== undefined ? selectedEvent.value.propValue : true
-    } else if (action === 'callMethod') {
-      selectedEvent.value.targetComponentId = selectedEvent.value.targetComponentId || ''
-      selectedEvent.value.methodName = selectedEvent.value.methodName || ''
-    } else if (action === 'custom') {
-      selectedEvent.value.code =
-        selectedEvent.value.code ||
-        `// 使用 $component 操作其他组件\n// 示例：设置按钮 loading\n$component.setProp('button_123', 'loading', true);\n\n// 示例：获取组件\nconst btn = $component.get('button_123');\nconsole.log(btn);\n\n// 使用 $vars 操作变量\n// 示例：获取变量值\nconst username = $vars.get('username');\nconsole.log(username);\n\n// 示例：设置变量值\n$vars.set('count', 100);`
-    }
+    selectedEvent.value.actionConfig = createDefaultActionConfig(action)
   }
 
   // 删除事件
@@ -519,32 +452,22 @@
   // 编辑已有事件
   function handleEditEvent(event) {
     localEvents.value = JSON.parse(JSON.stringify(props.componentEvents || []))
-    // 为每个事件添加 customType 字段（如果不存在）
-    localEvents.value.forEach(e => {
-      if (!e.customType) {
-        e.customType = e.type
-      }
-    })
     selectedEvent.value = localEvents.value.find(e => e.id === event.id) || null
     dialogVisible.value = true
   }
 
   // 保存事件
   function handleSaveEvents() {
-    // 处理事件类型，确保使用正确的类型值
     const eventsToSave = localEvents.value.map(event => {
       // 确定最终的事件类型
-      let finalType = event.type
-      // 如果 type 是 'custom' 且 customType 有值，使用 customType
-      if (event.type === 'custom' && event.customType) {
-        finalType = event.customType
-      } else if (event.customType && event.customType !== event.type) {
-        // 如果 customType 存在且与 type 不同，使用 customType
-        finalType = event.customType
-      }
+      const finalEventType =
+        event.eventType === 'custom' && event.customEventType
+          ? event.customEventType
+          : event.eventType
+
       return {
         ...event,
-        type: finalType,
+        eventType: finalEventType,
       }
     })
     emit('event-change', eventsToSave)
@@ -563,91 +486,119 @@
   }
 
   .section-title {
-    font-size: 0.875rem;
+    font-size: 14px;
     font-weight: 600;
-    color: #374151;
-    margin-bottom: 0.75rem;
-  }
-
-  .event-tag {
-    transition: background-color 0.2s;
-  }
-
-  .event-list {
-    overflow-y: auto;
-  }
-
-  .event-item {
-    transition: background-color 0.2s;
-  }
-
-  .event-item:hover {
-    background-color: #f3f4f6;
+    color: #303133;
+    margin-bottom: 12px;
   }
 
   .config-item {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 4px;
   }
 
   .config-label {
-    font-size: 0.75rem;
+    font-size: 12px;
+    color: #606266;
     font-weight: 500;
-    color: #6b7280;
+  }
+
+  .event-tag {
+    transition: all 0.2s;
+  }
+
+  .event-item {
+    transition: all 0.2s;
+  }
+
+  .event-item:hover {
+    background-color: #f5f7fa;
   }
 
   .dialog-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
-    border-top: 1px solid #e5e7eb;
   }
 
   .code-help {
     display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    background-color: #eff6ff;
-    border: 1px solid #dbeafe;
-    border-radius: 0.375rem;
-    margin-bottom: 0.5rem;
-    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    padding: 8px;
+    background-color: #f5f7fa;
+    border-radius: 4px;
+    font-size: 12px;
   }
 
   .code-help-icon {
-    color: #3b82f6;
-    flex-shrink: 0;
-    margin-top: 0.125rem;
+    color: #409eff;
   }
 
   .code-help-title {
-    font-size: 0.75rem;
+    color: #606266;
     font-weight: 500;
-    color: #1e40af;
-    flex-shrink: 0;
   }
 
   .code-help-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.375rem;
-    flex: 1;
+    gap: 6px;
   }
 
   .code-help-item {
-    font-size: 0.6875rem;
-    padding: 0.125rem 0.375rem;
-    background-color: #dbeafe;
-    color: #1e40af;
-    border-radius: 0.25rem;
+    padding: 2px 6px;
+    background-color: #e4e7ed;
+    border-radius: 3px;
+    color: #606266;
     cursor: help;
-    transition: background-color 0.2s;
   }
 
-  .code-help-item:hover {
-    background-color: #bfdbfe;
+  /* 标签徽章样式 */
+  .label-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 500;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .label-badge.static {
+    background-color: #e6f7ff;
+    color: #1890ff;
+    border: 1px solid #91d5ff;
+  }
+
+  .label-badge.dynamic {
+    background-color: #f6ffed;
+    color: #52c41a;
+    border: 1px solid #b7eb8f;
+  }
+
+  /* 动态配置区域样式 */
+  .dynamic-config-section {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    padding: 12px;
+    background-color: #fafafa;
+  }
+
+  .dynamic-config-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e8e8e8;
+  }
+
+  .dynamic-config-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #595959;
   }
 </style>

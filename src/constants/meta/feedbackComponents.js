@@ -37,7 +37,7 @@ export const feedbackComponents = [
         name: 'closable',
         label: '可关闭',
         type: PropTypes.BOOLEAN,
-        default: true,
+        default: false,
       },
       {
         name: 'center',
@@ -47,7 +47,7 @@ export const feedbackComponents = [
       },
       {
         name: 'close-text',
-        label: '关闭按钮文本',
+        label: '关闭按钮自定义文本',
         type: PropTypes.STRING,
         default: '',
       },
@@ -68,6 +68,18 @@ export const feedbackComponents = [
         ],
       },
       {
+        name: 'show-after',
+        label: '延迟显示(ms)',
+        type: PropTypes.NUMBER,
+        default: 0,
+      },
+      {
+        name: 'hide-after',
+        label: '延迟关闭(ms)',
+        type: PropTypes.NUMBER,
+        default: 200,
+      },
+      {
         name: 'auto-close',
         label: '自动关闭延迟(ms)',
         type: PropTypes.NUMBER,
@@ -79,30 +91,50 @@ export const feedbackComponents = [
       { name: 'close', label: '关闭' },
     ],
     slots: [
-      { name: 'default', label: '内容插槽' },
-      { name: 'title', label: '标题插槽' },
-      { name: 'icon', label: '图标插槽' },
+      { name: '-', label: 'Alert 内容描述' },
+      { name: 'title', label: '标题的内容' },
+      { name: 'icon', label: '图标内容' },
     ],
     styleConfig: {
       parts: [
         {
           name: 'container',
-          label: '外层容器',
+          label: 'alert 外层容器',
           styles: ['background-color', 'border-color'],
         },
         {
           name: 'icon-wrap',
-          label: '图标容器',
+          label: 'alert 图标容器',
+          styles: ['color'],
+        },
+        {
+          name: 'icon',
+          label: 'alert 图标',
+          styles: ['color'],
+        },
+        {
+          name: 'content-wrap',
+          label: 'alert 内层容器',
           styles: ['color'],
         },
         {
           name: 'title',
-          label: '标题容器',
+          label: 'alert 标题容器',
           styles: ['color'],
         },
         {
           name: 'description',
-          label: '描述容器',
+          label: 'alert 描述容器',
+          styles: ['color'],
+        },
+        {
+          name: 'close-btn',
+          label: 'alert 关闭按钮容器',
+          styles: ['color'],
+        },
+        {
+          name: 'close-icon',
+          label: 'alert 关闭图标',
           styles: ['color'],
         },
       ],
@@ -355,6 +387,7 @@ export const feedbackComponents = [
         type: PropTypes.SELECT,
         default: 'info',
         options: [
+          { label: '主要', value: 'primary' },
           { label: '成功', value: 'success' },
           { label: '警告', value: 'warning' },
           { label: '信息', value: 'info' },
@@ -399,6 +432,12 @@ export const feedbackComponents = [
           { label: '右下', value: 'bottom-right' },
         ],
       },
+      {
+        name: 'appendTo',
+        label: '挂载目标',
+        type: PropTypes.STRING,
+        default: 'body',
+      },
     ],
     events: [
       { name: 'show', label: '显示' },
@@ -409,6 +448,35 @@ export const feedbackComponents = [
     ],
     slots: [],
     isService: true,
+    styles: [
+      {
+        name: 'container',
+        label: '消息容器',
+        styles: ['background-color', 'border-color', 'border-radius', 'box-shadow'],
+      },
+      {
+        name: 'icon',
+        label: '类型图标',
+        styles: ['color'],
+      },
+      {
+        name: 'content-wrap',
+        label: '内容区域',
+        styles: ['color'],
+      },
+      {
+        name: 'close-icon',
+        label: '关闭按钮',
+        styles: ['color'],
+      },
+    ],
+    methods: [
+      {
+        name: 'close',
+        label: '关闭消息',
+        description: '关闭当前的 Message',
+      },
+    ],
   },
   {
     type: 'ea-message-box',
