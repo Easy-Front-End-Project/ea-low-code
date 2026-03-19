@@ -136,14 +136,14 @@
     return resolveValue(props.component.props?.children) || ''
   })
 
-  // 传递给组件的 props（解析变量绑定，过滤掉 slot 属性）
+  // 传递给组件的 props（解析变量绑定，过滤掉 slot 和 children 属性）
   const componentProps = computed(() => {
     const rawProps = props.component.props || {}
     const resolvedProps = {}
 
-    // 遍历所有属性，解析变量绑定，过滤掉 slot 属性
+    // 遍历所有属性，解析变量绑定，过滤掉 slot 和 children 属性
     for (const [key, value] of Object.entries(rawProps)) {
-      if (key === 'slot') continue
+      if (key === 'slot' || key === 'children') continue
       // 处理 scope 属性，转换为 data-{scope} 形式
       if (key === 'scope' && value) {
         resolvedProps[`data-${value}`] = ''

@@ -47,9 +47,9 @@
               />
 
               <!-- AI 面板 -->
-              <div v-else-if="activeLeftPanel === 'ai'" class="h-full p-4">
+              <!-- <div v-else-if="activeLeftPanel === 'ai'" class="h-full p-4">
                 <ea-text type="info">AI 助手（待实现）</ea-text>
-              </div>
+              </div> -->
             </div>
             <!-- 左侧切换按钮 -->
             <ea-button
@@ -68,10 +68,10 @@
 
           <!-- 右侧：组件属性配置 -->
           <ea-aside
-            :width="rightAsideCollapsed ? '0px' : '320px'"
+            :width="rightAsideCollapsed ? '0px' : '370px'"
             class="bg-white border-l border-gray-200 relative transition-all duration-300"
           >
-            <div v-show="!rightAsideCollapsed" class="h-full">
+            <div v-show="!rightAsideCollapsed" class="h-full w-full">
               <PropsPanel class="h-full w-full" />
             </div>
             <!-- 右侧切换按钮 -->
@@ -127,7 +127,7 @@
     { key: 'components', label: '组件', title: '组件库' },
     { key: 'page', label: '页面', title: '页面设置' },
     { key: 'json', label: 'JSON', title: 'JSON 编辑器' },
-    { key: 'ai', label: 'AI', title: 'AI 助手' },
+    // { key: 'ai', label: 'AI', title: 'AI 助手' },
   ]
 
   // 切换左侧面板

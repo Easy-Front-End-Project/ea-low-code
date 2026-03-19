@@ -111,7 +111,8 @@
                   class="w-full"
                   @change="handleActionChange"
                 >
-                  <ea-option value="message">显示提示</ea-option>
+                  <ea-option value="message">显示消息</ea-option>
+                  <ea-option value="notification">显示通知</ea-option>
                   <ea-option value="setProp">设置组件属性</ea-option>
                   <ea-option value="callMethod">调用组件方法</ea-option>
                   <ea-option value="custom">自定义代码</ea-option>
@@ -120,88 +121,36 @@
 
               <!-- 动态配置区域 -->
               <div class="dynamic-config-section" :key="selectedEvent.id">
-                <!-- 显示提示配置 -->
+                <!-- 显示消息配置 -->
                 <MessageActionConfig
                   v-if="selectedEvent.action === 'message'"
                   v-model="selectedEvent.actionConfig"
                 />
 
+                <!-- 显示通知配置 -->
+                <NotificationActionConfig
+                  v-if="selectedEvent.action === 'notification'"
+                  v-model="selectedEvent.actionConfig"
+                />
+
                 <!-- 设置组件属性配置 -->
-                <template v-if="selectedEvent.action === 'setProp'">
-                  <div class="config-item">
-                    <label class="config-label">目标组件ID</label>
-                    <EaInput
-                      v-model="selectedEvent.actionConfig.targetComponentId"
-                      placeholder="如：button_123"
-                      size="small"
-                    />
-                  </div>
-                  <div class="config-item">
-                    <label class="config-label">属性名</label>
-                    <EaInput
-                      v-model="selectedEvent.actionConfig.propName"
-                      placeholder="如：loading"
-                      size="small"
-                    />
-                  </div>
-                  <div class="config-item">
-                    <label class="config-label">属性值</label>
-                    <EaSelect
-                      v-model="selectedEvent.actionConfig.propValue"
-                      size="small"
-                      class="w-full"
-                    >
-                      <ea-option :value="true">true</ea-option>
-                      <ea-option :value="false">false</ea-option>
-                    </EaSelect>
-                  </div>
-                </template>
+                <SetPropActionConfig
+                  v-if="selectedEvent.action === 'setProp'"
+                  v-model="selectedEvent.actionConfig"
+                />
 
                 <!-- 调用组件方法配置 -->
-                <template v-if="selectedEvent.action === 'callMethod'">
-                  <div class="config-item">
-                    <label class="config-label">目标组件ID</label>
-                    <EaInput
-                      v-model="selectedEvent.actionConfig.targetComponentId"
-                      placeholder="如：button_123"
-                      size="small"
-                    />
-                  </div>
-                  <div class="config-item">
-                    <label class="config-label">方法名</label>
-                    <EaInput
-                      v-model="selectedEvent.actionConfig.methodName"
-                      placeholder="如：focus"
-                      size="small"
-                    />
-                  </div>
-                </template>
+                <CallMethodActionConfig
+                  v-if="selectedEvent.action === 'callMethod'"
+                  v-model="selectedEvent.actionConfig"
+                />
 
                 <!-- 自定义代码配置 -->
-                <div v-if="selectedEvent.action === 'custom'" class="config-item">
-                  <label class="config-label">自定义代码</label>
-                  <div class="code-help">
-                    <ea-icon icon="icon-info" size="12" class="code-help-icon"></ea-icon>
-                    <span class="code-help-title">可用 API：</span>
-                    <div class="code-help-list">
-                      <code
-                        v-for="api in codeHelpApis"
-                        :key="api.name"
-                        class="code-help-item"
-                        :title="api.desc"
-                      >
-                        {{ api.name }}
-                      </code>
-                    </div>
-                  </div>
-                  <MonacoEditor
-                    v-if="dialogVisible"
-                    v-model="selectedEvent.actionConfig.code"
-                    language="javascript"
-                    height="200px"
-                    :extra-libs="editorExtraLibs"
-                  />
-                </div>
+                <CustomCodeActionConfig
+                  v-if="selectedEvent.action === 'custom'"
+                  v-model="selectedEvent.actionConfig"
+                  :visible="dialogVisible"
+                />
 
                 <!-- 动态配置区域结束 -->
               </div>
@@ -231,10 +180,13 @@
 
 <script setup>
   import { ref, computed } from 'vue'
-  import MonacoEditor from '../common/MonacoEditor.vue'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
   import MessageActionConfig from './special/MessageActionConfig.vue'
+  import NotificationActionConfig from './special/NotificationActionConfig.vue'
+  import SetPropActionConfig from './special/SetPropActionConfig.vue'
+  import CallMethodActionConfig from './special/CallMethodActionConfig.vue'
+  import CustomCodeActionConfig from './special/CustomCodeActionConfig.vue'
   import { generateUniqueId } from '@/utils/schemaHelper'
 
   const props = defineProps({
@@ -275,58 +227,6 @@
     { name: 'error', label: '错误' },
   ]
 
-  // 代码帮助 API 配置
-  const codeHelpApis = ref([
-    { name: '$event', desc: '原始事件对象' },
-    { name: '$component.get(id)', desc: '通过ID获取组件DOM元素' },
-    { name: '$component.setProp(id, prop, value)', desc: '通过ID设置组件属性' },
-    { name: '$component.getProp(id, prop)', desc: '通过ID获取组件属性' },
-    { name: '$component.call(id, method, ...args)', desc: '通过ID调用组件方法' },
-    { name: '$vars.get(name)', desc: '获取变量值' },
-    { name: '$vars.set(name, value)', desc: '设置变量值' },
-    { name: '$alias.get(alias)', desc: '通过别名获取组件ID' },
-    { name: '$alias.find(alias)', desc: '通过别名查找组件' },
-    { name: '$alias.getElement(alias)', desc: '通过别名获取DOM元素' },
-    { name: '$alias.setProp(alias, prop, value)', desc: '通过别名设置组件属性（推荐）' },
-    { name: '$alias.getProp(alias, prop)', desc: '通过别名获取组件属性（推荐）' },
-    { name: '$alias.call(alias, method, ...args)', desc: '通过别名调用组件方法（推荐）' },
-  ])
-
-  // Monaco Editor 类型定义（用于代码提示）
-  const editorExtraLibs = [
-    {
-      filePath: 'ts:global/event-api.d.ts',
-      content: `
-        /** 事件对象 */
-        declare const $event: Event;
-
-        /** 组件操作辅助对象 */
-        declare const $component: {
-          get(id: string): Element | null;
-          setProp(id: string, prop: string, value: any): void;
-          getProp(id: string, prop: string): any;
-          call(id: string, method: string, ...args: any[]): void;
-        };
-
-        /** 变量操作辅助对象 */
-        declare const $vars: {
-          get(name: string): any;
-          set(name: string, value: any): void;
-        };
-
-        /** 别名操作辅助对象 */
-        declare const $alias: {
-          get(alias: string): string | null;
-          find(alias: string): any | null;
-          getElement(alias: string): Element | null;
-          setProp(alias: string, prop: string, value: any): void;
-          getProp(alias: string, prop: string): any;
-          call(alias: string, method: string, ...args: any[]): void;
-        };
-      `,
-    },
-  ]
-
   // 可用事件列表
   const availableEvents = computed(() => {
     const predefinedEvents = props.events || []
@@ -363,6 +263,20 @@
           dangerouslyUseHTMLString: false,
           placement: 'top',
           offset: 16,
+        }
+      case 'notification':
+        return {
+          title: '通知',
+          message: '通知消息',
+          type: 'info',
+          duration: 3000,
+          showClose: true,
+          closeIcon: 'icon-cancel',
+          dangerouslyUseHTMLString: false,
+          placement: 'top-right',
+          icon: '',
+          zIndex: 0,
+          appendTo: 'body',
         }
       case 'setProp':
         return {
@@ -520,40 +434,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
-
-  .code-help {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 8px;
-    padding: 8px;
-    background-color: #f5f7fa;
-    border-radius: 4px;
-    font-size: 12px;
-  }
-
-  .code-help-icon {
-    color: #409eff;
-  }
-
-  .code-help-title {
-    color: #606266;
-    font-weight: 500;
-  }
-
-  .code-help-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .code-help-item {
-    padding: 2px 6px;
-    background-color: #e4e7ed;
-    border-radius: 3px;
-    color: #606266;
-    cursor: help;
   }
 
   /* 标签徽章样式 */

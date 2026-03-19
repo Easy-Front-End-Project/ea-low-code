@@ -1,0 +1,125 @@
+// Action Config 公共样式
+
+@mixin action-config-base {
+  .config-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .config-label {
+      font-size: 12px;
+      color: #606266;
+      font-weight: 500;
+    }
+  }
+}
+
+@mixin target-selector {
+  .target-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .mode-switch {
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .alias-input-wrapper,
+    .id-input-wrapper {
+      display: flex;
+      gap: 8px;
+
+      :deep(.ea-input) {
+        flex: 1;
+      }
+    }
+
+    .alias-hint {
+      font-size: 11px;
+      color: #909399;
+      margin-top: 4px;
+    }
+  }
+}
+
+@mixin component-selector-list {
+  .selector-list {
+    max-height: 300px;
+    overflow-y: auto;
+
+    .selector-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      border-bottom: 1px solid #ebeef5;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: #f5f7fa;
+      }
+
+      .alias-name,
+      .component-name {
+        font-size: 13px;
+        color: #303133;
+        font-weight: 500;
+      }
+
+      .alias-id,
+      .component-id {
+        font-size: 11px;
+        color: #909399;
+        margin-left: auto;
+      }
+    }
+  }
+}
+
+@mixin code-help {
+  .code-help {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 8px 12px;
+    background-color: #f5f7fa;
+    border-radius: 4px;
+    margin-bottom: 8px;
+
+    .code-help-icon {
+      color: #909399;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .code-help-title {
+      font-size: 12px;
+      color: #606266;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .code-help-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      flex: 1;
+
+      .code-help-item {
+        font-size: 11px;
+        color: #409eff;
+        background-color: #ecf5ff;
+        padding: 2px 6px;
+        border-radius: 3px;
+        cursor: help;
+        font-family: monospace;
+
+        &:hover {
+          background-color: #d9ecff;
+        }
+      }
+    }
+  }
+}

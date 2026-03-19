@@ -114,6 +114,20 @@ export function showMessage(actionConfig) {
 }
 
 /**
+ * 显示通知
+ * @param {Object} actionConfig - 通知配置
+ */
+export function showNotification(actionConfig) {
+  if (window.$notify && actionConfig.message) {
+    window.$notify(actionConfig)
+  } else if (actionConfig.message) {
+    alert(
+      actionConfig.title ? `${actionConfig.title}: ${actionConfig.message}` : actionConfig.message
+    )
+  }
+}
+
+/**
  * 调用组件方法
  * @param {string} componentId - 组件ID
  * @param {string} methodName - 方法名
@@ -121,22 +135,43 @@ export function showMessage(actionConfig) {
  */
 export function callComponentMethod(componentId, methodName, methodArgs = []) {
   const instanceStore = useComponentInstanceStore()
-  if (componentId && methodName) {
-    instanceStore.callComponentMethod(componentId, methodName, ...methodArgs)
+  const resolvedId = resolveComponentId(componentId)
+  if (resolvedId && methodName) {
+    instanceStore.callComponentMethod(resolvedId, methodName, ...methodArgs)
   }
 }
 
 /**
+ * 解析组件ID（支持 alias: 前缀）
+ * @param {string} componentIdOrAlias - 组件ID或别名（如：alias:submitBtn 或 button_123）
+ * @returns {string|null} 解析后的组件ID
+ */
+function resolveComponentId(componentIdOrAlias) {
+  if (!componentIdOrAlias) return null
+
+  // 支持 alias: 前缀格式
+  if (componentIdOrAlias.startsWith('alias:')) {
+    const alias = componentIdOrAlias.slice(6)
+    const schemaStore = useSchemaStore()
+    return schemaStore.getComponentIdByAlias(alias)
+  }
+
+  return componentIdOrAlias
+}
+
+/**
  * 设置组件属性
- * @param {string} componentId - 组件ID
+ * @param {string} componentId - 组件ID（支持 alias: 前缀）
  * @param {string} propName - 属性名
  * @param {*} propValue - 属性值
  */
 export function setComponentProp(componentId, propName, propValue) {
   const instanceStore = useComponentInstanceStore()
-  if (componentId && propName !== undefined) {
+  const resolvedId = resolveComponentId(componentId)
+
+  if (resolvedId && propName !== undefined) {
     const resolvedValue = resolveValue(propValue)
-    instanceStore.setComponentProp(componentId, propName, resolvedValue)
+    instanceStore.setComponentProp(resolvedId, propName, resolvedValue)
   }
 }
 
@@ -156,6 +191,10 @@ export function executeEvent(eventConfig, originalEvent) {
   switch (eventConfig.action) {
     case 'message':
       showMessage(actionConfig)
+      break
+
+    case 'notification':
+      showNotification(actionConfig)
       break
 
     case 'custom':

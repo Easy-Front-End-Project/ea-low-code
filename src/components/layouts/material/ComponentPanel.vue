@@ -98,7 +98,9 @@
       const allComponents = getComponentsByCategory(cat.value)
       // 过滤掉隐藏的子组件，但保留其他子组件用于平铺显示
       const visibleComponents = allComponents.filter(
-        comp => !comp.isChildComponent || !hiddenChildComponentsInPanel.includes(comp.type)
+        comp =>
+          (!comp.isChildComponent || !hiddenChildComponentsInPanel.includes(comp.type)) &&
+          !comp.isService
       )
       return {
         ...cat,

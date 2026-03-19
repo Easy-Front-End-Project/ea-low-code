@@ -208,6 +208,9 @@
     'ea-badge',
     'ea-avatar',
     'ea-dropdown',
+    'ea-popconfirm',
+    'ea-popover',
+    'ea-tooltip',
   ]
 
   // 是否为不可选中的组件

@@ -1,14 +1,13 @@
 <template>
-  <ea-input-number
-    ref="inputRef"
-    :value.attr="localValue"
+  <ea-radio-group
+    ref="radioGroupRef"
+    :value="localValue"
     :size="size"
-    :min="min"
-    :max="max"
-    :step="step"
     :disabled="disabled"
-    @ea-change.stop.prevent="handleChange"
-  />
+    @change="handleChange"
+  >
+    <slot></slot>
+  </ea-radio-group>
 </template>
 
 <script setup>
@@ -16,24 +15,12 @@
 
   const props = defineProps({
     modelValue: {
-      type: Number,
-      default: 0,
+      type: [String, Number, Boolean],
+      default: '',
     },
     size: {
       type: String,
       default: 'default',
-    },
-    min: {
-      type: Number,
-      default: -Infinity,
-    },
-    max: {
-      type: Number,
-      default: Infinity,
-    },
-    step: {
-      type: Number,
-      default: 1,
     },
     disabled: {
       type: Boolean,
@@ -43,13 +30,13 @@
 
   const emit = defineEmits(['update:modelValue', 'change'])
 
-  const inputRef = ref(null)
-  const localValue = ref(props.modelValue !== undefined ? props.modelValue : 0)
+  const radioGroupRef = ref(null)
+  const localValue = ref(props.modelValue)
 
   // 监听外部值变化
   watch(
     () => props.modelValue,
-    newVal => {
+    (newVal) => {
       if (newVal !== undefined && newVal !== localValue.value) {
         localValue.value = newVal
       }
@@ -59,7 +46,7 @@
 
   // 处理 change 事件
   function handleChange(event) {
-    const value = event.detail?.currentValue !== undefined ? event.detail.currentValue : event
+    const value = event.detail?.value
     if (value !== undefined && value !== localValue.value) {
       localValue.value = value
       emit('update:modelValue', value)
@@ -69,7 +56,7 @@
 
   // 暴露方法
   defineExpose({
-    focus: () => inputRef.value?.focus(),
-    blur: () => inputRef.value?.blur(),
+    focus: () => radioGroupRef.value?.focus(),
+    blur: () => radioGroupRef.value?.blur(),
   })
 </script>
