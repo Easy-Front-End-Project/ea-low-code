@@ -1,13 +1,13 @@
 <template>
   <div class="unit-input-wrapper flex gap-2">
     <EaInput
-      :model-value="inputValue"
+      :model-value="displayValue"
       @update:model-value="handleInputChange"
       class="prop-input flex-1"
       :placeholder="placeholder"
-      type="number"
     />
     <EaSelect
+      v-if="!isAutoValue"
       :model-value="unitValue"
       @update:model-value="handleUnitChange"
       class="unit-select w-20"
@@ -58,9 +58,20 @@
 
   const emit = defineEmits(['update:value'])
 
+  // 判断是否为 auto 值
+  const isAutoValue = computed(() => {
+    return String(props.value || '').toLowerCase() === 'auto'
+  })
+
   // 解析值和单位
   const parsedValue = computed(() => {
     const str = String(props.value || '')
+
+    // 如果是 auto，直接返回
+    if (str.toLowerCase() === 'auto') {
+      return { input: 'auto', unit: '' }
+    }
+
     // 匹配数字部分和单位部分
     const match = str.match(/^(\d[\d.]*)(.*)$/)
     if (match) {
@@ -75,10 +86,28 @@
   const inputValue = computed(() => parsedValue.value.input)
   const unitValue = computed(() => parsedValue.value.unit)
 
-  // 处理输入值变化 - 只允许输入数字
+  // 显示值：auto 时显示 auto，否则显示数字
+  const displayValue = computed(() => {
+    if (isAutoValue.value) {
+      return 'auto'
+    }
+    return inputValue.value
+  })
+
+  // 处理输入值变化 - 支持数字或 auto
   function handleInputChange(value) {
+    const strValue = String(value || '')
+      .trim()
+      .toLowerCase()
+
+    // 如果输入的是 auto，直接设置为 auto
+    if (strValue === 'auto') {
+      emit('update:value', 'auto')
+      return
+    }
+
     // 过滤非数字字符（只允许数字和小数点）
-    const numericValue = String(value).replace(/[^\d.]/g, '')
+    const numericValue = strValue.replace(/[^\d.]/g, '')
 
     // 确保只有一个小数点
     const parts = numericValue.split('.')

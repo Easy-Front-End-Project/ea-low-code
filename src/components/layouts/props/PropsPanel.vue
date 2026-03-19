@@ -1,10 +1,5 @@
 <template>
   <div class="props-panel flex flex-col h-full">
-    <!-- 面板标题 -->
-    <div class="h-12 flex items-center px-4 border-b border-gray-200">
-      <span class="font-medium text-gray-800">属性配置</span>
-    </div>
-
     <!-- 内容区域 -->
     <div class="flex-1 overflow-y-auto pb-32">
       <!-- 未选中组件时显示 -->
@@ -18,16 +13,9 @@
       <!-- 选中组件后显示属性表单 -->
       <div v-else class="p-4 space-y-6" :key="selectedComponent.id">
         <!-- 组件信息 -->
-        <div class="component-info pb-4 border-b border-gray-100">
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-2">
-              <ea-icon
-                :name="getComponentIcon(selectedComponent.type)"
-                size="20"
-                color="#3b82f6"
-              ></ea-icon>
-              <span class="font-medium text-gray-800">{{ componentMeta?.name }}</span>
-            </div>
+        <ea-card class="component-info-card">
+          <div slot="header" class="flex items-center justify-between">
+            <span class="font-medium text-gray-800">{{ componentMeta?.name }}</span>
             <ea-button
               type="danger"
               size="small"
@@ -44,7 +32,7 @@
             <div class="flex items-center gap-2 mt-2">
               <span>别名:</span>
               <div v-if="!isEditingAlias" class="flex items-center gap-2">
-                <span class="text-blue-600">{{ selectedComponent.alias || '未设置' }}</span>
+                <span class="text-blue-600 w-full">{{ selectedComponent.alias || '未设置' }}</span>
                 <ea-button type="primary" size="small" icon="icon-pencil" @click="startEditAlias">
                   {{ selectedComponent.alias ? '修改' : '设置' }}
                 </ea-button>
@@ -54,7 +42,7 @@
                   v-model="aliasInput"
                   size="small"
                   placeholder="输入别名"
-                  style="width: 120px"
+                  class="w-full"
                 ></ea-input>
                 <ea-button
                   type="success"
@@ -71,53 +59,78 @@
               </div>
             </div>
           </div>
-        </div>
+        </ea-card>
 
-        <!-- 目标插槽配置（排在最上面） -->
-        <SlotConfig
-          :parent-slots="parentComponentMeta?.slots"
-          :slot-value="selectedComponent.props?.slot || 'default'"
-          @slot-change="handleSlotChange"
-        />
+        <!-- 使用 ea-tabs 拆分成3个面板 -->
+        <ea-tabs active="props">
+          <!-- 属性面板 -->
+          <ea-tab panel="props">属性</ea-tab>
+          <ea-tab-panel name="props">
+            <div class="space-y-4 pt-2">
+              <!-- 目标插槽配置 -->
+              <SlotConfig
+                :parent-slots="parentComponentMeta?.slots"
+                :slot-value="selectedComponent.props?.slot || 'default'"
+                @slot-change="handleSlotChange"
+              />
 
-        <!-- 插槽 Scope 数据绑定配置 -->
-        <SlotScopeConfig
-          :parent-slots="parentComponentMeta?.slots"
-          :slot-value="selectedComponent.props?.slot || 'default'"
-          :scope="selectedComponent.props?.scope || ''"
-          @scope-change="handleScopeChange"
-        />
+              <!-- 插槽 Scope 数据绑定配置 -->
+              <SlotScopeConfig
+                :parent-slots="parentComponentMeta?.slots"
+                :slot-value="selectedComponent.props?.slot || 'default'"
+                :scope="selectedComponent.props?.scope || ''"
+                @scope-change="handleScopeChange"
+              />
 
-        <!-- 特殊配置：根据组件类型动态渲染对应的配置组件 -->
-        <SpecialConfigRenderer
-          v-if="hasSpecialConfig"
-          :component="selectedComponent"
-          :special-config="componentMeta?.specialConfig"
-        />
+              <!-- 特殊配置：根据组件类型动态渲染对应的配置组件 -->
+              <SpecialConfigRenderer
+                v-if="hasSpecialConfig"
+                :component="selectedComponent"
+                :special-config="componentMeta?.specialConfig"
+              />
 
-        <!-- 属性配置 -->
-        <PropConfig
-          :props="componentPropsWithoutSlot"
-          :component-props="selectedComponent.props"
-          @prop-change="handlePropChange"
-        />
+              <!-- 属性配置 -->
+              <PropConfig
+                :props="componentPropsWithoutSlot"
+                :component-props="selectedComponent.props"
+                @prop-change="handlePropChange"
+              />
+            </div>
+          </ea-tab-panel>
 
-        <!-- 样式配置 -->
-        <StyleConfig
-          :component-type="selectedComponent.type"
-          :component-props="selectedComponent.props"
-          :style="selectedComponent.style"
-          :css-variables="selectedComponent.cssVariables"
-          @style-change="handleStyleChange"
-          @css-variable-change="handleCssVariableChange"
-        />
+          <!-- 基础样式面板 -->
+          <ea-tab panel="baseStyle">基础样式</ea-tab>
+          <ea-tab-panel name="baseStyle">
+            <div class="pt-2">
+              <BaseStyleConfig :style="selectedComponent.style" @style-change="handleStyleChange" />
+            </div>
+          </ea-tab-panel>
 
-        <!-- 事件配置 -->
-        <EventConfig
-          :events="componentMeta?.events"
-          :component-events="selectedComponent.events"
-          @event-change="handleEventChange"
-        />
+          <!-- 组件样式面板 -->
+          <ea-tab panel="componentStyle">组件样式</ea-tab>
+          <ea-tab-panel name="componentStyle">
+            <div class="pt-2">
+              <ComponentStyleConfig
+                :component-type="selectedComponent.type"
+                :component-props="selectedComponent.props"
+                :css-variables="selectedComponent.cssVariables"
+                @css-variable-change="handleCssVariableChange"
+              />
+            </div>
+          </ea-tab-panel>
+
+          <!-- 事件面板 -->
+          <ea-tab panel="events">事件</ea-tab>
+          <ea-tab-panel name="events">
+            <div class="pt-2">
+              <EventConfig
+                :events="componentMeta?.events"
+                :component-events="selectedComponent.events"
+                @event-change="handleEventChange"
+              />
+            </div>
+          </ea-tab-panel>
+        </ea-tabs>
       </div>
     </div>
   </div>
@@ -128,7 +141,8 @@
   import { useSchemaStore } from '@/stores/designer/schema'
   import { getComponentMeta, getRemoteComponentMetaList } from '@/constants/componentMeta'
   import PropConfig from '@/components/configs/PropConfig.vue'
-  import StyleConfig from '@/components/configs/StyleConfig.vue'
+  import BaseStyleConfig from '@/components/configs/BaseStyleConfig.vue'
+  import ComponentStyleConfig from '@/components/configs/ComponentStyleConfig.vue'
   import EventConfig from '@/components/configs/EventConfig.vue'
   import SlotConfig from '@/components/configs/SlotConfig.vue'
   import SlotScopeConfig from '@/components/configs/SlotScopeConfig.vue'
@@ -225,39 +239,6 @@
     return getComponentMeta(parent.type)
   })
 
-  // 获取组件图标
-  function getComponentIcon(type) {
-    // 远程组件使用 link 图标
-    if (type?.startsWith('remote-')) {
-      return 'link'
-    }
-
-    const iconMap = {
-      'ea-button': 'button',
-      'ea-icon': 'star',
-      'ea-input': 'edit',
-      'ea-select': 'list',
-      'ea-checkbox': 'check-square',
-      'ea-checkbox-group': 'check-square',
-      'ea-radio': 'radio',
-      'ea-switch': 'switch',
-      'ea-container': 'container',
-      'ea-header': 'header',
-      'ea-aside': 'aside',
-      'ea-main': 'main',
-      'ea-card': 'card',
-      'ea-table': 'table',
-      'ea-pagination': 'page',
-      'ea-menu': 'menu',
-      'ea-tabs': 'tabs',
-      'ea-breadcrumb': 'breadcrumb',
-      'ea-dialog': 'dialog',
-      'ea-alert': 'alert',
-      'ea-message': 'message',
-    }
-    return iconMap[type] || 'cube'
-  }
-
   // 属性变更
   function handlePropChange(propName, value) {
     if (!selectedComponent.value) return
@@ -328,25 +309,5 @@
     background-color: #f9fafb;
     padding: 12px;
     border-radius: 8px;
-  }
-
-  .section-title {
-    @apply text-sm font-medium text-gray-700 mb-3;
-  }
-
-  .prop-item {
-    @apply flex flex-col gap-1;
-  }
-
-  .prop-label {
-    @apply text-xs text-gray-500;
-  }
-
-  .prop-input {
-    @apply px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
-  }
-
-  .event-item {
-    @apply p-3 bg-gray-50 rounded-lg;
   }
 </style>

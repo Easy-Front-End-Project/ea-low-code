@@ -1,43 +1,10 @@
 <template>
   <div class="props-section">
-    <h4 class="section-title">样式</h4>
+    <h4 class="section-title">组件样式</h4>
     <div class="space-y-3">
-      <!-- 基础样式 -->
-      <div class="prop-item">
-        <label class="prop-label">宽度</label>
-        <UnitInput
-          :value="style?.width || ''"
-          @update:value="handleInlineStyleChange('width', $event)"
-          placeholder="auto"
-        />
-      </div>
-      <div class="prop-item">
-        <label class="prop-label">高度</label>
-        <UnitInput
-          :value="style?.height || ''"
-          @update:value="handleInlineStyleChange('height', $event)"
-          placeholder="auto"
-        />
-      </div>
-      <div class="prop-item">
-        <label class="prop-label">外边距(px)</label>
-        <SpaceInput
-          :value="style?.margin || ''"
-          @update:value="handleInlineStyleChange('margin', $event)"
-        />
-      </div>
-      <div class="prop-item">
-        <label class="prop-label">内边距(px)</label>
-        <SpaceInput
-          :value="style?.padding || ''"
-          @update:value="handleInlineStyleChange('padding', $event)"
-        />
-      </div>
-
       <!-- 动态 CSS 变量样式（根据 type 属性变化） -->
       <template v-if="dynamicCssVariablesList.length > 0">
-        <div class="divider"></div>
-        <h5 class="subsection-title">组件样式</h5>
+        <h5 class="subsection-title">类型相关样式</h5>
         <div v-for="variable in dynamicCssVariablesList" :key="variable.name" class="prop-item">
           <label class="prop-label">{{ variable.label }}</label>
           <!-- 颜色类型变量 -->
@@ -60,8 +27,7 @@
 
       <!-- 通用的 CSS 变量样式（不随 type 变化） -->
       <template v-if="styleConfig?.cssVariables?.length > 0">
-        <div class="divider"></div>
-        <h5 class="subsection-title">通用样式</h5>
+        <h5 class="subsection-title">通用主题样式</h5>
         <div v-for="variable in styleConfig.cssVariables" :key="variable.name" class="prop-item">
           <label class="prop-label">{{ variable.label }}</label>
           <!-- 颜色类型变量 -->
@@ -88,6 +54,14 @@
           />
         </div>
       </template>
+
+      <!-- 无组件样式时显示提示 -->
+      <div
+        v-if="dynamicCssVariablesList.length === 0 && !styleConfig?.cssVariables?.length"
+        class="empty-tip"
+      >
+        <p class="text-gray-400 text-sm text-center py-4">该组件暂无自定义样式配置</p>
+      </div>
     </div>
   </div>
 </template>
@@ -96,7 +70,6 @@
   import { computed } from 'vue'
   import { getComponentMeta } from '@/constants/componentMeta'
   import UnitInput from '../common/UnitInput.vue'
-  import SpaceInput from '../common/SpaceInput.vue'
 
   const props = defineProps({
     componentType: {
@@ -107,17 +80,13 @@
       type: Object,
       default: () => ({}),
     },
-    style: {
-      type: Object,
-      default: () => ({}),
-    },
     cssVariables: {
       type: Object,
       default: () => ({}),
     },
   })
 
-  const emit = defineEmits(['style-change', 'css-variable-change'])
+  const emit = defineEmits(['css-variable-change'])
 
   // 获取组件的样式配置
   const styleConfig = computed(() => {
@@ -151,11 +120,6 @@
       }
     })
   })
-
-  // 处理内联样式变更
-  function handleInlineStyleChange(styleName, value) {
-    emit('style-change', styleName, value, 'inline')
-  }
 
   // 处理 CSS 变量样式变更
   function handleCssVariableChange(variableName, value) {
@@ -203,9 +167,7 @@
     color: #6b7280;
   }
 
-  .divider {
-    height: 1px;
-    background-color: #e5e7eb;
-    margin: 0.75rem 0;
+  .empty-tip {
+    padding: 1rem 0;
   }
 </style>

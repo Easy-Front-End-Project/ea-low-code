@@ -1,5 +1,5 @@
 <template>
-  <ea-container class="h-screen w-screen">
+  <ea-container class="h-screen w-screen" direction="vertical">
     <!-- 顶部工具栏 -->
     <ea-header height="60px" class="bg-white border-b border-gray-200">
       <Toolbar class="h-full" />
@@ -68,7 +68,7 @@
 
           <!-- 右侧：组件属性配置 -->
           <ea-aside
-            :width="rightAsideCollapsed ? '0px' : '370px'"
+            :width="rightAsideCollapsed ? '0px' : '430px'"
             class="bg-white border-l border-gray-200 relative transition-all duration-300"
           >
             <div v-show="!rightAsideCollapsed" class="h-full w-full">

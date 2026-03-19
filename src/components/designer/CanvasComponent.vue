@@ -63,9 +63,9 @@
         v-on="componentEventListeners"
       >
         <!-- 文本内容 -->
-        <ea-text v-if="hasChildrenText" type="normal" size="medium">
+        <template v-if="hasChildrenText">
           {{ resolvedChildrenText }}
-        </ea-text>
+        </template>
 
         <!-- 子组件 -->
         <template v-else>
@@ -417,12 +417,12 @@
     return listeners
   })
 
+  // 外层容器样式
   const componentStyle = computed(() => ({
-    ...props.component.style,
     position: props.component.style?.position === 'absolute' ? 'absolute' : 'relative',
   }))
 
-  // 内部 EA-UI 组件样式
+  // 内部 EA-UI 组件样式（所有样式 + CSS 变量）
   const componentInnerStyle = computed(() => ({
     ...props.component.style,
     ...props.component.cssVariables,

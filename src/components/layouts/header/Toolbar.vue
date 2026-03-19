@@ -14,12 +14,12 @@
 
     <!-- 中间：操作按钮 -->
     <div class="flex items-center gap-2">
-      <ea-button text :disabled="!canUndo" @click="handleUndo" title="撤销">
+      <!-- <ea-button text :disabled="!canUndo" @click="handleUndo" title="撤销">
         <span>撤销</span>
       </ea-button>
       <ea-button text :disabled="!canRedo" @click="handleRedo" title="重做">
         <span>重做</span>
-      </ea-button>
+      </ea-button> -->
       <div class="w-px h-6 bg-gray-300 mx-2"></div>
       <ea-button text @click="handleClear" title="清空">
         <span>清空</span>
@@ -28,6 +28,9 @@
         <span>大纲</span>
       </ea-button>
       <div class="w-px h-6 bg-gray-300 mx-2"></div>
+      <!-- <ea-button text @click="handleLoadExample" title="加载示例">
+        <span>示例</span>
+      </ea-button> -->
     </div>
 
     <!-- 右侧：变量、预览和导出 -->
@@ -68,6 +71,7 @@
   import { ref } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
   import { exportSchemaToJson, importSchemaFromJson } from '@/utils/schemaHelper'
+  import { exampleSchema } from '@/constants/exampleSchema'
   import ComponentTree from '@/components/designer/ComponentTree.vue'
   import VariableManager from '@/components/designer/VariableManager.vue'
   import RemoteComponentManager from '@/components/designer/RemoteComponentManager.vue'
@@ -119,6 +123,17 @@
     }
   }
 
+  // 加载示例 Schema - 首页/落地页
+  function handleLoadExample() {
+    if (schemaStore.components.length > 0) {
+      if (!confirm('当前画布已有内容，加载示例将清空现有内容，是否继续？')) {
+        return
+      }
+    }
+
+    schemaStore.importSchema(exampleSchema)
+  }
+
   function handlePreview() {
     schemaStore.setPreviewMode(true)
   }
@@ -144,7 +159,7 @@
     if (!file) return
 
     const reader = new FileReader()
-    reader.onload = (e) => {
+    reader.onload = e => {
       try {
         const json = e.target.result
         const schema = importSchemaFromJson(json)
