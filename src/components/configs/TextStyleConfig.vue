@@ -212,38 +212,10 @@
 </script>
 
 <style scoped>
-  .config-group {
-    margin-bottom: 1rem;
-  }
-
-  .group-title {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #6b7280;
-    margin-bottom: 0.5rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
+  @import './config-styles.css';
 
   .prop-row {
-    display: flex;
     gap: 1rem;
-  }
-
-  .prop-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .prop-item.flex-1 {
-    flex: 1;
-  }
-
-  .prop-label {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: #6b7280;
   }
 
   .font-style-buttons,
@@ -265,16 +237,6 @@
 
   .align-tag {
     font-size: 12px;
-  }
-
-  .color-input-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .color-picker {
-    flex-shrink: 0;
   }
 
   .color-text-input {

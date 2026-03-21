@@ -93,40 +93,16 @@
         <ea-icon name="link" variant="solid" size="12"></ea-icon>
       </ea-button>
     </div>
-
-    <!-- 变量选择对话框 -->
-    <VariableSelector
-      :visible="selectorVisible"
-      @select="handleSelectVariable"
-      @close="selectorVisible = false"
-    />
-
-    <!-- MonacoEditor 弹窗 -->
-    <ea-dialog
-      :visible="editorVisible"
-      :title="editorTitle"
-      width="600px"
-      @close="handleCloseEditor"
-    >
-      <div class="editor-content">
-        <MonacoEditor v-if="editorVisible" v-model="editorValue" language="json" height="300px" />
-      </div>
-      <div slot="footer" class="dialog-footer">
-        <ea-button @click="handleCloseEditor">取消</ea-button>
-        <ea-button type="primary" @click="handleSaveEditor">保存</ea-button>
-      </div>
-    </ea-dialog>
   </div>
 </template>
 
 <script setup>
-  import { ref, computed } from 'vue'
-  import VariableSelector from '@/components/designer/VariableSelector.vue'
+  import { computed } from 'vue'
+  import { useGlobalDialogs } from '@/composables/useGlobalDialogs.js'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
   import EaSwitch from '@/components/ea-ui-wrap/EaSwitch.vue'
   import UnitInput from '@/components/common/UnitInput.vue'
-  import MonacoEditor from '@/components/common/MonacoEditor.vue'
 
   const props = defineProps({
     value: {
@@ -154,9 +130,7 @@
 
   const emit = defineEmits(['update:value'])
 
-  const selectorVisible = ref(false)
-  const editorVisible = ref(false)
-  const editorValue = ref('')
+  const { openVariableSelector, openEditor } = useGlobalDialogs()
 
   // 判断当前值是否是变量绑定
   const isVariable = computed(() => {
@@ -335,17 +309,16 @@
   }
 
   // 显示变量选择器
-  function handleShowVariableSelector() {
-    selectorVisible.value = true
-  }
-
-  // 选择变量
-  function handleSelectVariable(variableName) {
-    emit('update:value', {
-      type: 'variable',
-      value: variableName,
-    })
-    selectorVisible.value = false
+  async function handleShowVariableSelector() {
+    try {
+      const variableName = await openVariableSelector()
+      emit('update:value', {
+        type: 'variable',
+        value: variableName,
+      })
+    } catch {
+      // 用户取消选择，不做处理
+    }
   }
 
   // 清除变量绑定
@@ -354,31 +327,28 @@
   }
 
   // 打开编辑器
-  function handleOpenEditor() {
+  async function handleOpenEditor() {
     // 将值转换为 JSON 字符串显示
+    let initialValue
     try {
       if (props.value && typeof props.value === 'object') {
-        editorValue.value = JSON.stringify(props.value, null, 2)
+        initialValue = JSON.stringify(props.value, null, 2)
       } else {
-        editorValue.value = resolvedInputType.value === 'array' ? '[]' : '{}'
+        initialValue = resolvedInputType.value === 'array' ? '[]' : '{}'
       }
     } catch {
-      editorValue.value = resolvedInputType.value === 'array' ? '[]' : '{}'
+      initialValue = resolvedInputType.value === 'array' ? '[]' : '{}'
     }
-    editorVisible.value = true
-  }
 
-  // 关闭编辑器
-  function handleCloseEditor() {
-    editorVisible.value = false
-    editorValue.value = ''
-  }
-
-  // 保存编辑器内容
-  function handleSaveEditor() {
     try {
+      const result = await openEditor({
+        title: editorTitle.value,
+        value: initialValue,
+        language: 'json',
+      })
+
       // 解析 JSON
-      const parsedValue = JSON.parse(editorValue.value)
+      const parsedValue = JSON.parse(result)
 
       // 验证类型
       if (resolvedInputType.value === 'array' && !Array.isArray(parsedValue)) {
@@ -394,9 +364,11 @@
       }
 
       emit('update:value', parsedValue)
-      handleCloseEditor()
     } catch (error) {
-      alert('JSON 格式错误，请检查输入')
+      // 用户取消或 JSON 格式错误
+      if (error.message !== 'User cancelled') {
+        alert('JSON 格式错误，请检查输入')
+      }
     }
   }
 </script>
@@ -451,18 +423,6 @@
 
   .variable-tag span {
     flex: 1;
-  }
-
-  .editor-content {
-    padding: 1rem;
-  }
-
-  .dialog-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem;
-    padding: 1rem;
-    border-top: 1px solid #e5e7eb;
   }
 
   .w-full {

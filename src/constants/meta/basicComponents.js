@@ -216,7 +216,12 @@ export const basicComponents = [
         description: {
           type: 'ea-link',
           content: '图标来源：Font Awesome',
-          href: 'https://fontawesome.com/icons',
+          props: {
+            href: 'https://fontawesome.com/icons',
+            target: '_blank',
+            type: 'primary',
+            style: 'font-size: 10px;',
+          },
         },
       },
       {
@@ -229,7 +234,6 @@ export const basicComponents = [
           { label: 'Sharp', value: 'sharp' },
           { label: 'Brands', value: 'brands' },
         ],
-        description: '图标家族：classic、sharp、brands',
       },
       {
         name: 'variant',
@@ -243,7 +247,6 @@ export const basicComponents = [
           { label: 'Thin', value: 'thin' },
           { label: 'Duotone', value: 'duotone' },
         ],
-        description: '图标样式：solid、regular、light、thin、duotone',
       },
       {
         name: 'size',

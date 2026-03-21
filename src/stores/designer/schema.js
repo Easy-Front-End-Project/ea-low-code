@@ -130,7 +130,7 @@ export const useSchemaStore = defineStore('schema', () => {
    * 更新组件样式
    * @param {string} componentId - 组件ID
    * @param {Object} style - 新样式
-   * @param {string} styleType - 样式类型：'inline' | 'cssVariable'
+   * @param {string} styleType - 样式类型：'inline' | 'cssVariable' | 'position' | 'customCSS'
    */
   function updateComponentStyle(componentId, style, styleType = 'inline') {
     const component = findComponentById(pageSchema.value.components, componentId)
@@ -141,6 +141,15 @@ export const useSchemaStore = defineStore('schema', () => {
           component.cssVariables = {}
         }
         Object.assign(component.cssVariables, style)
+      } else if (styleType === 'position') {
+        // 定位样式存储在单独的字段中，用于绑定到容器
+        if (!component.positionStyle) {
+          component.positionStyle = {}
+        }
+        Object.assign(component.positionStyle, style)
+      } else if (styleType === 'customCSS') {
+        // 自定义 CSS 直接存储为字符串
+        component.customCSS = style
       } else {
         // 普通内联样式
         if (!component.style) {

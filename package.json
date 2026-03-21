@@ -20,6 +20,7 @@
     "@vueuse/core": "^14.2.1",
     "easy-component-ui": "latest",
     "lodash-es": "^4.17.23",
+    "monaco-editor": "^0.55.1",
     "pinia": "^3.0.4",
     "sortablejs": "^1.15.7",
     "vue": "^3.5.29",
@@ -41,6 +42,7 @@
     "rimraf": "^6.0.1",
     "unocss": "^66.6.2",
     "vite": "^7.3.1",
+    "vite-plugin-monaco-editor": "^1.1.0",
     "vite-plugin-vue-devtools": "^8.0.6"
   },
   "engines": {

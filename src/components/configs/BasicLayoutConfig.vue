@@ -83,30 +83,7 @@
 </script>
 
 <style scoped>
-  .config-group {
-    margin-bottom: 1rem;
-  }
-
-  .group-title {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #6b7280;
-    margin-bottom: 0.5rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .prop-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .prop-label {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: #6b7280;
-  }
+  @import './config-styles.css';
 
   .opacity-control {
     padding: 0.5rem 0;

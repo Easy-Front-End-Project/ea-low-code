@@ -4,7 +4,7 @@
 
 <script setup>
   import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
-  import loader from '@monaco-editor/loader'
+  import * as monaco from 'monaco-editor'
 
   const props = defineProps({
     modelValue: {
@@ -40,17 +40,9 @@
     }
 
     try {
-      // 加载 monaco-editor
-      const monaco = await loader.init()
-
-      if (!editorContainer.value) {
-        console.warn('[MonacoEditor] editorContainer became null after loader.init(), skipping initialization')
-        return
-      }
-
       // 添加自定义类型定义（用于代码提示）
       if (props.extraLibs && props.extraLibs.length > 0) {
-        props.extraLibs.forEach((lib) => {
+        props.extraLibs.forEach(lib => {
           monaco.languages.typescript.javascriptDefaults.addExtraLib(lib.content, lib.filePath)
         })
       }
@@ -96,11 +88,11 @@
   // 监听外部值变化
   watch(
     () => props.modelValue,
-    (newValue) => {
+    newValue => {
       if (editor && newValue !== undefined && editor.getValue() !== newValue) {
         editor.setValue(newValue)
       }
-    },
+    }
   )
 
   onBeforeUnmount(() => {

@@ -1,14 +1,14 @@
 <template>
   <ea-input
     ref="inputRef"
-    :value="modelValue"
+    :value="localValue"
     :size="size"
     :placeholder="placeholder"
     :disabled="disabled"
     :clearable="clearable"
     :type="type"
     :rows="rows"
-    @input="handleInput"
+    @input.stop.prevent="handleInput"
     @ea-clear="handleClear"
   >
     <div v-if="$slots.prefix" slot="prepend">
@@ -57,17 +57,17 @@
   const emit = defineEmits(['update:modelValue', 'change', 'input', 'clear'])
 
   const inputRef = ref(null)
-  const localValue = ref(props.modelValue)
+  const localValue = ref(props.modelValue !== undefined ? props.modelValue : '')
 
   // 监听外部值变化
   watch(
     () => props.modelValue,
-    (newVal) => {
-      if (newVal !== localValue.value) {
+    newVal => {
+      if (newVal !== undefined && newVal !== localValue.value) {
         localValue.value = newVal
       }
     },
-    { immediate: true },
+    { immediate: true }
   )
 
   // 处理 input 事件

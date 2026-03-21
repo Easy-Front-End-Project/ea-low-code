@@ -23,7 +23,7 @@
         <template v-else>
           <div class="id-input-wrapper">
             <EaInput v-model="idValue" placeholder="输入组件ID，如：button_123" size="small" />
-            <ea-button type="primary" size="small" @click="showComponentSelector = true">
+            <ea-button type="primary" size="small" @click="handleOpenComponentSelector">
               选择
             </ea-button>
           </div>
@@ -45,36 +45,12 @@
         <ea-option :value="false">false</ea-option>
       </EaSelect>
     </div>
-
-    <!-- 组件选择弹窗 -->
-    <ea-dialog
-      :visible="showComponentSelector"
-      title="选择组件"
-      width="400px"
-      @close="showComponentSelector = false"
-    >
-      <div class="selector-list">
-        <div
-          v-for="comp in flattenComponents"
-          :key="comp.id"
-          class="selector-item"
-          :style="{ paddingLeft: `${comp.level * 16 + 12}px` }"
-          @click="selectComponent(comp.id)"
-        >
-          <ea-icon name="folder" variant="solid" v-if="comp.children?.length" size="14"></ea-icon>
-          <ea-icon name="file" variant="solid" v-else size="14"></ea-icon>
-          <span class="component-name">{{ comp.name }}</span>
-          <span class="component-id">{{ comp.id }}</span>
-        </div>
-        <ea-empty v-if="flattenComponents.length === 0" description="暂无组件"></ea-empty>
-      </div>
-    </ea-dialog>
   </div>
 </template>
 
 <script setup>
   import { computed, ref, watch } from 'vue'
-  import { useSchemaStore } from '@/stores/designer/schema'
+  import { useGlobalDialogs } from '@/composables/useGlobalDialogs.js'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
   import EaRadioGroup from '@/components/ea-ui-wrap/EaRadioGroup.vue'
@@ -89,10 +65,7 @@
 
   const emit = defineEmits(['update:modelValue'])
 
-  const schemaStore = useSchemaStore()
-
-  // 弹窗显示状态
-  const showComponentSelector = ref(false)
+  const { openComponentSelector } = useGlobalDialogs()
 
   // 目标模式：alias 或 id
   const targetMode = ref('id')
@@ -109,47 +82,14 @@
     set: val => emit('update:modelValue', val),
   })
 
-  // 扁平化组件列表（用于选择器）
-  const flattenComponents = computed(() => {
-    const result = []
-    const components = schemaStore.pageSchema?.components || []
-
-    function flatten(components, level = 0) {
-      for (const comp of components) {
-        result.push({
-          id: comp.id,
-          name: getComponentName(comp),
-          level,
-          children: comp.children,
-        })
-        if (comp.children?.length) {
-          flatten(comp.children, level + 1)
-        }
-      }
+  // 打开组件选择器
+  async function handleOpenComponentSelector() {
+    try {
+      const componentId = await openComponentSelector()
+      idValue.value = componentId
+    } catch {
+      // 用户取消，不做处理
     }
-
-    flatten(components)
-    return result
-  })
-
-  // 获取组件显示名称
-  function getComponentName(component) {
-    if (component.props?.children) {
-      return `${component.type} - ${String(component.props.children).slice(0, 20)}`
-    }
-    if (component.props?.label) {
-      return `${component.type} - ${component.props.label}`
-    }
-    if (component.props?.title) {
-      return `${component.type} - ${component.props.title}`
-    }
-    return component.type
-  }
-
-  // 选择组件
-  function selectComponent(id) {
-    idValue.value = id
-    showComponentSelector.value = false
   }
 
   // 监听输入变化，更新 modelValue.targetComponentId

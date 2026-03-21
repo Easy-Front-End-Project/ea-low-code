@@ -92,7 +92,12 @@
           <ea-tab panel="baseStyle">基础样式</ea-tab>
           <ea-tab-panel name="baseStyle">
             <div class="pt-2">
-              <BaseStyleConfig :style="selectedComponent.style" @style-change="handleStyleChange" />
+              <BaseStyleConfig
+                :style="selectedComponent.style"
+                :position-style="selectedComponent.positionStyle"
+                :custom-c-s-s="selectedComponent.customCSS"
+                @style-change="handleStyleChange"
+              />
             </div>
           </ea-tab-panel>
 
@@ -250,7 +255,16 @@
   // 样式变更
   function handleStyleChange(styleName, value, styleType = 'inline') {
     if (!selectedComponent.value) return
-    schemaStore.updateComponentStyle(selectedComponent.value.id, { [styleName]: value }, styleType)
+    // 处理自定义 CSS（直接传递字符串值）
+    if (styleType === 'customCSS') {
+      schemaStore.updateComponentStyle(selectedComponent.value.id, value, 'customCSS')
+    } else {
+      schemaStore.updateComponentStyle(
+        selectedComponent.value.id,
+        { [styleName]: value },
+        styleType
+      )
+    }
   }
 
   // CSS 变量样式变更

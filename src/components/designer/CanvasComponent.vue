@@ -1,4 +1,6 @@
 <template>
+  <!-- 自定义样式 -->
+  <component :is="'style'" v-if="processedCustomCSS" v-html="processedCustomCSS"></component>
   <div
     class="canvas-component"
     :class="{
@@ -60,6 +62,7 @@
         ref="componentRef"
         v-bind="componentProps"
         :style="componentInnerStyle"
+        :class="customClassName"
         v-on="componentEventListeners"
       >
         <!-- 文本内容 -->
@@ -124,6 +127,7 @@
   import { getComponentMeta, getRemoteComponentMetaList } from '@/constants/componentMeta'
   import { loadRemoteComponent } from '@/utils/loadRemoteComponent'
   import { executeEvent } from '@/utils/eventExecutor'
+  import { processCustomCSS } from '@/utils/cssProcessor'
 
   const props = defineProps({
     component: {
@@ -415,16 +419,31 @@
     return listeners
   })
 
-  // 外层容器样式
+  // 外层容器样式（包含定位样式）
   const componentStyle = computed(() => ({
-    position: props.component.style?.position === 'absolute' ? 'absolute' : 'relative',
+    ...props.component.positionStyle,
   }))
 
-  // 内部 EA-UI 组件样式（所有样式 + CSS 变量）
-  const componentInnerStyle = computed(() => ({
-    ...props.component.style,
-    ...props.component.cssVariables,
-  }))
+  // 内部 EA-UI 组件样式（所有样式 + CSS 变量，排除定位样式）
+  const componentInnerStyle = computed(() => {
+    const { position, top, right, bottom, left, zIndex, overflow, ...restStyle } =
+      props.component.style || {}
+    return {
+      ...restStyle,
+      ...props.component.cssVariables,
+    }
+  })
+
+  // 自定义样式类名
+  const customClassName = computed(() => {
+    return props.component.customCSS ? `custom-${props.component.id}` : ''
+  })
+
+  // 处理后的自定义 CSS
+  const processedCustomCSS = computed(() => {
+    if (!props.component.customCSS) return ''
+    return processCustomCSS(props.component.customCSS, props.component.id)
+  })
 
   // 解析后的 children 文本
   const resolvedChildrenText = computed(() => resolveValue(props.component.props?.children) || '')
