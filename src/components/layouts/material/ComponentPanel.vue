@@ -3,12 +3,7 @@
     <!-- 搜索框 -->
     <div class="p-3 border-b border-gray-200">
       <div class="relative">
-        <EaInput v-model="searchQuery" placeholder="搜索组件..." prefix-icon="icon-search" />
-        <ea-icon
-          name="icon-search"
-          size="16"
-          class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-        ></ea-icon>
+        <EaInput v-model="searchQuery" placeholder="搜索组件..." prefix-icon="magnifying-glass" />
       </div>
     </div>
 

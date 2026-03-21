@@ -42,7 +42,7 @@
               title="左对齐"
               class="align-tag"
             >
-              <ea-icon icon="icon-align-left"></ea-icon>
+              <ea-icon name="align-left" variant="solid"></ea-icon>
             </ea-check-tag>
             <ea-check-tag
               :checked="textAlign === 'center'"
@@ -50,7 +50,7 @@
               title="居中"
               class="align-tag"
             >
-              <ea-icon icon="icon-align-center"></ea-icon>
+              <ea-icon name="align-center" variant="solid"></ea-icon>
             </ea-check-tag>
             <ea-check-tag
               :checked="textAlign === 'right'"
@@ -58,7 +58,7 @@
               title="右对齐"
               class="align-tag"
             >
-              <ea-icon icon="icon-align-right"></ea-icon>
+              <ea-icon name="align-right" variant="solid"></ea-icon>
             </ea-check-tag>
             <ea-check-tag
               :checked="textAlign === 'justify'"
@@ -66,7 +66,7 @@
               title="两端对齐"
               class="align-tag"
             >
-              <ea-icon icon="icon-align-justify"></ea-icon>
+              <ea-icon name="align-justify" variant="solid"></ea-icon>
             </ea-check-tag>
           </div>
         </div>

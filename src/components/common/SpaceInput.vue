@@ -12,7 +12,7 @@
         }"
       >
         <div class="space-inner" @click="toggleLink">
-          <ea-icon icon="icon-link" :class="{ 'is-active': isLinked }"></ea-icon>
+          <ea-icon name="link" variant="solid" :class="{ 'is-active': isLinked }"></ea-icon>
         </div>
       </div>
     </div>

@@ -32,9 +32,9 @@
       <!-- 空状态提示 -->
       <div
         v-if="components.length === 0"
-        class="absolute inset-0 flex flex-col items-center text-gray-400"
+        class="absolute inset-0 flex flex-col items-center text-gray-400 mt-8"
       >
-        <ea-icon name="drag" size="48" class="mb-2"></ea-icon>
+        <ea-icon name="hand" variant="solid" size="48" class="my-8"></ea-icon>
         <p class="text-sm">从左侧拖拽组件到此处</p>
       </div>
     </div>
@@ -66,10 +66,9 @@
 
   // 监听组件数量变化和结构变化（增删、移动），不监听属性变化
   watch(
-    () =>
-      components.value.map((c) => ({ id: c.id, children: c.children?.map((child) => child.id) })),
+    () => components.value.map(c => ({ id: c.id, children: c.children?.map(child => child.id) })),
     updateContentHeight,
-    { deep: false, flush: 'post' },
+    { deep: false, flush: 'post' }
   )
 
   // 画布样式
@@ -122,7 +121,7 @@
 
     // 提取默认属性
     if (componentMeta.props) {
-      componentMeta.props.forEach((prop) => {
+      componentMeta.props.forEach(prop => {
         defaultProps[prop.name] = prop.default
       })
     }

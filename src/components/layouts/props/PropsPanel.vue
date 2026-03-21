@@ -16,12 +16,7 @@
         <ea-card class="component-info-card">
           <div slot="header" class="flex items-center justify-between">
             <span class="font-medium text-gray-800">{{ componentMeta?.name }}</span>
-            <ea-button
-              type="danger"
-              size="small"
-              icon="icon-trash-empty"
-              @click="handleDeleteComponent"
-            >
+            <ea-button type="danger" size="small" icon="trash-can" @click="handleDeleteComponent">
               删除
             </ea-button>
           </div>
@@ -33,7 +28,7 @@
               <span>别名:</span>
               <div v-if="!isEditingAlias" class="flex items-center gap-2">
                 <span class="text-blue-600 w-full">{{ selectedComponent.alias || '未设置' }}</span>
-                <ea-button type="primary" size="small" icon="icon-pencil" @click="startEditAlias">
+                <ea-button type="primary" size="small" icon="pen" @click="startEditAlias">
                   {{ selectedComponent.alias ? '修改' : '设置' }}
                 </ea-button>
               </div>
@@ -44,16 +39,11 @@
                   placeholder="输入别名"
                   class="w-full"
                 ></ea-input>
-                <ea-button
-                  type="success"
-                  size="small"
-                  icon="icon-ok"
-                  @click="saveAlias"
-                ></ea-button>
+                <ea-button type="success" size="small" icon="check" @click="saveAlias"></ea-button>
                 <ea-button
                   type="default"
                   size="small"
-                  icon="icon-cancel"
+                  icon="xmark"
                   @click="cancelEditAlias"
                 ></ea-button>
               </div>

@@ -2,7 +2,7 @@
   <div class="select-options-config">
     <div class="config-header">
       <span class="config-title">选项配置</span>
-      <ea-button icon="icon-cog" type="primary" size="small" @click="openDialog">
+      <ea-button icon="gear" type="primary" size="small" @click="openDialog">
         <span>配置选项</span>
       </ea-button>
     </div>
@@ -28,16 +28,10 @@
       <div class="dialog-content">
         <!-- 工具栏 -->
         <div class="toolbar">
-          <ea-button icon="icon-plus" type="primary" text size="small" @click="addOption">
+          <ea-button icon="plus" type="primary" text size="small" @click="addOption">
             添加选项
           </ea-button>
-          <ea-button
-            icon="icon-folder-empty"
-            type="normal"
-            text
-            size="small"
-            @click="addOptionGroup"
-          >
+          <ea-button icon="folder" type="normal" text size="small" @click="addOptionGroup">
             添加分组
           </ea-button>
         </div>
@@ -52,7 +46,7 @@
             <!-- 分组节点 -->
             <div v-for="node in groupNodes" :key="node.id" class="tree-node is-group">
               <div class="node-content">
-                <ea-icon icon="icon-folder-empty" size="14" class="node-icon"></ea-icon>
+                <ea-icon name="folder" variant="solid" size="14" class="node-icon"></ea-icon>
                 <span class="node-label">{{ node.label || '未命名分组' }}</span>
                 <div class="node-actions">
                   <ea-button type="primary" text size="small" @click="addOptionToGroup(node)">
@@ -74,7 +68,7 @@
                   class="tree-node is-option"
                 >
                   <div class="node-content">
-                    <ea-icon icon="icon-folder-empty" size="12" class="node-icon"></ea-icon>
+                    <ea-icon name="file" variant="solid" size="12" class="node-icon"></ea-icon>
                     <span class="node-label">{{ child.label || '未命名选项' }}</span>
                     <span class="node-value">值: {{ child.value }}</span>
                     <div class="node-actions">
@@ -84,7 +78,7 @@
                       <ea-button
                         type="danger"
                         text
-                        icon="icon-trash-empty"
+                        icon="trash-can"
                         size="small"
                         @click="removeChildNode(node, childIndex)"
                       >
@@ -99,24 +93,18 @@
             <!-- 普通选项节点 -->
             <div v-for="node in optionNodes" :key="node.id" class="tree-node is-option">
               <div class="node-content">
-                <ea-icon icon="icon-cog" size="12" class="node-icon"></ea-icon>
+                <ea-icon name="file" variant="solid" size="12" class="node-icon"></ea-icon>
                 <span class="node-label">{{ node.label || '未命名选项' }}</span>
                 <span class="node-value">值: {{ node.value }}</span>
                 <div class="node-actions">
-                  <ea-button
-                    icon="icon-pencil"
-                    type="primary"
-                    text
-                    size="small"
-                    @click="editOption(node)"
-                  >
+                  <ea-button icon="pen" type="primary" text size="small" @click="editOption(node)">
                     编辑
                   </ea-button>
                   <ea-button
                     type="danger"
                     text
                     size="small"
-                    icon="icon-trash-empty"
+                    icon="trash-can"
                     @click="removeNodeById(node.id)"
                   >
                     删除

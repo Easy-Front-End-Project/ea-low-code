@@ -2,7 +2,7 @@
   <div class="radio-group-config">
     <div class="config-header">
       <span class="config-title">选项配置</span>
-      <ea-button icon="icon-cog" type="primary" size="small" @click="openDialog">
+      <ea-button icon="gear" type="primary" size="small" @click="openDialog">
         <span>配置选项</span>
       </ea-button>
     </div>
@@ -17,7 +17,7 @@
           class="preview-item"
           :class="{ 'is-disabled': item.disabled }"
         >
-          <ea-icon icon="icon-circle-empty" size="12" class="preview-icon"></ea-icon>
+          <ea-icon name="circle" variant="regular" size="12" class="preview-icon"></ea-icon>
           <span class="preview-label">{{ item.label }}</span>
           <span class="preview-value">({{ item.value }})</span>
         </div>
@@ -29,7 +29,7 @@
       <div class="dialog-content">
         <!-- 工具栏 -->
         <div class="toolbar">
-          <ea-button icon="icon-plus" type="primary" text size="small" @click="addOption">
+          <ea-button icon="plus" type="primary" text size="small" @click="addOption">
             添加选项
           </ea-button>
         </div>
@@ -48,7 +48,7 @@
               :class="{ 'is-disabled': node.disabled }"
             >
               <div class="option-content">
-                <ea-icon icon="icon-circle-empty" size="14" class="option-icon"></ea-icon>
+                <ea-icon name="circle" variant="regular" size="14" class="option-icon"></ea-icon>
                 <span class="option-label">{{ node.label || '未命名选项' }}</span>
                 <span class="option-value">值: {{ node.value }}</span>
                 <ea-tag v-if="node.disabled" type="info" size="small">禁用</ea-tag>
@@ -59,7 +59,7 @@
                   <ea-button
                     type="danger"
                     text
-                    icon="icon-trash-empty"
+                    icon="trash-can"
                     size="small"
                     @click="removeOption(index)"
                   >

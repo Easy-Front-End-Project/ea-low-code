@@ -4,7 +4,7 @@
       <!-- 搜索框 -->
       <div class="search-box">
         <ea-input v-model="searchKeyword" size="small" placeholder="搜索变量...">
-          <ea-icon slot="prefix" icon="icon-search" size="14"></ea-icon>
+          <ea-icon slot="prefix" name="magnifying-glass" variant="solid" size="14"></ea-icon>
         </ea-input>
       </div>
 
@@ -18,7 +18,7 @@
         >
           <div class="variable-info">
             <div class="variable-name">
-              <ea-icon icon="icon-cube" size="14" class="text-blue-500"></ea-icon>
+              <ea-icon name="cube" variant="solid" size="14" class="text-blue-500"></ea-icon>
               <span>{{ variable.name }}</span>
             </div>
             <div class="variable-meta">
@@ -33,7 +33,7 @@
 
         <!-- 空状态 -->
         <div v-if="filteredVariables.length === 0" class="empty-state">
-          <ea-icon icon="icon-inbox" size="32" class="text-gray-300"></ea-icon>
+          <ea-icon name="inbox" variant="solid" size="32" class="text-gray-300"></ea-icon>
           <p class="text-gray-400 text-sm mt-2">
             {{ searchKeyword ? '没有找到匹配的变量' : '暂无变量，请先定义变量' }}
           </p>
@@ -82,7 +82,7 @@
     }
     const keyword = searchKeyword.value.toLowerCase()
     return variables.filter(
-      (v) => v.name.toLowerCase().includes(keyword) || v.remark.toLowerCase().includes(keyword),
+      v => v.name.toLowerCase().includes(keyword) || v.remark.toLowerCase().includes(keyword)
     )
   })
 

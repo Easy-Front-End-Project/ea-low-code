@@ -53,7 +53,7 @@
                 class="w-full text-center"
                 type="primary"
                 size="small"
-                icon="icon-edit"
+                icon="pen"
                 @click="handleOpenEditor(variable)"
                 >编辑
               </ea-button>
@@ -76,7 +76,7 @@
             </div>
             <div class="col-action">
               <ea-button
-                icon="icon-cancel"
+                icon="xmark"
                 type="danger"
                 size="small"
                 text
@@ -99,7 +99,7 @@
     <!-- 底部按钮 -->
     <div slot="footer" class="dialog-footer">
       <ea-button type="primary" size="small" @click="handleAddVariable">
-        <ea-icon icon="icon-plus" size="12" class="mr-1"></ea-icon>
+        <ea-icon name="plus" variant="solid" size="12" class="mr-1"></ea-icon>
         <span>添加变量</span>
       </ea-button>
       <div class="flex items-center gap-2">
@@ -160,10 +160,10 @@
   // 监听 store 变化，同步到本地
   watch(
     () => variableStore.variables,
-    (newVariables) => {
-      localVariables.value = newVariables.map((v) => ({ ...v }))
+    newVariables => {
+      localVariables.value = newVariables.map(v => ({ ...v }))
     },
-    { immediate: true, deep: true },
+    { immediate: true, deep: true }
   )
 
   // 关闭弹框
@@ -186,7 +186,7 @@
     handleUpdate(id, 'type', newType)
 
     // 根据新类型设置默认值
-    const variable = variableStore.variables.find((v) => v.id === id)
+    const variable = variableStore.variables.find(v => v.id === id)
     if (!variable) return
 
     let newDefaultValue
@@ -211,7 +211,7 @@
     }
 
     // 更新本地变量
-    const localVar = localVariables.value.find((v) => v.id === id)
+    const localVar = localVariables.value.find(v => v.id === id)
     if (localVar) {
       localVar.defaultValue = newDefaultValue
     }
@@ -221,7 +221,7 @@
 
   // 更新变量
   function handleUpdate(id, field, value) {
-    const variable = variableStore.variables.find((v) => v.id === id)
+    const variable = variableStore.variables.find(v => v.id === id)
     if (!variable) return
 
     // 检查值是否真的改变了
@@ -279,7 +279,7 @@
       }
 
       // 更新本地变量
-      const localVar = localVariables.value.find((v) => v.id === editingVariableId.value)
+      const localVar = localVariables.value.find(v => v.id === editingVariableId.value)
       if (localVar) {
         localVar.defaultValue = parsedValue
       }

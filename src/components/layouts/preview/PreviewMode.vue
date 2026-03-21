@@ -3,10 +3,10 @@
     <!-- 预览工具栏 -->
     <div class="h-12 bg-white border-b border-gray-200 flex items-center justify-between px-4">
       <div class="flex items-center gap-2">
-        <ea-icon icon="icon-eye"></ea-icon>
+        <ea-icon name="eye" variant="solid"></ea-icon>
         <span class="font-medium text-gray-800">预览模式</span>
       </div>
-      <ea-button icon="icon-cancel" @click="handleExitPreview"> 退出预览 </ea-button>
+      <ea-button icon="xmark" @click="handleExitPreview"> 退出预览 </ea-button>
     </div>
 
     <!-- 预览画布 -->

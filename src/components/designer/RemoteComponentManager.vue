@@ -27,7 +27,7 @@
               （{{ remoteStore.componentCount }}）
             </span>
           </h4>
-          <ea-button type="primary" size="small" icon="icon-plus" @click="handleAddComponent">
+          <ea-button type="primary" size="small" icon="plus" @click="handleAddComponent">
             添加组件
           </ea-button>
         </div>
@@ -45,7 +45,7 @@
             >
               <div class="card-header flex items-center justify-between" slot="header">
                 <div class="flex items-center gap-2">
-                  <ea-icon :icon="comp.icon || 'icon-crown'" size="14"></ea-icon>
+                  <ea-icon :name="comp.icon || 'crown'" variant="solid" size="14"></ea-icon>
                   <span class="component-name">{{ comp.name }}</span>
                 </div>
                 <div class="card-actions">
@@ -73,24 +73,15 @@
                 </div>
               </div>
               <div class="card-footer flex justify-end gap-2" slot="footer">
-                <ea-button
-                  text
-                  size="small"
-                  icon="icon-cog"
-                  @click.stop="handleConfigComponent(comp)"
-                >
+                <ea-button text size="small" icon="gear" @click.stop="handleConfigComponent(comp)">
                   配置
                 </ea-button>
-                <ea-button
-                  text
-                  size="small"
-                  icon="icon-edit"
-                  @click.stop="handleEditComponent(comp)"
+                <ea-button text size="small" icon="pen" @click.stop="handleEditComponent(comp)"
                   >编辑</ea-button
                 >
                 <ea-button
                   type="danger"
-                  icon="icon-trash-empty"
+                  icon="trash-can"
                   text
                   size="small"
                   @click.stop="handleDeleteComponent(comp.id)"

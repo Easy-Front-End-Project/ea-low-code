@@ -43,14 +43,14 @@
       part="low-code-component-actions"
     >
       <ea-button
-        icon="icon-trash-empty"
+        icon="trash-can"
         type="danger"
         size="small"
         @click.stop="handleDelete"
         title="删除"
       >
       </ea-button>
-      <ea-button icon="icon-link" size="small" @click.stop="handleCopy" title="复制"> </ea-button>
+      <ea-button icon="copy" size="small" @click.stop="handleCopy" title="复制"> </ea-button>
     </div>
 
     <!-- 组件 -->
@@ -63,9 +63,7 @@
         v-on="componentEventListeners"
       >
         <!-- 文本内容 -->
-        <template v-if="hasChildrenText">
-          {{ resolvedChildrenText }}
-        </template>
+        <template v-if="hasChildrenText"> {{ resolvedChildrenText }} </template>
 
         <!-- 子组件 -->
         <template v-else>

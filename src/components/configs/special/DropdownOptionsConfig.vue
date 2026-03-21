@@ -2,7 +2,7 @@
   <div class="dropdown-options-config">
     <div class="config-header">
       <span class="config-title">菜单项配置</span>
-      <ea-button icon="icon-cog" type="primary" size="small" @click="openDialog">
+      <ea-button icon="gear" type="primary" size="small" @click="openDialog">
         <span>配置菜单项</span>
       </ea-button>
     </div>
@@ -35,7 +35,7 @@
       <div class="dialog-content">
         <!-- 工具栏 -->
         <div class="toolbar">
-          <ea-button icon="icon-plus" type="primary" text size="small" @click="addItem">
+          <ea-button icon="plus" type="primary" text size="small" @click="addItem">
             添加菜单项
           </ea-button>
         </div>
@@ -54,7 +54,7 @@
               :class="{ 'is-divided': item.divided }"
             >
               <div class="item-content">
-                <ea-icon icon="icon-cog" size="12" class="item-icon"></ea-icon>
+                <ea-icon name="gear" variant="solid" size="12" class="item-icon"></ea-icon>
                 <span class="item-label">{{ item.label || '未命名菜单项' }}</span>
                 <span v-if="item.command" class="item-command">指令: {{ item.command }}</span>
                 <div class="item-badges">
@@ -68,7 +68,7 @@
                   <ea-button
                     type="danger"
                     text
-                    icon="icon-trash-empty"
+                    icon="trash-can"
                     size="small"
                     @click="removeItem(index)"
                   >

@@ -1,6 +1,7 @@
 todo.md
 todo/
 ea-components/
+docs/
 
 # Logs
 logs
@@ -41,3 +42,4 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
+docs/ea-alert.md

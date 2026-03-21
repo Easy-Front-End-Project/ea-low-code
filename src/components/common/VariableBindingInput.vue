@@ -4,10 +4,10 @@
     <div class="input-wrapper">
       <!-- 显示变量绑定状态 -->
       <div v-if="isVariable" class="variable-tag">
-        <ea-icon icon="icon-link" size="12"></ea-icon>
+        <ea-icon name="link" variant="solid" size="12"></ea-icon>
         <span>{{ variableName }}</span>
         <ea-button type="text" size="small" @click="handleClearVariable">
-          <ea-icon icon="icon-cancel" size="10"></ea-icon>
+          <ea-icon name="xmark" variant="solid" size="10"></ea-icon>
         </ea-button>
       </div>
 
@@ -75,7 +75,7 @@
           class="w-full text-center flex-1"
           type="primary"
           size="small"
-          icon="icon-edit"
+          icon="pen"
           @click="handleOpenEditor"
         >
           {{ editorButtonText }}
@@ -90,7 +90,7 @@
         :class="{ 'is-bound': isVariable }"
         @click="handleShowVariableSelector"
       >
-        <ea-icon icon="icon-link" size="12"></ea-icon>
+        <ea-icon name="link" variant="solid" size="12"></ea-icon>
       </ea-button>
     </div>
 

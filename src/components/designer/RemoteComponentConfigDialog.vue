@@ -37,7 +37,7 @@
         <div v-if="activeTab === 'props'" class="config-section">
           <div class="config-header">
             <span class="text-sm text-gray-600">配置组件的属性参数</span>
-            <ea-button type="primary" size="small" icon="icon-plus" @click="handleAddProp">
+            <ea-button type="primary" size="small" icon="plus" @click="handleAddProp">
               添加属性
             </ea-button>
           </div>
@@ -70,7 +70,7 @@
                   type="danger"
                   text
                   size="small"
-                  icon="icon-trash-empty"
+                  icon="trash-can"
                   @click="handleRemoveProp(index)"
                 />
               </div>
@@ -82,7 +82,7 @@
         <div v-if="activeTab === 'events'" class="config-section">
           <div class="config-header">
             <span class="text-sm text-gray-600">配置组件的事件</span>
-            <ea-button type="primary" size="small" icon="icon-plus" @click="handleAddEvent">
+            <ea-button type="primary" size="small" icon="plus" @click="handleAddEvent">
               添加事件
             </ea-button>
           </div>
@@ -98,7 +98,7 @@
                   type="danger"
                   text
                   size="small"
-                  icon="icon-trash-empty"
+                  icon="trash-can"
                   @click="handleRemoveEvent(index)"
                 />
               </div>
@@ -115,7 +115,7 @@
         <div v-if="activeTab === 'slots'" class="config-section">
           <div class="config-header">
             <span class="text-sm text-gray-600">配置组件的插槽</span>
-            <ea-button type="primary" size="small" icon="icon-plus" @click="handleAddSlot">
+            <ea-button type="primary" size="small" icon="plus" @click="handleAddSlot">
               添加插槽
             </ea-button>
           </div>
@@ -131,7 +131,7 @@
                   type="danger"
                   text
                   size="small"
-                  icon="icon-trash-empty"
+                  icon="trash-can"
                   @click="handleRemoveSlot(index)"
                 />
               </div>
@@ -177,7 +177,7 @@
   // 监听组件变化，初始化表单
   watch(
     () => props.component,
-    (newComponent) => {
+    newComponent => {
       if (newComponent) {
         configForm.value = {
           props: newComponent.props ? [...newComponent.props] : [],
@@ -187,7 +187,7 @@
         activeTab.value = 'props'
       }
     },
-    { immediate: true },
+    { immediate: true }
   )
 
   function handleClose() {

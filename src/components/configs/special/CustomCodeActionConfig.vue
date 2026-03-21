@@ -3,7 +3,7 @@
     <div class="config-item">
       <label class="config-label">自定义代码</label>
       <div class="code-help">
-        <ea-icon icon="icon-info" size="12" class="code-help-icon"></ea-icon>
+        <ea-icon name="circle-info" variant="solid" size="12" class="code-help-icon"></ea-icon>
         <span class="code-help-title">可用 API：</span>
         <div class="code-help-list">
           <code

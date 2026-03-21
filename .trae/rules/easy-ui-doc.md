@@ -167,7 +167,7 @@ Table 组件支持在列定义中使用插槽：
 <ea-table id="customTable">
   <!-- 自定义列内容 -->
   <ea-table-column prop="date" label="日期">
-    <ea-icon icon="icon-clock"></ea-icon>
+    <ea-icon name="clock" variant="solid"></ea-icon>
     <span data-scope="date"></span>
   </ea-table-column>
 

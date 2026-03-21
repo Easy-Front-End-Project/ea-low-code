@@ -19,7 +19,7 @@
           <span class="text-xs text-blue-600 font-medium">{{ event.eventType }}</span>
           <span class="text-sm text-gray-700">{{ event.name }}</span>
         </div>
-        <ea-icon icon="icon-edit" size="12" class="text-gray-400"></ea-icon>
+        <ea-icon name="pen" variant="solid" size="12" class="text-gray-400"></ea-icon>
       </div>
     </div>
 
@@ -45,7 +45,7 @@
                 <span class="text-sm text-gray-700">{{ event.name }}</span>
               </div>
               <ea-button type="text" size="small" @click.stop="handleDeleteEvent(event.id)">
-                <ea-icon icon="icon-trash-empty" size="12" class="text-red-500"></ea-icon>
+                <ea-icon name="trash-can" variant="solid" size="12" class="text-red-500"></ea-icon>
               </ea-button>
             </div>
           </div>
@@ -166,7 +166,7 @@
       <!-- 底部按钮 -->
       <div slot="footer" class="dialog-footer">
         <ea-button type="primary" size="small" @click="handleAddNewEvent">
-          <ea-icon icon="icon-plus" size="12" class="mr-1"></ea-icon>
+          <ea-icon name="plus" variant="solid" size="12" class="mr-1"></ea-icon>
           <span>添加事件</span>
         </ea-button>
         <div class="flex items-center gap-2">

@@ -52,8 +52,8 @@
           :style="{ paddingLeft: `${comp.level * 16 + 12}px` }"
           @click="selectComponent(comp.id)"
         >
-          <ea-icon icon="icon-folder" v-if="comp.children?.length" size="14"></ea-icon>
-          <ea-icon icon="icon-doc" v-else size="14"></ea-icon>
+          <ea-icon name="folder" variant="solid" v-if="comp.children?.length" size="14"></ea-icon>
+          <ea-icon name="file" variant="solid" v-else size="14"></ea-icon>
           <span class="component-name">{{ comp.name }}</span>
           <span class="component-id">{{ comp.id }}</span>
         </div>

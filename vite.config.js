@@ -7,7 +7,7 @@ import UnoCSS from 'unocss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/Easy-Front-End-Project/',
+  base: '/ea-low-code/',
   plugins: [
     vue({
       template: {
