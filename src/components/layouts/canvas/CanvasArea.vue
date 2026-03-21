@@ -1,5 +1,8 @@
 <template>
   <div class="canvas-area p-6 pb-24 flex flex-col items-center justify-center">
+    <!-- 页面自定义 CSS -->
+    <component :is="'style'" v-if="pageCustomCSS"> {{ pageCustomCSS }} </component>
+
     <!-- 画布容器 -->
     <div
       ref="canvasRef"
@@ -71,6 +74,11 @@
     { deep: false, flush: 'post' }
   )
 
+  // 页面设置中的样式
+  const pageSettings = computed(() => schemaStore.pageSchema.settings || {})
+  const pageStyle = computed(() => pageSettings.value.style || {})
+  const pageCustomCSS = computed(() => pageSettings.value.customCSS || '')
+
   // 画布样式
   const canvasStyle = computed(() => {
     const { viewport } = schemaStore.pageSchema.meta
@@ -79,6 +87,7 @@
     const extraSpace = 100
     const dynamicHeight = Math.max(minHeight, contentHeight.value + extraSpace)
 
+    // 合并页面样式和视口样式
     return {
       width: `${viewport.width}px`,
       height: `${dynamicHeight}px`,
@@ -86,6 +95,7 @@
       minHeight: `${minHeight}px`,
       maxWidth: '100%',
       overflow: 'auto',
+      ...pageStyle.value,
     }
   })
 

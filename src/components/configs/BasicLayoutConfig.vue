@@ -83,7 +83,7 @@
 </script>
 
 <style scoped>
-  @import './config-styles.css';
+  @import './styles/config-styles.css';
 
   .opacity-control {
     padding: 0.5rem 0;

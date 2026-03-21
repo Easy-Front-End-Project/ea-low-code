@@ -9,6 +9,9 @@
       <ea-button icon="xmark" @click="handleExitPreview"> 退出预览 </ea-button>
     </div>
 
+    <!-- 页面自定义 CSS -->
+    <component :is="'style'" v-if="pageCustomCSS"> {{ pageCustomCSS }} </component>
+
     <!-- 预览画布 -->
     <div class="flex-1 bg-gray-100 p-6 overflow-auto flex items-center justify-center">
       <div
@@ -34,6 +37,11 @@
 
   const components = computed(() => schemaStore.components)
 
+  // 页面设置
+  const pageSettings = computed(() => schemaStore.pageSchema.settings || {})
+  const pageStyle = computed(() => pageSettings.value.style || {})
+  const pageCustomCSS = computed(() => pageSettings.value.customCSS || '')
+
   // 画布样式
   const canvasStyle = computed(() => {
     const { viewport } = schemaStore.pageSchema.meta
@@ -45,6 +53,7 @@
       maxWidth: '100%',
       maxHeight: '100%',
       overflow: viewport.overflow,
+      ...pageStyle.value,
     }
   })
 

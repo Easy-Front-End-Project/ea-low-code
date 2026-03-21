@@ -195,5 +195,5 @@
 </script>
 
 <style scoped>
-  @import './config-styles.css';
+  @import './styles/config-styles.css';
 </style>

@@ -58,6 +58,7 @@
         fontSize: 14,
         lineNumbers: 'on',
         roundedSelection: false,
+        fixedOverflowWidgets: true,
         scrollbar: {
           useShadows: false,
           verticalHasArrows: true,

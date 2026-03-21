@@ -7,6 +7,7 @@
         <label class="prop-label">阴影</label>
         <ea-segmented
           ref="shadowTypeRef"
+          name="shadow-type"
           :value="shadowType"
           :options="shadowTypeOptions"
           @change="handleShadowTypeChange"
@@ -247,5 +248,5 @@
 </script>
 
 <style scoped>
-  @import './config-styles.css';
+  @import './styles/config-styles.css';
 </style>

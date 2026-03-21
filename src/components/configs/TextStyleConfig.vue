@@ -96,7 +96,7 @@
       <div class="prop-row">
         <div class="prop-item flex-1">
           <label class="prop-label">颜色</label>
-          <div class="color-input-wrapper">
+          <div class="color-input-wrapper text-center">
             <ea-color-picker
               :value="style?.color || ''"
               @change="handleInlineStyleChange('color', $event.detail.value)"
@@ -212,7 +212,7 @@
 </script>
 
 <style scoped>
-  @import './config-styles.css';
+  @import './styles/config-styles.css';
 
   .prop-row {
     gap: 1rem;

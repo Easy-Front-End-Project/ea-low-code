@@ -125,7 +125,7 @@
 </script>
 
 <style scoped>
-  @import './config-styles.css';
+  @import './styles/config-styles.css';
 
   .config-group {
     margin-bottom: 1rem;

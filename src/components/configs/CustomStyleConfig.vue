@@ -66,7 +66,7 @@
 </script>
 
 <style scoped>
-  @import './config-styles.css';
+  @import './styles/config-styles.css';
 
   .editor-header {
     display: flex;
