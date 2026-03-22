@@ -29,9 +29,10 @@
 </template>
 
 <script setup>
-  import { computed } from 'vue'
+  import { computed, onMounted, onUnmounted } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
   import PreviewComponent from '../../designer/PreviewComponent.vue'
+  import { executeEvent } from '@/utils/eventExecutor'
 
   const schemaStore = useSchemaStore()
 
@@ -41,6 +42,7 @@
   const pageSettings = computed(() => schemaStore.pageSchema.settings || {})
   const pageStyle = computed(() => pageSettings.value.style || {})
   const pageCustomCSS = computed(() => pageSettings.value.customCSS || '')
+  const pageEvents = computed(() => pageSettings.value.events || [])
 
   // 画布样式
   const canvasStyle = computed(() => {
@@ -61,6 +63,63 @@
   function handleExitPreview() {
     schemaStore.setPreviewMode(false)
   }
+
+  // 页面事件处理函数映射
+  const eventHandlers = new Map()
+
+  // 创建事件处理函数
+  function createEventHandler(eventConfig) {
+    return (event) => {
+      executeEvent(eventConfig, event)
+    }
+  }
+
+  // 绑定页面事件
+  function bindPageEvents() {
+    // 先解绑已有的事件
+    unbindPageEvents()
+
+    pageEvents.value.forEach(eventConfig => {
+      const eventType = eventConfig.eventType
+      if (!eventType) return
+
+      const handler = createEventHandler(eventConfig)
+      eventHandlers.set(eventType, handler)
+
+      // 绑定到 window
+      window.addEventListener(eventType, handler)
+    })
+  }
+
+  // 解绑页面事件
+  function unbindPageEvents() {
+    eventHandlers.forEach((handler, eventType) => {
+      window.removeEventListener(eventType, handler)
+    })
+    eventHandlers.clear()
+  }
+
+  // 组件挂载时绑定事件
+  onMounted(() => {
+    bindPageEvents()
+
+    // 执行 load 事件
+    const loadEvent = pageEvents.value.find(e => e.eventType === 'load')
+    if (loadEvent) {
+      executeEvent(loadEvent, null)
+    }
+  })
+
+  // 组件卸载时解绑事件
+  onUnmounted(() => {
+    // 执行 unload 事件
+    const unloadEvent = pageEvents.value.find(e => e.eventType === 'unload')
+    if (unloadEvent) {
+      executeEvent(unloadEvent, null)
+    }
+
+    unbindPageEvents()
+  })
 </script>
 
 <style scoped>

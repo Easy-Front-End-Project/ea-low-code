@@ -63,72 +63,72 @@
           </div>
         </ea-card>
 
+        <SpecialConfigRenderer
+          v-if="selectedComponent && hasSpecialConfig"
+          :component="selectedComponent"
+          :special-config="componentMeta?.specialConfig"
+        />
+
         <!-- 配置面板：页面级或组件级 -->
         <ea-tabs :active="selectedComponent ? 'props' : 'pageStyle'">
-          <!-- 页面级：样式面板 -->
-          <template v-if="!selectedComponent">
-            <ea-tab panel="pageStyle">页面样式</ea-tab>
-            <ea-tab-panel name="pageStyle">
-              <div class="pt-2">
+          <!-- 样式面板（页面和组件共用） -->
+          <ea-tab :panel="selectedComponent ? 'baseStyle' : 'pageStyle'">
+            {{ selectedComponent ? '基础样式' : '页面样式' }}
+          </ea-tab>
+          <ea-tab-panel :name="selectedComponent ? 'baseStyle' : 'pageStyle'">
+            <div class="pt-2">
+              <keep-alive>
                 <BaseStyleConfig
-                  :style="pageStyle"
-                  :custom-c-s-s="pageCustomCSS"
-                  @style-change="handlePageStyleChange"
+                  :style="currentStyleConfig.style"
+                  :position-style="currentStyleConfig.positionStyle"
+                  :custom-c-s-s="currentStyleConfig.customCSS"
+                  @style-change="handleStyleChange"
                 />
-              </div>
-            </ea-tab-panel>
+              </keep-alive>
+            </div>
+          </ea-tab-panel>
 
-            <ea-tab panel="pageEvents">页面事件</ea-tab>
-            <ea-tab-panel name="pageEvents">
-              <div class="pt-2">
-                <EventConfig
-                  :events="pageEventMeta"
-                  :component-events="pageEvents"
-                  @event-change="handlePageEventChange"
-                />
-              </div>
-            </ea-tab-panel>
-          </template>
+          <!-- 事件面板（页面和组件共用） -->
+          <ea-tab :panel="selectedComponent ? 'events' : 'pageEvents'">
+            {{ selectedComponent ? '事件' : '页面事件' }}
+          </ea-tab>
+          <ea-tab-panel :name="selectedComponent ? 'events' : 'pageEvents'">
+            <div class="pt-2">
+              <EventConfig
+                :events="currentEventConfig.events"
+                :component-events="currentEventConfig.componentEvents"
+                @event-change="handleEventChange"
+              />
+            </div>
+          </ea-tab-panel>
 
           <!-- 组件级：属性面板 -->
-          <template v-else>
+          <template v-if="selectedComponent">
             <ea-tab panel="props">属性</ea-tab>
             <ea-tab-panel name="props">
               <div class="space-y-4 pt-2">
-                <SlotConfig
-                  :parent-slots="parentComponentMeta?.slots"
-                  :slot-value="selectedComponent.props?.slot || 'default'"
-                  @slot-change="handleSlotChange"
-                />
-                <SlotScopeConfig
-                  :parent-slots="parentComponentMeta?.slots"
-                  :slot-value="selectedComponent.props?.slot || 'default'"
-                  :scope="selectedComponent.props?.scope || ''"
-                  @scope-change="handleScopeChange"
-                />
-                <SpecialConfigRenderer
-                  v-if="hasSpecialConfig"
-                  :component="selectedComponent"
-                  :special-config="componentMeta?.specialConfig"
-                />
-                <PropConfig
-                  :props="componentPropsWithoutSlot"
-                  :component-props="selectedComponent.props"
-                  @prop-change="handlePropChange"
-                />
-              </div>
-            </ea-tab-panel>
-
-            <!-- 基础样式面板 -->
-            <ea-tab panel="baseStyle">基础样式</ea-tab>
-            <ea-tab-panel name="baseStyle">
-              <div class="pt-2">
-                <BaseStyleConfig
-                  :style="selectedComponent.style"
-                  :position-style="selectedComponent.positionStyle"
-                  :custom-c-s-s="selectedComponent.customCSS"
-                  @style-change="handleStyleChange"
-                />
+                <keep-alive>
+                  <SlotConfig
+                    :parent-slots="parentComponentMeta?.slots"
+                    :slot-value="selectedComponent.props?.slot || 'default'"
+                    @slot-change="handleSlotChange"
+                  />
+                </keep-alive>
+                <keep-alive>
+                  <SlotScopeConfig
+                    :parent-slots="parentComponentMeta?.slots"
+                    :slot-value="selectedComponent.props?.slot || 'default'"
+                    :scope="selectedComponent.props?.scope || ''"
+                    @scope-change="handleScopeChange"
+                  />
+                </keep-alive>
+                <keep-alive>
+                  <PropConfig
+                    :props="componentPropsWithoutSlot"
+                    :component-props="selectedComponent.props"
+                    @prop-change="handlePropChange"
+                  />
+                </keep-alive>
               </div>
             </ea-tab-panel>
 
@@ -136,24 +136,14 @@
             <ea-tab panel="componentStyle">组件样式</ea-tab>
             <ea-tab-panel name="componentStyle">
               <div class="pt-2">
-                <ComponentStyleConfig
-                  :component-type="selectedComponent.type"
-                  :component-props="selectedComponent.props"
-                  :css-variables="selectedComponent.cssVariables"
-                  @css-variable-change="handleCssVariableChange"
-                />
-              </div>
-            </ea-tab-panel>
-
-            <!-- 事件面板 -->
-            <ea-tab panel="events">事件</ea-tab>
-            <ea-tab-panel name="events">
-              <div class="pt-2">
-                <EventConfig
-                  :events="componentMeta?.events"
-                  :component-events="selectedComponent.events"
-                  @event-change="handleEventChange"
-                />
+                <keep-alive>
+                  <ComponentStyleConfig
+                    :component-type="selectedComponent.type"
+                    :component-props="selectedComponent.props"
+                    :css-variables="selectedComponent.cssVariables"
+                    @css-variable-change="handleCssVariableChange"
+                  />
+                </keep-alive>
               </div>
             </ea-tab-panel>
           </template>
@@ -206,6 +196,36 @@
     ]
   })
 
+  // 当前样式配置（页面或组件）
+  const currentStyleConfig = computed(() => {
+    if (selectedComponent.value) {
+      return {
+        style: selectedComponent.value.style || {},
+        positionStyle: selectedComponent.value.positionStyle || {},
+        customCSS: selectedComponent.value.customCSS || '',
+      }
+    }
+    return {
+      style: pageStyle.value,
+      positionStyle: {},
+      customCSS: pageCustomCSS.value,
+    }
+  })
+
+  // 当前事件配置（页面或组件）
+  const currentEventConfig = computed(() => {
+    if (selectedComponent.value) {
+      return {
+        events: componentMeta.value?.events || [],
+        componentEvents: selectedComponent.value.events || [],
+      }
+    }
+    return {
+      events: pageEventMeta.value,
+      componentEvents: pageEvents.value,
+    }
+  })
+
   // 别名编辑状态
   const isEditingAlias = ref(false)
   const aliasInput = ref('')
@@ -247,6 +267,7 @@
     isEditingAlias.value = false
     aliasInput.value = ''
   }
+
   const componentMeta = computed(() => {
     if (!selectedComponent.value) return null
 
@@ -311,18 +332,34 @@
     }
   }
 
-  // 样式变更
+  // 样式变更（统一处理页面和组件）
   function handleStyleChange(styleName, value, styleType = 'inline') {
-    if (!selectedComponent.value) return
-    // 处理自定义 CSS（直接传递字符串值）
-    if (styleType === 'customCSS') {
-      schemaStore.updateComponentStyle(selectedComponent.value.id, value, 'customCSS')
+    if (selectedComponent.value) {
+      // 组件样式变更
+      if (styleType === 'customCSS') {
+        schemaStore.updateComponentStyle(selectedComponent.value.id, value, 'customCSS')
+      } else {
+        schemaStore.updateComponentStyle(
+          selectedComponent.value.id,
+          { [styleName]: value },
+          styleType
+        )
+      }
     } else {
-      schemaStore.updateComponentStyle(
-        selectedComponent.value.id,
-        { [styleName]: value },
-        styleType
-      )
+      // 页面样式变更
+      const currentSettings = schemaStore.pageSchema.settings || {}
+      if (styleType === 'customCSS') {
+        schemaStore.updatePageSettings({
+          ...currentSettings,
+          customCSS: value,
+        })
+      } else {
+        const currentStyle = currentSettings.style || {}
+        schemaStore.updatePageSettings({
+          ...currentSettings,
+          style: { ...currentStyle, [styleName]: value },
+        })
+      }
     }
   }
 
@@ -336,10 +373,17 @@
     )
   }
 
-  // 事件变更
+  // 事件变更（统一处理页面和组件）
   function handleEventChange(events) {
-    if (!selectedComponent.value) return
-    schemaStore.updateComponentEvents(selectedComponent.value.id, events)
+    if (selectedComponent.value) {
+      schemaStore.updateComponentEvents(selectedComponent.value.id, events)
+    } else {
+      const currentSettings = schemaStore.pageSchema.settings || {}
+      schemaStore.updatePageSettings({
+        ...currentSettings,
+        events,
+      })
+    }
   }
 
   // 插槽变更
@@ -360,34 +404,6 @@
     if (confirm('确定要删除这个组件吗？')) {
       schemaStore.removeComponent(selectedComponent.value.id)
     }
-  }
-
-  // 页面样式变更
-  function handlePageStyleChange(styleName, value, styleType = 'inline') {
-    const currentSettings = schemaStore.pageSchema.settings || {}
-    if (styleType === 'customCSS') {
-      // 自定义 CSS
-      schemaStore.updatePageSettings({
-        ...currentSettings,
-        customCSS: value,
-      })
-    } else {
-      // 普通内联样式
-      const currentStyle = currentSettings.style || {}
-      schemaStore.updatePageSettings({
-        ...currentSettings,
-        style: { ...currentStyle, [styleName]: value },
-      })
-    }
-  }
-
-  // 页面事件变更
-  function handlePageEventChange(events) {
-    const currentSettings = schemaStore.pageSchema.settings || {}
-    schemaStore.updatePageSettings({
-      ...currentSettings,
-      events,
-    })
   }
 </script>
 

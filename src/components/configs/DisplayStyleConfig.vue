@@ -5,9 +5,9 @@
       <!-- Display 选择 -->
       <div class="prop-item">
         <ea-segmented
-          ref="displaySegmentedRef"
           name="display-type"
           :value="currentDisplay"
+          :options="displayOptions"
           @change="handleDisplayChange"
           class="display-segmented"
           block
@@ -21,9 +21,9 @@
           <div class="prop-item flex-1">
             <label class="prop-label">主轴方向</label>
             <ea-segmented
-              ref="flexDirectionRef"
               name="flex-direction"
               :value="flexDirection"
+              :options="flexDirectionOptions"
               @change="handleFlexDirectionChange"
               class="flex-segmented"
               block
@@ -89,7 +89,7 @@
 </template>
 
 <script setup>
-  import { computed, ref, onMounted, watch } from 'vue'
+  import { computed } from 'vue'
   import EaSelect from '../ea-ui-wrap/EaSelect.vue'
 
   const props = defineProps({
@@ -101,11 +101,7 @@
 
   const emit = defineEmits(['style-change'])
 
-  // Refs for segmented components
-  const displaySegmentedRef = ref(null)
-  const flexDirectionRef = ref(null)
-
-  // Display options
+  // Display options - 使用静态数据避免重复创建
   const displayOptions = [
     { label: '块级', value: 'block' },
     { label: '行内', value: 'inline' },
@@ -142,29 +138,6 @@
 
   const alignItems = computed(() => {
     return props.style?.alignItems || 'stretch'
-  })
-
-  // Initialize segmented options
-  onMounted(() => {
-    if (displaySegmentedRef.value) {
-      displaySegmentedRef.value.options = displayOptions
-    }
-    if (flexDirectionRef.value) {
-      flexDirectionRef.value.options = flexDirectionOptions
-    }
-  })
-
-  // Watch for ref changes and set options
-  watch(displaySegmentedRef, el => {
-    if (el) {
-      el.options = displayOptions
-    }
-  })
-
-  watch(flexDirectionRef, el => {
-    if (el) {
-      el.options = flexDirectionOptions
-    }
   })
 
   // 处理 display 变化

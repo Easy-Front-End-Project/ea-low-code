@@ -12,7 +12,12 @@
         }"
       >
         <div class="space-inner" @click="toggleLink">
-          <ea-icon name="link" variant="solid" :class="{ 'is-active': isLinked }"></ea-icon>
+          <ea-icon
+            name="link"
+            variant="solid"
+            size="10"
+            :class="{ 'is-active': isLinked }"
+          ></ea-icon>
         </div>
       </div>
     </div>
@@ -23,6 +28,7 @@
           <div class="space-unit-wrapper">
             <EaInput
               :model-value="values.top.input"
+              size="small"
               @update:model-value="handleChange('top', $event)"
               @focus="handleFocus('top')"
               @blur="handleBlur"
@@ -32,6 +38,7 @@
             <EaSelect
               :model-value="values.top.unit"
               @update:model-value="handleUnitChange('top', $event)"
+              size="small"
               class="space-unit-select"
             >
               <ea-option v-for="unit in units" :key="unit" :value="unit">{{ unit }}</ea-option>
@@ -48,10 +55,12 @@
               @blur="handleBlur"
               class="space-input"
               placeholder="0"
+              size="small"
             />
             <EaSelect
               :model-value="values.right.unit"
               @update:model-value="handleUnitChange('right', $event)"
+              size="small"
               class="space-unit-select"
             >
               <ea-option v-for="unit in units" :key="unit" :value="unit">{{ unit }}</ea-option>
@@ -69,11 +78,13 @@
               @focus="handleFocus('bottom')"
               @blur="handleBlur"
               class="space-input"
+              size="small"
               placeholder="0"
             />
             <EaSelect
               :model-value="values.bottom.unit"
               @update:model-value="handleUnitChange('bottom', $event)"
+              size="small"
               class="space-unit-select"
             >
               <ea-option v-for="unit in units" :key="unit" :value="unit">{{ unit }}</ea-option>
@@ -88,12 +99,14 @@
               @update:model-value="handleChange('left', $event)"
               @focus="handleFocus('left')"
               @blur="handleBlur"
+              size="small"
               class="space-input"
               placeholder="0"
             />
             <EaSelect
               :model-value="values.left.unit"
               @update:model-value="handleUnitChange('left', $event)"
+              size="small"
               class="space-unit-select"
             >
               <ea-option v-for="unit in units" :key="unit" :value="unit">{{ unit }}</ea-option>
@@ -301,8 +314,8 @@
   }
 
   .space-box {
-    width: 60px;
-    height: 60px;
+    width: 40px;
+    height: 40px;
     border: 1px dashed #dcdfe6;
     display: flex;
     align-items: center;
@@ -339,8 +352,8 @@
   }
 
   .space-inner {
-    width: 30px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
     border: 1px solid #dcdfe6;
     background-color: #fff;
     display: flex;
@@ -354,7 +367,6 @@
     }
 
     ea-icon {
-      font-size: 14px;
       color: #909399;
       transition: color 0.2s;
 
@@ -386,7 +398,6 @@
   .space-label {
     font-size: 12px;
     color: #606266;
-    min-width: 20px;
   }
 
   .space-unit-wrapper {
