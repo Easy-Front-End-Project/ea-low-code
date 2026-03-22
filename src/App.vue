@@ -1,21 +1,14 @@
 <template>
   <div class="app-container h-screen w-screen overflow-hidden">
-    <DesignerLayout v-show="!isPreviewMode" />
-    <PreviewMode v-if="isPreviewMode" />
+    <RouterView />
     <!-- 全局弹窗容器 -->
     <GlobalDialogContainer />
   </div>
 </template>
 
 <script setup>
-  import { computed } from 'vue'
-  import { useSchemaStore } from '@/stores/designer/schema'
-  import DesignerLayout from '@/components/layouts/DesignerLayout.vue'
-  import PreviewMode from '@/components/layouts/preview/PreviewMode.vue'
+  import { RouterView } from 'vue-router'
   import GlobalDialogContainer from '@/components/common/GlobalDialogContainer.vue'
-
-  const schemaStore = useSchemaStore()
-  const isPreviewMode = computed(() => schemaStore.isPreviewMode)
 </script>
 
 <style>

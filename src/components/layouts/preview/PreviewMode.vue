@@ -30,11 +30,13 @@
 
 <script setup>
   import { computed, onMounted, onUnmounted } from 'vue'
+  import { useRouter } from 'vue-router'
   import { useSchemaStore } from '@/stores/designer/schema'
   import PreviewComponent from '../../designer/PreviewComponent.vue'
   import { executeEvent } from '@/utils/eventExecutor'
 
   const schemaStore = useSchemaStore()
+  const router = useRouter()
 
   const components = computed(() => schemaStore.components)
 
@@ -61,7 +63,7 @@
 
   // 退出预览
   function handleExitPreview() {
-    schemaStore.setPreviewMode(false)
+    router.push('/')
   }
 
   // 页面事件处理函数映射

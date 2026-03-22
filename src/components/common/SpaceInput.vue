@@ -25,93 +25,57 @@
       <div class="space-row">
         <div class="space-item">
           <span class="space-label">上</span>
-          <div class="space-unit-wrapper">
-            <EaInput
-              :model-value="values.top.input"
-              size="small"
-              @update:model-value="handleChange('top', $event)"
-              @focus="handleFocus('top')"
-              @blur="handleBlur"
-              class="space-input"
-              placeholder="0"
-            />
-            <EaSelect
-              :model-value="values.top.unit"
-              @update:model-value="handleUnitChange('top', $event)"
-              size="small"
-              class="space-unit-select"
-            >
-              <ea-option v-for="unit in units" :key="unit" :value="unit">{{ unit }}</ea-option>
-            </EaSelect>
-          </div>
+          <UnitInput
+            :value="formatValueForUnitInput(values.top)"
+            @input-change="(input, unit) => handleInputChange('top', input, unit)"
+            @unit-change="(input, unit) => handleUnitChange('top', input, unit)"
+            @focus="handleFocus('top')"
+            @blur="handleBlur"
+            :units="units"
+            class="space-unit-input"
+            placeholder="0"
+          />
         </div>
         <div class="space-item">
           <span class="space-label">右</span>
-          <div class="space-unit-wrapper">
-            <EaInput
-              :model-value="values.right.input"
-              @update:model-value="handleChange('right', $event)"
-              @focus="handleFocus('right')"
-              @blur="handleBlur"
-              class="space-input"
-              placeholder="0"
-              size="small"
-            />
-            <EaSelect
-              :model-value="values.right.unit"
-              @update:model-value="handleUnitChange('right', $event)"
-              size="small"
-              class="space-unit-select"
-            >
-              <ea-option v-for="unit in units" :key="unit" :value="unit">{{ unit }}</ea-option>
-            </EaSelect>
-          </div>
+          <UnitInput
+            :value="formatValueForUnitInput(values.right)"
+            @input-change="(input, unit) => handleInputChange('right', input, unit)"
+            @unit-change="(input, unit) => handleUnitChange('right', input, unit)"
+            @focus="handleFocus('right')"
+            @blur="handleBlur"
+            :units="units"
+            class="space-unit-input"
+            placeholder="0"
+          />
         </div>
       </div>
       <div class="space-row">
         <div class="space-item">
           <span class="space-label">下</span>
-          <div class="space-unit-wrapper">
-            <EaInput
-              :model-value="values.bottom.input"
-              @update:model-value="handleChange('bottom', $event)"
-              @focus="handleFocus('bottom')"
-              @blur="handleBlur"
-              class="space-input"
-              size="small"
-              placeholder="0"
-            />
-            <EaSelect
-              :model-value="values.bottom.unit"
-              @update:model-value="handleUnitChange('bottom', $event)"
-              size="small"
-              class="space-unit-select"
-            >
-              <ea-option v-for="unit in units" :key="unit" :value="unit">{{ unit }}</ea-option>
-            </EaSelect>
-          </div>
+          <UnitInput
+            :value="formatValueForUnitInput(values.bottom)"
+            @input-change="(input, unit) => handleInputChange('bottom', input, unit)"
+            @unit-change="(input, unit) => handleUnitChange('bottom', input, unit)"
+            @focus="handleFocus('bottom')"
+            @blur="handleBlur"
+            :units="units"
+            class="space-unit-input"
+            placeholder="0"
+          />
         </div>
         <div class="space-item">
           <span class="space-label">左</span>
-          <div class="space-unit-wrapper">
-            <EaInput
-              :model-value="values.left.input"
-              @update:model-value="handleChange('left', $event)"
-              @focus="handleFocus('left')"
-              @blur="handleBlur"
-              size="small"
-              class="space-input"
-              placeholder="0"
-            />
-            <EaSelect
-              :model-value="values.left.unit"
-              @update:model-value="handleUnitChange('left', $event)"
-              size="small"
-              class="space-unit-select"
-            >
-              <ea-option v-for="unit in units" :key="unit" :value="unit">{{ unit }}</ea-option>
-            </EaSelect>
-          </div>
+          <UnitInput
+            :value="formatValueForUnitInput(values.left)"
+            @input-change="(input, unit) => handleInputChange('left', input, unit)"
+            @unit-change="(input, unit) => handleUnitChange('left', input, unit)"
+            @focus="handleFocus('left')"
+            @blur="handleBlur"
+            :units="units"
+            class="space-unit-input"
+            placeholder="0"
+          />
         </div>
       </div>
     </div>
@@ -120,8 +84,7 @@
 
 <script setup>
   import { computed, ref } from 'vue'
-  import EaInput from '../ea-ui-wrap/EaInput.vue'
-  import EaSelect from '../ea-ui-wrap/EaSelect.vue'
+  import UnitInput from './UnitInput.vue'
 
   const props = defineProps({
     value: {
@@ -212,16 +175,22 @@
     return { top: empty, right: empty, bottom: empty, left: empty }
   })
 
-  // 处理输入值变化
-  function handleChange(direction, value) {
+  // 将解析后的值格式化为 UnitInput 需要的字符串格式
+  function formatValueForUnitInput({ input, unit }) {
+    if (input === 'auto') return 'auto'
+    if (!input || input === '') return `0${unit}`
+    return `${input}${unit}`
+  }
+
+  // 处理输入值变化（来自 UnitInput 的 input-change 事件）
+  function handleInputChange(direction, input, unit) {
     const currentValues = values.value
-    const newInput = value || ''
+    const newInput = input || ''
 
     let newValues
 
     if (isLinked.value) {
       // 链接状态下，所有方向同步更新
-      const unit = currentValues[direction].unit
       newValues = {
         top: { input: newInput, unit },
         right: { input: newInput, unit },
@@ -231,32 +200,32 @@
     } else {
       newValues = {
         ...currentValues,
-        [direction]: { ...currentValues[direction], input: newInput },
+        [direction]: { ...currentValues[direction], input: newInput, unit },
       }
     }
 
     emitCombinedValue(newValues)
   }
 
-  // 处理单位变化
-  function handleUnitChange(direction, unit) {
+  // 处理单位变化（来自 UnitInput 的 unit-change 事件）
+  function handleUnitChange(direction, input, unit) {
     const currentValues = values.value
 
     let newValues
 
     if (isLinked.value) {
-      // 链接状态下，所有方向同步更新单位
-      const input = currentValues[direction].input
+      // 链接状态下，所有方向同步更新单位，但保持各自的 input 值
       newValues = {
-        top: { input, unit },
-        right: { input, unit },
-        bottom: { input, unit },
-        left: { input, unit },
+        top: { input: currentValues.top.input, unit },
+        right: { input: currentValues.right.input, unit },
+        bottom: { input: currentValues.bottom.input, unit },
+        left: { input: currentValues.left.input, unit },
       }
     } else {
+      const currentInput = input || currentValues[direction].input
       newValues = {
         ...currentValues,
-        [direction]: { ...currentValues[direction], unit },
+        [direction]: { ...currentValues[direction], input: currentInput, unit },
       }
     }
 
@@ -297,7 +266,7 @@
   // 格式化单个值
   function formatValue({ input, unit }) {
     if (input === 'auto') return 'auto'
-    if (!input || input === '') return '0'
+    if (!input || input === '') return `0${unit}`
     return `${input}${unit}`
   }
 </script>
@@ -306,6 +275,7 @@
   .space-input-wrapper {
     display: flex;
     align-items: center;
+    flex-direction: column;
     gap: 12px;
   }
 
@@ -314,8 +284,8 @@
   }
 
   .space-box {
-    width: 40px;
-    height: 40px;
+    width: 80px;
+    height: 80px;
     border: 1px dashed #dcdfe6;
     display: flex;
     align-items: center;
@@ -352,8 +322,8 @@
   }
 
   .space-inner {
-    width: 20px;
-    height: 20px;
+    width: 40px;
+    height: 40px;
     border: 1px solid #dcdfe6;
     background-color: #fff;
     display: flex;
@@ -396,21 +366,12 @@
   }
 
   .space-label {
+    display: block;
     font-size: 12px;
     color: #606266;
   }
 
-  .space-unit-wrapper {
+  .space-unit-input {
     flex: 1;
-    display: flex;
-    gap: 4px;
-  }
-
-  .space-input {
-    flex: 1;
-  }
-
-  .space-unit-select {
-    width: 60px;
   }
 </style>

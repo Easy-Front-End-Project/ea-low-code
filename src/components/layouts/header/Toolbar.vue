@@ -69,6 +69,7 @@
 
 <script setup>
   import { ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import { useSchemaStore } from '@/stores/designer/schema'
   import { exportSchemaToJson, importSchemaFromJson } from '@/utils/schemaHelper'
   import { exampleSchema } from '@/constants/exampleSchema'
@@ -77,6 +78,7 @@
   import RemoteComponentManager from '@/components/designer/RemoteComponentManager.vue'
 
   const schemaStore = useSchemaStore()
+  const router = useRouter()
   const fileInput = ref(null)
 
   // 组件大纲弹框显示状态
@@ -135,7 +137,7 @@
   }
 
   function handlePreview() {
-    schemaStore.setPreviewMode(true)
+    router.push('/preview')
   }
 
   function handleExport() {

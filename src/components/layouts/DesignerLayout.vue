@@ -38,18 +38,17 @@
               <!-- 页面设置面板 -->
               <PageSettingsPanel v-else-if="activeLeftPanel === 'page'" class="h-full" />
               <!-- JSON 面板 -->
-
-              <MonacoEditor
-                v-else-if="activeLeftPanel === 'json'"
-                v-model="jsonContent"
-                language="json"
-                height="100%"
-              />
-
-              <!-- AI 面板 -->
-              <!-- <div v-else-if="activeLeftPanel === 'ai'" class="h-full p-4">
-                <ea-text type="info">AI 助手（待实现）</ea-text>
-              </div> -->
+              <Suspense v-else-if="activeLeftPanel === 'json'">
+                <template #default>
+                  <MonacoEditor v-model="jsonContent" language="json" height="100%" />
+                </template>
+                <template #fallback>
+                  <div class="h-full flex flex-col items-center justify-center">
+                    <div class="loading-spinner-small"></div>
+                    <span class="mt-2 text-sm text-gray-400">加载编辑器...</span>
+                  </div>
+                </template>
+              </Suspense>
             </div>
             <!-- 左侧切换按钮 -->
             <ea-button
@@ -72,7 +71,17 @@
             class="bg-white border-l border-gray-200 relative transition-all duration-300"
           >
             <div v-show="!rightAsideCollapsed" class="h-full w-full">
-              <PropsPanel class="h-full w-full" />
+              <Suspense>
+                <template #default>
+                  <PropsPanel class="h-full w-full" />
+                </template>
+                <template #fallback>
+                  <div class="h-full flex flex-col items-center justify-center">
+                    <div class="loading-spinner-small"></div>
+                    <span class="mt-2 text-sm text-gray-400">加载属性面板...</span>
+                  </div>
+                </template>
+              </Suspense>
             </div>
             <!-- 右侧切换按钮 -->
             <ea-button
@@ -90,64 +99,75 @@
 </template>
 
 <script setup>
-  import { ref, computed, watch } from 'vue'
+  import { ref, computed, watch, defineAsyncComponent } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
   import Toolbar from './header/Toolbar.vue'
   import ComponentPanel from './material/ComponentPanel.vue'
   import PageSettingsPanel from './page/PageSettingsPanel.vue'
   import CanvasArea from './canvas/CanvasArea.vue'
-  import PropsPanel from './props/PropsPanel.vue'
-  import MonacoEditor from '@/components/common/MonacoEditor.vue'
+
+  // 异步加载重型组件
+  const MonacoEditor = defineAsyncComponent(() => import('@/components/common/MonacoEditor.vue'))
+  const PropsPanel = defineAsyncComponent(() => import('./props/PropsPanel.vue'))
 
   const schemaStore = useSchemaStore()
 
-  // 当前激活的左侧面板
+  // 左侧面板状态
   const activeLeftPanel = ref('components')
-  // 左侧边栏展开/收起状态
   const leftAsideCollapsed = ref(false)
-  // 右侧边栏展开/收起状态
-  const rightAsideCollapsed = ref(false)
 
-  // JSON 编辑器内容 - 从 schema 计算得出
-  const jsonContent = computed({
-    get: () => JSON.stringify(schemaStore.pageSchema, null, 2),
-    set: value => {
-      try {
-        const parsed = JSON.parse(value)
-        schemaStore.importSchema(parsed)
-      } catch (e) {
-        // JSON 格式错误时不更新
-        console.warn('Invalid JSON:', e)
-      }
-    },
-  })
+  // 右侧面板状态
+  const rightAsideCollapsed = ref(false)
 
   // 左侧面板配置
   const leftPanelItems = [
     { key: 'components', label: '组件', title: '组件库' },
     { key: 'page', label: '页面', title: '页面设置' },
-    { key: 'json', label: 'JSON', title: 'JSON 编辑器' },
+    { key: 'json', label: 'JSON', title: 'JSON 编辑' },
     // { key: 'ai', label: 'AI', title: 'AI 助手' },
   ]
 
   // 切换左侧面板
-  function switchLeftPanel(panel) {
-    activeLeftPanel.value = panel
-
-    if (leftAsideCollapsed.value) {
+  function switchLeftPanel(key) {
+    if (activeLeftPanel.value === key) {
+      leftAsideCollapsed.value = !leftAsideCollapsed.value
+    } else {
+      activeLeftPanel.value = key
       leftAsideCollapsed.value = false
     }
   }
 
-  // 切换左侧边栏
+  // 切换左侧折叠
   function toggleLeftAside() {
     leftAsideCollapsed.value = !leftAsideCollapsed.value
   }
 
-  // 切换右侧边栏
+  // 切换右侧折叠
   function toggleRightAside() {
     rightAsideCollapsed.value = !rightAsideCollapsed.value
   }
+
+  // JSON 编辑器内容
+  const jsonContent = computed({
+    get: () => JSON.stringify(schemaStore.pageSchema, null, 2),
+    set: val => {
+      try {
+        const parsed = JSON.parse(val)
+        schemaStore.importSchema(parsed)
+      } catch (e) {
+        // JSON 解析错误，忽略
+      }
+    },
+  })
+
+  // 监听 schema 变化，用于调试
+  watch(
+    () => schemaStore.pageSchema,
+    newVal => {
+      console.log('Schema updated:', newVal)
+    },
+    { deep: true }
+  )
 </script>
 
 <style scoped>
@@ -169,5 +189,21 @@
 
   ea-main::part(container) {
     padding: 0;
+  }
+
+  /* 小型加载动画 */
+  .loading-spinner-small {
+    width: 32px;
+    height: 32px;
+    border: 2px solid #e4e7ed;
+    border-top-color: #409eff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 </style>

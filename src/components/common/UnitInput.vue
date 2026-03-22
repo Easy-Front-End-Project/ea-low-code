@@ -1,8 +1,10 @@
 <template>
-  <div class="unit-input-wrapper flex gap-2">
+  <div class="unit-input-wrapper flex gap-1">
     <EaInput
       :model-value="displayValue"
       @update:model-value="handleInputChange"
+      @focus="$emit('focus', $event)"
+      @blur="$emit('blur', $event)"
       class="prop-input flex-1"
       :placeholder="placeholder"
     />
@@ -10,7 +12,7 @@
       v-if="!isAutoValue"
       :model-value="unitValue"
       @update:model-value="handleUnitChange"
-      class="unit-select w-20"
+      class="w-18"
     >
       <ea-option v-for="unit in actualUnits" :key="unit" :value="unit">{{ unit }}</ea-option>
     </EaSelect>
@@ -56,7 +58,7 @@
     return UNIT_TYPES[props.unitType] || UNIT_TYPES.css
   })
 
-  const emit = defineEmits(['update:value'])
+  const emit = defineEmits(['update:value', 'input-change', 'unit-change', 'focus', 'blur'])
 
   // 判断是否为 auto 值
   const isAutoValue = computed(() => {
@@ -103,6 +105,7 @@
     // 如果输入的是 auto，直接设置为 auto
     if (strValue === 'auto') {
       emit('update:value', 'auto')
+      emit('input-change', 'auto', unitValue.value)
       return
     }
 
@@ -117,6 +120,7 @@
     const unit = unitValue.value
     const combinedValue = sanitizedValue ? `${sanitizedValue}${unit === 'auto' ? '' : unit}` : ''
     emit('update:value', combinedValue)
+    emit('input-change', sanitizedValue, unit)
   }
 
   // 处理单位变化
@@ -124,15 +128,11 @@
     const input = inputValue.value
     const combinedValue = input ? `${input}${unit === 'auto' ? '' : unit}` : ''
     emit('update:value', combinedValue)
+    emit('unit-change', input, unit)
   }
 </script>
 
 <style lang="scss" scoped>
-  .unit-input-wrapper {
-    display: flex;
-    gap: 0.5rem;
-  }
-
   .prop-input {
     flex: 1;
   }
@@ -151,9 +151,5 @@
     -webkit-appearance: none;
     -moz-appearance: textfield;
     appearance: none;
-  }
-
-  .unit-select {
-    width: 5rem;
   }
 </style>

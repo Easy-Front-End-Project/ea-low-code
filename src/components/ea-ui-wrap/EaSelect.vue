@@ -49,25 +49,19 @@
   const selectRef = ref(null)
   const localValue = ref(Array.isArray(props.modelValue) ? [...props.modelValue] : props.modelValue)
 
+  // 监听 props.modelValue 变化，同步更新 localValue
+  watch(() => props.modelValue, (newVal) => {
+    localValue.value = Array.isArray(newVal) ? [...newVal] : newVal
+  })
+
   // 处理 change 事件
   function handleChange(event) {
     const value = event.detail?.value
-    const options = [...event.target.querySelectorAll('ea-option')]
-    const selectedOption = options.find(o => o.getAttribute('value') === value)
 
-    if ((value !== undefined && value !== localValue.value && selectedOption) || value === true) {
+    if (value !== undefined && value !== localValue.value) {
       localValue.value = value
       emit('update:modelValue', value)
       emit('change', value)
-
-      return
-    }
-
-    if (props.multiple) {
-      localValue.value = value
-      emit('update:modelValue', value)
-      emit('change', value)
-      return
     }
   }
 
