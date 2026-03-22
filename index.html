@@ -1,12 +1,42 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
   <head>
+    <script>self["MonacoEnvironment"] = (function (paths) {
+          return {
+            globalAPI: false,
+            getWorkerUrl : function (moduleId, label) {
+              var result =  paths[label];
+              if (/^((http:)|(https:)|(file:)|(\/\/))/.test(result)) {
+                var currentUrl = String(window.location);
+                var currentOrigin = currentUrl.substr(0, currentUrl.length - window.location.hash.length - window.location.search.length - window.location.pathname.length);
+                if (result.substring(0, currentOrigin.length) !== currentOrigin) {
+                  var js = '/*' + label + '*/importScripts("' + result + '");';
+                  var blob = new Blob([js], { type: 'application/javascript' });
+                  return URL.createObjectURL(blob);
+                }
+              }
+              return result;
+            }
+          };
+        })({
+  "editorWorkerService": "/ea-low-code/monacoeditorwork/editor.worker.bundle.js",
+  "css": "/ea-low-code/monacoeditorwork/css.worker.bundle.js",
+  "html": "/ea-low-code/monacoeditorwork/html.worker.bundle.js",
+  "json": "/ea-low-code/monacoeditorwork/json.worker.bundle.js",
+  "typescript": "/ea-low-code/monacoeditorwork/ts.worker.bundle.js",
+  "javascript": "/ea-low-code/monacoeditorwork/ts.worker.bundle.js",
+  "less": "/ea-low-code/monacoeditorwork/css.worker.bundle.js",
+  "scss": "/ea-low-code/monacoeditorwork/css.worker.bundle.js",
+  "handlebars": "/ea-low-code/monacoeditorwork/html.worker.bundle.js",
+  "razor": "/ea-low-code/monacoeditorwork/html.worker.bundle.js"
+});</script>
+
     <meta charset="UTF-8">
     <link rel="icon" href="/ea-low-code/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EA 低代码设计器</title>
-    <script type="module" crossorigin src="/ea-low-code/assets/index-DMML9XT2.js"></script>
-    <link rel="stylesheet" crossorigin href="/ea-low-code/assets/index-CfKcmhVx.css">
+    <script type="module" crossorigin src="/ea-low-code/assets/index-TuB_AqyW.js"></script>
+    <link rel="stylesheet" crossorigin href="/ea-low-code/assets/index-ki2pQYGr.css">
   </head>
   <body>
     <div id="app"></div>
