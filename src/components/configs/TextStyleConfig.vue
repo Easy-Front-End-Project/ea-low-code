@@ -97,9 +97,10 @@
         <div class="prop-item flex-1">
           <label class="prop-label">颜色</label>
           <div class="color-input-wrapper text-center">
-            <ea-color-picker
-              :value="style?.color || ''"
-              @change="handleInlineStyleChange('color', $event.detail.value)"
+            <!-- 颜色类型变量 -->
+            <EaColorPicker
+              :model-value="style?.color || ''"
+              @update:model-value="handleInlineStyleChange('color', $event)"
               class="color-picker mx-auto"
             />
           </div>
@@ -162,6 +163,7 @@
   import { computed } from 'vue'
   import UnitInput from '../common/UnitInput.vue'
   import EaSelect from '../ea-ui-wrap/EaSelect.vue'
+  import EaColorPicker from '../ea-ui-wrap/EaColorPicker.vue'
 
   const props = defineProps({
     style: {

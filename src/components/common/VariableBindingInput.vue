@@ -62,11 +62,11 @@
           unit-type="time"
           @update:value="handleInputChange"
         />
-        <ea-color-picker
+        <EaColorPicker
           v-else-if="resolvedInputType === 'color'"
-          :value="inputValue"
-          @change="handleColorChange"
-          @ea-clear="handleClearVariable"
+          :model-value="inputValue"
+          @update:model-value="handleColorChange"
+          @clear="handleClearVariable"
           class="prop-input flex-1"
         />
         <!-- Array/Object 类型使用按钮打开编辑器 -->
@@ -102,6 +102,7 @@
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
   import EaSwitch from '@/components/ea-ui-wrap/EaSwitch.vue'
+  import EaColorPicker from '@/components/ea-ui-wrap/EaColorPicker.vue'
   import UnitInput from '@/components/common/UnitInput.vue'
 
   const props = defineProps({

@@ -17,9 +17,9 @@
       <!-- 图片或渐变 -->
       <div class="prop-item">
         <label class="prop-label">图片或渐变</label>
-        <ea-input
-          :value="style?.backgroundImage || ''"
-          @input="handleBackgroundImageChange($event.target.value)"
+        <EaInput
+          :model-value="style?.backgroundImage || ''"
+          @update:model-value="handleBackgroundImageChange($event)"
           placeholder="http://xxx.png"
           class="bg-image-input"
         />
@@ -97,6 +97,7 @@
   import UnitInput from '../common/UnitInput.vue'
   import EaSelect from '../ea-ui-wrap/EaSelect.vue'
   import EaColorPicker from '../ea-ui-wrap/EaColorPicker.vue'
+  import EaInput from '../ea-ui-wrap/EaInput.vue'
 
   const props = defineProps({
     style: {

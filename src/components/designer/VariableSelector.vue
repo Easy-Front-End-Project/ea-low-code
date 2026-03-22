@@ -3,9 +3,9 @@
     <div class="variable-selector">
       <!-- 搜索框 -->
       <div class="search-box">
-        <ea-input v-model="searchKeyword" size="small" placeholder="搜索变量...">
+        <EaInput v-model="searchKeyword" size="small" placeholder="搜索变量...">
           <ea-icon slot="prefix" name="magnifying-glass" variant="solid" size="14"></ea-icon>
-        </ea-input>
+        </EaInput>
       </div>
 
       <!-- 变量列表 -->
@@ -51,6 +51,7 @@
 <script setup>
   import { ref, computed } from 'vue'
   import { useVariableStore } from '@/stores/designer/variable'
+  import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
   const props = defineProps({
     visible: {

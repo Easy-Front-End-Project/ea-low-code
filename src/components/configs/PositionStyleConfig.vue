@@ -22,9 +22,9 @@
       <div class="prop-row">
         <div class="prop-item flex-1">
           <label class="prop-label">展示层级(zIndex)</label>
-          <ea-input
-            :value="positionStyle?.zIndex || ''"
-            @input="handleInlineStyleChange('zIndex', $event.target.value)"
+          <EaInput
+            :model-value="positionStyle?.zIndex || ''"
+            @update:model-value="handleInlineStyleChange('zIndex', $event)"
             placeholder="层级"
           />
         </div>
@@ -90,6 +90,7 @@
   import { computed } from 'vue'
   import UnitInput from '../common/UnitInput.vue'
   import EaSelect from '../ea-ui-wrap/EaSelect.vue'
+  import EaInput from '../ea-ui-wrap/EaInput.vue'
 
   const props = defineProps({
     positionStyle: {

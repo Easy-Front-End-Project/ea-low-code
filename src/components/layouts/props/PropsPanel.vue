@@ -35,12 +35,12 @@
                   </ea-button>
                 </div>
                 <div v-else class="flex items-center gap-2">
-                  <ea-input
+                  <EaInput
                     v-model="aliasInput"
                     size="small"
                     placeholder="输入别名"
                     class="w-full"
-                  ></ea-input>
+                  />
                   <ea-button
                     type="success"
                     size="small"
@@ -164,6 +164,7 @@
   import SlotConfig from '@/components/configs/SlotConfig.vue'
   import SlotScopeConfig from '@/components/configs/SlotScopeConfig.vue'
   import SpecialConfigRenderer from '@/components/configs/SpecialConfig.vue'
+  import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
   const schemaStore = useSchemaStore()
 

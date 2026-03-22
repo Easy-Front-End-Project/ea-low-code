@@ -8,17 +8,17 @@
         <div v-for="variable in dynamicCssVariablesList" :key="variable.name" class="prop-item">
           <label class="prop-label">{{ variable.label }}</label>
           <!-- 颜色类型变量 -->
-          <ea-color-picker
+          <EaColorPicker
             v-if="variable.type === 'color'"
-            :value="cssVariables?.[variable.name] || variable.default"
-            @change="handleCssVariableChange(variable.name, $event.detail.value)"
+            :model-value="cssVariables?.[variable.name] || variable.default"
+            @update:model-value="handleCssVariableChange(variable.name, $event)"
             class="prop-input m-x-auto"
           />
           <!-- 字符串类型变量 -->
-          <ea-input
+          <EaInput
             v-else
-            :value="cssVariables?.[variable.name] || ''"
-            @change="handleCssVariableChange(variable.name, $event.detail.value)"
+            :model-value="cssVariables?.[variable.name] || ''"
+            @update:model-value="handleCssVariableChange(variable.name, $event)"
             class="prop-input"
             :placeholder="variable.default"
           />
@@ -31,10 +31,10 @@
         <div v-for="variable in styleConfig.cssVariables" :key="variable.name" class="prop-item">
           <label class="prop-label">{{ variable.label }}</label>
           <!-- 颜色类型变量 -->
-          <ea-color-picker
+          <EaColorPicker
             v-if="variable.type === 'color'"
-            :value="cssVariables?.[variable.name] || variable.default"
-            @change="handleCssVariableChange(variable.name, $event.detail.value)"
+            :model-value="cssVariables?.[variable.name] || variable.default"
+            @update:model-value="handleCssVariableChange(variable.name, $event)"
             class="prop-input m-x-auto"
           />
           <!-- 带单位的变量使用 UnitInput -->
@@ -45,10 +45,10 @@
             :placeholder="variable.default"
           />
           <!-- 普通字符串类型变量 -->
-          <ea-input
+          <EaInput
             v-else
-            :value="cssVariables?.[variable.name] || ''"
-            @change="handleCssVariableChange(variable.name, $event.detail.value)"
+            :model-value="cssVariables?.[variable.name] || ''"
+            @update:model-value="handleCssVariableChange(variable.name, $event)"
             class="prop-input"
             :placeholder="variable.default"
           />
@@ -70,6 +70,8 @@
   import { computed } from 'vue'
   import { getComponentMeta } from '@/constants/componentMeta'
   import UnitInput from '../common/UnitInput.vue'
+  import EaInput from '../ea-ui-wrap/EaInput.vue'
+  import EaColorPicker from '../ea-ui-wrap/EaColorPicker.vue'
 
   const props = defineProps({
     componentType: {
