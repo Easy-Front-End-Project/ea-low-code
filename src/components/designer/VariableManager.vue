@@ -98,13 +98,10 @@
 
     <!-- 底部按钮 -->
     <div slot="footer" class="dialog-footer">
-      <ea-button type="primary" size="small" @click="handleAddVariable">
-        <ea-icon name="plus" variant="solid" size="12" class="mr-1"></ea-icon>
-        <span>添加变量</span>
+      <ea-button type="primary" icon="plus" size="small" @click="handleAddVariable">
+        添加变量
       </ea-button>
-      <div class="flex items-center gap-2">
-        <ea-button @click="handleClose">关闭</ea-button>
-      </div>
+      <ea-button @click="handleClose">关闭</ea-button>
     </div>
 
     <!-- MonacoEditor 弹窗 -->
@@ -294,9 +291,16 @@
   }
 
   // 删除变量
-  function handleDeleteVariable(id) {
-    if (confirm('确定要删除这个变量吗？')) {
+  async function handleDeleteVariable(id) {
+    try {
+      await window.$confirm('确定要删除这个变量吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
       variableStore.removeVariable(id)
+    } catch {
+      // 用户取消删除，不做任何操作
     }
   }
 </script>

@@ -44,8 +44,12 @@
                 <span class="text-xs text-gray-500">{{ event.eventType }}</span>
                 <span class="text-sm text-gray-700">{{ event.name }}</span>
               </div>
-              <ea-button type="text" size="small" @click.stop="handleDeleteEvent(event.id)">
-                <ea-icon name="trash-can" variant="solid" size="12" class="text-red-500"></ea-icon>
+              <ea-button
+                type="danger"
+                icon="trash-can"
+                size="small"
+                @click.stop="handleDeleteEvent(event.id)"
+              >
               </ea-button>
             </div>
           </div>
@@ -115,6 +119,7 @@
                   <ea-option value="notification">显示通知</ea-option>
                   <ea-option value="setProp">设置组件属性</ea-option>
                   <ea-option value="callMethod">调用组件方法</ea-option>
+                  <ea-option value="apiRequest">请求接口</ea-option>
                   <ea-option value="custom">自定义代码</ea-option>
                 </EaSelect>
               </div>
@@ -145,6 +150,12 @@
                   v-model="selectedEvent.actionConfig"
                 />
 
+                <!-- 请求接口配置 -->
+                <ApiRequestActionConfig
+                  v-if="selectedEvent.action === 'apiRequest'"
+                  v-model="selectedEvent.actionConfig"
+                />
+
                 <!-- 自定义代码配置 -->
                 <CustomCodeActionConfig
                   v-if="selectedEvent.action === 'custom'"
@@ -165,9 +176,8 @@
 
       <!-- 底部按钮 -->
       <div slot="footer" class="dialog-footer">
-        <ea-button type="primary" size="small" @click="handleAddNewEvent">
-          <ea-icon name="plus" variant="solid" size="12" class="mr-1"></ea-icon>
-          <span>添加事件</span>
+        <ea-button type="primary" icon="plus" size="small" @click="handleAddNewEvent">
+          添加事件
         </ea-button>
         <div class="flex items-center gap-2">
           <ea-button @click="handleCloseDialog">取消</ea-button>
@@ -186,6 +196,7 @@
   import NotificationActionConfig from './special/NotificationActionConfig.vue'
   import SetPropActionConfig from './special/SetPropActionConfig.vue'
   import CallMethodActionConfig from './special/CallMethodActionConfig.vue'
+  import ApiRequestActionConfig from './special/ApiRequestActionConfig.vue'
   import CustomCodeActionConfig from './special/CustomCodeActionConfig.vue'
   import { generateUniqueId } from '@/utils/schemaHelper'
 
@@ -288,6 +299,15 @@
         return {
           targetComponentId: '',
           methodName: '',
+        }
+      case 'apiRequest':
+        return {
+          url: '',
+          method: 'GET',
+          params: [],
+          body: [],
+          enableDataBinding: false,
+          targetVariable: '',
         }
       case 'custom':
         return {

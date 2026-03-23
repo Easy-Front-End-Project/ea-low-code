@@ -101,6 +101,111 @@ export function executeCustomCode(code, context, originalEvent) {
 }
 
 /**
+ * 执行 API 请求
+ * @param {Object} actionConfig - 请求配置
+ * @param {Object} context - 执行上下文
+ */
+export async function executeApiRequest(actionConfig, context) {
+  const {
+    url,
+    method = 'GET',
+    params = [],
+    body = [],
+    enableDataBinding,
+    targetVariable,
+  } = actionConfig
+
+  if (!url) {
+    console.warn('API 请求 URL 不能为空')
+    return
+  }
+
+  try {
+    // 构建查询参数
+    const queryParams = new URLSearchParams()
+    params.forEach(param => {
+      if (param.key) {
+        // 解析值（支持变量绑定）
+        const resolvedValue = resolveTemplateString(param.value, context)
+        queryParams.append(param.key, resolvedValue)
+      }
+    })
+
+    // 构建完整 URL
+    let fullUrl = url
+    const queryString = queryParams.toString()
+    if (queryString) {
+      fullUrl += (url.includes('?') ? '&' : '?') + queryString
+    }
+
+    // 构建请求选项
+    const fetchOptions = {
+      method: method.toUpperCase(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+
+    // 添加 body（非 GET 请求）
+    if (method.toUpperCase() !== 'GET' && body.length > 0) {
+      const bodyObj = {}
+      body.forEach(item => {
+        if (item.key) {
+          const resolvedValue = resolveTemplateString(item.value, context)
+          bodyObj[item.key] = resolvedValue
+        }
+      })
+      fetchOptions.body = JSON.stringify(bodyObj)
+    }
+
+    // 发送请求
+    const response = await fetch(fullUrl, fetchOptions)
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    // 数据绑定：将响应数据赋值给变量
+    if (enableDataBinding && targetVariable) {
+      const { $vars } = context
+      if ($vars && $vars.set) {
+        $vars.set(targetVariable, data)
+        console.log(`API 响应数据已绑定到变量: ${targetVariable}`, data)
+      }
+    }
+
+    return data
+  } catch (error) {
+    console.error('API 请求失败:', error)
+    if (window.$message) {
+      window.$message.error('请求失败: ' + error.message)
+    }
+    throw error
+  }
+}
+
+/**
+ * 解析模板字符串（支持 {{variable}} 语法）
+ * @param {string} template - 模板字符串
+ * @param {Object} context - 执行上下文
+ * @returns {string} 解析后的字符串
+ */
+function resolveTemplateString(template, context) {
+  if (!template || typeof template !== 'string') {
+    return template
+  }
+
+  // 支持 {{variable}} 语法
+  return template.replace(/\{\{([^}]+)\}\}/g, (match, varName) => {
+    const trimmedName = varName.trim()
+    const value = context.$vars?.get(trimmedName)
+    return value !== undefined ? value : match
+  })
+}
+
+/**
  * 显示消息
  * @param {string} message - 消息内容
  * @param {string} type - 消息类型: 'success' | 'error' | 'warning' | 'info'
@@ -181,7 +286,7 @@ export function setComponentProp(componentId, propName, propValue) {
  * @param {Object} eventConfig - 事件配置
  * @param {Event} originalEvent - 原始事件对象
  */
-export function executeEvent(eventConfig, originalEvent) {
+export async function executeEvent(eventConfig, originalEvent) {
   if (!eventConfig) return
 
   const context = createExecutionContext()
@@ -217,6 +322,10 @@ export function executeEvent(eventConfig, originalEvent) {
       )
       break
 
+    case 'apiRequest':
+      await executeApiRequest(actionConfig, context)
+      break
+
     default:
       console.warn('未知的事件动作类型:', eventConfig.action)
   }
@@ -228,7 +337,7 @@ export function executeEvent(eventConfig, originalEvent) {
  * @param {Object} eventConfig - 事件配置
  * @param {Event} originalEvent - 原始事件对象
  */
-export function executeEventWithAlias(eventConfig, originalEvent) {
+export async function executeEventWithAlias(eventConfig, originalEvent) {
   if (!eventConfig) return
 
   const schemaStore = useSchemaStore()

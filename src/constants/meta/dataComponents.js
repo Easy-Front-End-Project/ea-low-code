@@ -1900,8 +1900,9 @@ export const dataComponents = [
         name: 'fixed',
         label: '固定列',
         type: PropTypes.SELECT,
-        default: '',
+        default: 'false',
         options: [
+          { label: '无', value: 'false' },
           { label: '左', value: 'left' },
           { label: '右', value: 'right' },
         ],

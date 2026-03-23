@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { generateComponentId } from '@/utils/schemaHelper'
+import { useVariableStore } from './variable'
 
 // ==================== Constants ====================
 const DEFAULT_SCHEMA = {
@@ -11,6 +12,7 @@ const DEFAULT_SCHEMA = {
     viewport: {},
   },
   settings: {},
+  variables: [],
   components: [],
 }
 
@@ -612,6 +614,10 @@ export const useSchemaStore = defineStore('schema', () => {
     componentAliasMap.value.clear()
     rebuildAliasMap(schema.components || [], componentAliasMap.value)
 
+    // 恢复变量配置到 variableStore
+    const variableStore = useVariableStore()
+    variableStore.setVariables(schema.variables || [])
+
     // 导入后保存到历史记录
     saveHistory()
 
@@ -623,6 +629,10 @@ export const useSchemaStore = defineStore('schema', () => {
    * @returns {Object} Schema 对象的深拷贝
    */
   function exportSchema() {
+    // 从 variableStore 获取最新变量配置并同步到 schema
+    const variableStore = useVariableStore()
+    pageSchema.value.variables = variableStore.variables || []
+
     return JSON.parse(JSON.stringify(pageSchema.value))
   }
 
@@ -637,6 +647,15 @@ export const useSchemaStore = defineStore('schema', () => {
   }
 
   // ==================== Alias Actions ====================
+
+  /**
+   * 更新页面变量
+   * @param {Array} variables - 变量列表
+   */
+  function updatePageVariables(variables) {
+    pageSchema.value.variables = variables || []
+    saveHistory()
+  }
 
   /**
    * 设置组件别名
@@ -746,6 +765,7 @@ export const useSchemaStore = defineStore('schema', () => {
     setPreviewMode,
     updatePageMeta,
     updatePageSettings,
+    updatePageVariables,
     importSchema,
     exportSchema,
     clearCanvas,

@@ -27,12 +27,12 @@
 </template>
 
 <script setup>
-  import { computed, ref, onMounted, onBeforeUnmount, shallowRef } from 'vue'
+  import { computed, ref, onMounted, shallowRef } from 'vue'
   import { getRemoteComponentMetaList } from '@/constants/componentMeta'
-  import { useComponentInstanceStore } from '@/stores/designer/componentInstance'
   import { useVariableStore } from '@/stores/designer/variable'
   import { loadRemoteComponent } from '@/utils/loadRemoteComponent'
   import { executeEvent } from '@/utils/eventExecutor'
+  import { useComponentInstance } from '@/composables/useComponentInstance'
 
   const props = defineProps({
     component: {
@@ -41,7 +41,6 @@
     },
   })
 
-  const instanceStore = useComponentInstanceStore()
   const variableStore = useVariableStore()
   const componentRef = ref(null)
 
@@ -163,15 +162,15 @@
     events.forEach(eventConfig => {
       const eventType = eventConfig.eventType || eventConfig.type
       if (!listeners[eventType]) {
-        listeners[eventType] = event => {
-          executeEventHandler(eventConfig, event)
+        listeners[eventType] = async event => {
+          await executeEventHandler(eventConfig, event)
         }
       } else {
         // 如果已经有同类型事件，创建组合处理器
         const existingHandler = listeners[eventType]
-        listeners[eventType] = event => {
-          existingHandler(event)
-          executeEventHandler(eventConfig, event)
+        listeners[eventType] = async event => {
+          await existingHandler(event)
+          await executeEventHandler(eventConfig, event)
         }
       }
     })
@@ -180,32 +179,16 @@
   })
 
   // 执行事件
-  function executeEventHandler(eventConfig, originalEvent) {
-    executeEvent(eventConfig, originalEvent)
+  async function executeEventHandler(eventConfig, originalEvent) {
+    await executeEvent(eventConfig, originalEvent)
   }
 
-  // 注册组件实例
-  onMounted(() => {
-    if (componentRef.value) {
-      // 等待 Web Components 定义完成
-      const tagName = props.component.type
-      if (tagName && tagName.startsWith('ea-')) {
-        customElements.whenDefined(tagName).then(() => {
-          // 获取实际的 DOM 元素
-          const element = componentRef.value.$el || componentRef.value
-          if (element) {
-            instanceStore.registerInstance(props.component.id, element)
-          }
-        })
-      } else {
-        instanceStore.registerInstance(props.component.id, componentRef.value)
-      }
-    }
-  })
-
-  // 注销组件实例
-  onBeforeUnmount(() => {
-    instanceStore.unregisterInstance(props.component.id)
+  // 使用 composable 管理组件实例（包含 load 事件触发逻辑）
+  useComponentInstance({
+    componentId: props.component.id,
+    componentType: props.component.type,
+    componentRef,
+    events: props.component.events,
   })
 </script>
 

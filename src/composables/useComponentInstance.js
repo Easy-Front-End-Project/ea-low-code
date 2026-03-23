@@ -1,5 +1,6 @@
 import { onMounted, onBeforeUnmount } from 'vue'
 import { useComponentInstanceStore } from '@/stores/designer/componentInstance'
+import { executeEvent } from '@/utils/eventExecutor'
 
 /**
  * 组件实例管理 Composable
@@ -7,9 +8,21 @@ import { useComponentInstanceStore } from '@/stores/designer/componentInstance'
  * @param {string} options.componentId - 组件ID
  * @param {string} options.componentType - 组件类型
  * @param {Ref} options.componentRef - 组件引用
+ * @param {Array} options.events - 组件事件配置列表
  */
-export function useComponentInstance({ componentId, componentType, componentRef }) {
+export function useComponentInstance({ componentId, componentType, componentRef, events = [] }) {
   const instanceStore = useComponentInstanceStore()
+
+  /**
+   * 触发组件的 load 事件
+   * 用于在组件加载完成后自动执行配置的动作（如接口请求）
+   */
+  function triggerLoadEvent() {
+    const loadEvent = events?.find(e => e.eventType === 'load')
+    if (loadEvent) {
+      executeEvent(loadEvent, null)
+    }
+  }
 
   // 组件挂载时注册实例
   onMounted(() => {
@@ -23,10 +36,16 @@ export function useComponentInstance({ componentId, componentType, componentRef 
         const ref = componentRef.value
         if (!ref) return
         const element = ref.$el || ref
-        if (element) instanceStore.registerInstance(componentId, element)
+        if (element) {
+          instanceStore.registerInstance(componentId, element)
+          // 触发组件的 load 事件
+          triggerLoadEvent()
+        }
       })
     } else {
       instanceStore.registerInstance(componentId, componentRef.value)
+      // 触发组件的 load 事件
+      triggerLoadEvent()
     }
   })
 

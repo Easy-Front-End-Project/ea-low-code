@@ -195,13 +195,13 @@
 
     events.forEach(eventConfig => {
       const eventType = eventConfig.eventType || eventConfig.type
-      const handler = event => executeEvent(eventConfig, event)
+      const handler = async event => await executeEvent(eventConfig, event)
 
       if (listeners[eventType]) {
         const existingHandler = listeners[eventType]
-        listeners[eventType] = event => {
-          existingHandler(event)
-          handler(event)
+        listeners[eventType] = async event => {
+          await existingHandler(event)
+          await handler(event)
         }
       } else {
         listeners[eventType] = handler
@@ -319,6 +319,7 @@
     componentId: props.component.id,
     componentType: props.component.type,
     componentRef,
+    events: props.component.events,
   })
 </script>
 

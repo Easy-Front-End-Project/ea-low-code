@@ -1,6 +1,7 @@
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { generateUniqueId } from '@/utils/schemaHelper'
+import { useSchemaStore } from './schema'
 
 /**
  * 变量管理 Store
@@ -9,6 +10,19 @@ import { generateUniqueId } from '@/utils/schemaHelper'
 export const useVariableStore = defineStore('variable', () => {
   // 变量列表
   const variables = ref([])
+
+  // 监听变量变化，同步到 schema
+  let schemaStore = null
+  watch(
+    variables,
+    newVariables => {
+      if (!schemaStore) {
+        schemaStore = useSchemaStore()
+      }
+      schemaStore.updatePageVariables(newVariables)
+    },
+    { deep: true }
+  )
 
   // Getters
   const getVariableById = computed(() => id => variables.value.find(v => v.id === id))

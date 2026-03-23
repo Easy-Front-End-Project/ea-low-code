@@ -95,8 +95,8 @@
 
   // 创建事件处理函数
   function createEventHandler(eventConfig) {
-    return event => {
-      executeEvent(eventConfig, event)
+    return async event => {
+      await executeEvent(eventConfig, event)
     }
   }
 
@@ -130,7 +130,7 @@
     // 执行 load 事件
     const loadEvent = pageEvents.value.find(e => e.eventType === 'load')
     if (loadEvent) {
-      executeEvent(loadEvent, null)
+      await executeEvent(loadEvent, null)
     }
 
     const minDelay = 2000
@@ -155,11 +155,11 @@
   })
 
   // 组件卸载时解绑事件
-  onUnmounted(() => {
+  onUnmounted(async () => {
     // 执行 unload 事件
     const unloadEvent = pageEvents.value.find(e => e.eventType === 'unload')
     if (unloadEvent) {
-      executeEvent(unloadEvent, null)
+      await executeEvent(unloadEvent, null)
     }
 
     unbindPageEvents()
