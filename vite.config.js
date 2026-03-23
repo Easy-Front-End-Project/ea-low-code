@@ -33,4 +33,21 @@ export default defineConfig({
   optimizeDeps: {
     include: ['sortablejs', 'lodash-es'],
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          // EA-UI 组件单独打包
+          if (id.includes('easy-component-ui')) {
+            return 'ea-ui'
+          }
+          // Monaco Editor 单独打包
+          if (id.includes('monaco-editor')) {
+            return 'monaco'
+          }
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+  },
 })

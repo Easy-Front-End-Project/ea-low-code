@@ -1,6 +1,6 @@
 <template>
   <div
-    class="designer-toolbar h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4"
+    class="designer-toolbar h-14 bg-white border-b border-gray-200 flex items-center justify-between"
   >
     <!-- 左侧：项目名称和Logo -->
     <div class="flex items-center gap-3">
