@@ -28,6 +28,57 @@ export function getComponentsByCategory(category) {
   return componentMetaList.filter(comp => comp.category === category)
 }
 
+/**
+ * 根据分类获取组件，并按是否为子组件分组
+ * @param {string} category - 分类值
+ * @returns {{ regular: ComponentMeta[], child: ComponentMeta[] }} 普通组件和子组件分组
+ */
+export function getComponentsByCategoryGrouped(category) {
+  const components = componentMetaList.filter(comp => comp.category === category)
+  return {
+    regular: components.filter(comp => !comp.isChildComponent),
+    child: components.filter(comp => comp.isChildComponent),
+  }
+}
+
+/**
+ * 根据分类获取组件，并按父子关系分组
+ * @param {string} category - 分类值
+ * @returns {{ parentType: string, parentName: string, components: ComponentMeta[] }[]} 按父组件分组的列表
+ */
+export function getComponentsByParentGroup(category) {
+  const components = componentMetaList.filter(comp => comp.category === category)
+  const regular = components.filter(comp => !comp.isChildComponent)
+  const children = components.filter(comp => comp.isChildComponent)
+
+  // 创建父组件到子组件的映射
+  const parentMap = new Map()
+
+  // 初始化所有普通组件
+  regular.forEach(comp => {
+    parentMap.set(comp.type, {
+      parentType: comp.type,
+      parentName: comp.name,
+      components: [comp],
+    })
+  })
+
+  // 将子组件添加到对应的父组件组
+  children.forEach(child => {
+    const parentTypes = child.parentComponents || []
+    parentTypes.forEach(parentType => {
+      if (parentMap.has(parentType)) {
+        parentMap.get(parentType).components.push(child)
+      }
+    })
+  })
+
+  // 转换为数组，按父组件名称排序
+  return Array.from(parentMap.values()).sort((a, b) =>
+    a.parentName.localeCompare(b.parentName, 'zh-CN')
+  )
+}
+
 // 根据类型获取组件元数据（包含项目级组件）
 export function getComponentMeta(type) {
   const meta = allComponentMetaList.find(comp => comp.type === type)

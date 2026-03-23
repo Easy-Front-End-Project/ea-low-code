@@ -13,11 +13,7 @@ export const useSchemaStore = defineStore('schema', () => {
     meta: {
       title: '未命名页面',
       description: '',
-      viewport: {
-        width: 1920,
-        height: 1080,
-        overflow: 'auto',
-      },
+      viewport: { width: 1920, height: 1080, overflow: 'auto' },
     },
     // 页面级设置
     settings: {},
@@ -26,16 +22,15 @@ export const useSchemaStore = defineStore('schema', () => {
 
   const selectedComponentId = ref(null)
   const isPreviewMode = ref(false)
-
   // 组件别名映射：alias -> componentId
   const componentAliasMap = ref(new Map())
 
   // Getters
   const components = computed(() => pageSchema.value.components)
   const aliases = computed(() => Object.fromEntries(componentAliasMap.value))
-  const selectedComponent = computed(() => {
-    return findComponentById(pageSchema.value.components, selectedComponentId.value)
-  })
+  const selectedComponent = computed(() =>
+    findComponentById(pageSchema.value.components, selectedComponentId.value)
+  )
   const componentCount = computed(() => countComponents(pageSchema.value.components))
 
   // Actions
@@ -47,10 +42,8 @@ export const useSchemaStore = defineStore('schema', () => {
   function findParentComponent(componentId) {
     function findParent(components, targetId, parent = null) {
       for (const component of components) {
-        if (component.id === targetId) {
-          return parent
-        }
-        if (component.children && component.children.length > 0) {
+        if (component.id === targetId) return parent
+        if (component.children?.length) {
           const result = findParent(component.children, targetId, component)
           if (result) return result
         }
@@ -72,7 +65,7 @@ export const useSchemaStore = defineStore('schema', () => {
     const { slot = 'default', ...otherProps } = props
 
     // 只有当 slot 不是 'default' 时才添加到 props 中
-    const componentProps = slot === 'default' ? { ...otherProps } : { slot, ...otherProps }
+    const componentProps = slot === 'default' ? otherProps : { slot, ...otherProps }
 
     const newComponent = {
       id: generateComponentId(),
@@ -86,9 +79,7 @@ export const useSchemaStore = defineStore('schema', () => {
     if (parentId) {
       const parent = findComponentById(pageSchema.value.components, parentId)
       if (parent) {
-        if (!parent.children) {
-          parent.children = []
-        }
+        parent.children ??= []
         parent.children.push(newComponent)
       }
     } else {
@@ -108,16 +99,18 @@ export const useSchemaStore = defineStore('schema', () => {
     if (alias) {
       removeComponentAlias(alias)
     }
-    const result = removeComponentById(pageSchema.value.components, componentId)
-    if (result && selectedComponentId.value === componentId) {
-      selectedComponentId.value = null
+
+    if (removeComponentById(pageSchema.value.components, componentId)) {
+      if (selectedComponentId.value === componentId) {
+        selectedComponentId.value = null
+      }
     }
   }
 
   /**
    * 更新组件属性
    * @param {string} componentId - 组件ID
-   * @param {Object} props - 新属性
+   * @param {Object} newProps - 新属性
    */
   function updateComponentProps(componentId, newProps) {
     const component = findComponentById(pageSchema.value.components, componentId)
@@ -134,29 +127,24 @@ export const useSchemaStore = defineStore('schema', () => {
    */
   function updateComponentStyle(componentId, style, styleType = 'inline') {
     const component = findComponentById(pageSchema.value.components, componentId)
-    if (component) {
-      if (styleType === 'cssVariable') {
-        // CSS 变量样式存储在单独的字段中
-        if (!component.cssVariables) {
-          component.cssVariables = {}
-        }
-        Object.assign(component.cssVariables, style)
-      } else if (styleType === 'position') {
-        // 定位样式存储在单独的字段中，用于绑定到容器
-        if (!component.positionStyle) {
-          component.positionStyle = {}
-        }
-        Object.assign(component.positionStyle, style)
-      } else if (styleType === 'customCSS') {
-        // 自定义 CSS 直接存储为字符串
-        component.customCSS = style
-      } else {
-        // 普通内联样式
-        if (!component.style) {
-          component.style = {}
-        }
-        Object.assign(component.style, style)
-      }
+    if (!component) return
+
+    const styleMap = {
+      cssVariable: 'cssVariables',
+      position: 'positionStyle',
+      customCSS: 'customCSS',
+      inline: 'style',
+    }
+
+    const targetKey = styleMap[styleType]
+
+    if (styleType === 'customCSS') {
+      // 自定义 CSS 直接存储为字符串
+      component.customCSS = style
+    } else {
+      // 其他样式类型存储在对应的对象中
+      component[targetKey] ??= {}
+      Object.assign(component[targetKey], style)
     }
   }
 
@@ -167,9 +155,7 @@ export const useSchemaStore = defineStore('schema', () => {
    */
   function updateComponentEvents(componentId, events) {
     const component = findComponentById(pageSchema.value.components, componentId)
-    if (component) {
-      component.events = events
-    }
+    if (component) component.events = events
   }
 
   /**
@@ -179,9 +165,7 @@ export const useSchemaStore = defineStore('schema', () => {
    */
   function updateComponentScopeBindings(componentId, scopeBindings) {
     const component = findComponentById(pageSchema.value.components, componentId)
-    if (component) {
-      component.scopeBindings = scopeBindings
-    }
+    if (component) component.scopeBindings = scopeBindings
   }
 
   /**
@@ -191,9 +175,7 @@ export const useSchemaStore = defineStore('schema', () => {
    */
   function updateComponentChildren(componentId, children) {
     const component = findComponentById(pageSchema.value.components, componentId)
-    if (component) {
-      component.children = children
-    }
+    if (component) component.children = children
   }
 
   /**
@@ -213,9 +195,7 @@ export const useSchemaStore = defineStore('schema', () => {
     if (newParentId) {
       const newParent = findComponentById(pageSchema.value.components, newParentId)
       if (newParent) {
-        if (!newParent.children) {
-          newParent.children = []
-        }
+        newParent.children ??= []
         newParent.children.splice(newIndex, 0, component)
       }
     } else {
@@ -276,7 +256,7 @@ export const useSchemaStore = defineStore('schema', () => {
         if (comp.alias) {
           componentAliasMap.value.set(comp.alias, comp.id)
         }
-        if (comp.children && comp.children.length > 0) {
+        if (comp.children?.length) {
           rebuildAliasMap(comp.children)
         }
       }
@@ -301,13 +281,17 @@ export const useSchemaStore = defineStore('schema', () => {
   }
 
   // Helper functions
+  /**
+   * 根据 ID 查找组件
+   * @param {Array} components - 组件列表
+   * @param {string} id - 组件ID
+   * @returns {Object|null} 组件对象
+   */
   function findComponentById(components, id) {
     for (const comp of components) {
-      if (comp.id === id) {
-        return comp
-      }
+      if (comp.id === id) return comp
       // 在 children 中查找
-      if (comp.children && comp.children.length > 0) {
+      if (comp.children?.length) {
         const found = findComponentById(comp.children, id)
         if (found) return found
       }
@@ -315,6 +299,12 @@ export const useSchemaStore = defineStore('schema', () => {
     return null
   }
 
+  /**
+   * 根据 ID 删除组件
+   * @param {Array} components - 组件列表
+   * @param {string} id - 组件ID
+   * @returns {boolean} 是否删除成功
+   */
   function removeComponentById(components, id) {
     for (let i = 0; i < components.length; i++) {
       if (components[i].id === id) {
@@ -322,23 +312,23 @@ export const useSchemaStore = defineStore('schema', () => {
         return true
       }
       // 从 children 中删除
-      if (components[i].children && components[i].children.length > 0) {
-        const result = removeComponentById(components[i].children, id)
-        if (result) return true
+      if (components[i].children?.length) {
+        if (removeComponentById(components[i].children, id)) return true
       }
     }
     return false
   }
 
+  /**
+   * 统计组件数量
+   * @param {Array} components - 组件列表
+   * @returns {number} 组件总数
+   */
   function countComponents(components) {
-    let count = components.length
-    for (const comp of components) {
-      // 统计 children 中的组件
-      if (comp.children && comp.children.length > 0) {
-        count += countComponents(comp.children)
-      }
-    }
-    return count
+    return components.reduce((count, comp) => {
+      const childCount = comp.children?.length ? countComponents(comp.children) : 0
+      return count + 1 + childCount
+    }, 0)
   }
 
   /**
@@ -366,7 +356,7 @@ export const useSchemaStore = defineStore('schema', () => {
   }
 
   /**
-   * 通过别名获取组件ID
+   * 根据别名获取组件ID
    * @param {string} alias - 别名
    * @returns {string|null} 组件ID
    */
@@ -375,20 +365,17 @@ export const useSchemaStore = defineStore('schema', () => {
   }
 
   /**
-   * 通过别名查找组件
+   * 根据别名查找组件
    * @param {string} alias - 别名
    * @returns {Object|null} 组件对象
    */
   function findComponentByAlias(alias) {
     const componentId = getComponentIdByAlias(alias)
-    if (componentId) {
-      return findComponentById(pageSchema.value.components, componentId)
-    }
-    return null
+    return componentId ? findComponentById(pageSchema.value.components, componentId) : null
   }
 
   /**
-   * 获取组件的别名
+   * 获取组件别名
    * @param {string} componentId - 组件ID
    * @returns {string|null} 别名
    */

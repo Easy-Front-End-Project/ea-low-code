@@ -124,41 +124,4 @@ export const layoutComponents = [
       ],
     },
   },
-  {
-    type: 'ea-card',
-    name: '卡片',
-    category: ComponentCategories.LAYOUT,
-    icon: 'Card',
-    props: [
-      {
-        name: 'header',
-        label: '标题',
-        type: PropTypes.STRING,
-        default: '',
-      },
-      {
-        name: 'footer',
-        label: '页脚',
-        type: PropTypes.STRING,
-        default: '',
-      },
-      {
-        name: 'shadow',
-        label: '阴影',
-        type: PropTypes.SELECT,
-        default: 'always',
-        options: [
-          { label: '总是显示', value: 'always' },
-          { label: '悬停显示', value: 'hover' },
-          { label: '从不显示', value: 'never' },
-        ],
-      },
-    ],
-    events: [],
-    slots: [
-      { name: 'default', label: '内容插槽' },
-      { name: 'header', label: '标题插槽' },
-      { name: 'footer', label: '页脚插槽' },
-    ],
-  },
 ]

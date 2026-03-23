@@ -8,7 +8,7 @@ import router from './router'
 
 import 'easy-component-ui/icon-assets'
 import 'easy-component-ui'
-import './main.css'
+import './styles/main.scss'
 
 const app = createApp(App)
 

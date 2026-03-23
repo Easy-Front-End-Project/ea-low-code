@@ -6,13 +6,13 @@ import { defineStore } from 'pinia'
  * 用于管理画布上所有组件的实例，支持组件间联动
  */
 export const useComponentInstanceStore = defineStore('componentInstance', () => {
-  // 组件ID到组件实例的映射 Map<componentId, componentInstance>
+  // 存储组件实例的 Map：componentId -> instance
   const instanceMap = ref(new Map())
 
   /**
    * 注册组件实例
    * @param {string} componentId - 组件ID
-   * @param {object} instance - 组件实例（通常是ref）
+   * @param {Object} instance - 组件实例
    */
   function registerInstance(componentId, instance) {
     if (componentId && instance) {
@@ -33,33 +33,28 @@ export const useComponentInstanceStore = defineStore('componentInstance', () => 
   /**
    * 获取组件实例
    * @param {string} componentId - 组件ID
-   * @returns {object|null} 组件实例
+   * @returns {Object|null} 组件实例
    */
   function getInstance(componentId) {
     return instanceMap.value.get(componentId) || null
   }
 
   /**
-   * 获取组件实例（支持通过ref获取实际DOM元素）
+   * 获取组件 DOM 元素
    * @param {string} componentId - 组件ID
-   * @returns {HTMLElement|null} 组件DOM元素
+   * @returns {HTMLElement|null} 组件 DOM 元素
    */
   function getComponentElement(componentId) {
     const instance = instanceMap.value.get(componentId)
     if (!instance) return null
-
-    // 如果是Vue ref，获取其值
-    if (instance.value) {
-      return instance.value
-    }
-    return instance
+    return instance.value || instance
   }
 
   /**
    * 调用组件方法
-   * @param {string} componentId - 目标组件ID
+   * @param {string} componentId - 组件ID
    * @param {string} methodName - 方法名
-   * @param {...any} args - 方法参数
+   * @param {...any} args - 参数
    * @returns {any} 方法返回值
    */
   function callComponentMethod(componentId, methodName, ...args) {
@@ -69,12 +64,12 @@ export const useComponentInstanceStore = defineStore('componentInstance', () => 
       return null
     }
 
-    // 对于Web Components，直接操作属性或调用方法
+    // 直接调用方法
     if (typeof element[methodName] === 'function') {
       return element[methodName](...args)
     }
 
-    // 对于属性设置（如loading）
+    // 尝试调用 setXXX 方法（设置属性）
     if (methodName.startsWith('set')) {
       const propName = methodName.replace('set', '').toLowerCase()
       element[propName] = args[0]
@@ -87,9 +82,10 @@ export const useComponentInstanceStore = defineStore('componentInstance', () => 
 
   /**
    * 设置组件属性
-   * @param {string} componentId - 目标组件ID
+   * @param {string} componentId - 组件ID
    * @param {string} propName - 属性名
    * @param {any} value - 属性值
+   * @returns {boolean} 是否设置成功
    */
   function setComponentProp(componentId, propName, value) {
     const element = getComponentElement(componentId)
@@ -104,7 +100,7 @@ export const useComponentInstanceStore = defineStore('componentInstance', () => 
 
   /**
    * 获取组件属性
-   * @param {string} componentId - 目标组件ID
+   * @param {string} componentId - 组件ID
    * @param {string} propName - 属性名
    * @returns {any} 属性值
    */
@@ -126,8 +122,8 @@ export const useComponentInstanceStore = defineStore('componentInstance', () => 
   }
 
   /**
-   * 获取所有已注册组件ID
-   * @returns {string[]} 组件ID列表
+   * 获取所有组件ID
+   * @returns {Array<string>} 组件ID列表
    */
   function getAllComponentIds() {
     return Array.from(instanceMap.value.keys())

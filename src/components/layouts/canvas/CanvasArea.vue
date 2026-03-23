@@ -1,26 +1,28 @@
 <template>
-  <div class="canvas-area p-6 pb-24 flex flex-col items-center justify-center">
+  <div class="canvas-area">
     <!-- 页面自定义 CSS -->
-    <component :is="'style'" v-if="pageCustomCSS"> {{ pageCustomCSS }} </component>
+    <component :is="'style'" v-if="pageCustomCSS">{{ pageCustomCSS }}</component>
 
     <!-- 画布容器 -->
     <div
       ref="canvasRef"
-      class="canvas-container bg-white shadow-lg rounded-lg overflow-hidden relative"
+      class="canvas-area__container"
       :style="canvasStyle"
       @dragover="handleDragOver"
       @drop="handleDrop"
       @click="handleCanvasClick"
     >
       <!-- 网格背景 -->
-      <div class="grid-background absolute inset-0 pointer-events-none h-full"></div>
+      <div class="canvas-area__grid"></div>
+
+      <!-- 加载动画 -->
+      <div v-if="isLoading" class="canvas-area__loading">
+        <div class="canvas-area__loading-spinner"></div>
+        <p class="canvas-area__loading-text">加载组件中...</p>
+      </div>
 
       <!-- 组件渲染区域 -->
-      <div
-        ref="canvasContentRef"
-        v-if="!isPreviewMode"
-        class="canvas-content relative w-full min-h-full p-4"
-      >
+      <div v-show="!isLoading" ref="canvasContentRef" class="canvas-area__content">
         <CanvasComponent
           v-for="component in components"
           :key="component.id"
@@ -33,19 +35,16 @@
       </div>
 
       <!-- 空状态提示 -->
-      <div
-        v-if="components.length === 0"
-        class="absolute inset-0 flex flex-col items-center text-gray-400 mt-8"
-      >
-        <ea-icon name="hand" variant="solid" size="48" class="my-8"></ea-icon>
-        <p class="text-sm">从左侧拖拽组件到此处</p>
+      <div v-if="!isLoading && components.length === 0" class="canvas-area__empty">
+        <ea-icon name="hand" variant="solid" size="48" class="canvas-area__empty-icon"></ea-icon>
+        <p class="canvas-area__empty-text">从左侧拖拽组件到此处</p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-  import { ref, computed, watch, nextTick } from 'vue'
+  import { ref, computed, watch, nextTick, onMounted } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
   import CanvasComponent from '../../designer/CanvasComponent.vue'
 
@@ -53,41 +52,51 @@
   const canvasRef = ref(null)
   const canvasContentRef = ref(null)
   const contentHeight = ref(0)
+  const isLoading = ref(true)
 
   const components = computed(() => schemaStore.components)
-  const isPreviewMode = computed(() => schemaStore.isPreviewMode)
   const selectedComponentId = computed(() => schemaStore.selectedComponentId)
 
-  // 更新内容高度
+  // 组件加载完成后隐藏 loading
+  onMounted(() => {
+    // 使用 requestIdleCallback 或 setTimeout 确保组件有足够时间渲染
+    if (typeof requestIdleCallback !== 'undefined') {
+      requestIdleCallback(
+        () => {
+          isLoading.value = false
+        },
+        { timeout: 500 }
+      )
+    } else {
+      setTimeout(() => {
+        isLoading.value = false
+      }, 300)
+    }
+  })
+
   async function updateContentHeight() {
     await nextTick()
     if (canvasContentRef.value) {
-      const newHeight = canvasContentRef.value.scrollHeight
-      contentHeight.value = newHeight
+      contentHeight.value = canvasContentRef.value.scrollHeight
     }
   }
 
-  // 监听组件数量变化和结构变化（增删、移动），不监听属性变化
   watch(
     () => components.value.map(c => ({ id: c.id, children: c.children?.map(child => child.id) })),
     updateContentHeight,
     { deep: false, flush: 'post' }
   )
 
-  // 页面设置中的样式
   const pageSettings = computed(() => schemaStore.pageSchema.settings || {})
   const pageStyle = computed(() => pageSettings.value.style || {})
   const pageCustomCSS = computed(() => pageSettings.value.customCSS || '')
 
-  // 画布样式
   const canvasStyle = computed(() => {
     const { viewport } = schemaStore.pageSchema.meta
-
     const minHeight = viewport.height
     const extraSpace = 100
     const dynamicHeight = Math.max(minHeight, contentHeight.value + extraSpace)
 
-    // 合并页面样式和视口样式
     return {
       width: `${viewport.width}px`,
       height: `${dynamicHeight}px`,
@@ -99,98 +108,154 @@
     }
   })
 
-  // 拖拽悬停
   function handleDragOver(event) {
     event.preventDefault()
     event.dataTransfer.dropEffect = 'copy'
   }
 
-  // 放置组件
   function handleDrop(event) {
     event.preventDefault()
-
     const data = event.dataTransfer.getData('application/json')
     if (!data) return
 
     try {
-      const componentMeta = JSON.parse(data)
-      addComponentWithMeta(componentMeta)
+      addComponentWithMeta(JSON.parse(data))
     } catch (error) {
       console.error('拖拽放置失败:', error)
     }
   }
 
-  // 处理放置到父组件
   function handleDropToParent({ componentMeta, parentId, slotName = 'default' }) {
     addComponentWithMeta(componentMeta, parentId, slotName)
   }
 
-  // 添加组件（提取公共逻辑）
   function addComponentWithMeta(componentMeta, parentId = null, slotName = 'default') {
     const defaultProps = {}
 
-    // 提取默认属性
     if (componentMeta.props) {
       componentMeta.props.forEach(prop => {
         defaultProps[prop.name] = prop.default
       })
     }
 
-    // 如果指定了非默认插槽，添加到 props 中
     if (slotName !== 'default') {
       defaultProps.slot = slotName
     }
 
-    // 添加组件到画布（如果有 parentId 则添加到对应容器）
     const newComponent = schemaStore.addComponent(componentMeta.type, defaultProps, parentId)
 
-    // 如果是远程组件，保存远程配置
     if (componentMeta.isRemote && componentMeta.remoteConfig) {
       newComponent.isRemote = true
       newComponent.remoteConfig = componentMeta.remoteConfig
     }
 
-    // 选中新组件
     schemaStore.selectComponent(newComponent.id)
   }
 
-  // 点击画布空白处
   function handleCanvasClick(event) {
-    if (event.target === canvasRef.value || event.target.classList.contains('canvas-content')) {
+    if (
+      event.target === canvasRef.value ||
+      event.target.classList.contains('canvas-area__content')
+    ) {
       schemaStore.clearSelection()
     }
   }
 
-  // 选中组件
   function handleComponentSelect(componentId) {
     schemaStore.selectComponent(componentId)
   }
 
-  // 删除组件
   function handleComponentDelete(componentId) {
     schemaStore.removeComponent(componentId)
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .canvas-area {
     flex: 1;
     background-color: #f5f7fa;
     height: auto;
+    padding: 1.5rem;
+    padding-bottom: 6rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    &__container {
+      background-color: #fff;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      border-radius: 0.5rem;
+      overflow: hidden;
+      position: relative;
+    }
+
+    &__grid {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      height: 100%;
+      background-image:
+        linear-gradient(to right, #e5e7eb 1px, transparent 1px),
+        linear-gradient(to bottom, #e5e7eb 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    &__content {
+      position: relative;
+      width: 100%;
+      min-height: 100%;
+      padding: 1rem;
+    }
+
+    &__empty {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #9ca3af;
+      margin-top: 2rem;
+
+      &-icon {
+        margin: 2rem 0;
+      }
+
+      &-text {
+        font-size: 0.875rem;
+      }
+    }
+
+    &__loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.9);
+      z-index: 10;
+
+      &-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #e5e7eb;
+        border-top-color: #3b82f6;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      &-text {
+        margin-top: 1rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+      }
+    }
   }
 
-  .canvas-container {
-    position: relative;
-  }
-
-  .grid-background {
-    background-image:
-      linear-gradient(to right, #e5e7eb 1px, transparent 1px),
-      linear-gradient(to bottom, #e5e7eb 1px, transparent 1px);
-    background-size: 20px 20px;
-  }
-
-  .canvas-content {
-    min-height: 100%;
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 </style>

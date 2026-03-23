@@ -91,7 +91,7 @@ export const feedbackComponents = [
       { name: 'close', label: '关闭' },
     ],
     slots: [
-      { name: '-', label: 'Alert 内容描述' },
+      { name: 'default', label: 'Alert 内容描述' },
       { name: 'title', label: '标题的内容' },
       { name: 'icon', label: '图标内容' },
     ],
@@ -448,28 +448,30 @@ export const feedbackComponents = [
       { name: 'close', label: '关闭' },
     ],
     slots: [],
-    styles: [
-      {
-        name: 'container',
-        label: '消息容器',
-        styles: ['background-color', 'border-color', 'border-radius', 'box-shadow'],
-      },
-      {
-        name: 'icon',
-        label: '类型图标',
-        styles: ['color'],
-      },
-      {
-        name: 'content-wrap',
-        label: '内容区域',
-        styles: ['color'],
-      },
-      {
-        name: 'close-icon',
-        label: '关闭按钮',
-        styles: ['color'],
-      },
-    ],
+    styleConfig: {
+      parts: [
+        {
+          name: 'container',
+          label: '消息容器',
+          styles: ['background-color', 'border-color', 'border-radius', 'box-shadow'],
+        },
+        {
+          name: 'icon',
+          label: '类型图标',
+          styles: ['color'],
+        },
+        {
+          name: 'content-wrap',
+          label: '内容区域',
+          styles: ['color'],
+        },
+        {
+          name: 'close-icon',
+          label: '关闭按钮',
+          styles: ['color'],
+        },
+      ],
+    },
     methods: [
       {
         name: 'close',

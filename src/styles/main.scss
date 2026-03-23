@@ -1,0 +1,99 @@
+// Main Styles Entry
+// Global CSS Variables only - Component styles are defined in Vue files
+
+// Global Variables
+:root {
+  // Primary colors
+  --ea-primary: #409eff;
+  --ea-primary-light: #ecf5ff;
+  --ea-primary-dark: #3a8ee6;
+
+  // Success colors
+  --ea-success: #67c23a;
+  --ea-success-light: #f0f9eb;
+
+  // Warning colors
+  --ea-warning: #e6a23c;
+  --ea-warning-light: #fdf6ec;
+
+  // Danger colors
+  --ea-danger: #f56c6c;
+  --ea-danger-light: #fef0f0;
+
+  // Info colors
+  --ea-info: #909399;
+  --ea-info-light: #f4f4f5;
+
+  // Text colors
+  --ea-text-primary: #303133;
+  --ea-text-regular: #606266;
+  --ea-text-secondary: #909399;
+  --ea-text-placeholder: #c0c4cc;
+
+  // Border colors
+  --ea-border-base: #dcdfe6;
+  --ea-border-light: #e4e7ed;
+  --ea-border-lighter: #ebeef5;
+  --ea-border-extra-light: #f2f6fc;
+
+  // Background colors
+  --ea-bg-base: #f5f7fa;
+  --ea-bg-white: #ffffff;
+
+  // Spacing
+  --ea-spacing-xs: 4px;
+  --ea-spacing-sm: 8px;
+  --ea-spacing-md: 16px;
+  --ea-spacing-lg: 24px;
+  --ea-spacing-xl: 32px;
+
+  // Border radius
+  --ea-border-radius-sm: 2px;
+  --ea-border-radius-base: 4px;
+  --ea-border-radius-md: 8px;
+  --ea-border-radius-lg: 12px;
+
+  // Font sizes
+  --ea-font-size-xs: 10px;
+  --ea-font-size-sm: 12px;
+  --ea-font-size-base: 14px;
+  --ea-font-size-md: 16px;
+  --ea-font-size-lg: 18px;
+  --ea-font-size-xl: 20px;
+}
+
+// Reset & Base Styles
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: var(--ea-font-size-base);
+  color: var(--ea-text-primary);
+  background-color: var(--ea-bg-white);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Scrollbar Styles
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

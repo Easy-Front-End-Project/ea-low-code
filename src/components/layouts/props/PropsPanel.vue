@@ -1,12 +1,12 @@
 <template>
-  <div class="props-panel flex flex-col h-full">
+  <div class="props-panel">
     <!-- 内容区域 -->
-    <div class="flex-1 overflow-y-auto pb-32">
+    <div class="props-panel__content">
       <div class="p-4 space-y-6">
         <!-- 信息卡片：页面或组件 -->
-        <ea-card :class="selectedComponent ? 'component-info-card' : 'page-info-card'">
-          <div slot="header" class="flex items-center justify-between">
-            <span class="font-medium text-gray-800">
+        <ea-card :class="selectedComponent ? 'info-card--component' : 'info-card--page'">
+          <div slot="header" class="info-card__header">
+            <span class="info-card__title">
               {{ selectedComponent ? componentMeta?.name : '页面配置' }}
             </span>
             <ea-button
@@ -19,27 +19,25 @@
               删除
             </ea-button>
           </div>
-          <div class="text-xs text-gray-500 space-y-1">
+          <div class="info-card__content space-y-1">
             <template v-if="selectedComponent">
               <p>类型: {{ selectedComponent.type }}</p>
               <p>ID: {{ selectedComponent.id }}</p>
               <!-- 别名编辑 -->
-              <div class="flex items-center gap-2 mt-2">
-                <span>别名:</span>
-                <div v-if="!isEditingAlias" class="flex items-center gap-2">
-                  <span class="text-blue-600 w-full"
-                    >{{ selectedComponent.alias || '未设置' }}</span
-                  >
+              <div class="alias-editor">
+                <span class="text-nowrap">别名:</span>
+                <div v-if="!isEditingAlias" class="alias-editor__input-group">
+                  <span class="alias-editor__value">{{ selectedComponent.alias || '未设置' }}</span>
                   <ea-button type="primary" size="small" icon="pen" @click="startEditAlias">
                     {{ selectedComponent.alias ? '修改' : '设置' }}
                   </ea-button>
                 </div>
-                <div v-else class="flex items-center gap-2">
+                <div v-else class="alias-editor__input-group">
                   <EaInput
                     v-model="aliasInput"
                     size="small"
                     placeholder="输入别名"
-                    class="w-full"
+                    class="alias-editor__input"
                   />
                   <ea-button
                     type="success"
@@ -172,32 +170,17 @@
   const pageSchema = computed(() => schemaStore.pageSchema)
   const componentCount = computed(() => schemaStore.componentCount)
 
-  // 页面样式 - 从 pageSchema.settings.style 获取
-  const pageStyle = computed(() => {
-    return schemaStore.pageSchema.settings?.style || {}
-  })
+  const pageStyle = computed(() => schemaStore.pageSchema.settings?.style || {})
+  const pageCustomCSS = computed(() => schemaStore.pageSchema.settings?.customCSS || '')
+  const pageEvents = computed(() => schemaStore.pageSchema.settings?.events || [])
 
-  // 页面自定义 CSS
-  const pageCustomCSS = computed(() => {
-    return schemaStore.pageSchema.settings?.customCSS || ''
-  })
+  const pageEventMeta = computed(() => [
+    { name: 'load', label: '页面加载', description: '页面加载完成时触发' },
+    { name: 'unload', label: '页面卸载', description: '页面卸载时触发' },
+    { name: 'scroll', label: '页面滚动', description: '页面滚动时触发' },
+    { name: 'resize', label: '窗口调整', description: '窗口大小调整时触发' },
+  ])
 
-  // 页面事件
-  const pageEvents = computed(() => {
-    return schemaStore.pageSchema.settings?.events || []
-  })
-
-  // 页面事件元数据（定义页面支持的事件类型）
-  const pageEventMeta = computed(() => {
-    return [
-      { name: 'load', label: '页面加载', description: '页面加载完成时触发' },
-      { name: 'unload', label: '页面卸载', description: '页面卸载时触发' },
-      { name: 'scroll', label: '页面滚动', description: '页面滚动时触发' },
-      { name: 'resize', label: '窗口调整', description: '窗口大小调整时触发' },
-    ]
-  })
-
-  // 当前样式配置（页面或组件）
   const currentStyleConfig = computed(() => {
     if (selectedComponent.value) {
       return {
@@ -213,7 +196,6 @@
     }
   })
 
-  // 当前事件配置（页面或组件）
   const currentEventConfig = computed(() => {
     if (selectedComponent.value) {
       return {
@@ -227,43 +209,39 @@
     }
   })
 
-  // 别名编辑状态
   const isEditingAlias = ref(false)
   const aliasInput = ref('')
 
-  // 开始编辑别名
   function startEditAlias() {
     aliasInput.value = selectedComponent.value?.alias || ''
     isEditingAlias.value = true
   }
 
-  // 保存别名
   function saveAlias() {
     if (!selectedComponent.value) return
     const alias = aliasInput.value.trim()
-    // 验证别名格式：只能包含字母、数字、下划线，且不能以数字开头
+
     if (alias && !/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(alias)) {
       alert('别名格式不正确，只能包含字母、数字、下划线，且不能以数字开头')
       return
     }
-    // 检查别名是否已被其他组件使用
-    if (alias && typeof schemaStore.getComponentIdByAlias === 'function') {
-      const existingId = schemaStore.getComponentIdByAlias(alias)
+
+    if (alias) {
+      const existingId = schemaStore.getComponentIdByAlias?.(alias)
       if (existingId && existingId !== selectedComponent.value.id) {
         alert('该别名已被其他组件使用')
         return
       }
     }
-    if (typeof schemaStore.setComponentAlias === 'function') {
+
+    if (schemaStore.setComponentAlias) {
       schemaStore.setComponentAlias(selectedComponent.value.id, alias)
     } else {
-      // 如果方法不存在，直接设置到组件上
       selectedComponent.value.alias = alias
     }
     isEditingAlias.value = false
   }
 
-  // 取消编辑别名
   function cancelEditAlias() {
     isEditingAlias.value = false
     aliasInput.value = ''
@@ -272,71 +250,46 @@
   const componentMeta = computed(() => {
     if (!selectedComponent.value) return null
 
-    // 检查是否是远程组件
     const isRemote =
       selectedComponent.value.type?.startsWith('remote-') || selectedComponent.value.isRemote
     if (isRemote) {
-      // 从远程组件列表中查找
       const remoteMetaList = getRemoteComponentMetaList()
-      const remoteMeta = remoteMetaList.find(m => m.type === selectedComponent.value.type)
-      if (remoteMeta) return remoteMeta
+      return remoteMetaList.find(m => m.type === selectedComponent.value.type)
     }
 
     return getComponentMeta(selectedComponent.value.type)
   })
 
-  // 过滤掉 slot 属性的 props 列表
-  const componentPropsWithoutSlot = computed(() => {
-    const props = componentMeta.value?.props || []
-    return props.filter(prop => prop.name !== 'slot')
-  })
+  const componentPropsWithoutSlot = computed(() =>
+    (componentMeta.value?.props || []).filter(prop => prop.name !== 'slot')
+  )
 
-  // 是否有特殊配置
-  const hasSpecialConfig = computed(() => {
-    return !!selectedComponent.value && !!componentMeta.value?.specialConfig?.type
-  })
+  const hasSpecialConfig = computed(
+    () => !!(selectedComponent.value && componentMeta.value?.specialConfig?.type)
+  )
 
-  // 获取父组件的 meta 信息（用于显示目标插槽配置）
   const parentComponentMeta = computed(() => {
     if (!selectedComponent.value) return null
 
-    // 查找父组件
     const parent = schemaStore.findParentComponent(selectedComponent.value.id)
     if (!parent) return null
 
-    // 检查是否是远程组件
     const isRemote = parent.type?.startsWith('remote-') || parent.isRemote
     if (isRemote) {
       const remoteMetaList = getRemoteComponentMetaList()
-      const remoteMeta = remoteMetaList.find(m => m.type === parent.type)
-      if (remoteMeta) return remoteMeta
+      return remoteMetaList.find(m => m.type === parent.type)
     }
 
     return getComponentMeta(parent.type)
   })
 
-  // 属性变更
   function handlePropChange(propName, value) {
     if (!selectedComponent.value) return
-
-    // 处理变量绑定格式的值
-    if (value && typeof value === 'object' && value.type === 'variable') {
-      // 变量绑定格式: { type: 'variable', value: 'varName' }
-      schemaStore.updateComponentProps(selectedComponent.value.id, {
-        [propName]: value,
-      })
-    } else {
-      // 普通值
-      schemaStore.updateComponentProps(selectedComponent.value.id, {
-        [propName]: value,
-      })
-    }
+    schemaStore.updateComponentProps(selectedComponent.value.id, { [propName]: value })
   }
 
-  // 样式变更（统一处理页面和组件）
   function handleStyleChange(styleName, value, styleType = 'inline') {
     if (selectedComponent.value) {
-      // 组件样式变更
       if (styleType === 'customCSS') {
         schemaStore.updateComponentStyle(selectedComponent.value.id, value, 'customCSS')
       } else {
@@ -347,13 +300,9 @@
         )
       }
     } else {
-      // 页面样式变更
       const currentSettings = schemaStore.pageSchema.settings || {}
       if (styleType === 'customCSS') {
-        schemaStore.updatePageSettings({
-          ...currentSettings,
-          customCSS: value,
-        })
+        schemaStore.updatePageSettings({ ...currentSettings, customCSS: value })
       } else {
         const currentStyle = currentSettings.style || {}
         schemaStore.updatePageSettings({
@@ -364,7 +313,6 @@
     }
   }
 
-  // CSS 变量样式变更
   function handleCssVariableChange(variableName, value) {
     if (!selectedComponent.value) return
     schemaStore.updateComponentStyle(
@@ -374,32 +322,25 @@
     )
   }
 
-  // 事件变更（统一处理页面和组件）
   function handleEventChange(events) {
     if (selectedComponent.value) {
       schemaStore.updateComponentEvents(selectedComponent.value.id, events)
     } else {
       const currentSettings = schemaStore.pageSchema.settings || {}
-      schemaStore.updatePageSettings({
-        ...currentSettings,
-        events,
-      })
+      schemaStore.updatePageSettings({ ...currentSettings, events })
     }
   }
 
-  // 插槽变更
   function handleSlotChange(slotValue) {
     if (!selectedComponent.value) return
     schemaStore.updateComponentProps(selectedComponent.value.id, { slot: slotValue })
   }
 
-  // Scope 变更
   function handleScopeChange(scope) {
     if (!selectedComponent.value) return
     schemaStore.updateComponentProps(selectedComponent.value.id, { scope })
   }
 
-  // 删除组件
   function handleDeleteComponent() {
     if (!selectedComponent.value) return
     if (confirm('确定要删除这个组件吗？')) {
@@ -408,14 +349,132 @@
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .props-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     background-color: #fff;
+
+    &__content {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 8rem;
+    }
+
+    &__section {
+      padding: 1rem;
+    }
   }
 
-  .component-info {
-    background-color: #f9fafb;
-    padding: 12px;
-    border-radius: 8px;
+  .info-card {
+    &__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    &__title {
+      font-weight: 500;
+      color: #1f2937;
+    }
+
+    &__content {
+      font-size: 0.75rem;
+      color: #6b7280;
+
+      p {
+        margin: 0.25rem 0;
+      }
+    }
+  }
+
+  .alias-editor {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+
+    &__value {
+      color: #2563eb;
+      width: 100%;
+    }
+
+    &__input-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+    }
+
+    &__input {
+      flex: 1;
+    }
+  }
+
+  .config-section {
+    margin-bottom: 1.5rem;
+
+    &__title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0.75rem;
+    }
+
+    &__subsection-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #6b7280;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  }
+
+  .prop-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    &--inline {
+      flex-direction: row;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    &__label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #6b7280;
+    }
+
+    &__description {
+      margin-bottom: 0.25rem;
+    }
+  }
+
+  .divider {
+    height: 1px;
+    background-color: #e5e7eb;
+    margin: 0.75rem 0;
+  }
+
+  .space-y-3 {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .space-y-4 {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .space-y-6 {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
   }
 </style>

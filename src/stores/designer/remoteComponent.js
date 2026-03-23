@@ -15,28 +15,27 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
   const isLoaded = ref(false)
 
   // Getters
-  const enabledComponents = computed(() => {
-    return components.value.filter(comp => comp.enabled !== false)
-  })
+  const enabledComponents = computed(() => components.value.filter(comp => comp.enabled !== false))
 
-  // 获取完整 URL（拼接 globalUrl 和相对路径）
+  /**
+   * 获取完整 URL
+   * @param {string} url - 相对或绝对 URL
+   * @returns {string} 完整 URL
+   */
   function getFullUrl(url) {
     if (!url) return ''
-    // 如果已经是完整 URL，直接返回
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      return url
-    }
-    // 拼接 globalUrl 和相对路径
-    const base = globalUrl.value || ''
+    if (url.startsWith('http://') || url.startsWith('https://')) return url
+
+    const base = globalUrl.value
     if (!base) return url
-    // 确保 base 以 / 结尾，url 不以 / 开头
+
     const normalizedBase = base.endsWith('/') ? base : base + '/'
     const normalizedUrl = url.startsWith('/') ? url.slice(1) : url
     return normalizedBase + normalizedUrl
   }
 
-  const enabledComponentMetaList = computed(() => {
-    return enabledComponents.value.map(comp => ({
+  const enabledComponentMetaList = computed(() =>
+    enabledComponents.value.map(comp => ({
       type: `remote-${comp.id}`,
       name: comp.name || '远程组件',
       category: 'remote',
@@ -52,15 +51,13 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
       events: comp.events || [],
       slots: comp.slots || [{ name: 'default', label: '默认插槽' }],
     }))
-  })
+  )
 
   const componentCount = computed(() => components.value.length)
   const enabledCount = computed(() => enabledComponents.value.length)
 
-  // Actions
-
   /**
-   * 从 localStorage 加载配置
+   * 加载配置
    */
   function loadConfig() {
     try {
@@ -69,21 +66,18 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
         const config = JSON.parse(stored)
         globalUrl.value = config.globalUrl || ''
         components.value = config.components || []
-      } else {
-        globalUrl.value = ''
-        components.value = []
       }
-      isLoaded.value = true
     } catch (error) {
       console.error('加载远程组件配置失败:', error)
       globalUrl.value = ''
       components.value = []
-      isLoaded.value = true
     }
+    isLoaded.value = true
   }
 
   /**
-   * 保存配置到 localStorage
+   * 保存配置
+   * @returns {boolean} 是否保存成功
    */
   function saveConfig() {
     try {
@@ -102,7 +96,7 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
 
   /**
    * 设置全局 URL
-   * @param {string} url
+   * @param {string} url - 全局 URL
    */
   function setGlobalUrl(url) {
     globalUrl.value = url
@@ -110,7 +104,8 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
 
   /**
    * 添加组件
-   * @param {Object} component
+   * @param {Object} component - 组件配置
+   * @returns {Object} 新组件
    */
   function addComponent(component) {
     const newComponent = {
@@ -124,8 +119,9 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
 
   /**
    * 更新组件
-   * @param {string} id
-   * @param {Object} data
+   * @param {string} id - 组件ID
+   * @param {Object} data - 更新数据
+   * @returns {boolean} 是否更新成功
    */
   function updateComponent(id, data) {
     const index = components.value.findIndex(c => c.id === id)
@@ -138,7 +134,8 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
 
   /**
    * 删除组件
-   * @param {string} id
+   * @param {string} id - 组件ID
+   * @returns {boolean} 是否删除成功
    */
   function removeComponent(id) {
     const index = components.value.findIndex(c => c.id === id)
@@ -151,8 +148,9 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
 
   /**
    * 切换组件启用状态
-   * @param {string} id
-   * @param {boolean} enabled
+   * @param {string} id - 组件ID
+   * @param {boolean} enabled - 是否启用
+   * @returns {boolean} 是否切换成功
    */
   function toggleComponentEnabled(id, enabled) {
     const component = components.value.find(c => c.id === id)
@@ -164,8 +162,9 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
   }
 
   /**
-   * 获取组件 by id
-   * @param {string} id
+   * 根据 ID 获取组件
+   * @param {string} id - 组件ID
+   * @returns {Object|null} 组件对象
    */
   function getComponentById(id) {
     return components.value.find(c => c.id === id) || null
@@ -181,18 +180,13 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
   }
 
   return {
-    // State
     globalUrl,
     components,
     isLoaded,
-
-    // Getters
     enabledComponents,
     enabledComponentMetaList,
     componentCount,
     enabledCount,
-
-    // Actions
     loadConfig,
     saveConfig,
     setGlobalUrl,

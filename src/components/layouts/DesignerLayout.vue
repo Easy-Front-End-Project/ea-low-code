@@ -1,23 +1,20 @@
 <template>
   <ea-container class="h-screen w-screen" direction="vertical">
     <!-- 顶部工具栏 -->
-    <ea-header height="60px" class="bg-white border-b border-gray-200">
-      <Toolbar class="h-full" />
+    <ea-header height="60px" class="designer-layout__header">
+      <Toolbar class="designer-layout__toolbar" />
     </ea-header>
 
     <!-- 主要内容区域 -->
     <ea-container class="h-full">
       <!-- 最左侧：切换按钮 -->
-      <ea-aside
-        width="48px"
-        class="bg-white flex flex-col items-center py-4 gap-2 border-0 border-r-1 border-solid border-gray-200"
-      >
+      <ea-aside width="48px" class="designer-layout__sidebar">
         <div
           v-for="item in leftPanelItems"
           :key="item.key"
           :title="item.title"
-          class="w-10 h-10 flex items-center justify-center cursor-pointer rounded text-sm font-medium hover:bg-gray-100"
-          :class="{'bg-blue-50 text-blue-600': activeLeftPanel === item.key }"
+          class="designer-layout__sidebar-item"
+          :class="{ 'designer-layout__sidebar-item--active': activeLeftPanel === item.key }"
           @click="switchLeftPanel(item.key)"
         >
           {{ item.label }}
@@ -29,46 +26,44 @@
           <!-- 左侧：面板区 -->
           <ea-aside
             :width="leftAsideCollapsed ? '0px' : activeLeftPanel === 'json' ? '350px' : '280px'"
-            class="bg-white border-r border-gray-200 relative transition-all duration-300"
-            :class="{'pb-18':activeLeftPanel === 'json' }"
+            class="designer-layout__panel"
+            :class="{ 'designer-layout__panel--json': activeLeftPanel === 'json' }"
           >
-            <div v-show="!leftAsideCollapsed" class="w-full h-full px-3">
-              <!-- 组件面板 -->
+            <div v-show="!leftAsideCollapsed" class="designer-layout__panel-content">
               <ComponentPanel v-if="activeLeftPanel === 'components'" class="h-full" />
-              <!-- 页面设置面板 -->
               <PageSettingsPanel v-else-if="activeLeftPanel === 'page'" class="h-full" />
-              <!-- JSON 面板 -->
               <Suspense v-else-if="activeLeftPanel === 'json'">
                 <template #default>
                   <MonacoEditor v-model="jsonContent" language="json" height="100%" />
                 </template>
                 <template #fallback>
                   <div class="h-full flex flex-col items-center justify-center">
-                    <div class="loading-spinner-small"></div>
+                    <div class="loading-spinner loading-spinner--small"></div>
                     <span class="mt-2 text-sm text-gray-400">加载编辑器...</span>
                   </div>
                 </template>
               </Suspense>
             </div>
-            <!-- 左侧切换按钮 -->
             <ea-button
               @click="toggleLeftAside"
-              class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full w-5 h-12 z-10"
+              class="designer-layout__toggle-btn designer-layout__toggle-btn--left"
               :title="leftAsideCollapsed ? '展开' : '收起'"
             >
-              <span class="text-xs text-gray-500">{{ leftAsideCollapsed ? '›' : '‹' }}</span>
+              <span class="designer-layout__toggle-btn-icon"
+                >{{ leftAsideCollapsed ? '›' : '‹' }}</span
+              >
             </ea-button>
           </ea-aside>
 
           <!-- 中间：画布 -->
-          <ea-main class="bg-gray-100">
+          <ea-main class="designer-layout__canvas">
             <CanvasArea class="h-full" />
           </ea-main>
 
           <!-- 右侧：组件属性配置 -->
           <ea-aside
             :width="rightAsideCollapsed ? '0px' : '430px'"
-            class="bg-white border-l border-gray-200 relative transition-all duration-300"
+            class="designer-layout__panel designer-layout__panel--right"
           >
             <div v-show="!rightAsideCollapsed" class="h-full w-full">
               <Suspense>
@@ -77,19 +72,20 @@
                 </template>
                 <template #fallback>
                   <div class="h-full flex flex-col items-center justify-center">
-                    <div class="loading-spinner-small"></div>
+                    <div class="loading-spinner loading-spinner--small"></div>
                     <span class="mt-2 text-sm text-gray-400">加载属性面板...</span>
                   </div>
                 </template>
               </Suspense>
             </div>
-            <!-- 右侧切换按钮 -->
             <ea-button
               @click="toggleRightAside"
-              class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full w-5 h-12"
+              class="designer-layout__toggle-btn designer-layout__toggle-btn--right"
               :title="rightAsideCollapsed ? '展开' : '收起'"
             >
-              <span class="text-xs text-gray-500">{{ rightAsideCollapsed ? '‹' : '›' }}</span>
+              <span class="designer-layout__toggle-btn-icon"
+                >{{ rightAsideCollapsed ? '‹' : '›' }}</span
+              >
             </ea-button>
           </ea-aside>
         </ea-container>
@@ -106,28 +102,21 @@
   import PageSettingsPanel from './page/PageSettingsPanel.vue'
   import CanvasArea from './canvas/CanvasArea.vue'
 
-  // 异步加载重型组件
   const MonacoEditor = defineAsyncComponent(() => import('@/components/common/MonacoEditor.vue'))
   const PropsPanel = defineAsyncComponent(() => import('./props/PropsPanel.vue'))
 
   const schemaStore = useSchemaStore()
 
-  // 左侧面板状态
   const activeLeftPanel = ref('components')
   const leftAsideCollapsed = ref(false)
-
-  // 右侧面板状态
   const rightAsideCollapsed = ref(false)
 
-  // 左侧面板配置
   const leftPanelItems = [
     { key: 'components', label: '组件', title: '组件库' },
     { key: 'page', label: '页面', title: '页面设置' },
     { key: 'json', label: 'JSON', title: 'JSON 编辑' },
-    // { key: 'ai', label: 'AI', title: 'AI 助手' },
   ]
 
-  // 切换左侧面板
   function switchLeftPanel(key) {
     if (activeLeftPanel.value === key) {
       leftAsideCollapsed.value = !leftAsideCollapsed.value
@@ -137,73 +126,171 @@
     }
   }
 
-  // 切换左侧折叠
   function toggleLeftAside() {
     leftAsideCollapsed.value = !leftAsideCollapsed.value
   }
 
-  // 切换右侧折叠
   function toggleRightAside() {
     rightAsideCollapsed.value = !rightAsideCollapsed.value
   }
 
-  // JSON 编辑器内容
   const jsonContent = computed({
     get: () => JSON.stringify(schemaStore.pageSchema, null, 2),
     set: val => {
       try {
-        const parsed = JSON.parse(val)
-        schemaStore.importSchema(parsed)
-      } catch (e) {
+        schemaStore.importSchema(JSON.parse(val))
+      } catch {
         // JSON 解析错误，忽略
       }
     },
   })
 
-  // 监听 schema 变化，用于调试
   watch(
     () => schemaStore.pageSchema,
-    newVal => {
-      console.log('Schema updated:', newVal)
-    },
+    newVal => console.log('Schema updated:', newVal),
     { deep: true }
   )
 </script>
 
-<style scoped>
-  ea-container {
-    height: 100%;
+<style lang="scss" scoped>
+  .designer-layout {
+    height: 100vh;
+    width: 100vw;
+
+    &__header {
+      background-color: #fff;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    &__toolbar {
+      height: 100%;
+    }
+
+    &__sidebar {
+      background-color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem 0;
+      gap: 0.5rem;
+      border-right: 1px solid #e5e7eb;
+
+      &-item {
+        width: 2.5rem;
+        height: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+
+        &:hover {
+          background-color: #f3f4f6;
+        }
+
+        &--active {
+          background-color: #eff6ff;
+          color: #2563eb;
+        }
+      }
+    }
+
+    &__panel {
+      background-color: #fff;
+      border-right: 1px solid #e5e7eb;
+      position: relative;
+      transition: all 0.3s;
+
+      &--right {
+        border-right: none;
+        border-left: 1px solid #e5e7eb;
+      }
+
+      &--json {
+        padding-bottom: 4.5rem;
+      }
+
+      &-content {
+        width: 100%;
+        height: 100%;
+        padding: 0 0.75rem;
+      }
+    }
+
+    &__toggle-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 1.25rem;
+      height: 3rem;
+      z-index: 10;
+
+      &--left {
+        right: 0;
+        transform: translate(100%, -50%);
+      }
+
+      &--right {
+        left: 0;
+        transform: translate(-100%, -50%);
+      }
+
+      &-icon {
+        font-size: 0.75rem;
+        color: #6b7280;
+      }
+    }
+
+    &__canvas {
+      background-color: #f3f4f6;
+    }
+
+    &__props {
+      background-color: #fff;
+      border-left: 1px solid #e5e7eb;
+    }
   }
 
-  ea-main {
-    height: 100%;
-  }
-
-  ea-aside {
-    height: 100%;
-  }
-
-  ea-aside::part(container) {
-    align-items: center;
-  }
-
-  ea-main::part(container) {
-    padding: 0;
-  }
-
-  /* 小型加载动画 */
-  .loading-spinner-small {
+  .loading-spinner {
     width: 32px;
     height: 32px;
     border: 2px solid #e4e7ed;
     border-top-color: #409eff;
     border-radius: 50%;
     animation: spin 1s linear infinite;
+
+    &--small {
+      width: 24px;
+      height: 24px;
+      border-width: 2px;
+    }
   }
 
   @keyframes spin {
     to {
       transform: rotate(360deg);
+    }
+  }
+
+  :deep(ea-container) {
+    height: 100%;
+  }
+
+  :deep(ea-main) {
+    height: 100%;
+
+    &::part(container) {
+      padding: 0;
+    }
+  }
+
+  :deep(ea-aside) {
+    height: 100%;
+
+    &::part(container) {
+      align-items: center;
     }
   }
 </style>
