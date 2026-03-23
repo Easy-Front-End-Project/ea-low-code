@@ -13,11 +13,11 @@ const REMOTE_CONFIG_KEY = 'ea_lowcode_remote_config'
 // 组件元数据配置
 export const componentMetaList = [
   ...basicComponents,
+  ...layoutComponents,
   ...formComponents,
   ...dataComponents,
   ...navigationComponents,
   ...feedbackComponents,
-  ...layoutComponents,
 ]
 
 // 所有组件元数据（包含项目级组件）

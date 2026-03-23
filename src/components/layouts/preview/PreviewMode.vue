@@ -6,7 +6,15 @@
         <ea-icon name="eye" variant="solid"></ea-icon>
         <span class="font-medium text-gray-800">预览模式</span>
       </div>
-      <ea-button icon="xmark" @click="handleExitPreview"> 退出预览 </ea-button>
+      <ea-button
+        class="exit-preview-btn"
+        :class="{ 'exit-preview-btn--disabled': !isReady }"
+        :disabled="!isReady"
+        icon="xmark"
+        @click="handleExitPreview"
+      >
+        退出预览
+      </ea-button>
     </div>
 
     <!-- 页面自定义 CSS -->
@@ -18,25 +26,34 @@
         class="preview-canvas bg-white shadow-lg rounded-lg overflow-hidden"
         :style="canvasStyle"
       >
-        <PreviewComponent
-          v-for="component in components"
-          :key="component.id"
-          :component="component"
-        />
+        <!-- 使用 v-if 延迟渲染，避免阻塞主线程 -->
+        <template v-if="isReady">
+          <PreviewComponent
+            v-for="component in components"
+            :key="component.id"
+            :component="component"
+          />
+        </template>
+        <!-- 加载占位 -->
+        <div v-else class="flex items-center justify-center h-full">
+          <div class="loading-spinner"></div>
+          <span class="ml-2 text-gray-500">加载中...</span>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-  import { computed, onMounted, onUnmounted } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { computed, onMounted, onUnmounted, ref, nextTick } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
   import PreviewComponent from '../../designer/PreviewComponent.vue'
   import { executeEvent } from '@/utils/eventExecutor'
 
   const schemaStore = useSchemaStore()
-  const router = useRouter()
+  const isReady = ref(false)
+
+  const emit = defineEmits(['close'])
 
   const components = computed(() => schemaStore.components)
 
@@ -49,21 +66,28 @@
   // 画布样式
   const canvasStyle = computed(() => {
     const { viewport } = schemaStore.pageSchema.meta
+    const hasViewport = viewport?.width && viewport?.height
     return {
-      width: `${viewport.width}px`,
-      height: `${viewport.height}px`,
-      minWidth: '800px',
-      minHeight: '600px',
+      width: hasViewport ? `${viewport.width}px` : '100%',
+      height: hasViewport ? `${viewport.height}px` : '100%',
+      minWidth: hasViewport ? '800px' : 'auto',
+      minHeight: hasViewport ? '600px' : 'auto',
       maxWidth: '100%',
       maxHeight: '100%',
-      overflow: viewport.overflow,
+      overflow: viewport?.overflow || 'auto',
       ...pageStyle.value,
     }
   })
 
   // 退出预览
-  function handleExitPreview() {
-    router.push('/')
+  function handleExitPreview(event) {
+    // 如果按钮被禁用，阻止事件并返回
+    if (!isReady.value) {
+      event?.preventDefault()
+      event?.stopPropagation()
+      return false
+    }
+    emit('close')
   }
 
   // 页面事件处理函数映射
@@ -71,7 +95,7 @@
 
   // 创建事件处理函数
   function createEventHandler(eventConfig) {
-    return (event) => {
+    return event => {
       executeEvent(eventConfig, event)
     }
   }
@@ -102,13 +126,31 @@
   }
 
   // 组件挂载时绑定事件
-  onMounted(() => {
-    bindPageEvents()
-
+  onMounted(async () => {
     // 执行 load 事件
     const loadEvent = pageEvents.value.find(e => e.eventType === 'load')
     if (loadEvent) {
       executeEvent(loadEvent, null)
+    }
+
+    const minDelay = 2000
+    const startTime = Date.now()
+
+    const setReady = () => {
+      const elapsed = Date.now() - startTime
+      const remaining = Math.max(0, minDelay - elapsed)
+      setTimeout(() => {
+        isReady.value = true
+        // 组件渲染完成后再绑定页面事件
+        bindPageEvents()
+      }, remaining)
+    }
+
+    if (typeof requestIdleCallback !== 'undefined') {
+      requestIdleCallback(setReady, { timeout: minDelay })
+    } else {
+      await nextTick()
+      setReady()
     }
   })
 
@@ -131,5 +173,20 @@
 
   .preview-canvas {
     position: relative;
+  }
+
+  .loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid #e5e7eb;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 </style>

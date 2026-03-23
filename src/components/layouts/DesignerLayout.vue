@@ -1,12 +1,12 @@
 <template>
   <ea-container class="h-screen w-screen" direction="vertical">
     <!-- 顶部工具栏 -->
-    <ea-header height="60px" class="designer-layout__header">
+    <ea-header v-show="!isPreviewMode" height="60px" class="designer-layout__header">
       <Toolbar class="designer-layout__toolbar" />
     </ea-header>
 
     <!-- 主要内容区域 -->
-    <ea-container class="h-full">
+    <ea-container v-show="!isPreviewMode" class="h-full">
       <!-- 最左侧：切换按钮 -->
       <ea-aside width="48px" class="designer-layout__sidebar">
         <div
@@ -56,7 +56,7 @@
           </ea-aside>
 
           <!-- 中间：画布 -->
-          <ea-main class="designer-layout__canvas">
+          <ea-main class="designer-layout__canvas relative">
             <CanvasArea class="h-full" />
           </ea-main>
 
@@ -66,17 +66,19 @@
             class="designer-layout__panel designer-layout__panel--right"
           >
             <div v-show="!rightAsideCollapsed" class="h-full w-full">
-              <Suspense>
-                <template #default>
-                  <PropsPanel class="h-full w-full" />
-                </template>
-                <template #fallback>
-                  <div class="h-full flex flex-col items-center justify-center">
-                    <div class="loading-spinner loading-spinner--small"></div>
-                    <span class="mt-2 text-sm text-gray-400">加载属性面板...</span>
-                  </div>
-                </template>
-              </Suspense>
+              <keep-alive>
+                <Suspense>
+                  <template #default>
+                    <PropsPanel class="h-full w-full" />
+                  </template>
+                  <template #fallback>
+                    <div class="h-full flex flex-col items-center justify-center">
+                      <div class="loading-spinner loading-spinner--small"></div>
+                      <span class="mt-2 text-sm text-gray-400">加载属性面板...</span>
+                    </div>
+                  </template>
+                </Suspense>
+              </keep-alive>
             </div>
             <ea-button
               @click="toggleRightAside"
@@ -91,6 +93,9 @@
         </ea-container>
       </ea-main>
     </ea-container>
+
+    <!-- 预览模式 -->
+    <PreviewMode v-if="isPreviewMode" @close="setPreviewMode(false)" />
   </ea-container>
 </template>
 
@@ -101,11 +106,14 @@
   import ComponentPanel from './material/ComponentPanel.vue'
   import PageSettingsPanel from './page/PageSettingsPanel.vue'
   import CanvasArea from './canvas/CanvasArea.vue'
+  import PreviewMode from './preview/PreviewMode.vue'
 
   const MonacoEditor = defineAsyncComponent(() => import('@/components/common/MonacoEditor.vue'))
   const PropsPanel = defineAsyncComponent(() => import('./props/PropsPanel.vue'))
 
   const schemaStore = useSchemaStore()
+  const isPreviewMode = computed(() => schemaStore.isPreviewMode)
+  const setPreviewMode = schemaStore.setPreviewMode
 
   const activeLeftPanel = ref('components')
   const leftAsideCollapsed = ref(false)
@@ -144,12 +152,6 @@
       }
     },
   })
-
-  watch(
-    () => schemaStore.pageSchema,
-    newVal => console.log('Schema updated:', newVal),
-    { deep: true }
-  )
 </script>
 
 <style lang="scss" scoped>

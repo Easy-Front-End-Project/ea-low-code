@@ -14,17 +14,10 @@
 
     <!-- 中间：操作按钮 -->
     <div class="flex items-center gap-2">
-      <!-- <ea-button text :disabled="!canUndo" @click="handleUndo" title="撤销">
-        <span>撤销</span>
-      </ea-button>
-      <ea-button text :disabled="!canRedo" @click="handleRedo" title="重做">
-        <span>重做</span>
-      </ea-button> -->
-      <div class="w-px h-6 bg-gray-300 mx-2"></div>
-      <ea-button text @click="handleClear" title="清空">
+      <ea-button text @click="handleClear" title="清空" icon="trash-can">
         <span>清空</span>
       </ea-button>
-      <ea-button text @click="handleShowTree" title="大纲">
+      <ea-button text @click="handleShowTree" title="大纲" icon="sitemap">
         <span>大纲</span>
       </ea-button>
       <div class="w-px h-6 bg-gray-300 mx-2"></div>
@@ -35,22 +28,14 @@
 
     <!-- 右侧：变量、预览和导出 -->
     <div class="flex items-center gap-2">
-      <ea-button text @click="handleShowVariables" title="变量">
-        <span>变量</span>
-      </ea-button>
-      <ea-button text @click="handleShowRemoteConfig" title="远程组件">
-        <span>远程组件</span>
+      <ea-button text @click="handleShowVariables" title="变量" icon="variable"> 变量 </ea-button>
+      <ea-button text @click="handleShowRemoteConfig" title="远程组件" icon="cloud">
+        远程组件
       </ea-button>
       <div class="w-px h-6 bg-gray-300 mx-2"></div>
-      <ea-button type="primary" @click="handlePreview" title="预览">
-        <span>预览</span>
-      </ea-button>
-      <ea-button @click="handleExport" title="导出">
-        <span>导出</span>
-      </ea-button>
-      <ea-button @click="handleImport" title="导入">
-        <span>导入</span>
-      </ea-button>
+      <ea-button type="primary" @click="handlePreview" title="预览" icon="eye"> 预览 </ea-button>
+      <ea-button @click="handleExport" title="导出" icon="file-export"> 导出 </ea-button>
+      <ea-button @click="handleImport" title="导入" icon="file-import"> 导入 </ea-button>
     </div>
 
     <!-- 隐藏的文件输入 -->
@@ -69,7 +54,6 @@
 
 <script setup>
   import { ref } from 'vue'
-  import { useRouter } from 'vue-router'
   import { useSchemaStore } from '@/stores/designer/schema'
   import { exportSchemaToJson, importSchemaFromJson } from '@/utils/schemaHelper'
   import { exampleSchema } from '@/constants/exampleSchema'
@@ -78,7 +62,6 @@
   import RemoteComponentManager from '@/components/designer/RemoteComponentManager.vue'
 
   const schemaStore = useSchemaStore()
-  const router = useRouter()
   const fileInput = ref(null)
 
   // 组件大纲弹框显示状态
@@ -88,21 +71,9 @@
   // 远程组件配置弹框显示状态
   const remoteConfigVisible = ref(false)
 
-  // 撤销/重做功能（待实现）
-  const canUndo = ref(false)
-  const canRedo = ref(false)
-
   defineOptions({
     name: 'DesignerToolbar',
   })
-
-  function handleUndo() {
-    console.log('撤销')
-  }
-
-  function handleRedo() {
-    console.log('重做')
-  }
 
   // 显示组件大纲
   function handleShowTree() {
@@ -137,7 +108,7 @@
   }
 
   function handlePreview() {
-    router.push('/preview')
+    schemaStore.setPreviewMode(true)
   }
 
   function handleExport() {

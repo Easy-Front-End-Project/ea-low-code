@@ -3,55 +3,61 @@
     <!-- 页面自定义 CSS -->
     <component :is="'style'" v-if="pageCustomCSS">{{ pageCustomCSS }}</component>
 
-    <!-- 画布容器 -->
-    <div
-      ref="canvasRef"
-      class="canvas-area__container"
-      :style="canvasStyle"
-      @dragover="handleDragOver"
-      @drop="handleDrop"
-      @click="handleCanvasClick"
-    >
-      <!-- 网格背景 -->
-      <div class="canvas-area__grid"></div>
+    <!-- 画布工具栏 -->
+    <CanvasToolbar />
 
-      <!-- 加载动画 -->
-      <div v-if="isLoading" class="canvas-area__loading">
-        <div class="canvas-area__loading-spinner"></div>
-        <p class="canvas-area__loading-text">加载组件中...</p>
-      </div>
+    <!-- 画布滚动区域 -->
+    <div class="canvas-area__scroll-wrapper">
+      <!-- 画布容器 -->
+      <div
+        ref="canvasRef"
+        class="canvas-area__container"
+        :style="canvasStyle"
+        @dragover="handleDragOver"
+        @drop="handleDrop"
+        @click="handleCanvasClick"
+      >
+        <!-- 网格背景 -->
+        <div class="canvas-area__grid"></div>
 
-      <!-- 组件渲染区域 -->
-      <div v-show="!isLoading" ref="canvasContentRef" class="canvas-area__content">
-        <CanvasComponent
-          v-for="component in components"
-          :key="component.id"
-          :component="component"
-          :selected="selectedComponentId === component.id"
-          @select="handleComponentSelect"
-          @delete="handleComponentDelete"
-          @drop-to-parent="handleDropToParent"
-        />
-      </div>
+        <!-- 加载动画 -->
+        <div v-if="isLoading" class="canvas-area__loading">
+          <div class="canvas-area__loading-spinner"></div>
+          <p class="canvas-area__loading-text">加载组件中...</p>
+        </div>
 
-      <!-- 空状态提示 -->
-      <div v-if="!isLoading && components.length === 0" class="canvas-area__empty">
-        <ea-icon name="hand" variant="solid" size="48" class="canvas-area__empty-icon"></ea-icon>
-        <p class="canvas-area__empty-text">从左侧拖拽组件到此处</p>
+        <!-- 组件渲染区域 -->
+        <div v-show="!isLoading" class="canvas-area__content">
+          <CanvasComponent
+            v-for="component in components"
+            :key="component.id"
+            :component="component"
+            :selected="selectedComponentId === component.id"
+            @select="handleComponentSelect"
+            @delete="handleComponentDelete"
+            @copy="handleComponentCopy"
+            @drop-to-parent="handleDropToParent"
+          />
+        </div>
+
+        <!-- 空状态提示 -->
+        <div v-if="!isLoading && components.length === 0" class="canvas-area__empty">
+          <ea-icon name="hand" variant="solid" size="48" class="canvas-area__empty-icon"></ea-icon>
+          <p class="canvas-area__empty-text">从左侧拖拽组件到此处</p>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-  import { ref, computed, watch, nextTick, onMounted } from 'vue'
+  import { ref, computed, onMounted } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
   import CanvasComponent from '../../designer/CanvasComponent.vue'
+  import CanvasToolbar from '@/components/common/CanvasToolbar.vue'
 
   const schemaStore = useSchemaStore()
   const canvasRef = ref(null)
-  const canvasContentRef = ref(null)
-  const contentHeight = ref(0)
   const isLoading = ref(true)
 
   const components = computed(() => schemaStore.components)
@@ -74,34 +80,21 @@
     }
   })
 
-  async function updateContentHeight() {
-    await nextTick()
-    if (canvasContentRef.value) {
-      contentHeight.value = canvasContentRef.value.scrollHeight
-    }
-  }
-
-  watch(
-    () => components.value.map(c => ({ id: c.id, children: c.children?.map(child => child.id) })),
-    updateContentHeight,
-    { deep: false, flush: 'post' }
-  )
-
   const pageSettings = computed(() => schemaStore.pageSchema.settings || {})
   const pageStyle = computed(() => pageSettings.value.style || {})
   const pageCustomCSS = computed(() => pageSettings.value.customCSS || '')
 
   const canvasStyle = computed(() => {
-    const { viewport } = schemaStore.pageSchema.meta
-    const minHeight = viewport.height
-    const extraSpace = 100
-    const dynamicHeight = Math.max(minHeight, contentHeight.value + extraSpace)
+    // 从 pageStyle 中获取宽高设置
+    const width = pageStyle.value?.width
+    const height = pageStyle.value?.height
+    const hasCustomSize = width && height
 
     return {
-      width: `${viewport.width}px`,
-      height: `${dynamicHeight}px`,
+      width: hasCustomSize ? width : '100%',
+      height: hasCustomSize ? height : '100%',
       minWidth: 'auto',
-      minHeight: `${minHeight}px`,
+      minHeight: hasCustomSize ? height : '100vh',
       maxWidth: '100%',
       overflow: 'auto',
       ...pageStyle.value,
@@ -168,19 +161,32 @@
   function handleComponentDelete(componentId) {
     schemaStore.removeComponent(componentId)
   }
+
+  function handleComponentCopy(copiedComponent) {
+    schemaStore.addComponentBySchema(copiedComponent)
+    schemaStore.selectComponent(copiedComponent.id)
+  }
 </script>
 
 <style lang="scss" scoped>
   .canvas-area {
     flex: 1;
     background-color: #f5f7fa;
-    height: auto;
-    padding: 1.5rem;
-    padding-bottom: 6rem;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    height: 100%;
+    overflow: hidden;
+
+    &__scroll-wrapper {
+      flex: 1;
+      overflow: auto;
+      padding: 1.5rem;
+      padding-bottom: 6rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
 
     &__container {
       background-color: #fff;
@@ -188,6 +194,7 @@
       border-radius: 0.5rem;
       overflow: hidden;
       position: relative;
+      flex-shrink: 0;
     }
 
     &__grid {

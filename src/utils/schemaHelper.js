@@ -211,11 +211,7 @@ export function createDefaultPageSchema() {
     meta: {
       title: '未命名页面',
       description: '',
-      viewport: {
-        width: 1920,
-        height: 1080,
-        overflow: 'auto',
-      },
+      viewport: {},
     },
   }
 }

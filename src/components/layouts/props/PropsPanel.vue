@@ -68,21 +68,19 @@
         />
 
         <!-- 配置面板：页面级或组件级 -->
-        <ea-tabs :active="selectedComponent ? 'props' : 'pageStyle'">
+        <ea-tabs v-model="activeTab">
           <!-- 样式面板（页面和组件共用） -->
           <ea-tab :panel="selectedComponent ? 'baseStyle' : 'pageStyle'">
             {{ selectedComponent ? '基础样式' : '页面样式' }}
           </ea-tab>
           <ea-tab-panel :name="selectedComponent ? 'baseStyle' : 'pageStyle'">
             <div class="pt-2">
-              <keep-alive>
-                <BaseStyleConfig
-                  :style="currentStyleConfig.style"
-                  :position-style="currentStyleConfig.positionStyle"
-                  :custom-c-s-s="currentStyleConfig.customCSS"
-                  @style-change="handleStyleChange"
-                />
-              </keep-alive>
+              <BaseStyleConfig
+                :style="currentStyleConfig.style"
+                :position-style="currentStyleConfig.positionStyle"
+                :custom-c-s-s="currentStyleConfig.customCSS"
+                @style-change="handleStyleChange"
+              />
             </div>
           </ea-tab-panel>
 
@@ -105,28 +103,22 @@
             <ea-tab panel="props">属性</ea-tab>
             <ea-tab-panel name="props">
               <div class="space-y-4 pt-2">
-                <keep-alive>
-                  <SlotConfig
-                    :parent-slots="parentComponentMeta?.slots"
-                    :slot-value="selectedComponent.props?.slot || 'default'"
-                    @slot-change="handleSlotChange"
-                  />
-                </keep-alive>
-                <keep-alive>
-                  <SlotScopeConfig
-                    :parent-slots="parentComponentMeta?.slots"
-                    :slot-value="selectedComponent.props?.slot || 'default'"
-                    :scope="selectedComponent.props?.scope || ''"
-                    @scope-change="handleScopeChange"
-                  />
-                </keep-alive>
-                <keep-alive>
-                  <PropConfig
-                    :props="componentPropsWithoutSlot"
-                    :component-props="selectedComponent.props"
-                    @prop-change="handlePropChange"
-                  />
-                </keep-alive>
+                <SlotConfig
+                  :parent-slots="parentComponentMeta?.slots"
+                  :slot-value="selectedComponent.props?.slot || 'default'"
+                  @slot-change="handleSlotChange"
+                />
+                <SlotScopeConfig
+                  :parent-slots="parentComponentMeta?.slots"
+                  :slot-value="selectedComponent.props?.slot || 'default'"
+                  :scope="selectedComponent.props?.scope || ''"
+                  @scope-change="handleScopeChange"
+                />
+                <PropConfig
+                  :props="componentPropsWithoutSlot"
+                  :component-props="selectedComponent.props"
+                  @prop-change="handlePropChange"
+                />
               </div>
             </ea-tab-panel>
 
@@ -134,14 +126,12 @@
             <ea-tab panel="componentStyle">组件样式</ea-tab>
             <ea-tab-panel name="componentStyle">
               <div class="pt-2">
-                <keep-alive>
-                  <ComponentStyleConfig
-                    :component-type="selectedComponent.type"
-                    :component-props="selectedComponent.props"
-                    :css-variables="selectedComponent.cssVariables"
-                    @css-variable-change="handleCssVariableChange"
-                  />
-                </keep-alive>
+                <ComponentStyleConfig
+                  :component-type="selectedComponent.type"
+                  :component-props="selectedComponent.props"
+                  :css-variables="selectedComponent.cssVariables"
+                  @css-variable-change="handleCssVariableChange"
+                />
               </div>
             </ea-tab-panel>
           </template>
@@ -152,7 +142,7 @@
 </template>
 
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
   import { getComponentMeta, getRemoteComponentMetaList } from '@/constants/componentMeta'
   import PropConfig from '@/components/configs/PropConfig.vue'
@@ -166,14 +156,41 @@
 
   const schemaStore = useSchemaStore()
 
+  // ==================== 基础状态 ====================
+  /** 当前激活的 tab */
+  const activeTab = ref('pageStyle')
+
+  /** 当前选中的组件 */
   const selectedComponent = computed(() => schemaStore.selectedComponent)
+
+  // 只在从页面切换到组件或从组件切换到页面时重置 tab
+  watch(
+    selectedComponent,
+    (newVal, oldVal) => {
+      const wasComponent = !!oldVal
+      const isComponent = !!newVal
+      // 只有在页面/组件之间切换时才重置 tab
+      if (wasComponent !== isComponent) {
+        activeTab.value = isComponent ? 'props' : 'pageStyle'
+      }
+      // 如果是同类型切换（组件到组件），保持当前 tab
+    },
+    { immediate: true }
+  )
+  /** 页面 Schema */
   const pageSchema = computed(() => schemaStore.pageSchema)
+  /** 组件总数 */
   const componentCount = computed(() => schemaStore.componentCount)
 
+  // ==================== 页面级配置 ====================
+  /** 页面样式 */
   const pageStyle = computed(() => schemaStore.pageSchema.settings?.style || {})
+  /** 页面自定义 CSS */
   const pageCustomCSS = computed(() => schemaStore.pageSchema.settings?.customCSS || '')
+  /** 页面事件 */
   const pageEvents = computed(() => schemaStore.pageSchema.settings?.events || [])
 
+  /** 页面事件元数据 */
   const pageEventMeta = computed(() => [
     { name: 'load', label: '页面加载', description: '页面加载完成时触发' },
     { name: 'unload', label: '页面卸载', description: '页面卸载时触发' },
@@ -181,6 +198,7 @@
     { name: 'resize', label: '窗口调整', description: '窗口大小调整时触发' },
   ])
 
+  /** 当前样式配置（页面或组件） */
   const currentStyleConfig = computed(() => {
     if (selectedComponent.value) {
       return {
@@ -196,6 +214,7 @@
     }
   })
 
+  /** 当前事件配置（页面或组件） */
   const currentEventConfig = computed(() => {
     if (selectedComponent.value) {
       return {
@@ -209,23 +228,30 @@
     }
   })
 
+  // ==================== 别名编辑 ====================
+  /** 是否正在编辑别名 */
   const isEditingAlias = ref(false)
+  /** 别名输入值 */
   const aliasInput = ref('')
 
+  /** 开始编辑别名 */
   function startEditAlias() {
     aliasInput.value = selectedComponent.value?.alias || ''
     isEditingAlias.value = true
   }
 
+  /** 保存别名 */
   function saveAlias() {
     if (!selectedComponent.value) return
     const alias = aliasInput.value.trim()
 
+    // 验证别名格式
     if (alias && !/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(alias)) {
       alert('别名格式不正确，只能包含字母、数字、下划线，且不能以数字开头')
       return
     }
 
+    // 检查别名是否已被使用
     if (alias) {
       const existingId = schemaStore.getComponentIdByAlias?.(alias)
       if (existingId && existingId !== selectedComponent.value.id) {
@@ -234,6 +260,7 @@
       }
     }
 
+    // 保存别名
     if (schemaStore.setComponentAlias) {
       schemaStore.setComponentAlias(selectedComponent.value.id, alias)
     } else {
@@ -242,11 +269,14 @@
     isEditingAlias.value = false
   }
 
+  /** 取消编辑别名 */
   function cancelEditAlias() {
     isEditingAlias.value = false
     aliasInput.value = ''
   }
 
+  // ==================== 组件元数据 ====================
+  /** 当前组件元数据 */
   const componentMeta = computed(() => {
     if (!selectedComponent.value) return null
 
@@ -260,14 +290,17 @@
     return getComponentMeta(selectedComponent.value.type)
   })
 
+  /** 排除 slot 的组件属性 */
   const componentPropsWithoutSlot = computed(() =>
     (componentMeta.value?.props || []).filter(prop => prop.name !== 'slot')
   )
 
+  /** 是否有特殊配置 */
   const hasSpecialConfig = computed(
     () => !!(selectedComponent.value && componentMeta.value?.specialConfig?.type)
   )
 
+  /** 父组件元数据 */
   const parentComponentMeta = computed(() => {
     if (!selectedComponent.value) return null
 
@@ -283,11 +316,14 @@
     return getComponentMeta(parent.type)
   })
 
+  // ==================== 事件处理 ====================
+  /** 属性变更处理 */
   function handlePropChange(propName, value) {
     if (!selectedComponent.value) return
     schemaStore.updateComponentProps(selectedComponent.value.id, { [propName]: value })
   }
 
+  /** 样式变更处理 */
   function handleStyleChange(styleName, value, styleType = 'inline') {
     if (selectedComponent.value) {
       if (styleType === 'customCSS') {
@@ -313,6 +349,7 @@
     }
   }
 
+  /** CSS 变量变更处理 */
   function handleCssVariableChange(variableName, value) {
     if (!selectedComponent.value) return
     schemaStore.updateComponentStyle(
@@ -322,6 +359,7 @@
     )
   }
 
+  /** 事件变更处理 */
   function handleEventChange(events) {
     if (selectedComponent.value) {
       schemaStore.updateComponentEvents(selectedComponent.value.id, events)
@@ -331,16 +369,19 @@
     }
   }
 
+  /** 插槽变更处理 */
   function handleSlotChange(slotValue) {
     if (!selectedComponent.value) return
     schemaStore.updateComponentProps(selectedComponent.value.id, { slot: slotValue })
   }
 
+  /** Scope 变更处理 */
   function handleScopeChange(scope) {
     if (!selectedComponent.value) return
     schemaStore.updateComponentProps(selectedComponent.value.id, { scope })
   }
 
+  /** 删除组件处理 */
   function handleDeleteComponent() {
     if (!selectedComponent.value) return
     if (confirm('确定要删除这个组件吗？')) {

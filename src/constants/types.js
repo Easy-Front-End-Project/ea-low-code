@@ -16,10 +16,10 @@ export const PropTypes = {
 // 组件分类
 export const ComponentCategories = {
   BASIC: 'basic',
+  LAYOUT: 'layout',
   FORM: 'form',
   DATA: 'data',
   NAVIGATION: 'navigation',
   FEEDBACK: 'feedback',
-  LAYOUT: 'layout',
   REMOTE: 'remote',
 }

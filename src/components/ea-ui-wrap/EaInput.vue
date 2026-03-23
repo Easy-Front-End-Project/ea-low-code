@@ -8,6 +8,11 @@
     :clearable="clearable"
     :type="type"
     :rows="rows"
+    :name="name || undefined"
+    :pattern="pattern || undefined"
+    :required="required || undefined"
+    :minlength="minlength || undefined"
+    :maxlength="maxlength || undefined"
     @input.stop.prevent="handleInput"
     @ea-clear="handleClear"
   >
@@ -52,6 +57,26 @@
       type: Number,
       default: 2,
     },
+    name: {
+      type: String,
+      default: '',
+    },
+    pattern: {
+      type: String,
+      default: '',
+    },
+    required: {
+      type: Boolean,
+      default: false,
+    },
+    minlength: {
+      type: Number,
+      default: undefined,
+    },
+    maxlength: {
+      type: Number,
+      default: undefined,
+    },
   })
 
   const emit = defineEmits(['update:modelValue', 'change', 'input', 'clear'])
@@ -93,5 +118,8 @@
     focus: () => inputRef.value?.focus(),
     blur: () => inputRef.value?.blur(),
     select: () => inputRef.value?.select(),
+    checkValidity: () => inputRef.value?.checkValidity(),
+    reportValidity: () => inputRef.value?.reportValidity(),
+    setCustomValidity: message => inputRef.value?.setCustomValidity(message),
   })
 </script>

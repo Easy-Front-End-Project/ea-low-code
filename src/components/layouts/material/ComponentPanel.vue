@@ -121,6 +121,7 @@
 
   const categories = computed(() => {
     const cats = getCategories().filter(cat => cat.value !== ComponentCategories.REMOTE)
+
     return cats.map(cat => {
       const groups = getComponentsByParentGroup(cat.value)
         .map(group => ({

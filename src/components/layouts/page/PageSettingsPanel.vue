@@ -23,42 +23,6 @@
         </div>
       </div>
 
-      <!-- 视口设置 -->
-      <div class="settings-section mb-6">
-        <h4 class="section-title">视口设置</h4>
-        <div class="space-y-3">
-          <div class="setting-item">
-            <label class="setting-label">宽度 (px)</label>
-            <EaInputNumber
-              v-model="pageMeta.viewport.width"
-              :min="800"
-              :max="3840"
-              size="small"
-              @change="updatePageMeta"
-            />
-          </div>
-          <div class="setting-item">
-            <label class="setting-label">高度 (px)</label>
-            <EaInputNumber
-              v-model="pageMeta.viewport.height"
-              :min="600"
-              :max="2160"
-              size="small"
-              @change="updatePageMeta"
-            />
-          </div>
-          <div class="setting-item">
-            <label class="setting-label">溢出方式</label>
-            <EaSelect v-model="pageMeta.viewport.overflow" size="small" @change="updatePageMeta">
-              <ea-option value="auto">自动</ea-option>
-              <ea-option value="hidden">隐藏</ea-option>
-              <ea-option value="scroll">滚动</ea-option>
-              <ea-option value="visible">可见</ea-option>
-            </EaSelect>
-          </div>
-        </div>
-      </div>
-
       <!-- 项目级组件设置 -->
       <div class="settings-section">
         <h4 class="section-title">页面级组件</h4>
@@ -83,12 +47,9 @@
 </template>
 
 <script setup>
-  import { ref, computed, watch } from 'vue'
+  import { ref, watch } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
-  import EaInputNumber from '@/components/ea-ui-wrap/EaInputNumber.vue'
-  import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
-  import EaSwitch from '@/components/ea-ui-wrap/EaSwitch.vue'
 
   const schemaStore = useSchemaStore()
 
@@ -96,11 +57,6 @@
   const pageMeta = ref({
     title: '',
     description: '',
-    viewport: {
-      width: 1920,
-      height: 1080,
-      overflow: 'auto',
-    },
   })
 
   // 是否使用项目默认配置
@@ -119,11 +75,6 @@
         pageMeta.value = {
           title: newMeta.title || '',
           description: newMeta.description || '',
-          viewport: {
-            width: newMeta.viewport?.width || 1920,
-            height: newMeta.viewport?.height || 1080,
-            overflow: newMeta.viewport?.overflow || 'auto',
-          },
         }
       }
     },
@@ -148,7 +99,6 @@
     schemaStore.updatePageMeta({
       title: pageMeta.value.title,
       description: pageMeta.value.description,
-      viewport: { ...pageMeta.value.viewport },
     })
   }
 

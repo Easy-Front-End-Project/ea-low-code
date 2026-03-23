@@ -86,11 +86,11 @@
       <ea-button
         type="text"
         size="small"
+        icon="link"
         class="bind-btn"
         :class="{ 'is-bound': isVariable }"
         @click="handleShowVariableSelector"
       >
-        <ea-icon name="link" variant="solid" size="12"></ea-icon>
       </ea-button>
     </div>
   </div>
