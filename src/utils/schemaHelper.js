@@ -238,3 +238,150 @@ export function importSchemaFromJson(json) {
     return null
   }
 }
+
+/**
+ * 执行函数代码字符串
+ * @param {string} code - 函数代码字符串
+ * @param {Object} context - 执行上下文
+ * @returns {*} 函数执行结果
+ */
+export function executeFunctionCode(code, context = {}) {
+  if (!code || typeof code !== 'string') {
+    return null
+  }
+
+  try {
+    // 构建完整的函数执行器
+    // 使用 IIFE (Immediately Invoked Function Expression) 模式执行代码
+    const wrappedCode = `
+      return (async function() {
+        try {
+          ${code}
+        } catch (error) {
+          console.error('函数执行错误:', error);
+          throw error;
+        }
+      })();
+    `
+
+    // 创建函数，注入上下文变量
+    const fn = new Function('$component', '$vars', '$alias', '$utils', wrappedCode)
+
+    // 执行函数并返回结果
+    const result = fn(
+      context.$component || {},
+      context.$vars || {},
+      context.$alias || {},
+      context.$utils || {}
+    )
+
+    // 处理异步结果
+    return result instanceof Promise ? result : Promise.resolve(result)
+  } catch (error) {
+    console.error('执行函数代码失败:', error)
+    if (window.$message) {
+      window.$message.error('函数执行失败: ' + error.message)
+    }
+    return null
+  }
+}
+
+/**
+ * 同步执行函数代码字符串（用于需要立即返回值的场景）
+ * @param {string} code - 函数代码字符串
+ * @param {Object} context - 执行上下文
+ * @returns {*} 函数执行结果
+ */
+export function executeFunctionCodeSync(code, context = {}) {
+  if (!code || typeof code !== 'string') {
+    return null
+  }
+
+  try {
+    // 构建同步执行的函数
+    const wrappedCode = `
+      ${code}
+    `
+
+    // 创建函数并执行
+    const fn = new Function('$component', '$vars', '$alias', '$utils', wrappedCode)
+
+    return fn(
+      context.$component || {},
+      context.$vars || {},
+      context.$alias || {},
+      context.$utils || {}
+    )
+  } catch (error) {
+    console.error('同步执行函数代码失败:', error)
+    return null
+  }
+}
+
+/**
+ * 解析值（处理变量绑定）
+ * @param {*} value - 原始值，可能是变量绑定对象 { type: 'variable', value: 'varName' }
+ * @param {Function} getVariableValue - 获取变量值的函数
+ * @param {Function} getVariableType - 获取变量类型的函数
+ * @param {Object} context - 执行上下文（用于函数类型变量）
+ * @param {*} defaultValue - 默认值，当变量不存在时返回
+ * @returns {*} 解析后的值
+ */
+export function resolveValue(value, getVariableValue, getVariableType, context, defaultValue = '') {
+  // 如果是变量绑定对象
+  if (value && typeof value === 'object' && value.type === 'variable') {
+    const varName = value.value
+    const varValue = getVariableValue?.(varName)
+    const varType = getVariableType?.(varName)
+
+    // 如果变量不存在，返回默认值
+    if (varValue === undefined) {
+      return defaultValue
+    }
+
+    // 如果是函数类型变量，立即执行并返回结果
+    if (varType === 'function' && typeof varValue === 'string') {
+      return executeFunctionCodeSync(varValue, context)
+    }
+
+    return varValue
+  }
+  return value
+}
+
+/**
+ * 解析组件ID（支持 alias: 前缀）
+ * @param {string} componentIdOrAlias - 组件ID或别名（如：alias:submitBtn 或 button_123）
+ * @param {Function} getComponentIdByAlias - 通过别名获取组件ID的函数
+ * @returns {string|null} 解析后的组件ID
+ */
+export function resolveComponentId(componentIdOrAlias, getComponentIdByAlias) {
+  if (!componentIdOrAlias) return null
+
+  // 支持 alias: 前缀格式
+  if (componentIdOrAlias.startsWith('alias:')) {
+    const alias = componentIdOrAlias.slice(6)
+    return getComponentIdByAlias?.(alias) || null
+  }
+
+  return componentIdOrAlias
+}
+
+/**
+ * 检查是否为别名格式
+ * @param {string} value - 要检查的字符串
+ * @returns {boolean} 是否为别名格式
+ */
+export function isAliasFormat(value) {
+  return typeof value === 'string' && value.startsWith('alias:')
+}
+
+/**
+ * 从 alias:xxx 格式中提取别名
+ * @param {string} value - alias:xxx 格式的字符串
+ * @returns {string|null} 提取的别名
+ */
+export function extractAlias(value) {
+  if (!isAliasFormat(value)) return null
+  return value.slice(6)
+}

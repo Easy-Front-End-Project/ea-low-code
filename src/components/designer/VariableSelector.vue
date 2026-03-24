@@ -27,7 +27,7 @@
             </div>
           </div>
           <div class="variable-value">
-            <code>{{ formatValue(variable.defaultValue) }}</code>
+            <code>{{ formatValue(variable.defaultValue, variable.type) }}</code>
           </div>
         </div>
 
@@ -43,6 +43,7 @@
 
     <!-- 底部按钮 -->
     <div slot="footer" class="dialog-footer">
+      <ea-button type="primary" @click="handleAddVariable"> 管理变量 </ea-button>
       <ea-button @click="handleClose">取消</ea-button>
     </div>
   </ea-dialog>
@@ -60,7 +61,7 @@
     },
   })
 
-  const emit = defineEmits(['select', 'close'])
+  const emit = defineEmits(['select', 'close', 'add-variable'])
 
   const variableStore = useVariableStore()
   const searchKeyword = ref('')
@@ -72,6 +73,7 @@
     boolean: '布尔值',
     array: '数组',
     object: '对象',
+    function: '函数',
   }
 
   // 过滤后的变量列表
@@ -93,9 +95,12 @@
   }
 
   // 格式化值显示
-  function formatValue(value) {
+  function formatValue(value, type) {
     if (value === null || value === undefined) {
       return 'null'
+    }
+    if (type === 'function') {
+      return '[Function]'
     }
     if (typeof value === 'object') {
       return JSON.stringify(value).slice(0, 30) + '...'
@@ -112,6 +117,11 @@
   function handleClose() {
     searchKeyword.value = ''
     emit('close')
+  }
+
+  // 添加变量
+  function handleAddVariable() {
+    emit('add-variable')
   }
 </script>
 
@@ -202,7 +212,8 @@
 
   .dialog-footer {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     padding: 1rem;
     border-top: 1px solid #e5e7eb;
   }

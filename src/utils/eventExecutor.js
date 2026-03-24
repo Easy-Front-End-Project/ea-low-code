@@ -6,6 +6,10 @@
 import { useComponentInstanceStore } from '@/stores/designer/componentInstance'
 import { useVariableStore } from '@/stores/designer/variable'
 import { useSchemaStore } from '@/stores/designer/schema'
+import {
+  resolveValue as resolveValueUtil,
+  resolveComponentId as resolveComponentIdUtil,
+} from '@/utils/schemaHelper'
 
 /**
  * 创建事件执行上下文
@@ -29,6 +33,66 @@ export function createExecutionContext() {
     $vars: {
       get: name => variableStore.getVariableDefaultValue(name),
       set: (name, value) => variableStore.updateVariableByName(name, { defaultValue: value }),
+      call: (name, ...args) => {
+        const funcCode = variableStore.getVariableDefaultValue(name)
+        if (typeof funcCode !== 'string') {
+          console.warn(`变量 ${name} 不是函数类型或没有定义`)
+          return null
+        }
+        try {
+          // 创建函数执行上下文
+          const fn = new Function(
+            '$component',
+            '$vars',
+            '$alias',
+            ...args.map((_, i) => `arg${i}`),
+            funcCode
+          )
+          return fn(
+            {
+              get: id => instanceStore.getComponentElement(id),
+              setProp: (id, prop, value) => instanceStore.setComponentProp(id, prop, value),
+              getProp: (id, prop) => instanceStore.getComponentProp(id, prop),
+              call: (id, method, ...args) => instanceStore.callComponentMethod(id, method, ...args),
+            },
+            {
+              get: n => variableStore.getVariableDefaultValue(n),
+              set: (n, v) => variableStore.updateVariableByName(n, { defaultValue: v }),
+            },
+            {
+              get: alias => schemaStore.getComponentIdByAlias(alias),
+              find: alias => schemaStore.findComponentByAlias(alias),
+              getElement: alias => {
+                const id = schemaStore.getComponentIdByAlias(alias)
+                return id ? instanceStore.getComponentElement(id) : null
+              },
+              setProp: (alias, prop, value) => {
+                const id = schemaStore.getComponentIdByAlias(alias)
+                if (id) {
+                  instanceStore.setComponentProp(id, prop, value)
+                }
+              },
+              getProp: (alias, prop) => {
+                const id = schemaStore.getComponentIdByAlias(alias)
+                return id ? instanceStore.getComponentProp(id, prop) : null
+              },
+              call: (alias, method, ...args) => {
+                const id = schemaStore.getComponentIdByAlias(alias)
+                if (id) {
+                  instanceStore.callComponentMethod(id, method, ...args)
+                }
+              },
+            },
+            ...args
+          )
+        } catch (error) {
+          console.error(`执行函数变量 ${name} 失败:`, error)
+          if (window.$message) {
+            window.$message.error(`函数执行失败: ${error.message}`)
+          }
+          return null
+        }
+      },
     },
     // 别名操作
     $alias: {
@@ -64,12 +128,15 @@ export function createExecutionContext() {
  * @returns {*} 解析后的值
  */
 export function resolveValue(value) {
-  // 如果是变量绑定对象
-  if (value && typeof value === 'object' && value.type === 'variable') {
-    const variableStore = useVariableStore()
-    return variableStore.getVariableDefaultValue(value.value)
-  }
-  return value
+  const variableStore = useVariableStore()
+  const context = createExecutionContext()
+
+  return resolveValueUtil(
+    value,
+    variableStore.getVariableDefaultValue.bind(variableStore),
+    name => variableStore.getVariableByName(name)?.type,
+    context
+  )
 }
 
 /**
@@ -252,16 +319,11 @@ export function callComponentMethod(componentId, methodName, methodArgs = []) {
  * @returns {string|null} 解析后的组件ID
  */
 function resolveComponentId(componentIdOrAlias) {
-  if (!componentIdOrAlias) return null
-
-  // 支持 alias: 前缀格式
-  if (componentIdOrAlias.startsWith('alias:')) {
-    const alias = componentIdOrAlias.slice(6)
-    const schemaStore = useSchemaStore()
-    return schemaStore.getComponentIdByAlias(alias)
-  }
-
-  return componentIdOrAlias
+  const schemaStore = useSchemaStore()
+  return resolveComponentIdUtil(
+    componentIdOrAlias,
+    schemaStore.getComponentIdByAlias.bind(schemaStore)
+  )
 }
 
 /**

@@ -1,7 +1,6 @@
 <template>
   <div class="props-section">
     <h4 class="section-title">事件</h4>
-
     <!-- 添加事件按钮 -->
     <ea-button type="primary" size="small" @click="handleOpenDialog" class="w-full">
       <span>添加事件</span>
@@ -27,12 +26,12 @@
     <ea-dialog :visible="dialogVisible" title="事件配置" width="700px" @close="handleCloseDialog">
       <div class="event-dialog-content flex gap-4" style="height: 400px">
         <!-- 左侧：事件列表 -->
-        <div class="event-list w-48 border-r pr-4">
+        <div class="event-list w-48 border-r pr-4 pb-8">
           <div class="mb-3">
             <span class="text-sm font-medium text-gray-700">事件列表</span>
           </div>
 
-          <div class="space-y-2">
+          <div class="space-y-2 h-full overflow-auto">
             <div
               v-for="event in localEvents"
               :key="event.id"

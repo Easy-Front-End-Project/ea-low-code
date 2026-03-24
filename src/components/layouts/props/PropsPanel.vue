@@ -68,7 +68,7 @@
         />
 
         <!-- 配置面板：页面级或组件级 -->
-        <ea-tabs v-model="activeTab">
+        <ea-tabs :active="activeTab">
           <!-- 样式面板（页面和组件共用） -->
           <ea-tab :panel="selectedComponent ? 'baseStyle' : 'pageStyle'">
             {{ selectedComponent ? '基础样式' : '页面样式' }}
@@ -169,11 +169,9 @@
     (newVal, oldVal) => {
       const wasComponent = !!oldVal
       const isComponent = !!newVal
-      // 只有在页面/组件之间切换时才重置 tab
       if (wasComponent !== isComponent) {
         activeTab.value = isComponent ? 'props' : 'pageStyle'
       }
-      // 如果是同类型切换（组件到组件），保持当前 tab
     },
     { immediate: true }
   )

@@ -34,6 +34,7 @@
                 <ea-option value="boolean">布尔值</ea-option>
                 <ea-option value="array">数组</ea-option>
                 <ea-option value="object">对象</ea-option>
+                <ea-option value="function">函数</ea-option>
               </EaSelect>
             </div>
             <div class="col-default">
@@ -47,15 +48,15 @@
                 <ea-option :value="true">true</ea-option>
                 <ea-option :value="false">false</ea-option>
               </EaSelect>
-              <!-- 数组/对象类型使用按钮打开编辑器 -->
+              <!-- 数组/对象/函数类型使用按钮打开编辑器 -->
               <ea-button
-                v-else-if="variable.type === 'array' || variable.type === 'object'"
+                v-else-if="variable.type === 'array' || variable.type === 'object' || variable.type === 'function'"
                 class="w-full text-center"
                 type="primary"
                 size="small"
                 icon="pen"
                 @click="handleOpenEditor(variable)"
-                >编辑
+                >{{ variable.type === 'function' ? '编辑函数' : '编辑' }}
               </ea-button>
               <!-- 其他类型使用 EaInput -->
               <EaInput
@@ -104,21 +105,28 @@
       <ea-button @click="handleClose">关闭</ea-button>
     </div>
 
-    <!-- MonacoEditor 弹窗 -->
-    <ea-dialog
-      :visible="editorVisible"
-      :title="editorTitle"
-      width="600px"
-      @close="handleCloseEditor"
-    >
-      <div class="editor-content">
-        <MonacoEditor v-if="editorVisible" v-model="editorValue" language="json" height="300px" />
-      </div>
-      <div slot="footer" class="dialog-footer">
-        <ea-button @click="handleCloseEditor">取消</ea-button>
-        <ea-button type="primary" @click="handleSaveEditor">保存</ea-button>
-      </div>
-    </ea-dialog>
+    <Teleport to="body">
+      <!-- MonacoEditor 弹窗 -->
+      <ea-dialog
+        :visible="editorVisible"
+        :title="editorTitle"
+        width="600px"
+        @close="handleCloseEditor"
+      >
+        <div class="editor-content">
+          <MonacoEditor
+            v-if="editorVisible"
+            v-model="editorValue"
+            :language="editorLanguage"
+            height="300px"
+          />
+        </div>
+        <div slot="footer" class="dialog-footer">
+          <ea-button @click="handleCloseEditor">取消</ea-button>
+          <ea-button type="primary" @click="handleSaveEditor">保存</ea-button>
+        </div>
+      </ea-dialog>
+    </Teleport>
   </ea-dialog>
 </template>
 
@@ -151,7 +159,17 @@
 
   // 编辑器标题
   const editorTitle = computed(() => {
-    return editingVariableType.value === 'array' ? '编辑数组' : '编辑对象'
+    const typeMap = {
+      array: '编辑数组',
+      object: '编辑对象',
+      function: '编辑函数',
+    }
+    return typeMap[editingVariableType.value] || '编辑'
+  })
+
+  // 编辑器语言
+  const editorLanguage = computed(() => {
+    return editingVariableType.value === 'function' ? 'javascript' : 'json'
   })
 
   // 监听 store 变化，同步到本地
@@ -203,6 +221,21 @@
       case 'object':
         newDefaultValue = {}
         break
+      case 'function':
+        newDefaultValue = `// 函数型变量 - 代码将立即执行并返回结果
+// 可用 API：
+// $component.get(id) - 获取组件DOM
+// $component.setProp(id, prop, value) - 设置组件属性
+// $component.getProp(id, prop) - 获取组件属性
+// $component.call(id, method, ...args) - 调用组件方法
+// $vars.get(name) - 获取变量值
+// $vars.set(name, value) - 设置变量值
+// $alias.get(alias) - 通过别名获取组件ID
+// $alias.setProp(alias, prop, value) - 通过别名设置组件属性
+
+// 示例：返回当前时间戳加7天
+return Date.now() + 60 * 60 * 24 * 7 * 1000;`
+        break
       default:
         newDefaultValue = ''
     }
@@ -232,15 +265,35 @@
     editingVariableId.value = variable.id
     editingVariableType.value = variable.type
 
-    // 将值转换为 JSON 字符串显示
+    // 根据类型设置默认值和格式
     try {
-      if (typeof variable.defaultValue === 'object') {
+      if (variable.type === 'function') {
+        // 函数类型：直接使用字符串值或提供默认函数模板
+        if (variable.defaultValue && typeof variable.defaultValue === 'string') {
+          editorValue.value = variable.defaultValue
+        } else {
+          editorValue.value = `// 函数型变量 - 代码将立即执行并返回结果
+// 可用 API：
+// $component.get(id) - 获取组件DOM
+// $component.setProp(id, prop, value) - 设置组件属性
+// $component.getProp(id, prop) - 获取组件属性
+// $component.call(id, method, ...args) - 调用组件方法
+// $vars.get(name) - 获取变量值
+// $vars.set(name, value) - 设置变量值
+// $alias.get(alias) - 通过别名获取组件ID
+// $alias.setProp(alias, prop, value) - 通过别名设置组件属性
+
+// 示例：返回当前时间戳加7天
+return Date.now() + 60 * 60 * 24 * 7 * 1000;`
+        }
+      } else if (typeof variable.defaultValue === 'object') {
         editorValue.value = JSON.stringify(variable.defaultValue, null, 2)
       } else {
         editorValue.value = variable.type === 'array' ? '[]' : '{}'
       }
     } catch {
-      editorValue.value = variable.type === 'array' ? '[]' : '{}'
+      editorValue.value =
+        variable.type === 'array' ? '[]' : variable.type === 'function' ? '' : '{}'
     }
 
     editorVisible.value = true
@@ -257,6 +310,27 @@
   // 保存编辑器内容
   function handleSaveEditor() {
     if (!editingVariableId.value) return
+
+    // 函数类型直接保存字符串
+    if (editingVariableType.value === 'function') {
+      const codeValue = editorValue.value.trim()
+      if (!codeValue) {
+        alert('函数内容不能为空')
+        return
+      }
+
+      // 更新本地变量
+      const localVar = localVariables.value.find(v => v.id === editingVariableId.value)
+      if (localVar) {
+        localVar.defaultValue = codeValue
+      }
+
+      // 更新 store
+      variableStore.updateVariable(editingVariableId.value, { defaultValue: codeValue })
+
+      handleCloseEditor()
+      return
+    }
 
     try {
       // 解析 JSON

@@ -42,6 +42,7 @@
 <script setup>
   import { computed, ref, watch } from 'vue'
   import { useGlobalDialogs } from '@/composables/useGlobalDialogs.js'
+  import { isAliasFormat, extractAlias } from '@/utils/schemaHelper'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaRadioGroup from '@/components/ea-ui-wrap/EaRadioGroup.vue'
   import EaRadio from '@/components/ea-ui-wrap/EaRadio.vue'
@@ -110,9 +111,9 @@
     targetId => {
       if (!targetId) return
 
-      if (targetId.startsWith('alias:')) {
+      if (isAliasFormat(targetId)) {
         targetMode.value = 'alias'
-        aliasValue.value = targetId.slice(6)
+        aliasValue.value = extractAlias(targetId)
       } else {
         targetMode.value = 'id'
         idValue.value = targetId

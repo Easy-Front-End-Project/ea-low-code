@@ -61,15 +61,14 @@
 </template>
 
 <script setup>
-  import { computed, ref, defineOptions } from 'vue'
+  import { computed, ref, defineOptions, toRef } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
-  import { useVariableStore } from '@/stores/designer/variable'
   import { getComponentMeta } from '@/constants/componentMeta'
-  import { executeEvent } from '@/utils/eventExecutor'
   import { processCustomCSS } from '@/utils/cssProcessor'
   import { cloneComponentSchema } from '@/utils/schemaHelper'
   import { useRemoteComponent } from '@/composables/useRemoteComponent'
   import { useComponentInstance } from '@/composables/useComponentInstance'
+  import { useComponentRender } from '@/composables/useComponentRender'
   import {
     CONTAINER_TYPES,
     NON_CONTAINER_TYPES,
@@ -93,7 +92,6 @@
 
   // ==================== Stores ====================
   const schemaStore = useSchemaStore()
-  const variableStore = useVariableStore()
 
   // ==================== Refs ====================
   /** 是否悬停 */
@@ -105,6 +103,12 @@
   /** 组件引用 */
   const componentRef = ref(null)
 
+  // ==================== Composables ====================
+  // 使用公共的组件渲染逻辑
+  const componentRefWrapper = toRef(() => props.component)
+  const { resolvedChildrenText, hasChildrenText, componentProps, componentEventListeners } =
+    useComponentRender(componentRefWrapper, { skipSlot: true })
+
   // ==================== Computed ====================
   /** 当前选中的组件ID */
   const selectedComponentId = computed(() => schemaStore.selectedComponentId)
@@ -114,9 +118,7 @@
   const allChildren = computed(() => props.component.children || [])
 
   // 远程组件
-  const { isRemoteComponent, componentTag: remoteComponentTag } = useRemoteComponent(
-    props.component
-  )
+  const { isRemoteComponent, componentTag: remoteComponentTag } = useRemoteComponent(props.component)
   const componentTag = computed(() => remoteComponentTag.value)
 
   /** 是否不可选择 */
@@ -153,7 +155,8 @@
 
   /** 显示名称 */
   const displayName = computed(
-    () => componentMeta.value?.name || (isRemoteComponent.value ? '远程组件' : props.component.type)
+    () =>
+      componentMeta.value?.name || (isRemoteComponent.value ? '远程组件' : props.component.type)
   )
 
   /** 是否显示标签 */
@@ -181,64 +184,7 @@
     return processCustomCSS(props.component.customCSS, props.component.id)
   })
 
-  // 子组件文本
-  const resolvedChildrenText = computed(() => resolveValue(props.component.props?.children) || '')
-  const hasChildrenText = computed(() => resolvedChildrenText.value.length > 0)
-
-  // 组件属性
-  const componentProps = computed(() => resolveComponentProps(props.component.props || {}))
-
-  /** 组件事件监听器 */
-  const componentEventListeners = computed(() => {
-    const listeners = {}
-    const events = props.component.events || []
-
-    events.forEach(eventConfig => {
-      const eventType = eventConfig.eventType || eventConfig.type
-      const handler = async event => await executeEvent(eventConfig, event)
-
-      if (listeners[eventType]) {
-        const existingHandler = listeners[eventType]
-        listeners[eventType] = async event => {
-          await existingHandler(event)
-          await handler(event)
-        }
-      } else {
-        listeners[eventType] = handler
-      }
-    })
-
-    return listeners
-  })
-
   // ==================== Methods ====================
-  /** 解析变量值 */
-  function resolveValue(value) {
-    if (value && typeof value === 'object' && value.type === 'variable') {
-      return variableStore.getVariableDefaultValue(value.value) ?? ''
-    }
-    return value
-  }
-
-  /** 解析组件属性 */
-  function resolveComponentProps(props, options = {}) {
-    const { skipSlot = false } = options
-    const resolvedProps = {}
-
-    for (const [key, value] of Object.entries(props)) {
-      if (skipSlot && key === 'slot') continue
-      if (key === 'children') continue
-
-      if (key === 'scope' && value) {
-        resolvedProps[`data-${value}`] = ''
-      } else {
-        resolvedProps[key] = resolveValue(value)
-      }
-    }
-
-    return resolvedProps
-  }
-
   /** 点击处理 */
   function handleClick() {
     if (isNonSelectable.value) return

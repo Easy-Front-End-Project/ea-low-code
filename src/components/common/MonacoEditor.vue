@@ -23,6 +23,10 @@
       type: Array,
       default: () => [],
     },
+    fixedOverflowWidgets: {
+      type: Boolean,
+      default: false,
+    },
   })
 
   const emit = defineEmits(['update:modelValue'])
@@ -40,11 +44,28 @@
     }
 
     try {
-      // 添加自定义类型定义（用于代码提示）
-      if (props.extraLibs && props.extraLibs.length > 0) {
-        props.extraLibs.forEach(lib => {
-          monaco.languages.typescript.javascriptDefaults.addExtraLib(lib.content, lib.filePath)
+      // 配置 JavaScript 语言服务以启用代码提示
+      if (props.language === 'javascript' || props.language === 'typescript') {
+        console.log('[MonacoEditor] 配置 JavaScript/TypeScript 语言服务')
+        monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+          target: monaco.languages.typescript.ScriptTarget.ES2020,
+          allowNonTsExtensions: true,
+          moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+          module: monaco.languages.typescript.ModuleKind.CommonJS,
+          noEmit: true,
+          esModuleInterop: true,
+          allowJs: true,
+          checkJs: false,
+          strict: false,
         })
+
+        // 添加自定义类型定义（用于代码提示）
+        if (props.extraLibs && props.extraLibs.length > 0) {
+          console.log('[MonacoEditor] 添加 extraLibs:', props.extraLibs)
+          props.extraLibs.forEach(lib => {
+            monaco.languages.typescript.javascriptDefaults.addExtraLib(lib.content, lib.filePath)
+          })
+        }
       }
 
       // 创建编辑器实例
@@ -58,7 +79,7 @@
         fontSize: 14,
         lineNumbers: 'on',
         roundedSelection: false,
-        fixedOverflowWidgets: true,
+        fixedOverflowWidgets: props.fixedOverflowWidgets,
         scrollbar: {
           useShadows: false,
           verticalHasArrows: true,

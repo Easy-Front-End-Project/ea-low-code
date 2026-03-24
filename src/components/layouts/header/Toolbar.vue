@@ -14,13 +14,6 @@
 
     <!-- 中间：操作按钮 -->
     <div class="flex items-center gap-2">
-      <ea-button text @click="handleClear" title="清空" icon="trash-can">
-        <span>清空</span>
-      </ea-button>
-      <ea-button text @click="handleShowTree" title="大纲" icon="sitemap">
-        <span>大纲</span>
-      </ea-button>
-      <div class="w-px h-6 bg-gray-300 mx-2"></div>
       <!-- <ea-button text @click="handleLoadExample" title="加载示例">
         <span>示例</span>
       </ea-button> -->
@@ -28,7 +21,10 @@
 
     <!-- 右侧：变量、预览和导出 -->
     <div class="flex items-center gap-2">
-      <ea-button text @click="handleShowVariables" title="变量" icon="variable"> 变量 </ea-button>
+      <ea-button text @click="handleShowVariables" title="变量" icon="database"> 变量 </ea-button>
+      <ea-button text @click="handleShowTree" title="大纲" icon="sitemap">
+        <span>大纲</span>
+      </ea-button>
       <ea-button text @click="handleShowRemoteConfig" title="远程组件" icon="cloud">
         远程组件
       </ea-button>
@@ -88,12 +84,6 @@
   // 显示远程组件配置
   function handleShowRemoteConfig() {
     remoteConfigVisible.value = true
-  }
-
-  function handleClear() {
-    if (confirm('确定要清空画布吗？此操作不可恢复。')) {
-      schemaStore.clearCanvas()
-    }
   }
 
   // 加载示例 Schema - 首页/落地页

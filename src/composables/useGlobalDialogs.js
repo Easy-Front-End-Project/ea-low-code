@@ -13,6 +13,8 @@ const editorState = reactive({
   title: '',
   value: '',
   language: 'json',
+  extraLibs: [],
+  showApiHelp: false,
   resolve: null,
   reject: null,
 })
@@ -22,6 +24,11 @@ const componentSelectorState = reactive({
   visible: false,
   resolve: null,
   reject: null,
+})
+
+// 全局变量管理器状态
+const variableManagerState = reactive({
+  visible: false,
 })
 
 /**
@@ -58,6 +65,8 @@ export function useGlobalDialogs() {
     editorState.title = options.title || '编辑'
     editorState.value = options.value || ''
     editorState.language = options.language || 'json'
+    editorState.extraLibs = options.extraLibs || []
+    editorState.showApiHelp = options.showApiHelp || false
     editorState.visible = true
 
     return new Promise((resolve, reject) => {
@@ -70,6 +79,8 @@ export function useGlobalDialogs() {
   function closeEditor() {
     editorState.visible = false
     editorState.value = ''
+    editorState.extraLibs = []
+    editorState.showApiHelp = false
     editorState.resolve = null
     editorState.reject = null
   }
@@ -114,11 +125,22 @@ export function useGlobalDialogs() {
     closeComponentSelector()
   }
 
+  // 打开变量管理器
+  function openVariableManager() {
+    variableManagerState.visible = true
+  }
+
+  // 关闭变量管理器
+  function closeVariableManager() {
+    variableManagerState.visible = false
+  }
+
   return {
     // 状态
     selectorState,
     editorState,
     componentSelectorState,
+    variableManagerState,
     // 方法
     openVariableSelector,
     closeVariableSelector,
@@ -130,5 +152,7 @@ export function useGlobalDialogs() {
     openComponentSelector,
     closeComponentSelector,
     confirmComponentSelection,
+    openVariableManager,
+    closeVariableManager,
   }
 }

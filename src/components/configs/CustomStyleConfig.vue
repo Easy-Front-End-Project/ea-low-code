@@ -107,4 +107,9 @@
     white-space: pre-wrap;
     overflow-x: auto;
   }
+
+  /* 修复 Monaco Editor 代码提示框位置 */
+  .prop-item :deep(.monaco-editor .suggest-widget) {
+    position: absolute !important;
+  }
 </style>

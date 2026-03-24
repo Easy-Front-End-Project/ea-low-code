@@ -47,7 +47,10 @@ export const useComponentInstanceStore = defineStore('componentInstance', () => 
   function getComponentElement(componentId) {
     const instance = instanceMap.value.get(componentId)
     if (!instance) return null
-    return instance.value || instance
+    if (instance._isRef || instance.__v_isRef) {
+      return instance.value
+    }
+    return instance
   }
 
   /**

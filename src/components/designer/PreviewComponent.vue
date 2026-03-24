@@ -27,12 +27,11 @@
 </template>
 
 <script setup>
-  import { computed, ref, onMounted, shallowRef } from 'vue'
+  import { computed, ref, onMounted, shallowRef, toRef } from 'vue'
   import { getRemoteComponentMetaList } from '@/constants/componentMeta'
-  import { useVariableStore } from '@/stores/designer/variable'
   import { loadRemoteComponent } from '@/utils/loadRemoteComponent'
-  import { executeEvent } from '@/utils/eventExecutor'
   import { useComponentInstance } from '@/composables/useComponentInstance'
+  import { useComponentRender } from '@/composables/useComponentRender'
 
   const props = defineProps({
     component: {
@@ -41,8 +40,12 @@
     },
   })
 
-  const variableStore = useVariableStore()
   const componentRef = ref(null)
+  const componentRefWrapper = toRef(() => props.component)
+
+  // 使用公共的组件渲染逻辑
+  const { resolvedChildrenText, hasChildrenText, componentProps, componentEventListeners } =
+    useComponentRender(componentRefWrapper)
 
   // 是否为远程组件
   const isRemoteComponent = computed(() => {
@@ -113,75 +116,6 @@
   const hasNestedChildren = computed(() => {
     return Array.isArray(props.component.children) && props.component.children.length > 0
   })
-
-  // 解析值（处理变量绑定）
-  function resolveValue(value) {
-    // 如果是变量绑定格式 { type: 'variable', value: 'varName' }
-    if (value && typeof value === 'object' && value.type === 'variable') {
-      const varValue = variableStore.getVariableDefaultValue(value.value)
-      return varValue !== undefined ? varValue : ''
-    }
-    return value
-  }
-
-  // 是否有 children 文本属性（字符串形式的 children）
-  const hasChildrenText = computed(() => {
-    const childrenValue = resolveValue(props.component.props?.children)
-    return typeof childrenValue === 'string' && childrenValue.length > 0
-  })
-
-  // 解析后的 children 文本
-  const resolvedChildrenText = computed(() => {
-    return resolveValue(props.component.props?.children) || ''
-  })
-
-  // 传递给组件的 props（解析变量绑定，过滤掉 slot 和 children 属性）
-  const componentProps = computed(() => {
-    const rawProps = props.component.props || {}
-    const resolvedProps = {}
-
-    // 遍历所有属性，解析变量绑定，过滤掉 slot 和 children 属性
-    for (const [key, value] of Object.entries(rawProps)) {
-      if (key === 'slot' || key === 'children') continue
-      // 处理 scope 属性，转换为 data-{scope} 形式
-      if (key === 'scope' && value) {
-        resolvedProps[`data-${value}`] = ''
-      } else {
-        resolvedProps[key] = resolveValue(value)
-      }
-    }
-
-    return resolvedProps
-  })
-
-  // 组件事件监听器（动态绑定）
-  const componentEventListeners = computed(() => {
-    const listeners = {}
-    const events = props.component.events || []
-
-    events.forEach(eventConfig => {
-      const eventType = eventConfig.eventType || eventConfig.type
-      if (!listeners[eventType]) {
-        listeners[eventType] = async event => {
-          await executeEventHandler(eventConfig, event)
-        }
-      } else {
-        // 如果已经有同类型事件，创建组合处理器
-        const existingHandler = listeners[eventType]
-        listeners[eventType] = async event => {
-          await existingHandler(event)
-          await executeEventHandler(eventConfig, event)
-        }
-      }
-    })
-
-    return listeners
-  })
-
-  // 执行事件
-  async function executeEventHandler(eventConfig, originalEvent) {
-    await executeEvent(eventConfig, originalEvent)
-  }
 
   // 使用 composable 管理组件实例（包含 load 事件触发逻辑）
   useComponentInstance({
