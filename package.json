@@ -1,49 +1,25 @@
 {
-  "name": "ea-low-code-app",
+  "name": "ea-low-code",
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "vite",
-    "dev:clean": "rimraf node_modules/.vite node_modules/.vite-temp && vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "lint": "run-s lint:*",
-    "lint:oxlint": "oxlint . --fix",
-    "lint:eslint": "eslint . --fix --cache",
-    "format": "prettier --write --experimental-cli src/",
-    "deploy": "gh-pages -d dist"
-  },
-  "dependencies": {
-    "@element-plus/icons-vue": "^2.3.2",
-    "@monaco-editor/loader": "^1.7.0",
-    "@vueuse/core": "^14.2.1",
-    "easy-component-ui": "latest",
-    "lodash-es": "^4.17.23",
-    "monaco-editor": "^0.55.1",
-    "pinia": "^3.0.4",
-    "sortablejs": "^1.15.7",
-    "vue": "^3.5.29",
-    "vue-router": "^5.0.3"
+    "dev": "npm run dev -w apps/web",
+    "dev:web": "npm run dev -w apps/web",
+    "dev:server": "npm run dev -w apps/server",
+    "build": "npm run build -w apps/web",
+    "build:web": "npm run build -w apps/web",
+    "build:server": "npm run build -w apps/server",
+    "lint": "npm run lint -w apps/web",
+    "format": "npm run format -w apps/web",
+    "deploy": "npm run deploy -w apps/web"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@unocss/vite": "^66.6.2",
-    "@vitejs/plugin-vue": "^6.0.4",
-    "eslint": "^10.0.2",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-oxlint": "~1.50.0",
-    "eslint-plugin-vue": "~10.8.0",
-    "gh-pages": "^6.3.0",
-    "globals": "^17.3.0",
-    "npm-run-all2": "^8.0.4",
-    "oxlint": "~1.50.0",
-    "prettier": "3.8.1",
-    "rimraf": "^6.0.1",
-    "unocss": "^66.6.2",
-    "vite": "^7.3.1",
-    "vite-plugin-monaco-editor": "^1.1.0",
-    "vite-plugin-vue-devtools": "^8.0.6"
+    "npm-run-all2": "^8.0.4"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

@@ -19,6 +19,12 @@ dist-ssr
 coverage
 *.local
 
+# Monorepo
+apps/*/node_modules
+apps/*/dist
+packages/*/node_modules
+packages/*/dist
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

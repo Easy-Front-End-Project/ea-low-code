@@ -1,0 +1,13 @@
+{
+  "name": "@ea-low-code/server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "echo 'Server not initialized yet. Please set up your backend framework (e.g., NestJS, Express, FastAPI, etc.)'",
+    "build": "echo 'Server not initialized yet'",
+    "start": "echo 'Server not initialized yet'"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

@@ -4,11 +4,6 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import UnoCSS from 'unocss/vite'
-import monacoEditor from 'vite-plugin-monaco-editor'
-
-const monacoPlugin = monacoEditor.default({
-  languageWorkers: ['editorWorkerService', 'css', 'html', 'json', 'typescript'],
-})
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -23,7 +18,6 @@ export default defineConfig({
     }),
     vueDevTools(),
     UnoCSS(),
-    monacoPlugin,
   ],
   resolve: {
     alias: {
