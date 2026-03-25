@@ -32,6 +32,10 @@
           </div>
 
           <div class="space-y-2 h-full overflow-auto">
+            <div v-if="localEvents.length === 0" class="text-center text-gray-400 py-4 text-sm">
+              暂无事件，点击 + 添加
+            </div>
+
             <div
               v-for="event in localEvents"
               :key="event.id"
@@ -51,10 +55,6 @@
               >
               </ea-button>
             </div>
-          </div>
-
-          <div v-if="localEvents.length === 0" class="text-center text-gray-400 py-4 text-sm">
-            暂无事件，点击 + 添加
           </div>
         </div>
 

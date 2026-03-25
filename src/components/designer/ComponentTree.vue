@@ -1,6 +1,8 @@
 <template>
   <ea-dialog :visible="visible" title="组件大纲" width="400px" @close="handleClose">
+    <ea-empty v-if="treeData.length === 0" description="暂无组件" icon="box-open" />
     <ea-tree
+      v-else
       :data="treeData"
       :dataProps="treeProps"
       :default-expand-all="true"
@@ -35,7 +37,7 @@
   // 将组件列表转换为树形数据
   const treeData = computed(() => {
     const components = schemaStore.pageSchema?.components || []
-    return components.map((component) => convertToTreeNode(component))
+    return components.map(component => convertToTreeNode(component))
   })
 
   // 转换组件为树节点
@@ -43,12 +45,11 @@
     const node = {
       id: component.id,
       name: getComponentName(component),
-      componentId: component.id,
     }
 
     // 如果有子组件，递归转换
     if (component.children && component.children.length > 0) {
-      node.children = component.children.map((child) => convertToTreeNode(child))
+      node.children = component.children.map(child => convertToTreeNode(child))
     }
 
     return node
@@ -73,8 +74,8 @@
 
   // 处理节点点击
   function handleNodeClick(data) {
-    if (data.componentId) {
-      schemaStore.selectComponent(data.componentId)
+    if (data.id) {
+      schemaStore.selectComponent(data.id)
       handleClose()
     }
   }

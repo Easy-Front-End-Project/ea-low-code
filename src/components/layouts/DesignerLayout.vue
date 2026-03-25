@@ -32,17 +32,7 @@
             <div v-show="!leftAsideCollapsed" class="designer-layout__panel-content">
               <ComponentPanel v-if="activeLeftPanel === 'components'" class="h-full" />
               <PageSettingsPanel v-else-if="activeLeftPanel === 'page'" class="h-full" />
-              <Suspense v-else-if="activeLeftPanel === 'json'">
-                <template #default>
-                  <MonacoEditor v-model="jsonContent" language="json" height="100%" />
-                </template>
-                <template #fallback>
-                  <div class="h-full flex flex-col items-center justify-center">
-                    <div class="loading-spinner loading-spinner--small"></div>
-                    <span class="mt-2 text-sm text-gray-400">加载编辑器...</span>
-                  </div>
-                </template>
-              </Suspense>
+              <JsonEditorPanel v-else-if="activeLeftPanel === 'json'" class="h-full" />
             </div>
             <ea-button
               @click="toggleLeftAside"
@@ -95,25 +85,24 @@
     </ea-container>
 
     <!-- 预览模式 -->
-    <PreviewMode v-if="isPreviewMode" @close="setPreviewMode(false)" />
+    <PreviewMode v-if="isPreviewMode" @close="schemaStore.setPreviewMode(false)" />
   </ea-container>
 </template>
 
 <script setup>
-  import { ref, computed, watch, defineAsyncComponent } from 'vue'
+  import { ref, computed, defineAsyncComponent } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
   import Toolbar from './header/Toolbar.vue'
-  import ComponentPanel from './material/ComponentPanel.vue'
-  import PageSettingsPanel from './page/PageSettingsPanel.vue'
+  import ComponentPanel from './panels/ComponentPanel.vue'
+  import PageSettingsPanel from './panels/PageSettingsPanel.vue'
+  import JsonEditorPanel from './panels/JsonEditorPanel.vue'
   import CanvasArea from './canvas/CanvasArea.vue'
   import PreviewMode from './preview/PreviewMode.vue'
 
-  const MonacoEditor = defineAsyncComponent(() => import('@/components/common/MonacoEditor.vue'))
   const PropsPanel = defineAsyncComponent(() => import('./props/PropsPanel.vue'))
 
   const schemaStore = useSchemaStore()
   const isPreviewMode = computed(() => schemaStore.isPreviewMode)
-  const setPreviewMode = schemaStore.setPreviewMode
 
   const activeLeftPanel = ref('components')
   const leftAsideCollapsed = ref(false)
@@ -141,17 +130,6 @@
   function toggleRightAside() {
     rightAsideCollapsed.value = !rightAsideCollapsed.value
   }
-
-  const jsonContent = computed({
-    get: () => JSON.stringify(schemaStore.pageSchema, null, 2),
-    set: val => {
-      try {
-        schemaStore.importSchema(JSON.parse(val))
-      } catch {
-        // JSON 解析错误，忽略
-      }
-    },
-  })
 </script>
 
 <style lang="scss" scoped>

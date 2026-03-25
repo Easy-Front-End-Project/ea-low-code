@@ -33,13 +33,18 @@
           >
         </div>
 
-        <!-- Monaco Editor CSS 编辑器 -->
-        <MonacoEditor
-          :model-value="customCSS"
-          @update:model-value="handleCSSChange"
-          language="css"
-          height="200px"
-        />
+        <!-- 代码预览和编辑按钮 -->
+        <div class="code-preview-wrapper">
+          <div class="code-preview" @click="handleOpenEditor">
+            <pre v-if="customCSS">
+{{ customCSS.slice(0, 100) }}{{ customCSS.length > 100 ? '...' : '' }}</pre
+            >
+            <span v-else class="placeholder">点击编辑 CSS 代码</span>
+          </div>
+          <ea-button type="primary" size="small" icon="pen" @click="handleOpenEditor">
+            编辑
+          </ea-button>
+        </div>
       </div>
     </div>
   </div>
@@ -47,7 +52,7 @@
 
 <script setup>
   import { ref } from 'vue'
-  import MonacoEditor from '@/components/common/MonacoEditor.vue'
+  import { useGlobalDialogs } from '@/composables/useGlobalDialogs.js'
 
   const props = defineProps({
     customCSS: {
@@ -58,10 +63,21 @@
 
   const emit = defineEmits(['style-change'])
 
+  const { openEditor } = useGlobalDialogs()
+
   const showHelp = ref(false)
 
-  function handleCSSChange(value) {
-    emit('style-change', 'customCSS', value, 'customCSS')
+  async function handleOpenEditor() {
+    try {
+      const result = await openEditor({
+        title: '编辑 CSS 代码',
+        value: props.customCSS || '',
+        language: 'css',
+      })
+      emit('style-change', 'customCSS', result, 'customCSS')
+    } catch {
+      // 用户取消，不做处理
+    }
   }
 </script>
 
@@ -108,8 +124,37 @@
     overflow-x: auto;
   }
 
-  /* 修复 Monaco Editor 代码提示框位置 */
-  .prop-item :deep(.monaco-editor .suggest-widget) {
-    position: absolute !important;
+  .code-preview-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .code-preview {
+    min-height: 80px;
+    max-height: 150px;
+    overflow: auto;
+    padding: 8px 12px;
+    background-color: #f5f7fa;
+    border: 1px solid #e4e7ed;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .code-preview:hover {
+    border-color: #409eff;
+  }
+
+  .code-preview pre {
+    margin: 0;
+    font-family: monospace;
+    font-size: 0.875rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .placeholder {
+    color: #909399;
+    font-size: 0.875rem;
   }
 </style>
