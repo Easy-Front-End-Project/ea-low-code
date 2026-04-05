@@ -11,8 +11,21 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+# Dependencies
+node_modules/
 
-node_modules
+# Environment variables
+.env
+
+# Build output
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
 .DS_Store
 dist
 dist-ssr
@@ -48,4 +61,3 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
-docs/ea-alert.md
