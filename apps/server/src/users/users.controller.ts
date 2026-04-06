@@ -26,8 +26,7 @@ export class UsersController {
 
   @Post('update')
   async update(@Body() updateUserDto: UpdateUserDto): Promise<User> {
-    const { id, ...dto } = updateUserDto;
-    return await this.usersService.update(id, dto);
+    return await this.usersService.update(updateUserDto.id, updateUserDto.data);
   }
 
   @Post('delete')
