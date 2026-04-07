@@ -1,11 +1,21 @@
-import { Controller, Get, Post, Body, Query, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Query,
+  ParseIntPipe,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
 import { User } from './entities/user.entity';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('users')
+@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -30,7 +40,9 @@ export class UsersController {
   }
 
   @Post('delete')
-  async remove(@Body() deleteUserDto: DeleteUserDto): Promise<{ message: string }> {
+  async remove(
+    @Body() deleteUserDto: DeleteUserDto,
+  ): Promise<{ message: string }> {
     await this.usersService.remove(deleteUserDto.id);
     return { message: `User with ID ${deleteUserDto.id} has been deleted` };
   }
