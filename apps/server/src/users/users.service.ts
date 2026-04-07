@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserBodyDto } from './dto/update-user.dto';
+import { hashPassword } from '../common/utils/crypto.util';
 
 @Injectable()
 export class UsersService {
@@ -13,7 +14,11 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const user = this.usersRepository.create(createUserDto);
+    const hashedPassword = await hashPassword(createUserDto.password);
+    const user = this.usersRepository.create({
+      ...createUserDto,
+      password: hashedPassword,
+    });
     return await this.usersRepository.save(user);
   }
 
@@ -31,6 +36,11 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserBodyDto): Promise<User> {
     const user = await this.findOne(id);
+    
+    if (updateUserDto.password) {
+      updateUserDto.password = await hashPassword(updateUserDto.password);
+    }
+    
     Object.assign(user, updateUserDto);
     return await this.usersRepository.save(user);
   }
