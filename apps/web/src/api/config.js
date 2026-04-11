@@ -1,0 +1,28 @@
+/**
+ * API 接口配置列表
+ * 所有后端接口地址统一在此管理
+ */
+
+export const apiList = {
+  // 认证相关接口
+  auth: {
+    // 用户登录
+    login: '/auth/login',
+    // 获取当前用户信息
+    profile: '/auth/profile',
+  },
+
+  // 用户相关接口
+  user: {
+    // 创建用户（注册）
+    create: '/users/create',
+    // 获取用户列表
+    list: '/users/list',
+    // 获取用户详情
+    detail: '/users/detail',
+    // 更新用户信息
+    update: '/users/update',
+    // 删除用户
+    delete: '/users/delete',
+  },
+}

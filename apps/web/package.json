@@ -18,6 +18,7 @@
     "@element-plus/icons-vue": "^2.3.2",
     "@monaco-editor/loader": "^1.7.0",
     "@vueuse/core": "^14.2.1",
+    "axios": "^1.15.0",
     "easy-component-ui": "latest",
     "lodash-es": "^4.17.23",
     "monaco-editor": "^0.55.1",

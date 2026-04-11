@@ -19,9 +19,9 @@
     <div v-if="$slots.prefix" slot="prepend">
       <slot name="prefix"></slot>
     </div>
-    <template v-if="$slots.suffix" slot="append">
+    <div v-if="$slots.suffix" slot="append">
       <slot name="suffix"></slot>
-    </template>
+    </div>
   </ea-input>
 </template>
 
