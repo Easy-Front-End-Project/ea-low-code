@@ -9,6 +9,9 @@ import {
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { SendVerificationCodeDto } from './dto/send-verification-code.dto';
+import { VerifyCodeDto } from './dto/verify-code.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 interface RequestWithUser extends Request {
@@ -62,5 +65,53 @@ export class AuthController {
   @ApiResponse({ status: 401, description: '未授权' })
   getProfile(@Request() req: RequestWithUser) {
     return req.user;
+  }
+
+  @Post('send-verification-code')
+  @ApiOperation({ summary: '发送验证码', description: '发送验证码到指定邮箱，用于注册或重置密码' })
+  @ApiResponse({ 
+    status: 200, 
+    description: '发送成功',
+    schema: {
+      example: {
+        message: '验证码已发送'
+      }
+    }
+  })
+  @ApiResponse({ status: 400, description: '发送失败或邮箱已注册/未注册' })
+  async sendVerificationCode(@Body() dto: SendVerificationCodeDto) {
+    return await this.authService.sendVerificationCode(dto.email, dto.purpose);
+  }
+
+  @Post('verify-code')
+  @ApiOperation({ summary: '验证验证码', description: '验证邮箱验证码是否正确' })
+  @ApiResponse({ 
+    status: 200, 
+    description: '验证结果',
+    schema: {
+      example: {
+        valid: true
+      }
+    }
+  })
+  async verifyCode(@Body() dto: VerifyCodeDto) {
+    return await this.authService.verifyCode(dto.email, dto.code, dto.purpose);
+  }
+
+  @Post('reset-password')
+  @ApiOperation({ summary: '重置密码', description: '使用验证码重置密码' })
+  @ApiResponse({ 
+    status: 200, 
+    description: '重置成功',
+    schema: {
+      example: {
+        message: '密码重置成功'
+      }
+    }
+  })
+  @ApiResponse({ status: 400, description: '验证码无效或已过期' })
+  @ApiResponse({ status: 404, description: '用户不存在' })
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    return await this.authService.resetPassword(dto);
   }
 }

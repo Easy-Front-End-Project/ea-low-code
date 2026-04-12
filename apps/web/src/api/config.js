@@ -1,8 +1,3 @@
-/**
- * API 接口配置列表
- * 所有后端接口地址统一在此管理
- */
-
 export const apiList = {
   // 认证相关接口
   auth: {
@@ -10,6 +5,12 @@ export const apiList = {
     login: '/auth/login',
     // 获取当前用户信息
     profile: '/auth/profile',
+    // 发送验证码
+    sendVerificationCode: '/auth/send-verification-code',
+    // 验证验证码
+    verifyCode: '/auth/verify-code',
+    // 重置密码
+    resetPassword: '/auth/reset-password',
   },
 
   // 用户相关接口

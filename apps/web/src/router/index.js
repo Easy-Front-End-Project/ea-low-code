@@ -32,12 +32,12 @@ router.beforeEach((to, from) => {
 
   // 需要登录的页面
   if (to.meta.requiresAuth && !userStore.isLoggedIn) {
-    return '/login'
+    return { name: 'login' }
   }
 
   // 已登录用户访问登录页，重定向到首页
-  if (to.path === '/login' && userStore.isLoggedIn) {
-    return '/'
+  if (to.name === 'login' && userStore.isLoggedIn) {
+    return { name: 'designer' }
   }
 
   // 返回 true 或 undefined 表示继续导航

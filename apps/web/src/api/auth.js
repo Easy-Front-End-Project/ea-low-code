@@ -19,3 +19,38 @@ export const login = (data) => {
 export const getProfile = () => {
   return request.get(apiList.auth.profile)
 }
+
+/**
+ * 发送验证码
+ * @param {Object} data - 请求数据
+ * @param {string} data.email - 邮箱地址
+ * @param {string} [data.purpose] - 用途（register/resetPassword）
+ * @returns {Promise<{message: string}>}
+ */
+export const sendVerificationCode = (data) => {
+  return request.post(apiList.auth.sendVerificationCode, data)
+}
+
+/**
+ * 验证验证码
+ * @param {Object} data - 请求数据
+ * @param {string} data.email - 邮箱地址
+ * @param {string} data.code - 验证码
+ * @param {string} [data.purpose] - 用途
+ * @returns {Promise<{valid: boolean}>}
+ */
+export const verifyCode = (data) => {
+  return request.post(apiList.auth.verifyCode, data)
+}
+
+/**
+ * 重置密码
+ * @param {Object} data - 请求数据
+ * @param {string} data.email - 邮箱地址
+ * @param {string} data.newPassword - 新密码
+ * @param {string} data.code - 验证码
+ * @returns {Promise<{message: string}>}
+ */
+export const resetPassword = (data) => {
+  return request.post(apiList.auth.resetPassword, data)
+}

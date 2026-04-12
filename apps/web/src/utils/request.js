@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { getToken, clearAuth } from './storage.js'
 
 // API 基础配置
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
@@ -14,37 +15,38 @@ const request = axios.create({
 
 // 请求拦截器
 request.interceptors.request.use(
-  (config) => {
-    // 从 localStorage 获取 token
-    const token = localStorage.getItem('access_token')
+  config => {
+    // 从 storage 获取 token
+    const token = getToken()
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
     return config
   },
-  (error) => {
+  error => {
     return Promise.reject(error)
   }
 )
 
 // 响应拦截器
 request.interceptors.response.use(
-  (response) => {
+  response => {
     // 直接返回响应数据
     return response.data
   },
-  (error) => {
+  error => {
     // 统一错误处理
     const message = error.response?.data?.message || '请求失败，请稍后重试'
-    
+
     // 根据状态码处理不同错误
     const status = error.response?.status
     switch (status) {
       case 401:
-        // 未授权，清除 token 并跳转登录页
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('user')
-        window.location.href = '/login'
+        // 如果当前有 token，说明是 token 过期，需要清除并跳转
+        if (getToken()) {
+          clearAuth()
+          window.location.href = '/ea-low-code/login'
+        }
         break
       case 403:
         console.error('没有权限访问该资源')
@@ -58,7 +60,7 @@ request.interceptors.response.use(
       default:
         console.error('请求错误:', message)
     }
-    
+
     return Promise.reject(new Error(message))
   }
 )
@@ -75,7 +77,7 @@ request.interceptors.response.use(
  */
 export function httpRequest(url, options = {}) {
   const { method = 'get', data, params, headers } = options
-  
+
   return request({
     url,
     method: method.toLowerCase(),
