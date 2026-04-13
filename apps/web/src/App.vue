@@ -11,8 +11,4 @@
   import GlobalDialogContainer from '@/components/common/GlobalDialogContainer.vue'
 </script>
 
-<style>
-  .app-container {
-    background-color: #f5f7fa;
-  }
-</style>
+<style></style>
