@@ -55,6 +55,30 @@ export class AuthService {
     return result;
   }
 
+  /**
+   * 根据ID查找用户
+   * @param id - 用户ID
+   */
+  async findById(id: number): Promise<User> {
+    const user = await this.usersRepository.findOne({
+      where: { id },
+      select: [
+        'id',
+        'username',
+        'email',
+        'password',
+        'nickname',
+        'isActive',
+        'createdAt',
+        'updatedAt',
+      ],
+    });
+    if (!user) {
+      throw new UnauthorizedException('用户不存在');
+    }
+    return user;
+  }
+
   async login(
     loginDto: LoginDto,
   ): Promise<{ access_token: string; user: Omit<User, 'password'> }> {
@@ -171,5 +195,44 @@ export class AuthService {
     await this.usersRepository.save(user);
 
     return { message: '密码重置成功' };
+  }
+
+  /**
+   * 修改密码（需要旧密码验证）
+   * @param userId - 用户ID
+   * @param oldPassword - 旧密码
+   * @param newPassword - 新密码
+   */
+  async changePassword(
+    userId: number,
+    oldPassword: string,
+    newPassword: string,
+  ): Promise<{ message: string }> {
+    // 查找用户（包含密码字段）
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+      select: ['id', 'password'],
+    });
+    if (!user) {
+      throw new NotFoundException('用户不存在');
+    }
+
+    // 验证旧密码
+    const isOldPasswordValid = await comparePassword(
+      oldPassword,
+      user.password,
+    );
+    if (!isOldPasswordValid) {
+      throw new BadRequestException('旧密码错误');
+    }
+
+    // 加密新密码
+    const hashedPassword = await hashPassword(newPassword);
+
+    // 更新密码
+    user.password = hashedPassword;
+    await this.usersRepository.save(user);
+
+    return { message: '密码修改成功' };
   }
 }

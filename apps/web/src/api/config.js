@@ -11,6 +11,8 @@ export const apiList = {
     verifyCode: '/auth/verify-code',
     // 重置密码
     resetPassword: '/auth/reset-password',
+    // 修改密码
+    changePassword: '/auth/change-password',
   },
 
   // 用户相关接口
@@ -25,5 +27,15 @@ export const apiList = {
     update: '/users/update',
     // 删除用户
     delete: '/users/delete',
+  },
+
+  // 统计相关接口
+  stats: {
+    // 仪表盘统计数据
+    dashboard: '/stats/dashboard',
+    // 最近项目
+    recentProjects: '/stats/recent-projects',
+    // 最近活动
+    activities: '/stats/activities',
   },
 }

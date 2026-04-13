@@ -54,3 +54,14 @@ export const verifyCode = (data) => {
 export const resetPassword = (data) => {
   return request.post(apiList.auth.resetPassword, data)
 }
+
+/**
+ * 修改密码（需要旧密码）
+ * @param {Object} data - 请求数据
+ * @param {string} data.oldPassword - 旧密码
+ * @param {string} data.newPassword - 新密码
+ * @returns {Promise<{message: string}>}
+ */
+export const changePassword = (data) => {
+  return request.post(apiList.auth.changePassword, data)
+}

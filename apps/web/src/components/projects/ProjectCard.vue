@@ -36,11 +36,14 @@
         <ea-icon name="file-lines" size="14" color="#909399"></ea-icon>
         <span class="project-card__info-text">{{ project.pageCount || 0 }} 个页面</span>
       </div>
+      <div v-if="project.description" class="project-card__description">
+        {{ project.description }}
+      </div>
     </div>
 
     <!-- 卡片底部 -->
     <div slot="footer" class="project-card__footer">
-      <span class="project-card__time">{{ formatDate(project.createdAt) }}</span>
+      <span class="project-card__time">{{ formatTime(project.updatedAt) }}</span>
     </div>
   </ea-card>
 </template>
@@ -59,6 +62,7 @@
 
   const userInfo = computed(() => {
     const { userName, userAccount } = props.project
+
     if (userName && userAccount) {
       return `${userName} | ${userAccount}`
     }
@@ -83,13 +87,20 @@
     }
   }
 
-  function formatDate(date) {
+  function formatTime(date) {
     if (!date) return ''
     const d = new Date(date)
-    const year = d.getFullYear()
-    const month = String(d.getMonth() + 1).padStart(2, '0')
-    const day = String(d.getDate()).padStart(2, '0')
-    return `${year}-${month}-${day} 创建`
+    const now = new Date()
+    const diff = now.getTime() - d.getTime()
+
+    // 小于1小时
+    if (diff < 3600000) return '刚刚更新'
+    // 小于24小时
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)}小时前更新`
+          // 小于7天
+    if (diff < 604800000) return `${Math.floor(diff / 86400000)}天前更新`
+
+    return d.toLocaleDateString('zh-CN') + ' 更新'
   }
 </script>
 
@@ -98,7 +109,7 @@
     cursor: pointer;
 
     &::part(header) {
-padding: 0;
+      padding: 0;
     }
 
     &__header {
@@ -153,6 +164,24 @@ padding: 0;
         text-overflow: ellipsis;
         white-space: nowrap;
       }
+    }
+
+    &__description {
+      font-size: 12px;
+      color: var(--ea-text-secondary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      line-height: 1.5;
+      min-height: 36px;
+    }
+
+    &__footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     &__time {

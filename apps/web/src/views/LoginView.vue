@@ -460,7 +460,7 @@
         password: loginForm.password,
       })
       showMessage('登录成功', 'success')
-      await router.push({ name: 'designer' })
+      await router.push({ name: 'dashboard' })
     } catch (error) {
       showAlert(error.message || '登录失败')
     } finally {

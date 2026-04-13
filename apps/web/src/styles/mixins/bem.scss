@@ -1,0 +1,29 @@
+// BEM (Block Element Modifier) Mixins
+// 基础用法，只支持 Block 和 Element 两级
+
+// Block - 块级元素
+@mixin b($block) {
+  .#{$block} {
+    @content;
+  }
+}
+
+// Element - 元素
+// 只支持一级嵌套：.block__element
+@mixin e($element) {
+  @at-root {
+    #{&}__#{$element} {
+      @content;
+    }
+  }
+}
+
+// Modifier - 修饰符
+// 生成 .block--modifier 或 .block__element--modifier
+@mixin m($modifier) {
+  @at-root {
+    #{&}--#{$modifier} {
+      @content;
+    }
+  }
+}

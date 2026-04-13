@@ -32,35 +32,17 @@
             <ea-icon name="cloud" size="16"></ea-icon>
             <span>图片云</span>
           </ea-menu-item>
+          <ea-menu-item index="profile">
+            <div class="user-info">
+              <ea-avatar size="small">{{ avatarText }}</ea-avatar>
+              <span class="user-name">{{ userStore.user?.nickname || userStore.user?.username || '-' }}</span>
+            </div>
+          </ea-menu-item>
+          <ea-menu-item index="logout">
+            <ea-icon name="arrow-right-from-bracket" size="14" color="#f56c6c"></ea-icon>
+            <span style="color: #f56c6c">退出登录</span>
+          </ea-menu-item>
         </ea-menu>
-
-        <!-- 右侧工具 -->
-        <div class="project-layout__header-right">
-          <ea-button type="text" @click="handleHelp">
-            <ea-icon name="circle-question" size="16"></ea-icon>
-            <span>帮助文档</span>
-          </ea-button>
-
-          <div class="project-layout__user">
-            <div class="project-layout__user-trigger" @click="showUserMenu = !showUserMenu">
-              <div class="project-layout__avatar">{{ avatarText }}</div>
-              <ea-icon name="angle-down" size="12"></ea-icon>
-            </div>
-
-            <!-- 用户下拉菜单 -->
-            <div v-if="showUserMenu" class="project-layout__user-menu">
-              <div class="project-layout__user-menu-item" @click="handleProfile">
-                <ea-icon name="user" size="14"></ea-icon>
-                <span>个人设置</span>
-              </div>
-              <div class="project-layout__user-menu-divider"></div>
-              <div class="project-layout__user-menu-item" @click="handleLogout">
-                <ea-icon name="arrow-right-from-bracket" size="14" color="#f56c6c"></ea-icon>
-                <span style="color: #f56c6c">退出登录</span>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </ea-header>
 
@@ -72,173 +54,124 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/user.js'
+  import { ref, computed } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
+  import { useUserStore } from '@/stores/user.js'
 
-const route = useRoute()
-const router = useRouter()
-const userStore = useUserStore()
-const showUserMenu = ref(false)
+  const route = useRoute()
+  const router = useRouter()
+  const userStore = useUserStore()
+  // 当前激活的菜单
+  const activeMenu = computed(() => {
+    const pathMap = {
+      '/': 'home',
+      '/projects': 'projects',
+      '/components': 'components',
+      '/templates': 'templates',
+      '/cloud': 'cloud',
+      '/profile': 'profile',
+    }
+    return pathMap[route.path] || 'home'
+  })
 
-// 当前激活的菜单
-const activeMenu = computed(() => {
-  const pathMap = {
-    '/': 'projects',
-    '/components': 'components',
-    '/templates': 'templates',
-    '/cloud': 'cloud',
+  // 用户头像文字
+  const avatarText = computed(() => {
+    const username = userStore.user?.username
+    return username?.charAt(0)?.toUpperCase() || 'U'
+  })
+
+  // 菜单选择
+  function handleMenuSelect({ detail }) {
+    const { index } = detail
+
+    if (index === 'logout') {
+      userStore.logout()
+      router.push('/login')
+      return
+    }
+
+    const routeMap = {
+      home: '/',
+      projects: '/projects',
+      components: '/components',
+      templates: '/templates',
+      cloud: '/cloud',
+      profile: 'profile'
+    }
+
+    router.push(routeMap[index] || '/')
   }
-  return pathMap[route.path] || 'projects'
-})
 
-// 用户头像文字
-const avatarText = computed(() => {
-  const username = userStore.user?.username
-  return username?.charAt(0)?.toUpperCase() || 'U'
-})
 
-// 菜单选择
-function handleMenuSelect({ detail }) {
-  const { index } = detail
-
-  if (index === 'home') {
-    router.push('/')
-    return
-  }
-
-  const routeMap = {
-    projects: '/',
-    components: '/components',
-    templates: '/templates',
-    cloud: '/cloud',
-  }
-
-  router.push(routeMap[index] || '/')
-}
-
-// 帮助文档
-function handleHelp() {
-  window.open('https://github.com/your-org/ea-low-code/wiki', '_blank')
-}
-
-// 个人设置
-function handleProfile() {
-  showUserMenu.value = false
-  window.$message?.info('个人设置功能开发中')
-}
-
-// 退出登录
-function handleLogout() {
-  showUserMenu.value = false
-  userStore.logout()
-  router.push('/login')
-}
 </script>
 
 <style lang="scss" scoped>
-ea-menu::part(container) {
-  padding: 0;
-}
+  @import '@/styles/mixins/bem.scss';
 
-.project-layout {
-  min-height: 100vh;
+  ea-menu {
+    width: 100%;
 
-  &::part(container) {
-    height: 100vh;
-  }
-
-  &__header {
+    &::part(container) {
     padding: 0;
-    border-bottom: 1px solid var(--ea-border-light);
-
-    &-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 100%;
-    }
-
-    &-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
+  }
   }
 
-  &__logo-text {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--ea-text-primary);
+  ea-dropdown-menu {
+    line-height: normal;
   }
 
-  &__user {
-    position: relative;
+  // Block
+  @include b(project-layout) {
+    min-height: 100vh;
 
-    &-trigger {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      cursor: pointer;
-      padding: 4px;
-      border-radius: 4px;
-      transition: background 0.2s;
-
-      &:hover {
-        background: var(--ea-bg-base);
-      }
+    &::part(container) {
+      height: 100vh;
     }
 
-    &-menu {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      margin-top: 8px;
-      background: #ffffff;
-      border-radius: 4px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-      min-width: 140px;
-      z-index: 1000;
+    // Element (第2级)
+    @include e(header) {
+      padding: 0;
+      border-bottom: 1px solid var(--ea-border-light);
 
-      &-item {
+      // 第3级开始用完整类名
+      .project-layout__header-content {
         display: flex;
         align-items: center;
-        gap: 8px;
-        padding: 10px 16px;
-        font-size: 14px;
-        color: var(--ea-text-regular);
-        cursor: pointer;
-        transition: background 0.2s;
-
-        &:hover {
-          background: var(--ea-bg-base);
-        }
+        justify-content: space-between;
+        height: 100%;
       }
 
-      &-divider {
-        height: 1px;
-        background: var(--ea-border-light);
-        margin: 4px 0;
+      .project-layout__header-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-left: 1rem;
       }
     }
-  }
 
-  &__avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--ea-primary);
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 500;
-  }
+    @include e(logo-text) {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--ea-text-primary);
+    }
 
-  &__main {
-    padding: 0;
-    overflow: hidden;
+    // 用户信息样式
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 8px;
+
+      .user-name {
+        margin-left: 0.25rem;
+        font-size: 14px;
+        color: var(--ea-text-primary);
+      }
+    }
+
+    @include e(main) {
+      padding: 0;
+      overflow: hidden;
+    }
   }
-}
 </style>

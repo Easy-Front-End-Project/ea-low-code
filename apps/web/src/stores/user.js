@@ -22,9 +22,11 @@ export const useUserStore = defineStore('user', () => {
     const response = await loginApi(credentials)
     if (response.access_token) {
       token.value = response.access_token
-      user.value = response.user
+      user.value = response.user || null
       setToken(response.access_token)
-      setUser(response.user)
+      if (response.user) {
+        setUser(response.user)
+      }
     }
     return response
   }
@@ -86,9 +88,14 @@ export const useUserStore = defineStore('user', () => {
   function initUser() {
     const savedToken = getToken()
     const savedUser = getUser()
+    console.log('initUser - token:', savedToken ? 'exists' : 'null')
+    console.log('initUser - user:', savedUser)
     if (savedToken && savedUser) {
       token.value = savedToken
       user.value = savedUser
+      console.log('initUser - restored user:', savedUser.username)
+    } else {
+      console.log('initUser - failed to restore, token:', !!savedToken, 'user:', !!savedUser)
     }
   }
 

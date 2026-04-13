@@ -82,6 +82,57 @@
 }
 ```
 
+#### 2.3 BEM Mixin 工具（推荐）
+
+项目提供了 BEM mixin 工具简化命名，位于 `src/styles/mixins/bem.scss`：
+
+```scss
+<style lang="scss" scoped>
+@import '@/styles/mixins/bem.scss';
+
+@include b(component-panel) {
+  display: flex;
+  flex-direction: column;
+
+  @include e(search) {
+    padding: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  @include e(input) {
+    border-radius: 4px;
+
+    &:focus {
+      border-color: #3b82f6;
+    }
+  }
+
+  @include m(active) {
+    background-color: var(--ea-primary-light);
+  }
+
+  @include when(disabled) {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+</style>
+```
+
+**Mixin 说明**：
+
+| Mixin | 参数 | 说明 | 输出示例 |
+|-------|------|------|----------|
+| `@include b($block)` | 块名 | 定义 Block | `.component-panel` |
+| `@include e($element)` | 元素名 | 定义 Element | `.component-panel__search` |
+| `@include m($modifier)` | 修饰符 | 定义 Modifier | `.component-panel--active` |
+| `@include when($state)` | 状态名 | 定义状态类 | `.component-panel.disabled` |
+
+**使用要求**：
+- 所有新组件推荐使用 BEM mixin 编写样式
+- mixin 支持嵌套使用，保持代码结构清晰
+- 编译后的 CSS 与手动编写的 BEM 命名完全一致
+
 #### 2.3 全局样式
 
 全局 CSS 变量定义在 `src/styles/main.scss` 中：
