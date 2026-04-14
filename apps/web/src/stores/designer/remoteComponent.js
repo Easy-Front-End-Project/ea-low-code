@@ -1,30 +1,37 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { generateUniqueId } from '@/utils/schemaHelper'
+import * as componentApi from '@/api/component'
 
-const REMOTE_CONFIG_KEY = 'ea_lowcode_remote_config'
-
-/**
- * 远程组件配置管理 Store
- * 用于管理远程组件的本地配置信息
- */
 export const useRemoteComponentStore = defineStore('remoteComponent', () => {
-  // State
   const globalUrl = ref('')
   const components = ref([])
+  const urlPresets = ref([])
   const isLoaded = ref(false)
 
-  // Getters
   const enabledComponents = computed(() => components.value.filter(comp => comp.enabled !== false))
 
-  /**
-   * 获取完整 URL
-   * @param {string} url - 相对或绝对 URL
-   * @returns {string} 完整 URL
-   */
-  function getFullUrl(url) {
+  function getFullUrl(component) {
+    const { url, urlPresetId } = component
+
     if (!url) return ''
+
     if (url.startsWith('http://') || url.startsWith('https://')) return url
+
+    if (urlPresetId) {
+      const preset = urlPresets.value.find(p => p.id === urlPresetId)
+      if (preset && preset.url) {
+        const base = preset.url.endsWith('/') ? preset.url : `${preset.url}/`
+        const path = url.startsWith('/') ? url.slice(1) : url
+        return base + path
+      }
+    }
+
+    const defaultPreset = urlPresets.value.find(p => p.isDefault)
+    if (defaultPreset && defaultPreset.url) {
+      const base = defaultPreset.url.endsWith('/') ? defaultPreset.url : `${defaultPreset.url}/`
+      const path = url.startsWith('/') ? url.slice(1) : url
+      return base + path
+    }
 
     const base = globalUrl.value
     if (!base) return url
@@ -43,7 +50,7 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
       isRemote: true,
       remoteConfig: {
         id: comp.id,
-        url: getFullUrl(comp.url),
+        url: getFullUrl(comp),
         styleUrl: comp.styleUrl || '',
         exportName: comp.exportName,
       },
@@ -55,138 +62,111 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
 
   const componentCount = computed(() => components.value.length)
   const enabledCount = computed(() => enabledComponents.value.length)
+  const defaultUrlPreset = computed(() => urlPresets.value.find(p => p.isDefault) || null)
+  const urlPresetCount = computed(() => urlPresets.value.length)
 
-  /**
-   * 加载配置
-   */
-  function loadConfig() {
+  async function loadConfig() {
     try {
-      const stored = localStorage.getItem(REMOTE_CONFIG_KEY)
-      if (stored) {
-        const config = JSON.parse(stored)
-        globalUrl.value = config.globalUrl || ''
-        components.value = config.components || []
-      }
+      const [componentsResult, presetsResult] = await Promise.all([
+        componentApi.getComponentList(),
+        componentApi.getUrlPresetList(),
+      ])
+
+      components.value = componentsResult.list || []
+      urlPresets.value = presetsResult || []
+      isLoaded.value = true
     } catch (error) {
       console.error('加载远程组件配置失败:', error)
-      globalUrl.value = ''
-      components.value = []
-    }
-    isLoaded.value = true
-  }
-
-  /**
-   * 保存配置
-   * @returns {boolean} 是否保存成功
-   */
-  function saveConfig() {
-    try {
-      const config = {
-        globalUrl: globalUrl.value,
-        components: components.value,
-        lastUpdated: Date.now(),
-      }
-      localStorage.setItem(REMOTE_CONFIG_KEY, JSON.stringify(config))
-      return true
-    } catch (error) {
-      console.error('保存远程组件配置失败:', error)
-      throw error
+      isLoaded.value = true
     }
   }
 
-  /**
-   * 设置全局 URL
-   * @param {string} url - 全局 URL
-   */
+  async function saveConfig() {
+    // 后端自动保存，无需手动保存
+  }
+
   function setGlobalUrl(url) {
     globalUrl.value = url
   }
 
-  /**
-   * 添加组件
-   * @param {Object} component - 组件配置
-   * @returns {Object} 新组件
-   */
-  function addComponent(component) {
-    const newComponent = {
-      ...component,
-      id: generateUniqueId('remote'),
-      enabled: true,
-    }
-    components.value.push(newComponent)
-    return newComponent
+  async function addComponent(componentData) {
+    const result = await componentApi.createComponent(componentData)
+    await loadConfig()
+    return result
   }
 
-  /**
-   * 更新组件
-   * @param {string} id - 组件ID
-   * @param {Object} data - 更新数据
-   * @returns {boolean} 是否更新成功
-   */
-  function updateComponent(id, data) {
-    const index = components.value.findIndex(c => c.id === id)
-    if (index > -1) {
-      components.value[index] = { ...components.value[index], ...data }
-      return true
-    }
-    return false
+  async function updateComponent(id, data) {
+    await componentApi.updateComponent({ id: Number(id), ...data })
+    await loadConfig()
   }
 
-  /**
-   * 删除组件
-   * @param {string} id - 组件ID
-   * @returns {boolean} 是否删除成功
-   */
-  function removeComponent(id) {
-    const index = components.value.findIndex(c => c.id === id)
-    if (index > -1) {
-      components.value.splice(index, 1)
-      return true
-    }
-    return false
+  async function removeComponent(id) {
+    await componentApi.deleteComponent(Number(id))
+    await loadConfig()
   }
 
-  /**
-   * 切换组件启用状态
-   * @param {string} id - 组件ID
-   * @param {boolean} enabled - 是否启用
-   * @returns {boolean} 是否切换成功
-   */
-  function toggleComponentEnabled(id, enabled) {
-    const component = components.value.find(c => c.id === id)
-    if (component) {
-      component.enabled = enabled
-      return true
-    }
-    return false
+  async function toggleComponentEnabled(id, enabled) {
+    await componentApi.toggleComponentEnabled(Number(id), enabled)
+    await loadConfig()
   }
 
-  /**
-   * 根据 ID 获取组件
-   * @param {string} id - 组件ID
-   * @returns {Object|null} 组件对象
-   */
   function getComponentById(id) {
-    return components.value.find(c => c.id === id) || null
+    return components.value.find(c => c.id == id) || null
   }
 
-  /**
-   * 重置配置
-   */
+  async function fetchComponentDetail(id) {
+    const detail = await componentApi.getComponentDetail(Number(id))
+    const existingIndex = components.value.findIndex(c => c.id === detail.id)
+    if (existingIndex >= 0) {
+      components.value[existingIndex] = detail
+    } else {
+      components.value.push(detail)
+    }
+    return detail
+  }
+
+  async function addUrlPreset(presetData) {
+    const result = await componentApi.createUrlPreset(presetData)
+    await loadConfig()
+    return result
+  }
+
+  async function updateUrlPreset(id, data) {
+    await componentApi.updateUrlPreset({ id: Number(id), ...data })
+    await loadConfig()
+  }
+
+  async function removeUrlPreset(id) {
+    await componentApi.deleteUrlPreset(Number(id))
+    await loadConfig()
+  }
+
+  async function setDefaultUrlPreset(id) {
+    await componentApi.setDefaultUrlPreset(Number(id))
+    await loadConfig()
+  }
+
+  function getUrlPresetById(id) {
+    return urlPresets.value.find(p => p.id == id) || null
+  }
+
   function resetConfig() {
     globalUrl.value = ''
     components.value = []
-    saveConfig()
+    urlPresets.value = []
   }
 
   return {
     globalUrl,
     components,
+    urlPresets,
     isLoaded,
     enabledComponents,
     enabledComponentMetaList,
     componentCount,
     enabledCount,
+    defaultUrlPreset,
+    urlPresetCount,
     loadConfig,
     saveConfig,
     setGlobalUrl,
@@ -195,6 +175,13 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
     removeComponent,
     toggleComponentEnabled,
     getComponentById,
+    fetchComponentDetail,
+    addUrlPreset,
+    updateUrlPreset,
+    removeUrlPreset,
+    setDefaultUrlPreset,
+    getUrlPresetById,
     resetConfig,
+    getFullUrl,
   }
 })

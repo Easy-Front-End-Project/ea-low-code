@@ -33,23 +33,27 @@ export class PagesService {
       });
     }
 
-    const [list, total] = await queryBuilder
+    // 先获取总数
+    const total = await queryBuilder.getCount();
+
+    // 使用 getRawMany 获取原始数据，包含 addSelect 的字段
+    const rawList = await queryBuilder
       .orderBy('p.createdAt', 'DESC')
       .skip((page - 1) * pageSize)
       .take(pageSize)
-      .getManyAndCount();
+      .getRawMany();
 
     return {
-      list: list.map((project) => ({
-        id: project.id,
-        name: project.name,
-        description: project.description,
-        pageCount: (project as any).pageCount || 0,
-        isPublished: project.isPublished,
-        userName: (project as any).username || '',
-        userAccount: (project as any).email || '',
-        createdAt: project.createdAt,
-        updatedAt: project.updatedAt,
+      list: rawList.map((project: any) => ({
+        id: project.p_id,
+        name: project.p_name,
+        description: project.p_description,
+        pageCount: parseInt(project.pageCount) || 0,
+        isPublished: project.p_isPublished,
+        userName: project.user_username || '',
+        userAccount: project.user_email || '',
+        createdAt: project.p_createdAt,
+        updatedAt: project.p_updatedAt,
       })),
       total,
       page,

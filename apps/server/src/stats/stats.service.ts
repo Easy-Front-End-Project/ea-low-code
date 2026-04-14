@@ -1,68 +1,74 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, MoreThanOrEqual } from 'typeorm';
 import { Project } from '../pages/entities/project.entity';
+import { RemoteComponent } from '../components/entities/remote-component.entity';
 
 @Injectable()
 export class StatsService {
   constructor(
     @InjectRepository(Project)
     private projectsRepository: Repository<Project>,
+    @InjectRepository(RemoteComponent)
+    private componentsRepository: Repository<RemoteComponent>,
   ) {}
 
-  /**
-   * 获取仪表盘统计数据
-   */
   async getDashboardStats(userId: number) {
-    // 获取用户的项目数量
     const projectCount = await this.projectsRepository.count({
       where: { userId },
     });
 
-    // 获取所有项目的页面数总和
     const projects = await this.projectsRepository.find({
       where: { userId },
       relations: ['pages'],
     });
 
     let pageCount = 0;
-    let componentCount = 0;
+    let pageComponentCount = 0;
 
     for (const project of projects) {
-      // 统计页面数量
       if (project.pages) {
         pageCount += project.pages.length;
-        
-        // 统计组件数量
         for (const page of project.pages) {
           if (page.schema) {
-            componentCount += this.countComponents(page.schema);
+            pageComponentCount += this.countComponents(page.schema);
           }
         }
       }
     }
 
-    // 获取今日活动数量（简化处理：今日更新的项目数）
+    const remoteComponentCount = await this.componentsRepository.count({
+      where: { userId },
+    });
+
+    const componentCount = pageComponentCount + remoteComponentCount;
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const todayActivityCount = await this.projectsRepository.count({
-      where: {
-        userId,
-        updatedAt: today,
-      },
-    });
+
+    const [todayProjectUpdates, todayComponentUpdates] = await Promise.all([
+      this.projectsRepository.count({
+        where: {
+          userId,
+          updatedAt: MoreThanOrEqual(today),
+        },
+      }),
+      this.componentsRepository.count({
+        where: {
+          userId,
+          updatedAt: MoreThanOrEqual(today),
+        },
+      }),
+    ]);
 
     return {
       projectCount,
       pageCount,
       componentCount,
-      todayActivityCount,
+      todayActivityCount: todayProjectUpdates + todayComponentUpdates,
     };
   }
 
-  /**
-   * 获取最近项目
-   */
   async getRecentProjects(userId: number, limit: number = 4) {
     const projects = await this.projectsRepository
       .createQueryBuilder('p')
@@ -90,54 +96,75 @@ export class StatsService {
     }));
   }
 
-  /**
-   * 获取最近活动
-   */
-  async getRecentActivities(userId: number, limit: number = 5) {
-    // 获取最近更新的项目作为活动记录
-    const projects = await this.projectsRepository.find({
-      where: { userId },
-      order: { updatedAt: 'DESC' },
-      take: limit,
-      select: ['id', 'name', 'createdAt', 'updatedAt'],
-    });
+  async getRecentActivities(userId: number, limit: number = 10) {
+    const [recentProjects, recentComponents] = await Promise.all([
+      this.projectsRepository.find({
+        where: { userId },
+        order: { updatedAt: 'DESC' },
+        take: Math.ceil(limit / 2),
+        select: ['id', 'name', 'createdAt', 'updatedAt'],
+      }),
+      this.componentsRepository.find({
+        where: { userId },
+        order: { updatedAt: 'DESC' },
+        take: Math.floor(limit / 2),
+        select: ['id', 'name', 'createdAt', 'updatedAt'],
+      }),
+    ]);
 
-    return projects.map(project => {
+    const activities = [];
+
+    for (const project of recentProjects) {
       const isNew = project.createdAt.getTime() === project.updatedAt.getTime();
-      return {
+      activities.push({
         id: project.id,
         type: isNew ? 'create' : 'update',
-        description: isNew 
+        category: 'project',
+        description: isNew
           ? `创建了项目 "${project.name}"`
           : `更新了项目 "${project.name}"`,
         createdAt: project.updatedAt,
-      };
-    });
+      });
+    }
+
+    for (const component of recentComponents) {
+      const isNew = component.createdAt.getTime() === component.updatedAt.getTime();
+      activities.push({
+        id: component.id,
+        type: isNew ? 'create' : 'update',
+        category: 'component',
+        description: isNew
+          ? `添加了远程组件 "${component.name}"`
+          : `更新了组件 "${component.name}"`,
+        createdAt: component.updatedAt,
+      });
+    }
+
+    activities.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+
+    return activities.slice(0, limit);
   }
 
-  /**
-   * 递归统计组件数量
-   */
   private countComponents(schema: any): number {
     let count = 0;
-    
+
     if (!schema || typeof schema !== 'object') {
       return count;
     }
 
-    // 如果是一个组件节点
     if (schema.componentName || schema.type === 'component') {
       count++;
     }
 
-    // 递归遍历子节点
     if (schema.children && Array.isArray(schema.children)) {
       for (const child of schema.children) {
         count += this.countComponents(child);
       }
     }
 
-    // 遍历 components
     if (schema.components && Array.isArray(schema.components)) {
       for (const component of schema.components) {
         count += this.countComponents(component);

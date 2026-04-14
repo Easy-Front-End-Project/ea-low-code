@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { PagesModule } from './pages/pages.module';
 import { StatsModule } from './stats/stats.module';
+import { ComponentsModule } from './components/components.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { StatsModule } from './stats/stats.module';
     AuthModule,
     PagesModule,
     StatsModule,
+    ComponentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -42,7 +42,6 @@ request.interceptors.response.use(
     const status = error.response?.status
     switch (status) {
       case 401:
-        // 如果当前有 token，说明是 token 过期，需要清除并跳转
         if (getToken()) {
           clearAuth()
           window.location.href = '/ea-low-code/login'

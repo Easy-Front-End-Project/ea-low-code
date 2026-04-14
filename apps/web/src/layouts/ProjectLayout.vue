@@ -71,7 +71,16 @@
       '/cloud': 'cloud',
       '/profile': 'profile',
     }
-    return pathMap[route.path] || 'home'
+    const exactMatch = pathMap[route.path]
+    if (exactMatch) return exactMatch
+
+    if (route.path.startsWith('/components')) return 'components'
+    if (route.path.startsWith('/projects')) return 'projects'
+    if (route.path.startsWith('/templates')) return 'templates'
+    if (route.path.startsWith('/cloud')) return 'cloud'
+    if (route.path.startsWith('/profile')) return 'profile'
+
+    return 'home'
   })
 
   // 用户头像文字

@@ -38,4 +38,30 @@ export const apiList = {
     // 最近活动
     activities: '/stats/activities',
   },
+
+  // 远程组件管理接口
+  components: {
+    // 获取组件列表
+    list: '/components/list',
+    // 获取组件详情
+    detail: '/components/detail',
+    // 创建组件
+    create: '/components/create',
+    // 更新组件
+    update: '/components/update',
+    // 删除组件
+    delete: '/components/delete',
+    // 切换启用状态
+    toggleEnabled: '/components/toggle-enabled',
+    // 获取 URL 预设列表
+    presetsList: '/components/presets/list',
+    // 创建 URL 预设
+    presetsCreate: '/components/presets/create',
+    // 更新 URL 预设
+    presetsUpdate: '/components/presets/update',
+    // 删除 URL 预设
+    presetsDelete: '/components/presets/delete',
+    // 设置默认 URL 预设
+    presetsSetDefault: '/components/presets/set-default',
+  },
 }
