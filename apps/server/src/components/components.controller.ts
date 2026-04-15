@@ -16,8 +16,8 @@ export class ComponentsController {
 
   @Get('list')
   @ApiOperation({ summary: '获取组件列表' })
-  async findAllComponents(@NestRequest() req: any) {
-    return await this.componentsService.findAllComponents(req.user.userId);
+  async findAllComponents(@Query('keyword') keyword?: string, @NestRequest() req?: any) {
+    return await this.componentsService.findAllComponents(req.user.userId, keyword);
   }
 
   @Get('detail')

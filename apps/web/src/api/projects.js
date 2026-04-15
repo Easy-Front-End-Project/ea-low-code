@@ -3,8 +3,11 @@ import { httpRequest } from '../utils/request.js'
 const apiList = {
   list: '/pages/list',
   detail: '/pages/detail',
+  projectPages: '/pages/project-pages',
   create: '/pages/create',
+  pageCreate: '/pages/page-create',
   update: '/pages/update',
+  pageUpdate: '/pages/page-update',
   delete: '/pages/delete',
   clone: '/pages/clone',
   import: '/pages/import',
@@ -25,6 +28,13 @@ export function getProjectDetail(id) {
   })
 }
 
+export function getProjectPages(projectId) {
+  return httpRequest(apiList.projectPages, {
+    method: 'get',
+    params: { projectId: Number(projectId) },
+  })
+}
+
 export function createProject(data) {
   return httpRequest(apiList.create, {
     method: 'post',
@@ -32,8 +42,22 @@ export function createProject(data) {
   })
 }
 
+export function createPage(data) {
+  return httpRequest(apiList.pageCreate, {
+    method: 'post',
+    data,
+  })
+}
+
 export function updateProject(data) {
   return httpRequest(apiList.update, {
+    method: 'post',
+    data,
+  })
+}
+
+export function updatePage(data) {
+  return httpRequest(apiList.pageUpdate, {
     method: 'post',
     data,
   })

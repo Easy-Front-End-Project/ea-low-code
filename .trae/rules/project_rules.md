@@ -196,6 +196,62 @@
 }
 ```
 
+#### 2.5 BEM 嵌套规则
+
+**核心原则**：
+- **浅层嵌套（1-2 层）**：严格使用 BEM 命名（`&__element`）
+- **深层嵌套（3 层以上）**：可使用语义化类名，保持代码可读性
+
+```scss
+// ✅ 浅层嵌套 - 使用 BEM
+.pages-panel {
+  &__header { ... }
+  &__main { ... }
+  &__grid { ... }
+  &__footer { ... }
+}
+
+// ✅ 深层嵌套 - 保持语义化类名
+.page-card {
+  &__header { ... }     // 浅层：BEM
+  &__actions {          // 浅层：BEM
+    // 深层子元素使用语义化类名
+    .action-btn {       // 深层：语义化类名
+      display: flex;
+      
+      &:hover { ... }
+    }
+  }
+}
+```
+
+#### 2.6 空状态组件规范
+
+**统一使用 `ea-empty` 组件**展示空状态，禁止自定义空状态样式：
+
+```vue
+<!-- ✅ 正确：使用 ea-empty 组件 -->
+<ea-empty v-if="!hasData" description="暂无数据">
+  <ea-button type="primary" @click="handleCreate">新建</ea-button>
+</ea-empty>
+
+<!-- ❌ 错误：自定义空状态样式 -->
+<div v-if="!hasData" class="empty-state">
+  <ea-icon name="box-open" size="64"></ea-icon>
+  <p>暂无数据</p>
+</div>
+```
+
+**ea-empty 组件属性**：
+
+| 参数 | 说明 | 类型 | 默认值 |
+|------|------|------|--------|
+| description | 描述文字 | string | - |
+| image | 图片 URL | string | - |
+| image-size | 图片大小 | number | 80 |
+
+**参考文档**：[ea-empty.md](../../docs/ea-empty.md)
+
 ### 3. UNO CSS 使用规范
 
 #### 3.1 使用场景

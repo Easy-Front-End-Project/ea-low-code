@@ -1,52 +1,27 @@
 <template>
   <ea-container class="components-view" direction="vertical">
     <ea-header height="auto" class="components-view__header">
-      <div class="components-view__header-content">
-        <h2 class="components-view__title">组件管理</h2>
-        <div class="components-view__stats">
-          <span class="text-sm text-gray-500"
-            >共 {{ componentCount }} 个组件 · {{ enabledCount }} 个已启用</span
-          >
-        </div>
-        <div class="components-view__actions">
-          <ea-button circle @click="handleRefresh">
-            <ea-icon name="rotate" size="14"></ea-icon>
-          </ea-button>
-          <ea-button type="primary" icon="plus" @click="showAddDialog = true"> 添加组件 </ea-button>
-        </div>
-      </div>
+      <ComponentsSearchBar
+        :component-count="remoteStore.componentCount"
+        :enabled-count="remoteStore.enabledCount"
+        :url-preset-count="remoteStore.urlPresetCount"
+        :default-url-preset="remoteStore.defaultUrlPreset"
+        @search="handleSearch"
+        @create="showAddDialog = true"
+        @refresh="handleRefresh"
+        @manage-presets="showPresetManager = true"
+      />
     </ea-header>
 
     <ea-main class="components-view__main">
       <Loading :loading="loading" text="加载中...">
-        <div v-if="urlPresetCount > 0" class="url-presets-overview">
-          <h4 class="url-presets-overview__title">
-            URL 预设配置
-            <span class="text-xs text-gray-400 font-normal ml-2">
-              ({{ urlPresetCount }} 个预设)
-            </span>
-          </h4>
-          <div class="url-presets-overview__content">
-            <span class="text-sm text-gray-600">
-              默认: {{ defaultUrlPreset?.name || '未设置' }}
-            </span>
-            <ea-button size="small" icon="pen-to-square" text @click="showPresetManager = true">
-              管理
-            </ea-button>
-          </div>
-        </div>
+        <ea-empty v-if="!loading && !remoteStore.hasComponents" description="暂无远程组件">
+          <ea-button type="primary" @click="showAddDialog = true"> 添加组件 </ea-button>
+        </ea-empty>
 
-        <div v-if="componentCount === 0" class="components-view__empty">
-          <div class="components-view__empty-content">
-            <ea-icon name="box-open" size="64" color="#c0c4cc"></ea-icon>
-            <p>暂无远程组件</p>
-            <p class="text-sm text-gray-400">点击上方「添加组件」按钮开始配置您的第一个远程组件</p>
-          </div>
-        </div>
-
-        <div v-else class="components-view__grid">
+        <div v-if="remoteStore.hasComponents" class="components-view__grid">
           <RemoteComponentCard
-            v-for="comp in remoteStore.components"
+            v-for="comp in remoteStore.paginatedComponents"
             :key="comp.id"
             :component="comp"
             @edit="handleEdit"
@@ -56,6 +31,27 @@
         </div>
       </Loading>
     </ea-main>
+
+    <ea-footer
+      v-if="!loading && remoteStore.hasComponents"
+      height="64px"
+      class="components-view__footer"
+    >
+      <div class="components-view__pagination flex items-center justify-between w-full">
+        <div class="text-sm text-gray-500 whitespace-nowrap">
+          {{ remoteStore.enabledCount }} 个已启用
+        </div>
+
+        <ea-pagination
+          :total="remoteStore.total"
+          :page-size="remoteStore.pageSize"
+          :current-page="remoteStore.currentPage"
+          :layout="['total', 'prev', 'pager', 'next']"
+          @current-change="handlePageChange"
+          @size-change="handleSizeChange"
+        />
+      </div>
+    </ea-footer>
 
     <!-- 快速添加组件弹窗 -->
     <ea-dialog
@@ -84,10 +80,11 @@
 </template>
 
 <script setup>
-  import { ref, computed, onMounted } from 'vue'
+  import { ref, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
   import { useRemoteComponentStore } from '@/stores/designer/remoteComponent'
   import RemoteComponentCard from '@/components/remote-components/RemoteComponentCard.vue'
+  import ComponentsSearchBar from '@/components/remote-components/ComponentsSearchBar.vue'
   import UrlPresetManager from '@/components/remote-components/UrlPresetManager.vue'
   import Loading from '@/components/common/Loading.vue'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
@@ -95,40 +92,48 @@
   const router = useRouter()
   const remoteStore = useRemoteComponentStore()
 
-  const loading = ref(true)
+  const loading = ref(false)
   const showAddDialog = ref(false)
   const showPresetManager = ref(false)
   const componentForm = ref({ name: '' })
 
-  const componentCount = computed(() => remoteStore.componentCount)
-  const enabledCount = computed(() => remoteStore.enabledCount)
-  const urlPresetCount = computed(() => remoteStore.urlPresetCount)
-  const defaultUrlPreset = computed(() => remoteStore.defaultUrlPreset)
-
-  onMounted(() => {
-    if (!remoteStore.isLoaded) {
-      remoteStore.loadConfig()
-    }
-    loading.value = false
-  })
-
-  async function handleRefresh() {
+  async function loadData(searchKeyword) {
     loading.value = true
-    await remoteStore.loadConfig()
-    loading.value = false
+    try {
+      await remoteStore.loadConfig(searchKeyword)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  onMounted(() => loadData())
+
+  async function handleSearch(keyword) {
+    remoteStore.setKeyword(keyword)
+    await loadData(keyword)
+  }
+
+  function handleRefresh() {
+    remoteStore.setKeyword('')
+    loadData()
+  }
+
+  function handlePageChange(page) {
+    remoteStore.setPage(page)
+  }
+
+  function handleSizeChange(size) {
+    remoteStore.setPageSize(size)
   }
 
   async function handleQuickAdd() {
-    if (!componentForm.value.name.trim()) {
+    const name = componentForm.value.name.trim()
+    if (!name) {
       window.$message?.error('请输入组件名称')
       return
     }
 
-    await remoteStore.addComponent({
-      name: componentForm.value.name.trim(),
-      url: '',
-    })
-
+    await remoteStore.addComponent({ name, url: '' })
     showAddDialog.value = false
     componentForm.value.name = ''
     window.$message?.success('组件创建成功，请完善配置信息')
@@ -139,10 +144,9 @@
   }
 
   async function handleDelete(id) {
-    if (confirm('确定要删除这个远程组件吗？')) {
-      await remoteStore.removeComponent(id)
-      window.$message?.success('删除成功')
-    }
+    if (!confirm('确定要删除这个远程组件吗？')) return
+    await remoteStore.removeComponent(id)
+    window.$message?.success('删除成功')
   }
 
   async function handleToggleEnabled(id, enabled) {
@@ -151,86 +155,30 @@
 </script>
 
 <style lang="scss" scoped>
-  .components-view {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(components-view) {
     height: 100%;
 
-    &__header {
+    @include e(header) {
       padding: 0;
     }
 
-    &__header-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 1.5rem;
-    }
-
-    &__title {
-      margin: 0;
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--ea-text-primary);
-    }
-
-    &__actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    &__main {
+    @include e(main) {
       padding: 12px 0;
       overflow-y: auto;
     }
 
-    &__empty {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 400px;
-
-      &-content {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 16px;
-
-        p {
-          margin: 0;
-          font-size: 14px;
-          color: var(--ea-text-secondary);
-        }
-      }
-    }
-
-    &__grid {
+    @include e(grid) {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 24px;
       max-width: 1440px;
       margin: 0 auto;
-      padding: 0 1.5rem;
-    }
-  }
-
-  .url-presets-overview {
-    background-color: #f9fafb;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    padding: 1rem;
-    margin: 0 1.5rem 1.5rem;
-
-    &__title {
-      margin: 0 0 0.5rem 0;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: #374151;
     }
 
-    &__content {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
+    @include e(footer) {
+      border-top: 1px solid var(--ea-border-light);
     }
   }
 

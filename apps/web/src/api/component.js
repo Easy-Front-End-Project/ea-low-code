@@ -5,8 +5,9 @@ import { apiList } from './config.js'
  * 获取组件列表
  * @returns {Promise<{list: Array, total: number}>}
  */
-export const getComponentList = () => {
-  return request.get(apiList.components.list)
+export const getComponentList = (keyword) => {
+  const params = keyword ? { keyword } : {}
+  return request.get(apiList.components.list, { params })
 }
 
 /**

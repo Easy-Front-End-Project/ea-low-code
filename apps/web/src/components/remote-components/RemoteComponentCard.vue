@@ -1,9 +1,13 @@
 <template>
-  <ea-card class="remote-component-card" :class="{ 'is-active': component.enabled !== false }">
+  <ea-card
+    class="remote-component-card"
+    :class="{ 'is-active': component.enabled !== false }"
+    shadow="hover"
+  >
     <!-- 卡片头部 -->
     <div slot="header" class="remote-component-card__header">
       <div class="remote-component-card__title-wrap">
-        <ea-icon :name="'crown'" size="14"></ea-icon>
+        <ea-icon name="crown" size="14" color="white"></ea-icon>
         <span class="remote-component-card__title">{{ component.name }}</span>
       </div>
       <EaSwitch
@@ -18,19 +22,22 @@
     <div class="remote-component-card__body">
       <div class="remote-component-card__info">
         <ea-text class="remote-component-card__info-label">类型:</ea-text>
-        <ea-text class="remote-component-card__info-value">{{ component.type || 'remote-' + component.id }}</ea-text>
+        <ea-text class="remote-component-card__info-value">
+          {{ component.type || 'remote-' + component.id }}
+        </ea-text>
       </div>
       <div class="remote-component-card__info">
         <ea-text class="remote-component-card__info-label">URL:</ea-text>
-        <ea-text class="remote-component-card__info-value url-text" :title="component.url">{{ component.url }}</ea-text>
+        <ea-text class="remote-component-card__info-value url-text" :title="component.url">
+          {{ component.url || '未配置' }}
+        </ea-text>
       </div>
-      <div v-if="component.styleUrl" class="remote-component-card__info">
-        <ea-text class="remote-component-card__info-label">样式:</ea-text>
-        <ea-text class="remote-component-card__info-value url-text" :title="component.styleUrl">{{ component.styleUrl }}</ea-text>
+      <div v-if="component.description" class="remote-component-card__description">
+        {{ component.description || '暂无描述' }}
       </div>
     </div>
 
-    <!-- 卡片底部 -->
+    <!-- 卡片底部 - 操作按钮 -->
     <div slot="footer" class="remote-component-card__footer">
       <ea-button text size="small" icon="pen-to-square" @click.stop="$emit('edit', component)">
         编辑
@@ -62,7 +69,9 @@
 </script>
 
 <style lang="scss" scoped>
-  .remote-component-card {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(remote-component-card) {
     transition: all 0.2s;
 
     &.is-active {
@@ -78,53 +87,71 @@
       padding: 0;
     }
 
-    &__header {
+    @include e(header) {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 16px;
-      border-bottom: 1px solid #f3f4f6;
+      padding: 16px 20px;
+      background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 50%, #c4b5fd 100%);
+      min-height: 80px;
     }
 
-    &__title-wrap {
+    @include e(title-wrap) {
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    &__title {
-      font-weight: 500;
-      color: #374151;
-      font-size: 0.875rem;
+    @include e(title) {
+      font-size: 16px;
+      font-weight: 600;
+      color: #ffffff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    &__body {
-      padding: 12px 16px;
+    @include e(body) {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    &__info {
+    @include e(info) {
       display: flex;
       align-items: center;
       margin-bottom: 0.5rem;
-      font-size: 0.75rem;
+      font-size: 0.875rem;
 
       &:last-child {
         margin-bottom: 0;
       }
     }
 
-    &__info-label {
+    @include e(info-label) {
       color: #6b7280;
       min-width: 40px;
       margin-right: 0.5rem;
     }
 
-    &__info-value {
+    @include e(info-value) {
       color: #374151;
       font-weight: 500;
     }
 
-    &__footer {
+    @include e(description) {
+      font-size: 12px;
+      color: var(--ea-text-secondary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      line-height: 1.5;
+      min-height: 36px;
+    }
+
+    @include e(footer) {
       display: flex;
       justify-content: flex-end;
       gap: 8px;

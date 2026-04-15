@@ -1,228 +1,459 @@
 <template>
   <div class="project-settings-view">
+    <ea-page-header @back="goBack">
+      <span slot="content" class="text-large font-600">项目设置</span>
+      <div slot="extra">
+        <ea-button type="primary" @click="handleSave">保存设置</ea-button>
+      </div>
+    </ea-page-header>
+
     <div class="project-settings-view__container">
-      <!-- 左侧菜单 -->
-      <div class="project-settings-view__sidebar">
-        <div class="project-settings-view__menu">
-          <div
-            v-for="item in menuItems"
-            :key="item.key"
-            :class="['project-settings-view__menu-item', { 'is-active': activeMenu === item.key }]"
-            @click="activeMenu = item.key"
+      <!-- 主内容区域 - 带加载状态 -->
+      <Loading :loading="loading" text="加载项目数据中...">
+        <!-- 项目不存在 - 使用 ea-result 提示 -->
+        <div v-if="projectNotFound" class="result-state">
+          <ea-result
+            type="warning"
+            title="项目不存在"
+            sub-title="该项目可能已被删除或您没有访问权限"
           >
-            <ea-icon :name="item.icon" size="16"></ea-icon>
-            <span>{{ item.label }}</span>
+            <div slot="extra">
+              <ea-button type="primary" @click="goBack">返回项目列表</ea-button>
+            </div>
+          </ea-result>
+        </div>
+
+        <!-- 其他错误状态 -->
+        <div v-else-if="loadError" class="error-state">
+          <ea-icon
+            name="triangle-exclamation"
+            variant="solid"
+            size="32"
+            class="text-red-500"
+          ></ea-icon>
+          <p class="text-gray-600 mt-2">{{ loadError }}</p>
+          <div class="error-actions mt-4 flex gap-3 justify-center">
+            <ea-button type="primary" @click="loadProjectData(route.params.id)"> 重试 </ea-button>
+            <ea-button @click="goBack"> 返回列表 </ea-button>
           </div>
         </div>
-      </div>
 
-      <!-- 右侧内容 -->
-      <div class="project-settings-view__main">
-        <div class="project-settings-view__header">
-          <h2 class="project-settings-view__title">{{ currentMenuItem?.label }}</h2>
-          <ea-button type="primary" @click="handleSave">保存设置</ea-button>
-        </div>
+        <!-- 正常内容 -->
+        <ea-tabs
+          v-else
+          :active="activeMenu"
+          class="project-settings-view__tabs"
+          tab-position="left"
+        >
+          <ea-tab panel="pages">页面管理</ea-tab>
+          <ea-tab-panel name="pages">
+            <ea-container class="pages-panel" direction="vertical">
+              <ea-header height="auto" class="pages-panel__header">
+                <PagesSearchBar
+                  v-model:keyword="pagesStore.keyword"
+                  @search="handlePagesSearch"
+                  @create="showCreatePageDialog = true"
+                  @refresh="handlePagesRefresh"
+                />
+              </ea-header>
 
-        <div class="project-settings-view__body">
-          <!-- 基础设置 -->
-          <template v-if="activeMenu === 'basic'">
-            <div class="project-settings-view__form">
-              <div class="project-settings-view__form-item">
-                <label class="project-settings-view__label">
+              <ea-main class="pages-panel__main">
+                <Loading :loading="pagesStore.loading" text="加载中...">
+                  <ea-empty
+                    v-if="!pagesStore.hasPages && !pagesStore.loading"
+                    class="block h-full"
+                    description="暂无页面，点击新建按钮创建"
+                  >
+                    <ea-button type="primary" @click="showCreatePageDialog = true">
+                      新建页面
+                    </ea-button>
+                  </ea-empty>
+
+                  <div v-else class="pages-panel__grid">
+                    <PageCard
+                      v-for="page in pagesStore.pages"
+                      :key="page.id"
+                      :page="page"
+                      @card-click="handleCardClick"
+                      @edit="showEditDialog = true; editingPage = page"
+                      @clone="handleClonePage"
+                      @delete="handleDeletePage"
+                      @preview="handlePreviewPage"
+                    />
+                  </div>
+                </Loading>
+              </ea-main>
+
+              <ea-footer
+                v-if="pagesStore.hasPages && !pagesStore.loading"
+                height="64px"
+                class="pages-panel__footer"
+              >
+                <div class="pages-panel__pagination">
+                  <ea-pagination
+                    :total="pagesStore.total"
+                    :page-size="pagesStore.pageSize"
+                    :current-page="pagesStore.currentPage"
+                    :layout="['total', 'prev', 'pager', 'next']"
+                    @current-change="handlePageChange"
+                    @size-change="handlePageSizeChange"
+                  />
+                </div>
+              </ea-footer>
+            </ea-container>
+          </ea-tab-panel>
+
+          <ea-tab panel="basic">基础信息</ea-tab>
+          <ea-tab-panel name="basic">
+            <div class="settings-form">
+              <div class="form-item">
+                <label class="form-label">
                   项目名称
-                  <span class="project-settings-view__required">*</span>
+                  <span class="required">*</span>
                 </label>
-                <ea-input v-model="form.name" placeholder="请输入项目名称"></ea-input>
+                <EaInput v-model="form.name" placeholder="请输入项目名称" size="default" />
               </div>
-              <div class="project-settings-view__form-item">
-                <label class="project-settings-view__label">项目描述</label>
-                <ea-input
+
+              <div class="form-item">
+                <label class="form-label">项目描述</label>
+                <EaInput
                   v-model="form.description"
                   type="textarea"
                   :rows="4"
                   placeholder="请输入项目描述"
-                ></ea-input>
+                  size="default"
+                />
               </div>
             </div>
-          </template>
+          </ea-tab-panel>
 
-          <!-- 其他菜单项 -->
-          <template v-else>
-            <div class="project-settings-view__placeholder">
-              <ea-icon name="screwdriver-wrench" size="48" color="#c0c4cc"></ea-icon>
-              <p>{{ currentMenuItem?.label }}功能开发中...</p>
-            </div>
-          </template>
-        </div>
-      </div>
+          <!-- 创建页面弹窗 -->
+          <CreatePageDialog
+            v-model:visible="showCreatePageDialog"
+            :project-id="route.params.id"
+            @success="handlePagesRefresh"
+          />
+
+          <!-- 预览页面抽屉 -->
+          <PagePreviewDialog v-model:visible="showPreviewDialog" :page-id="previewPageId" />
+
+          <!-- 编辑页面弹窗 -->
+          <EditPageDialog
+            v-model:visible="showEditDialog"
+            :page="editingPage"
+            @success="handlePagesRefresh"
+          />
+        </ea-tabs>
+      </Loading>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { getProjectDetail, updateProject } from '@/api/projects.js'
+  import { ref, onMounted, watch } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
+  import { getProjectDetail, updateProject } from '@/api/projects.js'
+  import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
+  import Loading from '@/components/common/Loading.vue'
+  import PagesSearchBar from '@/components/pages/PagesSearchBar.vue'
+  import PageCard from '@/components/pages/PageCard.vue'
+  import CreatePageDialog from '@/components/pages/CreatePageDialog.vue'
+  import EditPageDialog from '@/components/pages/EditPageDialog.vue'
+  import PagePreviewDialog from '@/components/pages/PagePreviewDialog.vue'
+  import { usePagesStore } from '@/stores/pages.js'
 
-const route = useRoute()
+  const route = useRoute()
+  const router = useRouter()
+  const pagesStore = usePagesStore()
 
-const projectId = computed(() => route.params.id)
-const activeMenu = ref('basic')
-const loading = ref(false)
-const saving = ref(false)
+  const activeMenu = ref('pages')
+  const loading = ref(false)
+  const saving = ref(false)
+  const loadError = ref('')
+  const projectNotFound = ref(false)
+  const showCreatePageDialog = ref(false)
+  const showPreviewDialog = ref(false)
+  const previewPageId = ref(null)
+  const showEditDialog = ref(false)
+  const editingPage = ref(null)
 
-const form = ref({
-  name: '',
-  description: '',
-})
+  const form = ref({
+    name: '',
+    description: '',
+  })
 
-const menuItems = [
-  { key: 'basic', label: '基础设置', icon: 'gear' },
-  { key: 'pages', label: '页面管理', icon: 'file-lines' },
-  { key: 'members', label: '成员管理', icon: 'users' },
-  { key: 'export', label: '导入导出', icon: 'file-export' },
-]
+  function goBack() {
+    router.push({ name: 'projects' })
+  }
 
-const currentMenuItem = computed(() => menuItems.find((item) => item.key === activeMenu.value))
+  async function initProject(id) {
+    await loadProjectData(id)
+    if (activeMenu.value === 'pages') {
+      await loadPagesData(id)
+    }
+  }
 
-onMounted(async () => {
-  if (projectId.value) {
+  onMounted(async () => {
+    if (route.params.id) {
+      await initProject(route.params.id)
+      await loadPagesData(route.params.id)
+    }
+  })
+
+  // 监听路由变化（切换项目时），重置页面数据
+  watch(
+    () => route.params.id,
+    async newId => {
+      if (newId) {
+        pagesStore.reset()
+        showCreatePageDialog.value = false
+        showPreviewDialog.value = false
+        previewPageId.value = null
+        showEditDialog.value = false
+        editingPage.value = null
+
+        await initProject(newId)
+      }
+    }
+  )
+
+  watch(activeMenu, async newTab => {
+    if (newTab === 'pages' && route.params.id) {
+      pagesStore.reset()
+      await loadPagesData(route.params.id)
+    }
+  })
+
+  async function loadProjectData(id) {
     loading.value = true
+    loadError.value = ''
+    projectNotFound.value = false
+
     try {
-      const project = await getProjectDetail(projectId.value)
+      const project = await getProjectDetail(Number(id))
       form.value.name = project.name || ''
       form.value.description = project.description || ''
     } catch (error) {
-      window.$message?.error('获取项目详情失败')
+      console.error('加载项目数据失败:', error)
+      const status = error?.response?.status
+      if (status === 401) {
+        loadError.value = '登录已过期，请重新登录'
+        projectNotFound.value = false
+      } else if (status === 404) {
+        // 项目不存在 - 标记但不跳转
+        projectNotFound.value = true
+        loadError.value = ''
+      } else {
+        loadError.value = '加载数据失败，请检查网络连接或刷新页面重试'
+        projectNotFound.value = false
+      }
     } finally {
       loading.value = false
     }
   }
-})
 
-async function handleSave() {
-  if (!form.value.name.trim()) {
-    window.$message?.warning('请输入项目名称')
-    return
+  async function loadPagesData(projectId) {
+    try {
+      await pagesStore.fetchPages(projectId)
+    } catch (error) {
+      window.$message?.error('加载页面列表失败')
+    }
   }
 
-  saving.value = true
-  try {
-    await updateProject({
-      id: projectId.value,
-      name: form.value.name.trim(),
-      description: form.value.description,
-    })
-    window.$message?.success('保存成功')
-  } catch (error) {
-    window.$message?.error(error.message || '保存失败')
-  } finally {
-    saving.value = false
+  function handlePagesSearch() {
+    pagesStore.setPage(1)
+    if (route.params.id) {
+      loadPagesData(route.params.id)
+    }
   }
-}
+
+  function handlePagesRefresh() {
+    if (route.params.id) {
+      loadPagesData(route.params.id)
+    }
+  }
+
+  function handlePageChange(page) {
+    pagesStore.setPage(page)
+    if (route.params.id) {
+      loadPagesData(route.params.id)
+    }
+  }
+
+  function handlePageSizeChange(size) {
+    pagesStore.setPageSize(size)
+    if (route.params.id) {
+      loadPagesData(route.params.id)
+    }
+  }
+
+  function handleCardClick(page) {
+    router.push({ name: 'designer', params: { id: page.id } })
+  }
+
+  async function handleClonePage(page) {
+    try {
+      window.$message?.info('复制功能开发中...')
+    } catch (error) {
+      window.$message?.error(error.message || '复制失败')
+    }
+  }
+
+  async function handleDeletePage(page) {
+    if (!confirm(`确定要删除页面「${page.name || page.id}」吗？`)) return
+
+    try {
+      window.$message?.info('删除功能开发中...')
+    } catch (error) {
+      window.$message?.error(error.message || '删除失败')
+    }
+  }
+
+  function handlePreviewPage(page) {
+    previewPageId.value = page.id
+    showPreviewDialog.value = true
+  }
+
+  async function handleSave() {
+    if (!form.value.name.trim()) {
+      window.$message?.warning('请输入项目名称')
+      return
+    }
+
+    saving.value = true
+    try {
+      await updateProject({
+        id: Number(route.params.id),
+        name: form.value.name.trim(),
+        description: form.value.description,
+      })
+      window.$message?.success('保存成功')
+    } catch (error) {
+      window.$message?.error(error.message || '保存失败')
+    } finally {
+      saving.value = false
+    }
+  }
 </script>
 
 <style lang="scss" scoped>
-.project-settings-view {
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-
-  &__container {
-    display: flex;
-    gap: 24px;
-    background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-    min-height: calc(100vh - 112px);
+  ea-empty::part(container) {
+    height: 100%;
   }
 
-  &__sidebar {
-    width: 200px;
-    padding: 16px 0;
-    border-right: 1px solid var(--ea-border-lighter);
+  .project-settings-view {
+    height: 100%;
+    padding: 1rem;
+
+    &__container {
+      margin-top: 1rem;
+      height: calc(100% - 80px);
+    }
+
+    &__tabs {
+      width: 100%;
+      height: 100%;
+
+      &::part(content) {
+        overflow-y: auto;
+      }
+    }
   }
 
-  &__menu {
-    &-item {
+  .pages-panel {
+    height: 100%;
+
+    &__header {
+      padding: 0;
+    }
+
+    &__main {
+      padding: 12px 0;
+      overflow-y: auto;
+    }
+
+    &__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    &__footer {
+      padding: 0 24px;
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 20px;
-      font-size: 14px;
-      color: var(--ea-text-regular);
-      cursor: pointer;
-      transition: all 0.2s;
+      justify-content: flex-end;
+      border-top: 1px solid var(--ea-border-light);
+    }
 
-      &:hover {
-        color: var(--ea-primary);
-        background: var(--ea-primary-light);
-      }
+    &__pagination {
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+  }
+  ea-tab-panel[name='pages'] {
+    height: 100%;
 
-      &.is-active {
-        color: var(--ea-primary);
-        background: var(--ea-primary-light);
-        border-right: 2px solid var(--ea-primary);
-      }
+    &::part(container) {
+      height: 100%;
     }
   }
 
-  &__main {
-    flex: 1;
-    padding: 24px;
-  }
-
-  &__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--ea-border-lighter);
-  }
-
-  &__title {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--ea-text-primary);
-  }
-
-  &__form {
-    max-width: 480px;
-
-    &-item {
-      margin-bottom: 20px;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-  }
-
-  &__label {
-    display: block;
-    font-size: 14px;
-    color: var(--ea-text-regular);
-    margin-bottom: 8px;
-  }
-
-  &__required {
-    color: var(--ea-danger);
-    margin-left: 4px;
-  }
-
-  &__placeholder {
+  .error-state {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 16px;
-    padding: 48px 0;
-
-    p {
-      font-size: 14px;
-      color: var(--ea-text-secondary);
-    }
+    height: 400px;
+    gap: 12px;
   }
-}
+
+  .result-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    padding: 2rem;
+  }
+
+  .error-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+
+  .settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 640px;
+  }
+
+  .form-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .form-label {
+    font-size: 0.875rem;
+    color: var(--ea-text-regular);
+    font-weight: 500;
+  }
+
+  .required {
+    color: var(--ea-danger);
+    margin-left: 4px;
+  }
+
+  .placeholder-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    gap: 16px;
+  }
 </style>

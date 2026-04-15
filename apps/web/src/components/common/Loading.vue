@@ -29,8 +29,10 @@
 <style lang="scss" scoped>
   .loading-wrapper {
     position: relative;
+    height: 100%;
 
     &__content {
+      height: 100%;
       &.is-loading {
         pointer-events: none;
       }
@@ -47,7 +49,7 @@
       background-color: rgba(255, 255, 255, 0.95);
       z-index: 100;
 
-      &[style*="display: none"] {
+      &[style*='display: none'] {
         pointer-events: none;
       }
     }

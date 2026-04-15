@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import { RemoteComponent } from './entities/remote-component.entity';
 import { UrlPreset } from './entities/url-preset.entity';
 import { CreateComponentDto } from './dto/create-component.dto';
@@ -18,9 +18,13 @@ export class ComponentsService {
     private urlPresetRepository: Repository<UrlPreset>
   ) {}
 
-  async findAllComponents(userId: number) {
+  async findAllComponents(userId: number, keyword?: string) {
+    const where: any = { userId };
+    if (keyword?.trim()) {
+      where.name = Like(`%${keyword.trim()}%`);
+    }
     const components = await this.componentRepository.find({
-      where: { userId },
+      where,
       order: { createdAt: 'DESC' },
     });
     return {

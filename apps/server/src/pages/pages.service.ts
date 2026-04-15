@@ -4,6 +4,7 @@ import { Repository, In } from 'typeorm';
 import { Project } from './entities/project.entity';
 import { PageSchema } from './entities/page-schema.entity';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { CreatePageDto, UpdatePageDto } from './dto/page.dto';
 
 @Injectable()
 export class PagesService {
@@ -75,6 +76,35 @@ export class PagesService {
     };
   }
 
+  async findProjectPages(projectId: number, userId: number) {
+    const project = await this.projectRepository.findOne({
+      where: { id: projectId, userId },
+    });
+
+    if (!project) {
+      throw new NotFoundException('项目不存在');
+    }
+
+    const pages = await this.pageSchemaRepository.find({
+      where: { projectId },
+      order: { sortOrder: 'ASC', createdAt: 'ASC' },
+    });
+
+    return {
+      list: pages.map(page => ({
+        id: page.id,
+        name: page.name,
+        description: page.description || null,
+        projectId: page.projectId,
+        schema: page.schema,
+        sortOrder: page.sortOrder,
+        createdAt: page.createdAt,
+        updatedAt: page.updatedAt,
+      })),
+      total: pages.length,
+    };
+  }
+
   async create(userId: number, createProjectDto: CreateProjectDto) {
     const defaultPageName = '首页';
 
@@ -102,11 +132,60 @@ export class PagesService {
     return savedProject;
   }
 
+  async createPage(userId: number, createPageDto: CreatePageDto) {
+    const project = await this.projectRepository.findOne({
+      where: { id: createPageDto.projectId, userId },
+    });
+
+    if (!project) {
+      throw new NotFoundException('项目不存在');
+    }
+
+    const maxSortOrder = await this.pageSchemaRepository
+      .createQueryBuilder('ps')
+      .select('MAX(ps.sortOrder)', 'maxSort')
+      .where('ps.projectId = :projectId', { projectId: createPageDto.projectId })
+      .getRawOne();
+
+    const page = this.pageSchemaRepository.create({
+      name: createPageDto.name,
+      description: createPageDto.description,
+      schema: {
+        components: [],
+        config: {},
+      },
+      sortOrder: (parseInt(maxSortOrder?.maxSort) || 0) + 1,
+      projectId: createPageDto.projectId,
+    });
+
+    return await this.pageSchemaRepository.save(page);
+  }
+
   async update(id: number, userId: number, updateData: Record<string, any>) {
     const project = await this.findOne(id, userId);
     Object.assign(project, updateData);
     delete (project as any).pageCount;
     return await this.projectRepository.save(project);
+  }
+
+  async updatePage(userId: number, updatePageDto: UpdatePageDto) {
+    const { id, ...updateData } = updatePageDto;
+
+    const page = await this.pageSchemaRepository.findOne({
+      where: { id },
+      relations: ['project'],
+    });
+
+    if (!page) {
+      throw new NotFoundException('页面不存在');
+    }
+
+    if (page.project.userId !== userId) {
+      throw new NotFoundException('无权操作此页面');
+    }
+
+    Object.assign(page, updateData);
+    return await this.pageSchemaRepository.save(page);
   }
 
   async remove(id: number, userId: number) {

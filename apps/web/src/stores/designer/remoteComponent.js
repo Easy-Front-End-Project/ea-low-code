@@ -6,7 +6,9 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
   const globalUrl = ref('')
   const components = ref([])
   const urlPresets = ref([])
-  const isLoaded = ref(false)
+  const keyword = ref('')
+  const currentPage = ref(1)
+  const pageSize = ref(12)
 
   const enabledComponents = computed(() => components.value.filter(comp => comp.enabled !== false))
 
@@ -62,27 +64,32 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
 
   const componentCount = computed(() => components.value.length)
   const enabledCount = computed(() => enabledComponents.value.length)
+  const total = computed(() => components.value.length)
+  const pageCount = computed(() => Math.ceil(total.value / pageSize.value) || 1)
+
+  const paginatedComponents = computed(() => {
+    const start = (currentPage.value - 1) * pageSize.value
+    return components.value.slice(start, start + pageSize.value)
+  })
+
+  const hasComponents = computed(() => total.value > 0)
+
   const defaultUrlPreset = computed(() => urlPresets.value.find(p => p.isDefault) || null)
   const urlPresetCount = computed(() => urlPresets.value.length)
 
-  async function loadConfig() {
+  async function loadConfig(searchKeyword) {
     try {
+      const kw = searchKeyword ?? keyword.value
       const [componentsResult, presetsResult] = await Promise.all([
-        componentApi.getComponentList(),
+        componentApi.getComponentList(kw?.trim() || undefined),
         componentApi.getUrlPresetList(),
       ])
 
       components.value = componentsResult.list || []
       urlPresets.value = presetsResult || []
-      isLoaded.value = true
     } catch (error) {
       console.error('加载远程组件配置失败:', error)
-      isLoaded.value = true
     }
-  }
-
-  async function saveConfig() {
-    // 后端自动保存，无需手动保存
   }
 
   function setGlobalUrl(url) {
@@ -150,25 +157,46 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
     return urlPresets.value.find(p => p.id == id) || null
   }
 
-  function resetConfig() {
+  function setKeyword(value) {
+    keyword.value = value
+    currentPage.value = 1
+  }
+
+  function setPage(page) {
+    currentPage.value = page
+  }
+
+  function setPageSize(size) {
+    pageSize.value = size
+    currentPage.value = 1
+  }
+
+  function reset() {
     globalUrl.value = ''
     components.value = []
     urlPresets.value = []
+    keyword.value = ''
+    currentPage.value = 1
   }
 
   return {
     globalUrl,
     components,
     urlPresets,
-    isLoaded,
+    keyword,
+    currentPage,
+    pageSize,
     enabledComponents,
     enabledComponentMetaList,
     componentCount,
     enabledCount,
+    total,
+    pageCount,
+    paginatedComponents,
+    hasComponents,
     defaultUrlPreset,
     urlPresetCount,
     loadConfig,
-    saveConfig,
     setGlobalUrl,
     addComponent,
     updateComponent,
@@ -181,7 +209,10 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
     removeUrlPreset,
     setDefaultUrlPreset,
     getUrlPresetById,
-    resetConfig,
+    setKeyword,
+    setPage,
+    setPageSize,
+    reset,
     getFullUrl,
   }
 })
