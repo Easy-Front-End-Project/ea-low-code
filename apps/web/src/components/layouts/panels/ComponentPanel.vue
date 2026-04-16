@@ -73,26 +73,6 @@
             </template>
           </div>
         </ea-collapse-item>
-
-        <!-- 远程组件单独渲染 -->
-        <ea-collapse-item
-          v-if="remoteStore.enabledCount > 0"
-          name="remote"
-          :title="`远程组件 (${remoteStore.enabledCount})`"
-        >
-          <div class="component-grid">
-            <div
-              v-for="component in remoteStore.enabledComponentMetaList"
-              :key="component.type"
-              class="component-item component-item--remote"
-              draggable="true"
-              @dragstart="handleDragStart($event, component)"
-            >
-              <span class="component-item__name">{{ component.name }}</span>
-              <span class="component-item__badge">远程</span>
-            </div>
-          </div>
-        </ea-collapse-item>
       </ea-collapse>
     </div>
 
@@ -105,12 +85,10 @@
   import { ref, computed, onMounted, watch } from 'vue'
   import { getCategories, getComponentsByParentGroup } from '@/constants/componentMeta'
   import { ComponentCategories } from '@/constants/types'
-  import { useRemoteComponentStore } from '@/stores/designer/remoteComponent'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
   const searchQuery = ref('')
   const expandedCategories = ref([])
-  const remoteStore = useRemoteComponentStore()
 
   const hiddenChildComponentsInPanel = [
     'ea-option',
@@ -172,11 +150,9 @@
 
   // 监听分类变化，自动展开
   watch(
-    () => ({ cats: filteredCategories.value, remoteCount: remoteStore.enabledCount }),
-    ({ cats, remoteCount }) => {
-      const allKeys = cats.map(cat => cat.key)
-      if (remoteCount > 0) allKeys.push('remote')
-      expandedCategories.value = allKeys
+    () => filteredCategories.value,
+    cats => {
+      expandedCategories.value = cats.map(cat => cat.key)
     },
     { immediate: true }
   )
@@ -189,10 +165,6 @@
     event.dataTransfer.setData('application/json', JSON.stringify(component))
     event.dataTransfer.effectAllowed = 'copy'
   }
-
-  onMounted(() => {
-    if (!remoteStore.isLoaded) remoteStore.loadConfig()
-  })
 </script>
 
 <style lang="scss" scoped>

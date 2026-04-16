@@ -21,10 +21,7 @@
         <div class="canvas-area__grid"></div>
 
         <!-- 加载动画 -->
-        <div v-if="isLoading" class="canvas-area__loading">
-          <div class="canvas-area__loading-spinner"></div>
-          <p class="canvas-area__loading-text">加载组件中...</p>
-        </div>
+        <Loading v-if="isLoading" :loading="true" text="加载组件中..." />
 
         <!-- 组件渲染区域 -->
         <div v-show="!isLoading" class="canvas-area__content">
@@ -55,6 +52,7 @@
   import { useSchemaStore } from '@/stores/designer/schema'
   import CanvasComponent from '../../designer/CanvasComponent.vue'
   import CanvasToolbar from '@/components/common/CanvasToolbar.vue'
+  import Loading from '@/components/common/Loading.vue'
 
   const schemaStore = useSchemaStore()
   const canvasRef = ref(null)
@@ -232,37 +230,6 @@
         font-size: 0.875rem;
       }
     }
-
-    &__loading {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background-color: rgba(255, 255, 255, 0.9);
-      z-index: 10;
-
-      &-spinner {
-        width: 40px;
-        height: 40px;
-        border: 3px solid #e5e7eb;
-        border-top-color: #3b82f6;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-      }
-
-      &-text {
-        margin-top: 1rem;
-        font-size: 0.875rem;
-        color: #6b7280;
-      }
-    }
   }
 
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
 </style>

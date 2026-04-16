@@ -144,6 +144,7 @@
 <script setup>
   import { computed, ref, watch } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
+  import { useRemoteComponentStore } from '@/stores/designer/remoteComponent'
   import { getComponentMeta, getRemoteComponentMetaList } from '@/constants/componentMeta'
   import PropConfig from '@/components/configs/PropConfig.vue'
   import BaseStyleConfig from '@/components/configs/BaseStyleConfig.vue'
@@ -155,6 +156,7 @@
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
   const schemaStore = useSchemaStore()
+  const remoteStore = useRemoteComponentStore()
 
   // ==================== 基础状态 ====================
   /** 当前激活的 tab */
@@ -280,9 +282,18 @@
 
     const isRemote =
       selectedComponent.value.type?.startsWith('remote-') || selectedComponent.value.isRemote
+
     if (isRemote) {
-      const remoteMetaList = getRemoteComponentMetaList()
-      return remoteMetaList.find(m => m.type === selectedComponent.value.type)
+      const remoteMeta = remoteStore.enabledComponentMetaList.find(
+        m =>
+          m.type === selectedComponent.value.type ||
+          m.remoteConfig?.id == selectedComponent.value.remoteConfig?.id
+      )
+      if (remoteMeta) return remoteMeta
+
+      // 旧架构（localStorage）
+      const legacyMetaList = getRemoteComponentMetaList()
+      return legacyMetaList.find(m => m.type === selectedComponent.value.type)
     }
 
     return getComponentMeta(selectedComponent.value.type)
@@ -307,8 +318,14 @@
 
     const isRemote = parent.type?.startsWith('remote-') || parent.isRemote
     if (isRemote) {
-      const remoteMetaList = getRemoteComponentMetaList()
-      return remoteMetaList.find(m => m.type === parent.type)
+      const remoteMeta = remoteStore.enabledComponentMetaList.find(
+        m => m.type === parent.type || m.remoteConfig?.id == parent.remoteConfig?.id
+      )
+      if (remoteMeta) return remoteMeta
+
+      // 旧架构
+      const legacyMetaList = getRemoteComponentMetaList()
+      return legacyMetaList.find(m => m.type === parent.type)
     }
 
     return getComponentMeta(parent.type)

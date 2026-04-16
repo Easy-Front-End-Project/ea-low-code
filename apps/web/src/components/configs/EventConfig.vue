@@ -78,8 +78,23 @@
                     class="w-full"
                     @change="handleEventTypeChange"
                   >
+                    <!-- 常用自定义事件 -->
+                    <ea-option-group label="常用事件">
+                      <ea-option value="custom">自定义...</ea-option>
+                    </ea-option-group>
+
+                    <ea-option-group v-if="componentCustomEvents.length > 0" label="组件自定义事件">
+                      <ea-option
+                        v-for="event in componentCustomEvents"
+                        :key="event.name"
+                        :value="event.name"
+                      >
+                        {{ event.label || event.name }}
+                      </ea-option>
+                    </ea-option-group>
+
                     <!-- 组件预定义事件 -->
-                    <ea-option-group label="组件事件">
+                    <ea-option-group label="常用事件">
                       <ea-option
                         v-for="event in availableEvents"
                         :key="event.name"
@@ -87,10 +102,6 @@
                       >
                         {{ event.label }} ({{ event.name }})
                       </ea-option>
-                    </ea-option-group>
-                    <!-- 常用自定义事件 -->
-                    <ea-option-group label="常用事件">
-                      <ea-option value="custom">自定义...</ea-option>
                     </ea-option-group>
                   </EaSelect>
                 </div>
@@ -237,16 +248,15 @@
     { name: 'error', label: '错误' },
   ]
 
-  // 可用事件列表
+  // 系统预定义的通用事件（不包含组件自定义事件）
   const availableEvents = computed(() => {
-    const predefinedEvents = props.events || []
-    const allEvents = [...predefinedEvents]
-    commonCustomEvents.forEach(event => {
-      if (!allEvents.find(e => e.name === event.name)) {
-        allEvents.push(event)
-      }
-    })
-    return allEvents
+    return [...commonCustomEvents]
+  })
+
+  // 组件自定义事件
+  const componentCustomEvents = computed(() => {
+    const customEvents = props.events || []
+    return customEvents.filter(event => !commonCustomEvents.find(e => e.name === event.name))
   })
 
   // 弹框显示状态
@@ -258,7 +268,13 @@
 
   // 检查是否是预定义事件
   function isPredefinedEvent(eventType) {
-    return availableEvents.value.some(e => e.name === eventType)
+    if (!eventType) return false
+
+    const isSystemEvent = availableEvents.value.some(e => e.name === eventType)
+
+    const isComponentCustomEvent = componentCustomEvents.value.some(e => e.name === eventType)
+
+    return isSystemEvent || isComponentCustomEvent
   }
 
   // 创建默认动作配置

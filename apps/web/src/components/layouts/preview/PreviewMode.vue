@@ -35,10 +35,7 @@
           />
         </template>
         <!-- 加载占位 -->
-        <div v-else class="flex items-center justify-center h-full">
-          <div class="loading-spinner"></div>
-          <span class="ml-2 text-gray-500">加载中...</span>
-        </div>
+        <Loading v-else :loading="true" text="加载中..." />
       </div>
     </div>
   </div>
@@ -49,6 +46,7 @@
   import { useSchemaStore } from '@/stores/designer/schema'
   import PreviewComponent from '../../designer/PreviewComponent.vue'
   import { executeEvent } from '@/utils/eventExecutor'
+  import Loading from '@/components/common/Loading.vue'
 
   const schemaStore = useSchemaStore()
   const isReady = ref(false)
@@ -173,20 +171,5 @@
 
   .preview-canvas {
     position: relative;
-  }
-
-  .loading-spinner {
-    width: 24px;
-    height: 24px;
-    border: 2px solid #e5e7eb;
-    border-top-color: #3b82f6;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
   }
 </style>

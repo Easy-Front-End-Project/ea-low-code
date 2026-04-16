@@ -12,10 +12,7 @@
           <MonacoEditor v-model="jsonContent" language="json" height="100%" />
         </template>
         <template #fallback>
-          <div class="h-full flex flex-col items-center justify-center">
-            <div class="loading-spinner loading-spinner--small"></div>
-            <span class="mt-2 text-sm text-gray-400">加载编辑器...</span>
-          </div>
+          <Loading loading text="加载编辑器..." />
         </template>
       </Suspense>
     </div>
@@ -27,6 +24,7 @@
   import { useSchemaStore } from '@/stores/designer/schema'
   import { exportSchemaToJson, importSchemaFromJson } from '@/utils/schemaHelper'
   import MonacoEditor from '@/components/common/MonacoEditor.vue'
+  import Loading from '@/components/common/Loading.vue'
 
   const schemaStore = useSchemaStore()
   const fileInput = ref(null)
@@ -100,20 +98,5 @@
   .json-editor-content {
     flex: 1;
     overflow: hidden;
-  }
-
-  .loading-spinner {
-    width: 24px;
-    height: 24px;
-    border: 2px solid #e4e7ed;
-    border-top-color: #409eff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
   }
 </style>

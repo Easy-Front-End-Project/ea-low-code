@@ -1,4 +1,4 @@
-import { IsInt, IsOptional, IsString, MinLength, MaxLength } from 'class-validator';
+import { IsInt, IsOptional, IsObject, IsString, MinLength, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePageDto {
@@ -34,4 +34,9 @@ export class UpdatePageDto {
   @MaxLength(500)
   @IsString()
   description?: string;
+
+  @ApiProperty({ description: '页面 Schema（组件树 JSON）', required: false })
+  @IsOptional()
+  @IsObject()
+  schema?: Record<string, any>;
 }

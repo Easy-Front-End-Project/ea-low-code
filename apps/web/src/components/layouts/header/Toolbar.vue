@@ -1,84 +1,87 @@
 <template>
-  <div
-    class="designer-toolbar h-14 bg-white border-b border-gray-200 flex items-center justify-between"
-  >
-    <EaLogo />
+  <div class="designer-toolbar">
+    <ea-page-header icon="" @back="handleBack">
+      <EaLogo slot="content" />
 
-    <!-- 中间：操作按钮 -->
-    <div class="flex items-center gap-2">
-      <!-- <ea-button text @click="handleLoadExample" title="加载示例">
-        <span>示例</span>
-      </ea-button> -->
-    </div>
+      <div class="designer-toolbar__extra" slot="extra">
+        <ea-button text @click="handleShowVariables" title="变量" icon="database"> 变量 </ea-button>
+        <ea-button text @click="handleShowTree" title="大纲" icon="sitemap"> 大纲 </ea-button>
+        <!-- 保存状态提示 -->
+        <span v-if="saveStatus.lastSavedTime" class="designer-toolbar__save-hint">
+          {{ saveStatus.saveStatusText }}
+        </span>
+        <div class="designer-toolbar__divider"></div>
+        <ea-button type="primary" @click="handlePreview" title="预览" icon="eye"> 预览 </ea-button>
+      </div>
 
-    <!-- 右侧：变量、大纲和远程组件 -->
-    <div class="flex items-center gap-2">
-      <ea-button text @click="handleShowVariables" title="变量" icon="database"> 变量 </ea-button>
-      <ea-button text @click="handleShowTree" title="大纲" icon="sitemap">
-        <span>大纲</span>
-      </ea-button>
-      <ea-button text @click="handleShowRemoteConfig" title="远程组件" icon="cloud">
-        远程组件
-      </ea-button>
-      <div class="w-px h-6 bg-gray-300 mx-2"></div>
-      <ea-button type="primary" @click="handlePreview" title="预览" icon="eye"> 预览 </ea-button>
-    </div>
+      <!-- 组件大纲弹框 -->
+      <ComponentTree :visible="treeVisible" @close="treeVisible = false" />
 
-    <!-- 组件大纲弹框 -->
-    <ComponentTree :visible="treeVisible" @close="treeVisible = false" />
-
-    <!-- 变量管理弹框 -->
-    <VariableManager :visible="variableVisible" @close="variableVisible = false" />
-
-    <!-- 远程组件配置弹框 -->
-    <RemoteComponentManager :visible="remoteConfigVisible" @close="remoteConfigVisible = false" />
+      <!-- 变量管理弹框 -->
+      <VariableManager :visible="variableVisible" @close="variableVisible = false" />
+    </ea-page-header>
   </div>
 </template>
 
 <script setup>
   import { ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import { useSchemaStore } from '@/stores/designer/schema'
   import ComponentTree from '@/components/designer/ComponentTree.vue'
   import VariableManager from '@/components/designer/VariableManager.vue'
-  import RemoteComponentManager from '@/components/designer/RemoteComponentManager.vue'
   import EaLogo from '@/components/common/EaLogo.vue'
+  import { useSaveStatus } from '@/composables/useSaveStatus.js'
 
+  const router = useRouter()
   const schemaStore = useSchemaStore()
+  const saveStatus = useSaveStatus()
 
-  // 组件大纲弹框显示状态
   const treeVisible = ref(false)
-  // 变量管理弹框显示状态
   const variableVisible = ref(false)
-  // 远程组件配置弹框显示状态
-  const remoteConfigVisible = ref(false)
 
   defineOptions({
     name: 'DesignerToolbar',
   })
 
-  // 显示组件大纲
+  function handleBack() {
+    router.back()
+  }
+
   function handleShowTree() {
     treeVisible.value = true
   }
 
-  // 显示变量管理
   function handleShowVariables() {
     variableVisible.value = true
   }
 
-  // 显示远程组件配置
-  function handleShowRemoteConfig() {
-    remoteConfigVisible.value = true
-  }
-
-  // 预览
   function handlePreview() {
     schemaStore.setPreviewMode(true)
   }
 </script>
 
-<style scoped>
-  .designer-toolbar {
-    height: 100%;
+<style lang="scss" scoped>
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(designer-toolbar) {
+    &__extra {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    &__divider {
+      width: 1px;
+      height: 1.5rem;
+      background-color: var(--ea-border-light);
+      margin: 0 0.5rem;
+    }
+
+    &__save-hint {
+      font-size: 0.75rem;
+      color: #67c23a;
+      white-space: nowrap;
+      margin-left: 0.25rem;
+    }
   }
 </style>

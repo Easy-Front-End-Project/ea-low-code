@@ -31,6 +31,7 @@
           >
             <div v-show="!leftAsideCollapsed" class="designer-layout__panel-content">
               <ComponentPanel v-if="activeLeftPanel === 'components'" class="h-full" />
+              <RemoteComponentPanel v-else-if="activeLeftPanel === 'remote'" class="h-full" />
               <PageSettingsPanel v-else-if="activeLeftPanel === 'page'" class="h-full" />
               <JsonEditorPanel v-else-if="activeLeftPanel === 'json'" class="h-full" />
             </div>
@@ -62,10 +63,7 @@
                     <PropsPanel class="h-full w-full" />
                   </template>
                   <template #fallback>
-                    <div class="h-full flex flex-col items-center justify-center">
-                      <div class="loading-spinner loading-spinner--small"></div>
-                      <span class="mt-2 text-sm text-gray-400">加载属性面板...</span>
-                    </div>
+                    <Loading loading text="加载属性面板..." />
                   </template>
                 </Suspense>
               </keep-alive>
@@ -96,8 +94,10 @@
   import ComponentPanel from './panels/ComponentPanel.vue'
   import PageSettingsPanel from './panels/PageSettingsPanel.vue'
   import JsonEditorPanel from './panels/JsonEditorPanel.vue'
+  import RemoteComponentPanel from './panels/RemoteComponentPanel.vue'
   import CanvasArea from './canvas/CanvasArea.vue'
   import PreviewMode from './preview/PreviewMode.vue'
+  import Loading from '@/components/common/Loading.vue'
 
   const PropsPanel = defineAsyncComponent(() => import('./props/PropsPanel.vue'))
 
@@ -110,6 +110,7 @@
 
   const leftPanelItems = [
     { key: 'components', label: '组件', title: '组件库' },
+    { key: 'remote', label: '远程', title: '远程组件' },
     { key: 'page', label: '页面', title: '页面设置' },
     { key: 'json', label: 'JSON', title: 'JSON 编辑' },
   ]
@@ -230,27 +231,6 @@
     &__props {
       background-color: #fff;
       border-left: 1px solid #e5e7eb;
-    }
-  }
-
-  .loading-spinner {
-    width: 32px;
-    height: 32px;
-    border: 2px solid #e4e7ed;
-    border-top-color: #409eff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-
-    &--small {
-      width: 24px;
-      height: 24px;
-      border-width: 2px;
-    }
-  }
-
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
     }
   }
 

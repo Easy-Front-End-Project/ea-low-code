@@ -7,12 +7,11 @@
 
       <div v-else class="page-preview-view__content">
         <component :is="'style'" v-if="pageCustomCSS">{{ pageCustomCSS }}</component>
-        <template v-if="isReady">
-          <PreviewComponent v-for="comp in components" :key="comp.id" :component="comp" />
-        </template>
-        <div v-else class="page-preview-view__loading-hint">
-          <div class="page-preview-view__spinner"></div>
-          <span>渲染预览中...</span>
+        <div class="page-preview-view__canvas" :style="canvasStyle">
+          <template v-if="isReady">
+            <PreviewComponent v-for="comp in components" :key="comp.id" :component="comp" />
+          </template>
+          <Loading v-else :loading="true" text="渲染预览中..." />
         </div>
       </div>
     </Loading>
@@ -20,12 +19,13 @@
 </template>
 
 <script setup>
-  import { ref, computed, onMounted, nextTick } from 'vue'
+  import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
   import { useRoute } from 'vue-router'
   import { useSchemaStore } from '@/stores/designer/schema'
   import { getPageDetail } from '@/api/projects.js'
   import PreviewComponent from '@/components/designer/PreviewComponent.vue'
   import Loading from '@/components/common/Loading.vue'
+  import { executeEvent } from '@/utils/eventExecutor'
 
   const route = useRoute()
   const schemaStore = useSchemaStore()
@@ -35,9 +35,27 @@
   const isReady = ref(false)
 
   const components = computed(() => schemaStore.components)
-  const pageCustomCSS = computed(() => {
-    const settings = schemaStore.pageSchema?.settings || {}
-    return settings.customCSS || ''
+
+  // 页面设置 - 与 PreviewMode 保持一致
+  const pageSettings = computed(() => schemaStore.pageSchema.settings || {})
+  const pageStyle = computed(() => pageSettings.value.style || {})
+  const pageCustomCSS = computed(() => pageSettings.value.customCSS || '')
+  const pageEvents = computed(() => pageSettings.value.events || [])
+
+  // 画布样式 - 与 PreviewMode 保持一致
+  const canvasStyle = computed(() => {
+    const { viewport } = schemaStore.pageSchema.meta || {}
+    const hasViewport = viewport?.width && viewport?.height
+    return {
+      width: hasViewport ? `${viewport.width}px` : '100%',
+      height: hasViewport ? `${viewport.height}px` : '100%',
+      minWidth: hasViewport ? '800px' : 'auto',
+      minHeight: hasViewport ? '600px' : 'auto',
+      maxWidth: '100%',
+      maxHeight: '100%',
+      overflow: viewport?.overflow || 'auto',
+      ...pageStyle.value,
+    }
   })
 
   onMounted(async () => {
@@ -59,6 +77,7 @@
       const data = await getPageDetail(pageId)
       if (!data?.schema) {
         loadError.value = '该页面暂无内容，请先在设计器中进行编辑'
+        loading.value = false
         return
       }
 
@@ -81,8 +100,9 @@
     }
   }
 
+  // 延迟就绪逻辑 - 与 PreviewMode 保持一致
   function scheduleReady() {
-    const minDelay = 500
+    const minDelay = 2000
     const startTime = Date.now()
 
     const setReady = () => {
@@ -90,6 +110,7 @@
       setTimeout(
         () => {
           isReady.value = true
+          bindPageEvents()
         },
         Math.max(0, minDelay - elapsed)
       )
@@ -101,6 +122,37 @@
       setReady()
     }
   }
+
+  // 页面事件处理 - 与 PreviewMode 保持一致
+  const eventHandlers = new Map()
+
+  function createEventHandler(eventConfig) {
+    return async event => {
+      await executeEvent(eventConfig, event)
+    }
+  }
+
+  function bindPageEvents() {
+    unbindPageEvents()
+    pageEvents.value.forEach(eventConfig => {
+      const eventType = eventConfig.eventType
+      if (!eventType) return
+      const handler = createEventHandler(eventConfig)
+      eventHandlers.set(eventType, handler)
+      window.addEventListener(eventType, handler)
+    })
+  }
+
+  function unbindPageEvents() {
+    eventHandlers.forEach((handler, eventType) => {
+      window.removeEventListener(eventType, handler)
+    })
+    eventHandlers.clear()
+  }
+
+  onUnmounted(() => {
+    unbindPageEvents()
+  })
 </script>
 
 <style lang="scss" scoped>
@@ -108,7 +160,7 @@
 
   @include b(page-preview-view) {
     height: 100vh;
-    background-color: #f5f5f5;
+    background-color: #f5f7fa;
 
     &__error {
       display: flex;
@@ -126,30 +178,12 @@
       overflow: auto;
     }
 
-    &__loading-hint {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: calc(100vh - 48px);
-      gap: 12px;
-      color: var(--ea-text-secondary);
-      font-size: 14px;
-    }
-
-    &__spinner {
-      width: 32px;
-      height: 32px;
-      border: 3px solid var(--ea-border-light);
-      border-top-color: var(--ea-primary);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-  }
-
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
+    &__canvas {
+      background-color: #fff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
     }
   }
 </style>

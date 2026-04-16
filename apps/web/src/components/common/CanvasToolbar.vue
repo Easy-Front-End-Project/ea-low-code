@@ -17,14 +17,72 @@
     >
     </ea-button>
     <div class="toolbar-divider"></div>
+
+    <!-- 保存按钮 -->
+    <ea-button
+      text
+      type="primary"
+      :loading="saveStatus.isSaving"
+      :disabled="!currentPageId || saveStatus.isSaving"
+      @click="handleSave"
+      title="保存 (Ctrl+S)"
+      icon="floppy-disk"
+    >
+      保存
+    </ea-button>
+
+    <div class="toolbar-divider"></div>
     <ea-button text @click="handleClear" title="清空" icon="trash-can"> </ea-button>
   </div>
 </template>
 
 <script setup>
+  import { computed, onMounted, onBeforeUnmount } from 'vue'
   import { useSchemaStore } from '@/stores/designer/schema'
+  import { usePagesStore } from '@/stores/pages'
+  import { useRoute } from 'vue-router'
+  import { useSaveStatus } from '@/composables/useSaveStatus.js'
 
   const schemaStore = useSchemaStore()
+  const pagesStore = usePagesStore()
+  const route = useRoute()
+  const saveStatus = useSaveStatus()
+
+  const currentPageId = computed(() => route.params.id)
+
+  async function handleSave() {
+    if (!currentPageId.value || saveStatus.isSaving.value) return
+
+    saveStatus.setSaving(true)
+    try {
+      const schema = schemaStore.exportSchema()
+      await pagesStore.updatePage({
+        id: Number(currentPageId.value),
+        schema,
+      })
+      saveStatus.markSaved()
+      window.$message?.success('保存成功')
+    } catch (error) {
+      window.$message?.error('保存失败: ' + (error.message || '未知错误'))
+    } finally {
+      saveStatus.setSaving(false)
+    }
+  }
+
+  function handleKeyDown(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault()
+      handleSave()
+    }
+  }
+
+  onMounted(() => {
+    window.addEventListener('keydown', handleKeyDown)
+  })
+
+  onBeforeUnmount(() => {
+    window.removeEventListener('keydown', handleKeyDown)
+  })
 
   function handleUndo() {
     schemaStore.undo()
