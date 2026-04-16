@@ -14,7 +14,13 @@
         <div class="config-item-row">
           <EaInput v-model="item.name" placeholder="插槽名 (如: default)" size="small" />
           <EaInput v-model="item.label" placeholder="显示名称 (如: 默认插槽)" size="small" />
-          <ea-button type="danger" text size="small" icon="trash-can" @click="$emit('remove', index)" />
+          <ea-button
+            type="danger"
+            text
+            size="small"
+            icon="trash-can"
+            @click="$emit('remove', index)"
+          />
         </div>
         <EaInput v-model="item.description" placeholder="插槽描述" size="small" />
       </div>
@@ -23,16 +29,16 @@
 </template>
 
 <script setup>
-import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
+  import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
-defineProps({
-  slots: {
-    type: Array,
-    default: () => [],
-  },
-})
+  defineProps({
+    slots: {
+      type: Array,
+      default: () => [],
+    },
+  })
 
-defineEmits(['add', 'remove'])
+  defineEmits(['add', 'remove'])
 </script>
 
 <style lang="scss" scoped>

@@ -14,6 +14,7 @@ import { PagesService } from './pages.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { DeleteProjectDto } from './dto/delete-project.dto';
+import { DeletePageDto } from './dto/delete-page.dto';
 import { CreatePageDto, UpdatePageDto } from './dto/page.dto';
 
 @ApiTags('项目管理')
@@ -48,6 +49,16 @@ export class PagesController {
   ) {
     const userId = req.user.userId;
     return await this.pagesService.findProjectPages(projectId, userId);
+  }
+
+  @Get('page-detail')
+  @ApiOperation({ summary: '获取页面详情（含 Schema）' })
+  async findPageDetail(
+    @Query('id', ParseIntPipe) id: number,
+    @NestRequest() req: any,
+  ) {
+    const userId = req.user.userId;
+    return await this.pagesService.findPageDetail(id, userId);
   }
 
   @Post('create')
@@ -109,5 +120,25 @@ export class PagesController {
   ) {
     const userId = req.user.userId;
     return await this.pagesService.clone(deleteProjectDto.id, userId);
+  }
+
+  @Post('page-delete')
+  @ApiOperation({ summary: '删除页面' })
+  async removePage(
+    @Body() deletePageDto: DeletePageDto,
+    @NestRequest() req: any,
+  ) {
+    const userId = req.user.userId;
+    return await this.pagesService.removePage(deletePageDto.id, userId);
+  }
+
+  @Post('page-clone')
+  @ApiOperation({ summary: '复制页面' })
+  async clonePage(
+    @Body() deletePageDto: DeletePageDto,
+    @NestRequest() req: any,
+  ) {
+    const userId = req.user.userId;
+    return await this.pagesService.clonePage(deletePageDto.id, userId);
   }
 }

@@ -2,15 +2,7 @@
   <div
     class="designer-toolbar h-14 bg-white border-b border-gray-200 flex items-center justify-between"
   >
-    <!-- 左侧：项目名称和Logo -->
-    <div class="flex items-center gap-3">
-      <div
-        class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold"
-      >
-        EA
-      </div>
-      <span class="text-lg font-semibold text-gray-800">低代码设计器</span>
-    </div>
+    <EaLogo />
 
     <!-- 中间：操作按钮 -->
     <div class="flex items-center gap-2">
@@ -49,6 +41,7 @@
   import ComponentTree from '@/components/designer/ComponentTree.vue'
   import VariableManager from '@/components/designer/VariableManager.vue'
   import RemoteComponentManager from '@/components/designer/RemoteComponentManager.vue'
+  import EaLogo from '@/components/common/EaLogo.vue'
 
   const schemaStore = useSchemaStore()
 

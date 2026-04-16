@@ -37,76 +37,76 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
-import { createPage } from '@/api/projects.js'
+  import { ref, computed, watch } from 'vue'
+  import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
+  import { usePagesStore } from '@/stores/pages.js'
 
-const props = defineProps({
-  visible: {
-    type: Boolean,
-    default: false,
-  },
-  projectId: {
-    type: [Number, String],
-    default: null,
-  },
-})
+  const props = defineProps({
+    visible: {
+      type: Boolean,
+      default: false,
+    },
+    projectId: {
+      type: [Number, String],
+      default: null,
+    },
+  })
 
-const emit = defineEmits(['update:visible', 'success'])
+  const emit = defineEmits(['update:visible'])
+  const pagesStore = usePagesStore()
 
-const loading = ref(false)
+  const loading = ref(false)
 
-const form = ref({
-  name: '',
-  description: '',
-})
-
-const canSubmit = computed(() => !!form.value.name.trim())
-
-function resetForm() {
-  form.value = {
+  const form = ref({
     name: '',
     description: '',
-  }
-}
+  })
 
-function handleVisibleChange(val) {
-  emit('update:visible', val)
-}
+  const canSubmit = computed(() => !!form.value.name.trim())
 
-function handleClose() {
-  emit('update:visible', false)
-  resetForm()
-}
-
-async function handleSubmit() {
-  if (!canSubmit.value || !props.projectId) return
-
-  loading.value = true
-  try {
-    await createPage({
-      projectId: Number(props.projectId),
-      name: form.value.name.trim(),
-      description: form.value.description,
-    })
-    window.$message?.success('创建成功')
-    emit('success')
-    handleClose()
-  } catch (error) {
-    window.$message?.error(error.message || '创建失败')
-  } finally {
-    loading.value = false
-  }
-}
-
-watch(
-  () => props.visible,
-  val => {
-    if (val) {
-      resetForm()
+  function resetForm() {
+    form.value = {
+      name: '',
+      description: '',
     }
   }
-)
+
+  function handleVisibleChange(val) {
+    emit('update:visible', val)
+  }
+
+  function handleClose() {
+    emit('update:visible', false)
+    resetForm()
+  }
+
+  async function handleSubmit() {
+    if (!canSubmit.value || !props.projectId) return
+
+    loading.value = true
+    try {
+      await pagesStore.createPage({
+        projectId: Number(props.projectId),
+        name: form.value.name.trim(),
+        description: form.value.description,
+      })
+      window.$message?.success('创建成功')
+      handleClose()
+    } catch (error) {
+      window.$message?.error(error.message || '创建失败')
+    } finally {
+      loading.value = false
+    }
+  }
+
+  watch(
+    () => props.visible,
+    val => {
+      if (val) {
+        resetForm()
+      }
+    }
+  )
 </script>
 
 <style lang="scss" scoped>

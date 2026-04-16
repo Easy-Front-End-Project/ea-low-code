@@ -24,14 +24,15 @@
           </EaSelect>
         </div>
         <div class="config-item-row">
-          <EaInput
-            v-model="item.defaultValue"
-            placeholder="默认值"
-            size="small"
-            class="flex-2"
-          />
+          <EaInput v-model="item.defaultValue" placeholder="默认值" size="small" class="flex-2" />
           <EaSwitch v-model="item.required" size="small" active-text="必填" />
-          <ea-button type="danger" text size="small" icon="trash-can" @click="$emit('remove', index)" />
+          <ea-button
+            type="danger"
+            text
+            size="small"
+            icon="trash-can"
+            @click="$emit('remove', index)"
+          />
         </div>
       </div>
     </div>
@@ -39,18 +40,18 @@
 </template>
 
 <script setup>
-import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
-import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
-import EaSwitch from '@/components/ea-ui-wrap/EaSwitch.vue'
+  import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
+  import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
+  import EaSwitch from '@/components/ea-ui-wrap/EaSwitch.vue'
 
-defineProps({
-  props: {
-    type: Array,
-    default: () => [],
-  },
-})
+  defineProps({
+    props: {
+      type: Array,
+      default: () => [],
+    },
+  })
 
-defineEmits(['add', 'remove'])
+  defineEmits(['add', 'remove'])
 </script>
 
 <style lang="scss" scoped>

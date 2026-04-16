@@ -13,8 +13,7 @@
           @select="handleMenuSelect"
         >
           <ea-menu-item index="home" class="mr-a">
-            <ea-icon name="layer-group" size="24" color="#409eff"></ea-icon>
-            <span class="project-layout__logo-text">EA-LowCode</span>
+            <EaLogo />
           </ea-menu-item>
           <ea-menu-item index="projects">
             <ea-icon name="folder-open" size="16"></ea-icon>
@@ -24,10 +23,15 @@
             <ea-icon name="cubes" size="16"></ea-icon>
             <span>组件库</span>
           </ea-menu-item>
-          <ea-menu-item index="templates">
+          <ea-menu-item index="datasources">
+            <ea-icon name="database" size="16"></ea-icon>
+            <span>数据源管理</span>
+          </ea-menu-item>
+          <!-- <ea-menu-item index="templates">
             <ea-icon name="clipboard" size="16"></ea-icon>
             <span>模板中心</span>
-          </ea-menu-item>
+          </ea-menu-item> -->
+
           <ea-menu-item index="cloud">
             <ea-icon name="cloud" size="16"></ea-icon>
             <span>图片云</span>
@@ -35,7 +39,9 @@
           <ea-menu-item index="profile">
             <div class="user-info">
               <ea-avatar size="small">{{ avatarText }}</ea-avatar>
-              <span class="user-name">{{ userStore.user?.nickname || userStore.user?.username || '-' }}</span>
+              <span class="user-name"
+                >{{ userStore.user?.nickname || userStore.user?.username || '-' }}</span
+              >
             </div>
           </ea-menu-item>
           <ea-menu-item index="logout">
@@ -57,6 +63,7 @@
   import { ref, computed } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useUserStore } from '@/stores/user.js'
+  import EaLogo from '@/components/common/EaLogo.vue'
 
   const route = useRoute()
   const router = useRouter()
@@ -67,6 +74,7 @@
       '/': 'home',
       '/projects': 'projects',
       '/components': 'components',
+      '/datasources': 'datasources',
       '/templates': 'templates',
       '/cloud': 'cloud',
       '/profile': 'profile',
@@ -75,6 +83,7 @@
     if (exactMatch) return exactMatch
 
     if (route.path.startsWith('/components')) return 'components'
+    if (route.path.startsWith('/datasources')) return 'datasources'
     if (route.path.startsWith('/projects')) return 'projects'
     if (route.path.startsWith('/templates')) return 'templates'
     if (route.path.startsWith('/cloud')) return 'cloud'
@@ -103,15 +112,18 @@
       home: '/',
       projects: '/projects',
       components: '/components',
+      datasources: '/datasources',
       templates: '/templates',
       cloud: '/cloud',
-      profile: 'profile'
+      profile: 'profile',
+    }
+
+    if (index === 'projects' && route.params.id) {
+      return
     }
 
     router.push(routeMap[index] || '/')
   }
-
-
 </script>
 
 <style lang="scss" scoped>
@@ -121,8 +133,8 @@
     width: 100%;
 
     &::part(container) {
-    padding: 0;
-  }
+      padding: 0;
+    }
   }
 
   ea-dropdown-menu {

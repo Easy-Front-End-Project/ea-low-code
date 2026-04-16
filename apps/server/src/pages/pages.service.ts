@@ -12,7 +12,7 @@ export class PagesService {
     @InjectRepository(Project)
     private projectRepository: Repository<Project>,
     @InjectRepository(PageSchema)
-    private pageSchemaRepository: Repository<PageSchema>,
+    private pageSchemaRepository: Repository<PageSchema>
   ) {}
 
   async findAll(userId: number, query: any) {
@@ -91,7 +91,7 @@ export class PagesService {
     });
 
     return {
-      list: pages.map(page => ({
+      list: pages.map((page) => ({
         id: page.id,
         name: page.name,
         description: page.description || null,
@@ -102,6 +102,32 @@ export class PagesService {
         updatedAt: page.updatedAt,
       })),
       total: pages.length,
+    };
+  }
+
+  async findPageDetail(pageId: number, userId: number) {
+    const page = await this.pageSchemaRepository.findOne({
+      where: { id: pageId },
+      relations: ['project'],
+    });
+
+    if (!page) {
+      throw new NotFoundException('页面不存在');
+    }
+
+    if (page.project.userId !== userId) {
+      throw new NotFoundException('无权访问此页面');
+    }
+
+    return {
+      id: page.id,
+      name: page.name,
+      description: page.description || null,
+      projectId: page.projectId,
+      schema: page.schema,
+      sortOrder: page.sortOrder,
+      createdAt: page.createdAt,
+      updatedAt: page.updatedAt,
     };
   }
 
@@ -144,7 +170,9 @@ export class PagesService {
     const maxSortOrder = await this.pageSchemaRepository
       .createQueryBuilder('ps')
       .select('MAX(ps.sortOrder)', 'maxSort')
-      .where('ps.projectId = :projectId', { projectId: createPageDto.projectId })
+      .where('ps.projectId = :projectId', {
+        projectId: createPageDto.projectId,
+      })
       .getRawOne();
 
     const page = this.pageSchemaRepository.create({
@@ -213,12 +241,54 @@ export class PagesService {
           schema: JSON.parse(JSON.stringify(page.schema)),
           sortOrder: page.sortOrder,
           projectId: savedProject.id,
-        }),
+        })
       );
 
       await this.pageSchemaRepository.save(newPages);
     }
 
     return savedProject;
+  }
+
+  async removePage(pageId: number, userId: number) {
+    const page = await this.pageSchemaRepository.findOne({
+      where: { id: pageId },
+    });
+    if (!page) {
+      throw new Error('页面不存在');
+    }
+    const project = await this.projectRepository.findOne({
+      where: { id: page.projectId, userId },
+    });
+    if (!project) {
+      throw new Error('无权限操作此页面');
+    }
+    await this.pageSchemaRepository.remove(page);
+    return { success: true, message: '页面删除成功' };
+  }
+
+  async clonePage(pageId: number, userId: number) {
+    const source = await this.pageSchemaRepository.findOne({
+      where: { id: pageId },
+    });
+    if (!source) {
+      throw new Error('源页面不存在');
+    }
+    const project = await this.projectRepository.findOne({
+      where: { id: source.projectId, userId },
+    });
+    if (!project) {
+      throw new Error('无权限操作此页面');
+    }
+
+    const clonedPage = this.pageSchemaRepository.create({
+      name: `${source.name} (副本)`,
+      description: source.description,
+      schema: source.schema ? JSON.parse(JSON.stringify(source.schema)) : null,
+      sortOrder: 0,
+      projectId: project.id,
+    });
+
+    return await this.pageSchemaRepository.save(clonedPage);
   }
 }

@@ -128,21 +128,10 @@
           </ea-tab-panel>
 
           <!-- 创建页面弹窗 -->
-          <CreatePageDialog
-            v-model:visible="showCreatePageDialog"
-            :project-id="route.params.id"
-            @success="handlePagesRefresh"
-          />
-
-          <!-- 预览页面抽屉 -->
-          <PagePreviewDialog v-model:visible="showPreviewDialog" :page-id="previewPageId" />
+          <CreatePageDialog v-model:visible="showCreatePageDialog" :project-id="route.params.id" />
 
           <!-- 编辑页面弹窗 -->
-          <EditPageDialog
-            v-model:visible="showEditDialog"
-            :page="editingPage"
-            @success="handlePagesRefresh"
-          />
+          <EditPageDialog v-model:visible="showEditDialog" :page="editingPage" />
         </ea-tabs>
       </Loading>
     </div>
@@ -159,7 +148,6 @@
   import PageCard from '@/components/pages/PageCard.vue'
   import CreatePageDialog from '@/components/pages/CreatePageDialog.vue'
   import EditPageDialog from '@/components/pages/EditPageDialog.vue'
-  import PagePreviewDialog from '@/components/pages/PagePreviewDialog.vue'
   import { usePagesStore } from '@/stores/pages.js'
 
   const route = useRoute()
@@ -172,8 +160,6 @@
   const loadError = ref('')
   const projectNotFound = ref(false)
   const showCreatePageDialog = ref(false)
-  const showPreviewDialog = ref(false)
-  const previewPageId = ref(null)
   const showEditDialog = ref(false)
   const editingPage = ref(null)
 
@@ -207,8 +193,6 @@
       if (newId) {
         pagesStore.reset()
         showCreatePageDialog.value = false
-        showPreviewDialog.value = false
-        previewPageId.value = null
         showEditDialog.value = false
         editingPage.value = null
 
@@ -253,8 +237,11 @@
   }
 
   async function loadPagesData(projectId) {
+    const id = Number(projectId)
+    if (!id || isNaN(id)) return
+
     try {
-      await pagesStore.fetchPages(projectId)
+      await pagesStore.fetchPages(id)
     } catch (error) {
       window.$message?.error('加载页面列表失败')
     }
@@ -293,25 +280,27 @@
 
   async function handleClonePage(page) {
     try {
-      window.$message?.info('复制功能开发中...')
+      await pagesStore.clonePage(page.id)
+      window.$message?.success(`页面「${page.name || page.id}」复制成功`)
     } catch (error) {
       window.$message?.error(error.message || '复制失败')
     }
   }
 
   async function handleDeletePage(page) {
-    if (!confirm(`确定要删除页面「${page.name || page.id}」吗？`)) return
+    if (!confirm(`确定要删除页面「${page.name || page.id}」吗？此操作不可恢复。`)) return
 
     try {
-      window.$message?.info('删除功能开发中...')
+      await pagesStore.removePage(page.id)
+      window.$message?.success('页面已删除')
     } catch (error) {
       window.$message?.error(error.message || '删除失败')
     }
   }
 
   function handlePreviewPage(page) {
-    previewPageId.value = page.id
-    showPreviewDialog.value = true
+    const url = router.resolve({ name: 'preview', params: { pageId: page.id } }).href
+    window.open(url, '_blank')
   }
 
   async function handleSave() {

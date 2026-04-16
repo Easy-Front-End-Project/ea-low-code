@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { getProjectPages } from '@/api/projects.js'
+import { getProjectPages, createPage, updatePage, deletePage, clonePage } from '@/api/projects.js'
 
 export const usePagesStore = defineStore('pages', () => {
   const pages = ref([])
@@ -13,24 +13,6 @@ export const usePagesStore = defineStore('pages', () => {
 
   const hasPages = computed(() => pages.value.length > 0)
   const pageCount = computed(() => Math.ceil(total.value / pageSize.value))
-
-  async function fetchPages(projectId) {
-    loading.value = true
-    currentProjectId.value = projectId
-
-    try {
-      const res = await getProjectPages(projectId)
-      pages.value = res.list || []
-      total.value = res.total || 0
-    } catch (error) {
-      console.error('获取页面列表失败:', error)
-      pages.value = []
-      total.value = 0
-      throw error
-    } finally {
-      loading.value = false
-    }
-  }
 
   function setPage(page) {
     currentPage.value = page
@@ -55,6 +37,53 @@ export const usePagesStore = defineStore('pages', () => {
     currentProjectId.value = null
   }
 
+  async function fetchPages(projectId) {
+    loading.value = true
+    currentProjectId.value = projectId
+
+    try {
+      const res = await getProjectPages(projectId)
+      pages.value = res.list || []
+      total.value = res.total || 0
+    } catch (error) {
+      console.error('获取页面列表失败:', error)
+      pages.value = []
+      total.value = 0
+      throw error
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function createPageAction(data) {
+    await createPage(data)
+    if (currentProjectId.value) {
+      await fetchPages(currentProjectId.value)
+    }
+  }
+
+  async function updatePageAction(data) {
+    await updatePage(data)
+    if (currentProjectId.value) {
+      await fetchPages(currentProjectId.value)
+    }
+  }
+
+  async function removePage(pageId) {
+    await deletePage(pageId)
+    if (currentProjectId.value) {
+      await fetchPages(currentProjectId.value)
+    }
+  }
+
+  async function clonePageAction(pageId) {
+    const result = await clonePage(pageId)
+    if (currentProjectId.value) {
+      await fetchPages(currentProjectId.value)
+    }
+    return result
+  }
+
   return {
     pages,
     loading,
@@ -66,9 +95,13 @@ export const usePagesStore = defineStore('pages', () => {
     hasPages,
     pageCount,
     fetchPages,
+    createPage: createPageAction,
+    updatePage: updatePageAction,
     setPage,
     setPageSize,
     setKeyword,
     reset,
+    removePage,
+    clonePage: clonePageAction,
   }
 })

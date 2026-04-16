@@ -12,6 +12,8 @@ import ProjectSettingsView from '@/views/ProjectSettingsView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import ComponentsView from '@/views/ComponentsView.vue'
 import ComponentSettingsView from '@/views/ComponentSettingsView.vue'
+import DataSourceView from '@/views/DataSourceView.vue'
+import PagePreviewView from '@/views/PagePreviewView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -25,46 +27,61 @@ const router = createRouter({
           path: '',
           name: 'dashboard',
           component: DashboardView,
+          meta: { title: '工作台' },
         },
         {
           path: 'projects',
           name: 'projects',
           component: ProjectView,
+          meta: { title: '我的项目' },
         },
         {
           path: 'components',
           name: 'components',
           component: ComponentsView,
+          meta: { title: '组件库' },
         },
         {
           path: 'components/create',
           name: 'component-settings',
           component: ComponentSettingsView,
+          meta: { title: '新建组件' },
         },
         {
           path: 'components/:id',
           name: 'component-settings',
           component: ComponentSettingsView,
+          meta: { title: '组件设置' },
+        },
+        {
+          path: 'datasources',
+          name: 'datasources',
+          component: DataSourceView,
+          meta: { title: '数据源管理' },
         },
         {
           path: 'templates',
           name: 'templates',
           component: PlaceholderView,
+          meta: { title: '模板市场' },
         },
         {
           path: 'cloud',
           name: 'cloud',
           component: CloudView,
+          meta: { title: '云端' },
         },
         {
           path: 'projects/:id/settings',
           name: 'project-settings',
           component: ProjectSettingsView,
+          meta: { title: '项目设置' },
         },
         {
           path: 'profile',
           name: 'profile',
           component: ProfileView,
+          meta: { title: '个人中心' },
         },
       ],
     },
@@ -72,13 +89,19 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: LoginView,
-      meta: { requiresAuth: false },
+      meta: { requiresAuth: false, title: '登录' },
     },
     {
       path: '/designer/:id?',
       name: 'designer',
       component: DesignerView,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, title: '设计器' },
+    },
+    {
+      path: '/preview/:pageId',
+      name: 'preview',
+      component: PagePreviewView,
+      meta: { requiresAuth: true, title: '页面预览' },
     },
   ],
 })
@@ -112,6 +135,13 @@ router.beforeEach(async (to, from) => {
   }
 
   return true
+})
+
+const DEFAULT_TITLE = 'Easy Weave'
+
+router.afterEach((to) => {
+  const title = to.meta?.title
+  document.title = title ? `${DEFAULT_TITLE} | ${title}` : DEFAULT_TITLE
 })
 
 export default router

@@ -13,7 +13,13 @@
           名称
           <span class="edit-page-dialog__required">*</span>
         </label>
-        <EaInput v-model="form.name" placeholder="请输入名称" clearable show-word-limit :maxlength="15"></EaInput>
+        <EaInput
+          v-model="form.name"
+          placeholder="请输入名称"
+          clearable
+          show-word-limit
+          :maxlength="15"
+        ></EaInput>
       </div>
 
       <div class="edit-page-dialog__form-item">
@@ -39,95 +45,95 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
-import { updatePage } from '@/api/projects.js'
+  import { ref, computed, watch } from 'vue'
+  import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
+  import { usePagesStore } from '@/stores/pages.js'
 
-const props = defineProps({
-  visible: {
-    type: Boolean,
-    default: false,
-  },
-  page: {
-    type: Object,
-    default: null,
-  },
-})
+  const props = defineProps({
+    visible: {
+      type: Boolean,
+      default: false,
+    },
+    page: {
+      type: Object,
+      default: null,
+    },
+  })
 
-const emit = defineEmits(['update:visible', 'success'])
+  const emit = defineEmits(['update:visible'])
+  const pagesStore = usePagesStore()
 
-const loading = ref(false)
+  const loading = ref(false)
 
-const form = ref({
-  name: '',
-  description: '',
-})
-
-const canSubmit = computed(() => !!form.value.name.trim())
-
-function resetForm() {
-  form.value = {
+  const form = ref({
     name: '',
     description: '',
-  }
-}
+  })
 
-function initForm() {
-  if (props.page) {
+  const canSubmit = computed(() => !!form.value.name.trim())
+
+  function resetForm() {
     form.value = {
-      name: props.page.name || '',
-      description: props.page.description || '',
+      name: '',
+      description: '',
     }
   }
-}
 
-function handleVisibleChange(val) {
-  emit('update:visible', val)
-}
-
-function handleClose() {
-  emit('update:visible', false)
-  resetForm()
-}
-
-async function handleSubmit() {
-  if (!canSubmit.value || !props.page?.id) return
-
-  loading.value = true
-  try {
-    await updatePage({
-      id: props.page.id,
-      name: form.value.name.trim(),
-      description: form.value.description,
-    })
-    window.$message?.success('更新成功')
-    emit('success')
-    handleClose()
-  } catch (error) {
-    window.$message?.error(error.message || '更新失败')
-  } finally {
-    loading.value = false
-  }
-}
-
-watch(
-  () => props.visible,
-  val => {
-    if (val) {
-      initForm()
+  function initForm() {
+    if (props.page) {
+      form.value = {
+        name: props.page.name || '',
+        description: props.page.description || '',
+      }
     }
   }
-)
 
-watch(
-  () => props.page,
-  val => {
-    if (val && props.visible) {
-      initForm()
+  function handleVisibleChange(val) {
+    emit('update:visible', val)
+  }
+
+  function handleClose() {
+    emit('update:visible', false)
+    resetForm()
+  }
+
+  async function handleSubmit() {
+    if (!canSubmit.value || !props.page?.id) return
+
+    loading.value = true
+    try {
+      await pagesStore.updatePage({
+        id: props.page.id,
+        name: form.value.name.trim(),
+        description: form.value.description,
+      })
+      window.$message?.success('更新成功')
+      handleClose()
+    } catch (error) {
+      window.$message?.error(error.message || '更新失败')
+    } finally {
+      loading.value = false
     }
-  },
-  { immediate: true }
-)
+  }
+
+  watch(
+    () => props.visible,
+    val => {
+      if (val) {
+        initForm()
+      }
+    }
+  )
+
+  watch(
+    () => props.page,
+    val => {
+      if (val && props.visible) {
+        initForm()
+      }
+    },
+    { immediate: true }
+  )
 </script>
 
 <style lang="scss" scoped>
