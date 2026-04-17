@@ -30,7 +30,7 @@
             v-for="image in imagesStore.images"
             :key="image.id"
             :image="image"
-            @preview="handlePreview"
+            :preview-list="allImageUrls"
             @download="handleDownload"
             @edit="handleEdit"
             @delete="handleDelete"
@@ -81,7 +81,7 @@
 </template>
 
 <script setup>
-  import { ref, onMounted } from 'vue'
+  import { ref, computed, onMounted } from 'vue'
   import { useImagesStore } from '@/stores/images.js'
   import ImageSearchBar from '@/components/images/ImageSearchBar.vue'
   import ImageCard from '@/components/images/ImageCard.vue'
@@ -95,6 +95,11 @@
   const showCreateGroupDialog = ref(false)
   const showEditDialog = ref(false)
   const editingImage = ref(null)
+
+  const allImageUrls = computed(() => {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
+    return imagesStore.images.map(img => `${baseUrl}${img.url}`)
+  })
 
   onMounted(async () => {
     await Promise.all([imagesStore.fetchGroups(), imagesStore.fetchImages()])
@@ -117,10 +122,6 @@
   function handleSizeChange(size) {
     imagesStore.setPageSize(size)
     imagesStore.fetchImages()
-  }
-
-  function handlePreview(image) {
-    window.open(image.url, '_blank')
   }
 
   function handleDownload(image) {

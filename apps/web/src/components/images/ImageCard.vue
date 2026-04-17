@@ -1,20 +1,42 @@
 <template>
-  <ea-card class="image-card" shadow="hover" @click="handlePreview">
+  <ea-card class="image-card" shadow="hover">
     <!-- 卡片头部 - 图片预览区 -->
     <div slot="header" class="image-card__header">
-      <div class="image-card__preview">
-        <img
-          v-if="imageUrl"
-          :src="imageUrl"
-          :alt="image.alt || image.filename"
-          class="image-card__img"
-        />
-        <ea-icon v-else name="image" size="48" color="#c0c4cc"></ea-icon>
-      </div>
+      <ea-image
+        v-if="imageUrl"
+        ref="imageRef"
+        :src="imageUrl"
+        :alt="image.alt || image.filename"
+        class="image-card__img"
+        fit="contain"
+        preview
+      />
     </div>
 
     <!-- 卡片内容 -->
     <div class="image-card__body">
+      <!-- 图片 URL 地址（可复制 + 可点击） -->
+      <div v-if="imageUrl" class="image-card__url">
+        <ea-link
+          icon="link"
+          :href="imageUrl"
+          target="_blank"
+          class="image-card__url-link"
+          :title="imageUrl"
+          @click.stop
+        >
+          {{ imageUrl }}
+        </ea-link>
+        <ea-button
+          text
+          size="small"
+          icon="copy"
+          title="复制地址"
+          class="image-card__url-copy"
+          @click.stop="handleCopyUrl"
+        ></ea-button>
+      </div>
+
       <div class="image-card__info">
         <ea-icon name="file-image" size="14" color="#909399"></ea-icon>
         <span class="image-card__info-text" :title="image.filename">{{ image.filename }}</span>
@@ -29,6 +51,7 @@
         <ea-icon name="file-code" size="14" color="#909399"></ea-icon>
         <span class="image-card__info-text">{{ formatMimeType(image.mimeType) }}</span>
       </div>
+
       <div v-if="image.alt" class="image-card__description">{{ image.alt }}</div>
     </div>
 
@@ -57,16 +80,22 @@
 </template>
 
 <script setup>
-  import { computed } from 'vue'
+  import { computed, ref, onMounted, nextTick } from 'vue'
 
   const props = defineProps({
     image: {
       type: Object,
       required: true,
     },
+    previewList: {
+      type: Array,
+      default: () => [],
+    },
   })
 
   defineEmits(['preview', 'download', 'edit', 'delete'])
+
+  const imageRef = ref(null)
 
   const imageUrl = computed(() => {
     if (!props.image.url) return ''
@@ -78,8 +107,45 @@
     return props.image.group?.name || '未分组'
   })
 
-  function handlePreview() {
-    // 预览逻辑由父组件处理
+  onMounted(async () => {
+    if (imageRef.value && imageUrl.value) {
+      await nextTick()
+      try {
+        await customElements.whenDefined('ea-image-preview')
+        const list = props.previewList.length > 0 ? props.previewList : [imageUrl.value]
+        imageRef.value.previewSrcList = list
+      } catch (e) {
+        // 预览组件不可用时静默失败
+      }
+    }
+  })
+
+  function handleCopyUrl() {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(imageUrl.value).then(() => {
+        window.$message?.success('地址已复制到剪贴板')
+      }).catch(() => {
+        fallbackCopy()
+      })
+    } else {
+      fallbackCopy()
+    }
+  }
+
+  function fallbackCopy() {
+    const textarea = document.createElement('textarea')
+    textarea.value = imageUrl.value
+    textarea.style.position = 'fixed'
+    textarea.style.opacity = '0'
+    document.body.appendChild(textarea)
+    textarea.select()
+    try {
+      document.execCommand('copy')
+      window.$message?.success('地址已复制到剪贴板')
+    } catch (e) {
+      window.$message?.error('复制失败，请手动复制')
+    }
+    document.body.removeChild(textarea)
   }
 
   function formatSize(bytes) {
@@ -144,23 +210,41 @@
       align-items: center;
       justify-content: center;
       padding: 0;
-      min-height: 180px;
       overflow: hidden;
-    }
-
-    &__preview {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
     }
 
     &__img {
       max-width: 100%;
       max-height: 160px;
-      object-fit: contain;
       border-radius: 4px;
+    }
+
+    &__url {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 4px;
+      margin-top: 4px;
+
+      &-link {
+        flex: 1;
+        font-size: 12px;
+        color: var(--ea-color-primary, #409eff);
+        text-decoration: none;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      &-copy {
+        flex-shrink: 0;
+        padding: 2px !important;
+      }
     }
 
     &__body {
@@ -192,7 +276,6 @@
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       line-height: 1.5;
-      min-height: 36px;
     }
 
     &__footer {
