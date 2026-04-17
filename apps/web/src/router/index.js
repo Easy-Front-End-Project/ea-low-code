@@ -69,7 +69,7 @@ const router = createRouter({
           path: 'cloud',
           name: 'cloud',
           component: CloudView,
-          meta: { title: '云端' },
+          meta: { title: '图片云' },
         },
         {
           path: 'projects/:id/settings',
@@ -139,7 +139,7 @@ router.beforeEach(async (to, from) => {
 
 const DEFAULT_TITLE = 'Easy Weave'
 
-router.afterEach((to) => {
+router.afterEach(to => {
   const title = to.meta?.title
   document.title = title ? `${DEFAULT_TITLE} | ${title}` : DEFAULT_TITLE
 })

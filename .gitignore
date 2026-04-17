@@ -61,3 +61,6 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
+
+# Uploads (user uploaded files)
+apps/server/uploads/

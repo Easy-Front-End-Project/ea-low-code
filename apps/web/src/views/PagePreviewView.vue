@@ -173,7 +173,6 @@
       display: flex;
       justify-content: center;
       align-items: flex-start;
-      padding: 24px;
       height: 100vh;
       overflow: auto;
     }

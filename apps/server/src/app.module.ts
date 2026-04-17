@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -8,12 +10,23 @@ import { AuthModule } from './auth/auth.module';
 import { PagesModule } from './pages/pages.module';
 import { StatsModule } from './stats/stats.module';
 import { ComponentsModule } from './components/components.module';
+import { ImagesModule } from './images/images.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['../../.env', '../.env', './.env'],
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+      serveStaticOptions: {
+        fallthrough: true,
+        setHeaders: (res) => {
+          res.set('Cache-Control', 'public, max-age=31536000');
+        },
+      },
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -34,6 +47,7 @@ import { ComponentsModule } from './components/components.module';
     PagesModule,
     StatsModule,
     ComponentsModule,
+    ImagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
