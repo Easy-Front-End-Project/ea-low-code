@@ -14,11 +14,180 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
         config: {},
       },
       version: '1.0',
+      settings: {
+        style: {
+          width: '',
+        },
+        events: [
+          {
+            id: 'event_1776540278357_06zg6o8s',
+            name: 'initPage',
+            action: 'custom',
+            eventType: 'load',
+            actionConfig: {
+              code: '// 页面初始化：填充订单表格数据\nconst orderData = $vars.get("orderData");\n$alias.setProp("orderTable", "data", orderData);',
+            },
+            customEventType: 'load',
+          },
+        ],
+      },
+      variables: [
+        {
+          id: 'var_1776540278357_mh9yfq3y',
+          name: 'orderData',
+          type: 'array',
+          remark: '',
+          defaultValue: [
+            {
+              amount: '¥12,800.00',
+              status: '已完成',
+              orderNo: 'ORD-20240115-001',
+              customer: '张三',
+              createdAt: '2024-01-15 10:30',
+            },
+            {
+              amount: '¥5,600.50',
+              status: '处理中',
+              orderNo: 'ORD-20240114-002',
+              customer: '李四',
+              createdAt: '2024-01-14 16:20',
+            },
+            {
+              amount: '¥23,400.00',
+              status: '已完成',
+              orderNo: 'ORD-20240114-003',
+              customer: '王五',
+              createdAt: '2024-01-14 09:15',
+            },
+            {
+              amount: '¥8,900.00',
+              status: '待付款',
+              orderNo: 'ORD-20240113-004',
+              customer: '赵六',
+              createdAt: '2024-01-13 14:45',
+            },
+            {
+              amount: '¥15,200.00',
+              status: '已完成',
+              orderNo: 'ORD-20240112-005',
+              customer: '王二',
+              createdAt: '2024-01-12 12:00',
+            },
+            {
+              amount: '¥3,450.80',
+              status: '已取消',
+              orderNo: 'ORD-20240111-006',
+              customer: '孙七',
+              createdAt: '2024-01-11 08:50',
+            },
+            {
+              amount: '¥19,800.00',
+              status: '已完成',
+              orderNo: 'ORD-20240110-007',
+              customer: '周八',
+              createdAt: '2024-01-10 15:10',
+            },
+            {
+              amount: '¥7,250.00',
+              status: '处理中',
+              orderNo: 'ORD-20240109-008',
+              customer: '吴九',
+              createdAt: '2024-01-09 11:25',
+            },
+            {
+              amount: '¥42,000.00',
+              status: '已完成',
+              orderNo: 'ORD-20240108-009',
+              customer: '郑十',
+              createdAt: '2024-01-08 09:00',
+            },
+            {
+              amount: '¥1,350.60',
+              status: '待付款',
+              orderNo: 'ORD-20240107-010',
+              customer: '陈明',
+              createdAt: '2024-01-07 17:40',
+            },
+            {
+              amount: '¥28,500.00',
+              status: '已完成',
+              orderNo: 'ORD-20240106-011',
+              customer: '林芳',
+              createdAt: '2024-01-06 13:20',
+            },
+            {
+              amount: '¥6,780.00',
+              status: '已取消',
+              orderNo: 'ORD-20240105-012',
+              customer: '黄伟',
+              createdAt: '2024-01-05 10:05',
+            },
+            {
+              amount: '¥11,200.00',
+              status: '处理中',
+              orderNo: 'ORD-20240104-013',
+              customer: '刘洋',
+              createdAt: '2024-01-04 14:30',
+            },
+            {
+              amount: '¥35,600.00',
+              status: '已完成',
+              orderNo: 'ORD-20240103-014',
+              customer: '杨静',
+              createdAt: '2024-01-03 16:55',
+            },
+            {
+              amount: '¥4,920.30',
+              status: '待付款',
+              orderNo: 'ORD-20240102-015',
+              customer: '何磊',
+              createdAt: '2024-01-02 08:15',
+            },
+            {
+              amount: '¥16,800.00',
+              status: '已完成',
+              orderNo: 'ORD-20240101-016',
+              customer: '马丽',
+              createdAt: '2024-01-01 11:45',
+            },
+            {
+              amount: '¥9,100.00',
+              status: '已取消',
+              orderNo: 'ORD-20231231-017',
+              customer: '徐强',
+              createdAt: '2023-12-31 15:30',
+            },
+            {
+              amount: '¥22,750.00',
+              status: '处理中',
+              orderNo: 'ORD-20231230-018',
+              customer: '高敏',
+              createdAt: '2023-12-30 09:50',
+            },
+            {
+              amount: '¥7,600.00',
+              status: '已完成',
+              orderNo: 'ORD-20231229-019',
+              customer: '田华',
+              createdAt: '2023-12-29 13:10',
+            },
+            {
+              amount: '¥31,200.00',
+              status: '待付款',
+              orderNo: 'ORD-20231228-020',
+              customer: '罗杰',
+              createdAt: '2023-12-28 10:25',
+            },
+          ],
+        },
+      ],
       components: [
         {
-          id: generateId(),
+          id: 'comp_1776540278357_s105jpt1',
           type: 'ea-container',
-          props: { direction: 'vertical' },
+          props: {
+            direction: 'vertical',
+          },
           slots: {},
           style: {
             padding: '24px',
@@ -28,64 +197,81 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
           events: [],
           children: [
             {
-              id: generateId(),
+              id: 'comp_1776540278357_uz91mfom',
               type: 'ea-row',
-              props: { gutter: 16, align: 'middle' },
+              props: {
+                align: 'middle',
+                gutter: 16,
+              },
               slots: {},
-              style: { marginBottom: '20px' },
+              style: {
+                marginBottom: '20px',
+              },
               events: [],
               children: [
                 {
-                  id: generateId(),
+                  id: 'comp_1776540278357_u4dz1hhr',
                   type: 'ea-col',
-                  props: { span: 16 },
+                  props: {
+                    span: 16,
+                  },
                   slots: {},
                   style: {},
                   events: [],
                   children: [
                     {
-                      id: generateId(),
+                      id: 'comp_1776540278357_npb9n0c3',
                       type: 'ea-text',
-                      props: { children: '工作台', size: 'large' },
+                      props: {
+                        size: 'large',
+                        children: '工作台',
+                      },
                       slots: {},
                       style: {
-                        fontWeight: '600',
                         color: '#1d2129',
                         display: 'block',
+                        fontWeight: '600',
                       },
                       events: [],
                       children: [],
                     },
                     {
-                      id: generateId(),
+                      id: 'comp_1776540278357_jy70lgg2',
                       type: 'ea-text',
                       props: {
-                        children: '欢迎回来，管理员，祝您今天工作愉快！',
                         size: 'medium',
                         type: 'info',
+                        children: '欢迎回来，管理员，祝您今天工作愉快！',
                       },
                       slots: {},
-                      style: { marginTop: '6px', display: 'block' },
+                      style: {
+                        display: 'block',
+                        marginTop: '6px',
+                      },
                       events: [],
                       children: [],
                     },
                   ],
                 },
                 {
-                  id: generateId(),
+                  id: 'comp_1776540278357_c88tlxco',
                   type: 'ea-col',
-                  props: { span: 8 },
+                  props: {
+                    span: 8,
+                  },
                   slots: {},
-                  style: { textAlign: 'right' },
+                  style: {
+                    textAlign: 'right',
+                  },
                   events: [],
                   children: [
                     {
-                      id: generateId(),
+                      id: 'comp_1776540278357_nwkqtgpu',
                       type: 'ea-text',
                       props: {
-                        children: '2024年01月15日 星期一',
                         size: 'small',
                         type: 'info',
+                        children: '2024年01月15日 星期一',
                       },
                       slots: {},
                       style: {},
@@ -97,56 +283,71 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
               ],
             },
             {
-              id: generateId(),
+              id: 'comp_1776540278357_cqicqv3r',
               type: 'ea-row',
-              props: { gutter: 16 },
+              props: {
+                gutter: 16,
+              },
               slots: {},
-              style: { marginBottom: '20px' },
+              style: {
+                marginBottom: '20px',
+              },
               events: [],
               children: [
                 {
-                  id: generateId(),
+                  id: 'comp_1776540278357_eix5vuc8',
                   type: 'ea-col',
-                  props: { span: 6 },
+                  props: {
+                    span: 6,
+                  },
                   slots: {},
                   style: {},
                   events: [],
                   children: [
                     {
-                      id: generateId(),
+                      id: 'comp_1776540278357_48wbitwx',
                       type: 'ea-card',
-                      props: { shadow: 'hover' },
+                      props: {
+                        shadow: 'hover',
+                      },
                       slots: {},
                       style: {
-                        borderRadius: '8px',
-                        borderLeft: '4px solid #1890ff',
                         padding: '20px',
+                        borderLeft: '4px solid #1890ff',
+                        borderRadius: '8px',
                       },
                       events: [],
                       children: [
                         {
-                          id: generateId(),
+                          id: 'comp_1776540278357_ed4m4ilb',
                           type: 'ea-row',
-                          props: { align: 'middle', justify: 'space-between' },
+                          props: {
+                            align: 'middle',
+                            justify: 'space-between',
+                          },
                           slots: {},
-                          style: { marginBottom: '12px' },
+                          style: {
+                            marginBottom: '12px',
+                          },
                           events: [],
                           children: [
                             {
-                              id: generateId(),
+                              id: 'comp_1776540278357_ynwcst7s',
                               type: 'ea-col',
-                              props: { span: 12 },
+                              props: {
+                                span: 12,
+                              },
                               slots: {},
                               style: {},
                               events: [],
                               children: [
                                 {
-                                  id: generateId(),
+                                  id: 'comp_1776540278357_txmsns5m',
                                   type: 'ea-text',
                                   props: {
-                                    children: '总销售额',
                                     size: 'medium',
                                     type: 'info',
+                                    children: '总销售额',
                                   },
                                   slots: {},
                                   style: {},
@@ -156,15 +357,19 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                               ],
                             },
                             {
-                              id: generateId(),
+                              id: 'comp_1776540278357_f33bplsy',
                               type: 'ea-col',
-                              props: { span: 12 },
+                              props: {
+                                span: 12,
+                              },
                               slots: {},
-                              style: { textAlign: 'right' },
+                              style: {
+                                textAlign: 'right',
+                              },
                               events: [],
                               children: [
                                 {
-                                  id: generateId(),
+                                  id: 'comp_1776540278357_oxpm7zt6',
                                   type: 'ea-icon',
                                   props: {
                                     name: 'chart-line',
@@ -181,19 +386,21 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                           ],
                         },
                         {
-                          id: generateId(),
+                          id: 'comp_1776540278357_l93wuag4',
                           type: 'ea-statistic',
-                          props: { value: '128000' },
+                          props: {
+                            value: '128000',
+                          },
                           slots: {},
                           style: {},
                           events: [],
                           children: [
                             {
-                              id: generateId(),
+                              id: 'comp_1776540278357_zmcl7uvb',
                               type: 'ea-text',
                               props: {
-                                slot: 'suffix',
                                 size: 'small',
+                                slot: 'suffix',
                                 children: ' 元',
                               },
                               slots: {},
@@ -204,15 +411,18 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                           ],
                         },
                         {
-                          id: generateId(),
+                          id: 'comp_1776540278357_vyf3wpa7',
                           type: 'ea-text',
                           props: {
-                            children: '↑ 12.5% 较上周',
                             size: 'small',
                             type: 'success',
+                            children: '↑ 12.5% 较上周',
                           },
                           slots: {},
-                          style: { marginTop: '8px', display: 'block' },
+                          style: {
+                            display: 'block',
+                            marginTop: '8px',
+                          },
                           events: [],
                           children: [],
                         },
@@ -221,48 +431,59 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                   ],
                 },
                 {
-                  id: generateId(),
+                  id: 'comp_1776540278357_1xwbl4u2',
                   type: 'ea-col',
-                  props: { span: 6 },
+                  props: {
+                    span: 6,
+                  },
                   slots: {},
                   style: {},
                   events: [],
                   children: [
                     {
-                      id: generateId(),
+                      id: 'comp_1776540278357_6heoq9sa',
                       type: 'ea-card',
-                      props: { shadow: 'hover' },
+                      props: {
+                        shadow: 'hover',
+                      },
                       slots: {},
                       style: {
-                        borderRadius: '8px',
-                        borderLeft: '4px solid #52c41a',
                         padding: '20px',
+                        borderLeft: '4px solid #52c41a',
+                        borderRadius: '8px',
                       },
                       events: [],
                       children: [
                         {
-                          id: generateId(),
+                          id: 'comp_1776540278357_zjksda6p',
                           type: 'ea-row',
-                          props: { align: 'middle', justify: 'space-between' },
+                          props: {
+                            align: 'middle',
+                            justify: 'space-between',
+                          },
                           slots: {},
-                          style: { marginBottom: '12px' },
+                          style: {
+                            marginBottom: '12px',
+                          },
                           events: [],
                           children: [
                             {
-                              id: generateId(),
+                              id: 'comp_1776540278357_f8pwmlyc',
                               type: 'ea-col',
-                              props: { span: 12 },
+                              props: {
+                                span: 12,
+                              },
                               slots: {},
                               style: {},
                               events: [],
                               children: [
                                 {
-                                  id: generateId(),
+                                  id: 'comp_1776540278357_lr1h0199',
                                   type: 'ea-text',
                                   props: {
-                                    children: '订单总数',
                                     size: 'medium',
                                     type: 'info',
+                                    children: '订单总数',
                                   },
                                   slots: {},
                                   style: {},
@@ -272,15 +493,19 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                               ],
                             },
                             {
-                              id: generateId(),
+                              id: 'comp_1776540278357_emkz1m1s',
                               type: 'ea-col',
-                              props: { span: 12 },
+                              props: {
+                                span: 12,
+                              },
                               slots: {},
-                              style: { textAlign: 'right' },
+                              style: {
+                                textAlign: 'right',
+                              },
                               events: [],
                               children: [
                                 {
-                                  id: generateId(),
+                                  id: 'comp_1776540278357_5rrth8o3',
                                   type: 'ea-icon',
                                   props: {
                                     name: 'cart-shopping',
@@ -297,19 +522,21 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                           ],
                         },
                         {
-                          id: generateId(),
+                          id: 'comp_1776540278357_rjm86e7l',
                           type: 'ea-statistic',
-                          props: { value: '3560' },
+                          props: {
+                            value: '3560',
+                          },
                           slots: {},
                           style: {},
                           events: [],
                           children: [
                             {
-                              id: generateId(),
+                              id: 'comp_1776540278357_nsa3avpc',
                               type: 'ea-text',
                               props: {
-                                slot: 'suffix',
                                 size: 'small',
+                                slot: 'suffix',
                                 children: ' 单',
                               },
                               slots: {},
@@ -320,15 +547,18 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                           ],
                         },
                         {
-                          id: generateId(),
+                          id: 'comp_1776540278357_pxfx04gh',
                           type: 'ea-text',
                           props: {
-                            children: '↑ 8.2% 较上周',
                             size: 'small',
                             type: 'success',
+                            children: '↑ 8.2% 较上周',
                           },
                           slots: {},
-                          style: { marginTop: '8px', display: 'block' },
+                          style: {
+                            display: 'block',
+                            marginTop: '8px',
+                          },
                           events: [],
                           children: [],
                         },
@@ -337,48 +567,59 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                   ],
                 },
                 {
-                  id: generateId(),
+                  id: 'comp_1776540278357_fciq4qjs',
                   type: 'ea-col',
-                  props: { span: 6 },
+                  props: {
+                    span: 6,
+                  },
                   slots: {},
                   style: {},
                   events: [],
                   children: [
                     {
-                      id: generateId(),
+                      id: 'comp_1776540278357_gilqvhqz',
                       type: 'ea-card',
-                      props: { shadow: 'hover' },
+                      props: {
+                        shadow: 'hover',
+                      },
                       slots: {},
                       style: {
-                        borderRadius: '8px',
-                        borderLeft: '4px solid #faad14',
                         padding: '20px',
+                        borderLeft: '4px solid #faad14',
+                        borderRadius: '8px',
                       },
                       events: [],
                       children: [
                         {
-                          id: generateId(),
+                          id: 'comp_1776540278357_k0515zj6',
                           type: 'ea-row',
-                          props: { align: 'middle', justify: 'space-between' },
+                          props: {
+                            align: 'middle',
+                            justify: 'space-between',
+                          },
                           slots: {},
-                          style: { marginBottom: '12px' },
+                          style: {
+                            marginBottom: '12px',
+                          },
                           events: [],
                           children: [
                             {
-                              id: generateId(),
+                              id: 'comp_1776540278357_ht5pi5kw',
                               type: 'ea-col',
-                              props: { span: 12 },
+                              props: {
+                                span: 12,
+                              },
                               slots: {},
                               style: {},
                               events: [],
                               children: [
                                 {
-                                  id: generateId(),
+                                  id: 'comp_1776540278357_ucrlcwko',
                                   type: 'ea-text',
                                   props: {
-                                    children: '访客数量',
                                     size: 'medium',
                                     type: 'info',
+                                    children: '访客数量',
                                   },
                                   slots: {},
                                   style: {},
@@ -388,15 +629,19 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                               ],
                             },
                             {
-                              id: generateId(),
+                              id: 'comp_1776540278357_h12tilsn',
                               type: 'ea-col',
-                              props: { span: 12 },
+                              props: {
+                                span: 12,
+                              },
                               slots: {},
-                              style: { textAlign: 'right' },
+                              style: {
+                                textAlign: 'right',
+                              },
                               events: [],
                               children: [
                                 {
-                                  id: generateId(),
+                                  id: 'comp_1776540278357_m5cjy3pv',
                                   type: 'ea-icon',
                                   props: {
                                     name: 'users',
@@ -413,19 +658,21 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                           ],
                         },
                         {
-                          id: generateId(),
+                          id: 'comp_1776540278357_zx7aqdwg',
                           type: 'ea-statistic',
-                          props: { value: '8920' },
+                          props: {
+                            value: '8920',
+                          },
                           slots: {},
                           style: {},
                           events: [],
                           children: [
                             {
-                              id: generateId(),
+                              id: 'comp_1776540278357_dvrlq1ne',
                               type: 'ea-text',
                               props: {
-                                slot: 'suffix',
                                 size: 'small',
+                                slot: 'suffix',
                                 children: ' 人',
                               },
                               slots: {},
@@ -436,15 +683,18 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                           ],
                         },
                         {
-                          id: generateId(),
+                          id: 'comp_1776540278357_fcyzvsr9',
                           type: 'ea-text',
                           props: {
-                            children: '↓ 3.1% 较上周',
                             size: 'small',
                             type: 'danger',
+                            children: '↓ 3.1% 较上周',
                           },
                           slots: {},
-                          style: { marginTop: '8px', display: 'block' },
+                          style: {
+                            display: 'block',
+                            marginTop: '8px',
+                          },
                           events: [],
                           children: [],
                         },
@@ -453,48 +703,59 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                   ],
                 },
                 {
-                  id: generateId(),
+                  id: 'comp_1776540278357_d5z0a6xk',
                   type: 'ea-col',
-                  props: { span: 6 },
+                  props: {
+                    span: 6,
+                  },
                   slots: {},
                   style: {},
                   events: [],
                   children: [
                     {
-                      id: generateId(),
+                      id: 'comp_1776540278357_r1p2gubc',
                       type: 'ea-card',
-                      props: { shadow: 'hover' },
+                      props: {
+                        shadow: 'hover',
+                      },
                       slots: {},
                       style: {
-                        borderRadius: '8px',
-                        borderLeft: '4px solid #722ed1',
                         padding: '20px',
+                        borderLeft: '4px solid #722ed1',
+                        borderRadius: '8px',
                       },
                       events: [],
                       children: [
                         {
-                          id: generateId(),
+                          id: 'comp_1776540278357_1a2cunij',
                           type: 'ea-row',
-                          props: { align: 'middle', justify: 'space-between' },
+                          props: {
+                            align: 'middle',
+                            justify: 'space-between',
+                          },
                           slots: {},
-                          style: { marginBottom: '12px' },
+                          style: {
+                            marginBottom: '12px',
+                          },
                           events: [],
                           children: [
                             {
-                              id: generateId(),
+                              id: 'comp_1776540278357_odkcfucx',
                               type: 'ea-col',
-                              props: { span: 12 },
+                              props: {
+                                span: 12,
+                              },
                               slots: {},
                               style: {},
                               events: [],
                               children: [
                                 {
-                                  id: generateId(),
+                                  id: 'comp_1776540278357_2gm1vauk',
                                   type: 'ea-text',
                                   props: {
-                                    children: '转化率',
                                     size: 'medium',
                                     type: 'info',
+                                    children: '转化率',
                                   },
                                   slots: {},
                                   style: {},
@@ -504,15 +765,19 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                               ],
                             },
                             {
-                              id: generateId(),
+                              id: 'comp_1776540278357_0p04w4t7',
                               type: 'ea-col',
-                              props: { span: 12 },
+                              props: {
+                                span: 12,
+                              },
                               slots: {},
-                              style: { textAlign: 'right' },
+                              style: {
+                                textAlign: 'right',
+                              },
                               events: [],
                               children: [
                                 {
-                                  id: generateId(),
+                                  id: 'comp_1776540278357_872tk7gz',
                                   type: 'ea-icon',
                                   props: {
                                     name: 'percentage',
@@ -529,19 +794,21 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                           ],
                         },
                         {
-                          id: generateId(),
+                          id: 'comp_1776540278357_94q4lu18',
                           type: 'ea-statistic',
-                          props: { value: '72.8' },
+                          props: {
+                            value: '72.8',
+                          },
                           slots: {},
                           style: {},
                           events: [],
                           children: [
                             {
-                              id: generateId(),
+                              id: 'comp_1776540278357_40sabf82',
                               type: 'ea-text',
                               props: {
-                                slot: 'suffix',
                                 size: 'small',
+                                slot: 'suffix',
                                 children: ' %',
                               },
                               slots: {},
@@ -552,15 +819,18 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                           ],
                         },
                         {
-                          id: generateId(),
+                          id: 'comp_1776540278357_64j0g1y2',
                           type: 'ea-text',
                           props: {
-                            children: '↑ 2.4% 较上周',
                             size: 'small',
                             type: 'success',
+                            children: '↑ 2.4% 较上周',
                           },
                           slots: {},
-                          style: { marginTop: '8px', display: 'block' },
+                          style: {
+                            display: 'block',
+                            marginTop: '8px',
+                          },
                           events: [],
                           children: [],
                         },
@@ -571,286 +841,256 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
               ],
             },
             {
-              id: generateId(),
+              id: 'comp_1776540278357_08jnqg8x',
               type: 'ea-row',
-              props: { gutter: 16 },
+              props: {
+                gutter: 20,
+              },
               slots: {},
-              style: { marginBottom: '20px' },
+              style: {
+                marginBottom: '20px',
+              },
               events: [],
               children: [
                 {
-                  id: generateId(),
+                  id: 'comp_1776540278357_cb8e6ndq',
                   type: 'ea-col',
-                  props: { span: 16 },
+                  props: {
+                    span: 12,
+                  },
                   slots: {},
                   style: {},
                   events: [],
                   children: [
                     {
-                      id: generateId(),
-                      type: 'ea-card',
-                      props: { shadow: 'always' },
-                      slots: {},
-                      style: { borderRadius: '8px' },
+                      id: 'comp_1776540773998_ilseekpi',
+                      type: 'ea-table',
+                      props: {
+                        data: {
+                          type: 'variable',
+                          value: 'orderData',
+                        },
+                        border: false,
+                        height: '500px',
+                        stripe: false,
+                        'max-height': '',
+                        'show-summary': false,
+                        'highlight-current-row': false,
+                      },
+                      style: {
+                        width: '100%',
+                      },
                       events: [],
                       children: [
                         {
-                          id: generateId(),
-                          type: 'ea-text',
+                          id: 'comp_1776541079178_wmaea3v9',
+                          type: 'ea-table-column',
                           props: {
-                            slot: 'header',
-                            children: '最近订单',
-                            size: 'medium',
+                            prop: 'orderNo',
+                            type: '',
+                            align: 'left',
+                            fixed: 'false',
+                            label: 'OrderNo',
+                            width: '',
+                            sortable: false,
                           },
-                          slots: {},
-                          style: {
-                            fontWeight: '600',
-                            padding: '16px 20px',
-                            borderBottom: '1px solid #f0f0f0',
-                          },
+                          style: {},
                           events: [],
                           children: [],
                         },
                         {
-                          id: generateId(),
-                          type: 'ea-table',
-                          props: { stripe: true },
-                          slots: {},
-                          style: { width: '100%' },
+                          id: 'comp_1776541206466_wtnu2e10',
+                          type: 'ea-table-column',
+                          props: {
+                            prop: 'customer',
+                            type: '',
+                            align: 'left',
+                            fixed: 'false',
+                            label: 'Customer',
+                            width: '',
+                            sortable: false,
+                          },
+                          style: {},
                           events: [],
-                          children: [
-                            {
-                              id: generateId(),
-                              type: 'ea-table-column',
-                              props: {
-                                label: '订单号',
-                                prop: 'orderNo',
-                                width: '180px',
-                              },
-                              slots: {},
-                              style: {},
-                              events: [],
-                              children: [],
-                            },
-                            {
-                              id: generateId(),
-                              type: 'ea-table-column',
-                              props: {
-                                label: '客户名称',
-                                prop: 'customer',
-                                width: '120px',
-                              },
-                              slots: {},
-                              style: {},
-                              events: [],
-                              children: [],
-                            },
-                            {
-                              id: generateId(),
-                              type: 'ea-table-column',
-                              props: {
-                                label: '金额',
-                                prop: 'amount',
-                                width: '120px',
-                                align: 'right',
-                              },
-                              slots: {},
-                              style: {},
-                              events: [],
-                              children: [],
-                            },
-                            {
-                              id: generateId(),
-                              type: 'ea-table-column',
-                              props: {
-                                label: '状态',
-                                prop: 'status',
-                                width: '100px',
-                                align: 'center',
-                              },
-                              slots: {},
-                              style: {},
-                              events: [],
-                              children: [],
-                            },
-                            {
-                              id: generateId(),
-                              type: 'ea-table-column',
-                              props: {
-                                label: '下单时间',
-                                prop: 'createdAt',
-                                width: '160px',
-                                align: 'center',
-                              },
-                              slots: {},
-                              style: {},
-                              events: [],
-                              children: [],
-                            },
-                          ],
-                          alias: 'orderTable',
+                          children: [],
+                        },
+                        {
+                          id: 'comp_1776541209578_izdwwa00',
+                          type: 'ea-table-column',
+                          props: {
+                            prop: 'amount',
+                            type: '',
+                            align: 'left',
+                            fixed: 'false',
+                            label: 'Amount',
+                            width: '',
+                            sortable: false,
+                          },
+                          style: {},
+                          events: [],
+                          children: [],
+                        },
+                        {
+                          id: 'comp_1776541212155_l52tuf5m',
+                          type: 'ea-table-column',
+                          props: {
+                            prop: 'status',
+                            type: '',
+                            align: 'left',
+                            fixed: 'false',
+                            label: 'Status',
+                            width: '',
+                            sortable: false,
+                          },
+                          style: {},
+                          events: [],
+                          children: [],
+                        },
+                        {
+                          id: 'comp_1776541214200_zq47qjtw',
+                          type: 'ea-table-column',
+                          props: {
+                            prop: 'createdAt',
+                            type: '',
+                            align: 'left',
+                            fixed: 'false',
+                            label: 'CreatedAt',
+                            width: '',
+                            sortable: false,
+                          },
+                          style: {},
+                          events: [],
+                          children: [],
                         },
                       ],
                     },
                   ],
                 },
                 {
-                  id: generateId(),
+                  id: 'comp_1776540747850_7qv2kj93',
                   type: 'ea-col',
-                  props: { span: 8 },
-                  slots: {},
+                  props: {
+                    pull: 0,
+                    push: 0,
+                    span: 12,
+                    offset: 0,
+                  },
                   style: {},
                   events: [],
                   children: [
                     {
-                      id: generateId(),
-                      type: 'ea-card',
-                      props: { shadow: 'always' },
-                      slots: {},
-                      style: { borderRadius: '8px', marginBottom: '16px' },
+                      id: 'comp_1776540807208_bks5zhms',
+                      type: 'ea-row',
+                      props: {
+                        align: 'top',
+                        gutter: 0,
+                        justify: 'start',
+                      },
+                      style: {},
                       events: [],
                       children: [
                         {
-                          id: generateId(),
-                          type: 'ea-text',
+                          id: 'comp_1776543006865_igielec3',
+                          type: 'ea-card',
                           props: {
-                            slot: 'header',
-                            children: '日历',
-                            size: 'medium',
+                            footer: '',
+                            header: '',
+                            shadow: 'always',
                           },
-                          slots: {},
                           style: {
-                            fontWeight: '600',
-                            padding: '16px 20px',
-                            borderBottom: '1px solid #f0f0f0',
+                            width: '',
                           },
                           events: [],
-                          children: [],
-                        },
-                        {
-                          id: generateId(),
-                          type: 'ea-calendar',
-                          props: {},
-                          slots: {},
-                          style: {},
-                          events: [],
-                          children: [],
+                          children: [
+                            {
+                              id: 'comp_1776543040220_akj4fskz',
+                              type: 'ea-calendar',
+                              props: {
+                                value: 1776542241136,
+                                'controller-type': 'button',
+                              },
+                              style: {},
+                              events: [],
+                              children: [],
+                            },
+                          ],
                         },
                       ],
                     },
                     {
-                      id: generateId(),
-                      type: 'ea-card',
-                      props: { shadow: 'always' },
-                      slots: {},
-                      style: { borderRadius: '8px' },
+                      id: 'comp_1776541029610_t6mnqmhd',
+                      type: 'ea-row',
+                      props: {
+                        align: 'top',
+                        gutter: 0,
+                        justify: 'start',
+                      },
+                      style: {},
                       events: [],
                       children: [
                         {
-                          id: generateId(),
-                          type: 'ea-text',
+                          id: 'comp_1776543136388_yra5skmb',
+                          type: 'ea-card',
                           props: {
-                            slot: 'header',
-                            children: '待办事项',
-                            size: 'medium',
+                            footer: '',
+                            header: '',
+                            shadow: 'always',
                           },
-                          slots: {},
                           style: {
-                            fontWeight: '600',
-                            padding: '16px 20px',
-                            borderBottom: '1px solid #f0f0f0',
+                            width: '100%',
                           },
-                          events: [],
-                          children: [],
-                        },
-                        {
-                          id: generateId(),
-                          type: 'ea-collapse',
-                          props: { accordion: true },
-                          slots: {},
-                          style: {},
                           events: [],
                           children: [
                             {
-                              id: generateId(),
-                              type: 'ea-collapse-item',
-                              props: { title: '今日待办 (3)', name: 'today' },
-                              slots: {},
+                              id: 'comp_1776542605021_dw7ay0mj',
+                              type: 'ea-collapse',
+                              props: {
+                                active: '',
+                                accordion: false,
+                                'expand-icon-position': 'right',
+                              },
                               style: {},
                               events: [],
                               children: [
                                 {
-                                  id: generateId(),
-                                  type: 'ea-text',
-                                  props: { children: '审批新用户注册申请' },
-                                  slots: {},
-                                  style: {
-                                    display: 'block',
-                                    padding: '6px 0',
-                                    fontSize: '14px',
+                                  id: 'comp_1776542608569_za1hxlif',
+                                  type: 'ea-collapse-item',
+                                  props: {
+                                    name: 'today',
+                                    title: '今日待办',
+                                    disabled: false,
                                   },
+                                  style: {},
                                   events: [],
-                                  children: [],
+                                  children: [
+                                    {
+                                      id: 'comp_1776542806128_gv1i1rbw',
+                                      type: 'ea-tag',
+                                      props: {
+                                        size: 'default',
+                                        type: 'primary',
+                                        color: '',
+                                        round: false,
+                                        effect: 'light',
+                                        children: '工作',
+                                        closable: false,
+                                        'disable-transitions': false,
+                                      },
+                                      style: {},
+                                      events: [],
+                                      children: [],
+                                    },
+                                  ],
                                 },
                                 {
-                                  id: generateId(),
-                                  type: 'ea-text',
-                                  props: { children: '核对本月财务报表' },
-                                  slots: {},
-                                  style: {
-                                    display: 'block',
-                                    padding: '6px 0',
-                                    fontSize: '14px',
+                                  id: 'comp_1776542612204_xpku4vea',
+                                  type: 'ea-collapse-item',
+                                  props: {
+                                    name: 'week',
+                                    title: '本周计划',
+                                    disabled: false,
                                   },
-                                  events: [],
-                                  children: [],
-                                },
-                                {
-                                  id: generateId(),
-                                  type: 'ea-text',
-                                  props: { children: '更新产品库存信息' },
-                                  slots: {},
-                                  style: {
-                                    display: 'block',
-                                    padding: '6px 0',
-                                    fontSize: '14px',
-                                  },
-                                  events: [],
-                                  children: [],
-                                },
-                              ],
-                            },
-                            {
-                              id: generateId(),
-                              type: 'ea-collapse-item',
-                              props: { title: '本周计划 (2)', name: 'week' },
-                              slots: {},
-                              style: {},
-                              events: [],
-                              children: [
-                                {
-                                  id: generateId(),
-                                  type: 'ea-text',
-                                  props: { children: '完成季度销售报告' },
-                                  slots: {},
-                                  style: {
-                                    display: 'block',
-                                    padding: '6px 0',
-                                    fontSize: '14px',
-                                  },
-                                  events: [],
-                                  children: [],
-                                },
-                                {
-                                  id: generateId(),
-                                  type: 'ea-text',
-                                  props: { children: '组织团队周会' },
-                                  slots: {},
-                                  style: {
-                                    display: 'block',
-                                    padding: '6px 0',
-                                    fontSize: '14px',
-                                  },
+                                  style: {},
                                   events: [],
                                   children: [],
                                 },
@@ -865,56 +1105,67 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
               ],
             },
             {
-              id: generateId(),
+              id: 'comp_1776540278357_x8cenpu3',
               type: 'ea-row',
-              props: { gutter: 16 },
+              props: {
+                gutter: 16,
+              },
               slots: {},
               style: {},
               events: [],
               children: [
                 {
-                  id: generateId(),
+                  id: 'comp_1776540278357_2smodf2i',
                   type: 'ea-col',
-                  props: { span: 12 },
+                  props: {
+                    span: 12,
+                  },
                   slots: {},
                   style: {},
                   events: [],
                   children: [
                     {
-                      id: generateId(),
+                      id: 'comp_1776540278357_3jxkkzny',
                       type: 'ea-card',
-                      props: { shadow: 'always' },
+                      props: {
+                        shadow: 'always',
+                      },
                       slots: {},
-                      style: { borderRadius: '8px' },
+                      style: {
+                        borderRadius: '8px',
+                      },
                       events: [],
                       children: [
                         {
-                          id: generateId(),
+                          id: 'comp_1776540278357_n7sc143l',
                           type: 'ea-text',
                           props: {
+                            size: 'medium',
                             slot: 'header',
                             children: '系统公告',
-                            size: 'medium',
                           },
                           slots: {},
                           style: {
-                            fontWeight: '600',
                             padding: '16px 20px',
+                            fontWeight: '600',
                             borderBottom: '1px solid #f0f0f0',
                           },
                           events: [],
                           children: [],
                         },
                         {
-                          id: generateId(),
+                          id: 'comp_1776540278357_4h53vfxx',
                           type: 'ea-descriptions',
-                          props: { column: 1, border: true },
+                          props: {
+                            border: true,
+                            column: 1,
+                          },
                           slots: {},
                           style: {},
                           events: [],
                           children: [
                             {
-                              id: generateId(),
+                              id: 'comp_1776540278357_43dl5ndx',
                               type: 'ea-descriptions-item',
                               props: {
                                 label: '2024-01-15',
@@ -927,7 +1178,7 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                               children: [],
                             },
                             {
-                              id: generateId(),
+                              id: 'comp_1776540278357_6qjortq6',
                               type: 'ea-descriptions-item',
                               props: {
                                 label: '2024-01-12',
@@ -940,7 +1191,7 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                               children: [],
                             },
                             {
-                              id: generateId(),
+                              id: 'comp_1776540278357_hgpknybe',
                               type: 'ea-descriptions-item',
                               props: {
                                 label: '2024-01-10',
@@ -959,50 +1210,62 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                   ],
                 },
                 {
-                  id: generateId(),
+                  id: 'comp_1776540278357_ncfww1jc',
                   type: 'ea-col',
-                  props: { span: 12 },
+                  props: {
+                    span: 12,
+                  },
                   slots: {},
                   style: {},
                   events: [],
                   children: [
                     {
-                      id: generateId(),
+                      id: 'comp_1776540278357_3roja3bn',
                       type: 'ea-card',
-                      props: { shadow: 'always' },
+                      props: {
+                        shadow: 'always',
+                      },
                       slots: {},
-                      style: { borderRadius: '8px' },
+                      style: {
+                        borderRadius: '8px',
+                      },
                       events: [],
                       children: [
                         {
-                          id: generateId(),
+                          id: 'comp_1776540278357_bqy9mlhq',
                           type: 'ea-text',
                           props: {
+                            size: 'medium',
                             slot: 'header',
                             children: '快捷操作',
-                            size: 'medium',
                           },
                           slots: {},
                           style: {
-                            fontWeight: '600',
                             padding: '16px 20px',
+                            fontWeight: '600',
                             borderBottom: '1px solid #f0f0f0',
                           },
                           events: [],
                           children: [],
                         },
                         {
-                          id: generateId(),
+                          id: 'comp_1776540278357_puyj0ara',
                           type: 'ea-row',
-                          props: { gutter: 16 },
+                          props: {
+                            gutter: 16,
+                          },
                           slots: {},
-                          style: { padding: '16px 0' },
+                          style: {
+                            padding: '16px 0',
+                          },
                           events: [],
                           children: [
                             {
-                              id: generateId(),
+                              id: 'comp_1776540278357_xru21ays',
                               type: 'ea-col',
-                              props: { span: 6 },
+                              props: {
+                                span: 6,
+                              },
                               slots: {},
                               style: {
                                 textAlign: 'center',
@@ -1011,24 +1274,28 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                               events: [],
                               children: [
                                 {
-                                  id: generateId(),
+                                  id: 'comp_1776540278357_kp1v89ts',
                                   type: 'ea-button',
                                   props: {
                                     icon: 'user-plus',
-                                    children: '新增用户',
                                     type: 'primary',
+                                    children: '新增用户',
                                   },
                                   slots: {},
-                                  style: { width: '100%' },
+                                  style: {
+                                    width: '100%',
+                                  },
                                   events: [],
                                   children: [],
                                 },
                               ],
                             },
                             {
-                              id: generateId(),
+                              id: 'comp_1776540278357_cqj3ox44',
                               type: 'ea-col',
-                              props: { span: 6 },
+                              props: {
+                                span: 6,
+                              },
                               slots: {},
                               style: {
                                 textAlign: 'center',
@@ -1037,24 +1304,28 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                               events: [],
                               children: [
                                 {
-                                  id: generateId(),
+                                  id: 'comp_1776540278357_9mt0g2hb',
                                   type: 'ea-button',
                                   props: {
                                     icon: 'file-lines',
-                                    children: '新建文档',
                                     type: 'success',
+                                    children: '新建文档',
                                   },
                                   slots: {},
-                                  style: { width: '100%' },
+                                  style: {
+                                    width: '100%',
+                                  },
                                   events: [],
                                   children: [],
                                 },
                               ],
                             },
                             {
-                              id: generateId(),
+                              id: 'comp_1776540278357_sffhjjgl',
                               type: 'ea-col',
-                              props: { span: 6 },
+                              props: {
+                                span: 6,
+                              },
                               slots: {},
                               style: {
                                 textAlign: 'center',
@@ -1063,24 +1334,28 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                               events: [],
                               children: [
                                 {
-                                  id: generateId(),
+                                  id: 'comp_1776540278357_ha0dsuvs',
                                   type: 'ea-button',
                                   props: {
                                     icon: 'chart-simple',
-                                    children: '数据报表',
                                     type: 'warning',
+                                    children: '数据报表',
                                   },
                                   slots: {},
-                                  style: { width: '100%' },
+                                  style: {
+                                    width: '100%',
+                                  },
                                   events: [],
                                   children: [],
                                 },
                               ],
                             },
                             {
-                              id: generateId(),
+                              id: 'comp_1776540278357_lipkg5il',
                               type: 'ea-col',
-                              props: { span: 6 },
+                              props: {
+                                span: 6,
+                              },
                               slots: {},
                               style: {
                                 textAlign: 'center',
@@ -1089,15 +1364,17 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                               events: [],
                               children: [
                                 {
-                                  id: generateId(),
+                                  id: 'comp_1776540278357_hs7sjnbr',
                                   type: 'ea-button',
                                   props: {
                                     icon: 'gear',
-                                    children: '系统设置',
                                     type: 'danger',
+                                    children: '系统设置',
                                   },
                                   slots: {},
-                                  style: { width: '100%' },
+                                  style: {
+                                    width: '100%',
+                                  },
                                   events: [],
                                   children: [],
                                 },
@@ -1114,58 +1391,6 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
           ],
         },
       ],
-      variables: [
-        {
-          id: generateId().replace('comp_', 'var_'),
-          name: 'orderData',
-          type: 'array',
-          defaultValue: [
-            {
-              orderNo: 'ORD-20240115-001',
-              customer: '张三',
-              amount: '¥12,800.00',
-              status: '已完成',
-              createdAt: '2024-01-15 10:30',
-            },
-            {
-              orderNo: 'ORD-20240114-002',
-              customer: '李四',
-              amount: '¥5,600.50',
-              status: '处理中',
-              createdAt: '2024-01-14 16:20',
-            },
-            {
-              orderNo: 'ORD-20240114-003',
-              customer: '王五',
-              amount: '¥23,400.00',
-              status: '已完成',
-              createdAt: '2024-01-14 09:15',
-            },
-            {
-              orderNo: 'ORD-20240113-004',
-              customer: '赵六',
-              amount: '¥8,900.00',
-              status: '待付款',
-              createdAt: '2024-01-13 14:45',
-            },
-          ],
-          remark: '',
-        },
-      ],
-      settings: {
-        events: [
-          {
-            id: generateId().replace('comp_', 'event_'),
-            name: 'initPage',
-            eventType: 'load',
-            customEventType: 'load',
-            action: 'custom',
-            actionConfig: {
-              code: '// 页面初始化：填充订单表格数据\nconst orderData = $vars.get("orderData");\n$alias.setProp("orderTable", "data", orderData);',
-            },
-          },
-        ],
-      },
     },
   },
 
