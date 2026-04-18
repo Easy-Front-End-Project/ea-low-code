@@ -11,6 +11,7 @@ import { PagesModule } from './pages/pages.module';
 import { StatsModule } from './stats/stats.module';
 import { ComponentsModule } from './components/components.module';
 import { ImagesModule } from './images/images.module';
+import { ModelsModule } from './models/models.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { ImagesModule } from './images/images.module';
     StatsModule,
     ComponentsModule,
     ImagesModule,
+    ModelsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

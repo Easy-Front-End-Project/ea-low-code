@@ -12,8 +12,8 @@ import ProjectSettingsView from '@/views/ProjectSettingsView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import ComponentsView from '@/views/ComponentsView.vue'
 import ComponentSettingsView from '@/views/ComponentSettingsView.vue'
-import DataSourceView from '@/views/DataSourceView.vue'
 import PagePreviewView from '@/views/PagePreviewView.vue'
+import ModelView from '@/views/ModelView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -56,7 +56,7 @@ const router = createRouter({
         {
           path: 'datasources',
           name: 'datasources',
-          component: DataSourceView,
+          component: ModelView,
           meta: { title: '数据源管理' },
         },
         {

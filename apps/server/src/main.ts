@@ -7,6 +7,8 @@ import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.setGlobalPrefix('api');
+
   // CORS 配置
   const corsOrigin = process.env.CORS_ORIGIN?.split(',') || [
     'http://localhost:5173',
@@ -25,7 +27,7 @@ async function bootstrap() {
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
-    }),
+    })
   );
 
   app.useGlobalFilters(new GlobalExceptionFilter());
@@ -44,7 +46,7 @@ async function bootstrap() {
         description: '输入 JWT Token',
         in: 'header',
       },
-      'JWT-auth',
+      'JWT-auth'
     )
     .build();
   const document = SwaggerModule.createDocument(app, config);
@@ -52,10 +54,10 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3000);
   console.log(
-    `Application is running on: http://localhost:${process.env.PORT ?? 3000}`,
+    `Application is running on: http://localhost:${process.env.PORT ?? 3000}`
   );
   console.log(
-    `Swagger API Docs: http://localhost:${process.env.PORT ?? 3000}/api-docs`,
+    `Swagger API Docs: http://localhost:${process.env.PORT ?? 3000}/api-docs`
   );
 }
 bootstrap();

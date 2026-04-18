@@ -121,4 +121,31 @@ export const apiList = {
     /** 更新图片信息（名称、分组、描述） */
     update: '/images/update',
   },
+
+  // ==================== 动态建模模块 ====================
+  models: {
+    // --- 模型管理 ---
+    /** 获取所有模型列表（支持关键词搜索） */
+    list: '/models/list',
+    /** 获取模型详情（含字段列表） */
+    detail: '/models/detail',
+    /** 创建数据模型（同时创建物理表） */
+    create: '/models/create',
+    /** 更新模型信息（描述等） */
+    update: '/models/update',
+    /** 删除模型（同时删除物理表和字段记录） */
+    delete: '/models/delete',
+
+    // --- 字段管理 ---
+    /** 获取模型的字段列表（分页） */
+    fieldsList: '/models/fields/list',
+    /** 新增模型字段（同步添加物理列） */
+    fieldsCreate: '/models/fields/create',
+    /** 更新模型字段定义（同步修改物理列） */
+    fieldsUpdate: '/models/fields/update',
+    /** 删除模型字段（同步删除物理列） */
+    fieldsDelete: '/models/fields/delete',
+    /** 批量更新字段排序序号 */
+    fieldsSort: '/models/fields/sort',
+  },
 }

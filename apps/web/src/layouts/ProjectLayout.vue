@@ -84,6 +84,7 @@
 
     if (route.path.startsWith('/components')) return 'components'
     if (route.path.startsWith('/datasources')) return 'datasources'
+    if (route.path.startsWith('/models')) return 'datasources'
     if (route.path.startsWith('/projects')) return 'projects'
     if (route.path.startsWith('/templates')) return 'templates'
     if (route.path.startsWith('/cloud')) return 'cloud'
