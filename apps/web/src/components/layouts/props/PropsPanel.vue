@@ -21,8 +21,23 @@
           </div>
           <div class="info-card__content space-y-1">
             <template v-if="selectedComponent">
-              <p>类型: {{ selectedComponent.type }}</p>
+              <div class="flex items-center gap-2">
+                <span>类型:</span>
+                <ea-tag :type="selectedComponent.isRemote ? 'warning' : 'primary'" size="small">
+                  {{ selectedComponent.type }}
+                </ea-tag>
+                <ea-tag v-if="selectedComponent.isRemote" size="small">远程组件</ea-tag>
+              </div>
               <p>ID: {{ selectedComponent.id }}</p>
+              <template v-if="selectedComponent.isRemote && selectedComponent.remoteConfig">
+                <p>组件: {{ selectedComponent.remoteConfig.exportName || '未知' }}</p>
+                <p
+                  class="truncate text-xs text-gray-400"
+                  :title="selectedComponent.remoteConfig.url"
+                >
+                  来源: {{ selectedComponent.remoteConfig.url }}
+                </p>
+              </template>
               <!-- 别名编辑 -->
               <div class="alias-editor">
                 <span class="text-nowrap">别名:</span>
@@ -130,6 +145,7 @@
                   :component-type="selectedComponent.type"
                   :component-props="selectedComponent.props"
                   :css-variables="selectedComponent.cssVariables"
+                  :meta="componentMeta"
                   @css-variable-change="handleCssVariableChange"
                 />
               </div>
@@ -293,7 +309,31 @@
 
       // 旧架构（localStorage）
       const legacyMetaList = getRemoteComponentMetaList()
-      return legacyMetaList.find(m => m.type === selectedComponent.value.type)
+      const legacyMeta = legacyMetaList.find(m => m.type === selectedComponent.value.type)
+      if (legacyMeta) return legacyMeta
+
+      const rc = selectedComponent.value.remoteConfig
+      const rawProps = selectedComponent.value.props || {}
+      return {
+        type: selectedComponent.value.type,
+        name: rc?.exportName || '远程组件',
+        category: 'remote',
+        icon: 'Link',
+        isRemote: true,
+        remoteConfig: rc || {},
+        props: Object.keys(rawProps).map(key => ({
+          name: key,
+          label: key,
+          type:
+            typeof rawProps[key] === 'number'
+              ? 'number'
+              : typeof rawProps[key] === 'boolean'
+                ? 'boolean'
+                : 'string',
+        })),
+        events: [],
+        slots: [{ name: 'default', label: '默认插槽' }],
+      }
     }
 
     return getComponentMeta(selectedComponent.value.type)

@@ -86,12 +86,17 @@
       type: Object,
       default: () => ({}),
     },
+    meta: {
+      type: Object,
+      default: null,
+    },
   })
 
   const emit = defineEmits(['css-variable-change'])
 
-  // 获取组件的样式配置
+  // 获取组件的样式配置（优先使用传入的 meta，回退到内置 getComponentMeta）
   const styleConfig = computed(() => {
+    if (props.meta) return props.meta.styleConfig || null
     if (!props.componentType) return null
     const meta = getComponentMeta(props.componentType)
     return meta?.styleConfig || null
