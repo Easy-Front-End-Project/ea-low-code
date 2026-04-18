@@ -4,7 +4,10 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('dynamic_models')
 export class DynamicModel {
@@ -22,6 +25,13 @@ export class DynamicModel {
 
   @Column({ default: true })
   isActive: boolean;
+
+  @Column({ type: 'int', nullable: true })
+  userId: number | null;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'userId' })
+  user: User;
 
   @CreateDateColumn()
   createdAt: Date;

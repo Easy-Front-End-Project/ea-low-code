@@ -18,8 +18,9 @@
       <div class="prop-item">
         <label class="prop-label">图片或渐变</label>
         <EaInput
-          :model-value="style?.backgroundImage || ''"
-          @update:model-value="handleBackgroundImageChange($event)"
+          :model-value="isEditing ? localBackgroundImage : (style?.backgroundImage || '')"
+          @update:model-value="handleBackgroundImageInput"
+          @blur="handleBackgroundImageBlur"
           placeholder="http://xxx.png"
           class="bg-image-input"
         />
@@ -45,7 +46,9 @@
           <div class="size-input-row">
             <UnitInput
               :value="customBackgroundSize"
-              @update:value="handleCustomBackgroundSizeChange"
+              @update:value="handleCustomBackgroundSizeInput"
+              @unit-change="handleCustomBackgroundSizeUnitChange"
+              @blur="handleCustomBackgroundSizeBlur"
               placeholder="auto"
             />
           </div>
@@ -93,7 +96,7 @@
 </template>
 
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import UnitInput from '../common/UnitInput.vue'
   import EaSelect from '../ea-ui-wrap/EaSelect.vue'
   import EaColorPicker from '../ea-ui-wrap/EaColorPicker.vue'
@@ -108,10 +111,36 @@
 
   const emit = defineEmits(['style-change'])
 
+  // 本地状态：用于编辑期间暂存值
+  const localBackgroundImage = ref('')
+  const localCustomBackgroundSize = ref('')
+  const isEditing = ref(false)
+
+  // 初始化本地状态
+  function initLocalState() {
+    localBackgroundImage.value = props.style?.backgroundImage || ''
+    const size = props.style?.backgroundSize || ''
+    if (['cover', 'contain', '100% 100%', ''].includes(size)) {
+      localCustomBackgroundSize.value = ''
+    } else {
+      localCustomBackgroundSize.value = size.replace(/(px|%|em|rem)$/, '')
+    }
+  }
+
+  // 监听外部 props 变化
+  watch(
+    () => props.style,
+    newStyle => {
+      if (!isEditing.value) {
+        initLocalState()
+      }
+    },
+    { deep: true }
+  )
+
   // 背景尺寸
   const backgroundSize = computed(() => {
     const size = props.style?.backgroundSize || ''
-    // 如果是自定义尺寸（包含px/%等单位），返回空字符串让下拉框显示placeholder
     if (size && !['cover', 'contain', '100% 100%'].includes(size)) {
       return ''
     }
@@ -120,21 +149,29 @@
 
   // 自定义背景尺寸值
   const customBackgroundSize = computed(() => {
+    if (isEditing.value) {
+      return localCustomBackgroundSize.value
+    }
     const size = props.style?.backgroundSize || ''
-    // 如果是预设值，返回空
     if (['cover', 'contain', '100% 100%', ''].includes(size)) {
       return ''
     }
-    // 提取数值部分
     return size.replace(/(px|%|em|rem)$/, '')
   })
 
   // 尺寸单位
   const sizeUnit = ref('px')
 
-  // 处理背景图片变化
-  function handleBackgroundImageChange(value) {
-    // 如果用户输入的是URL但不是url()格式，自动添加
+  // 处理背景图片变化 - 只更新本地状态
+  function handleBackgroundImageInput(value) {
+    isEditing.value = true
+    localBackgroundImage.value = value
+  }
+
+  // 失去焦点时提交背景图片
+  function handleBackgroundImageBlur() {
+    isEditing.value = false
+    let value = localBackgroundImage.value
     if (
       value &&
       !value.startsWith('url(') &&
@@ -143,39 +180,64 @@
     ) {
       value = `url(${value})`
     }
-    handleInlineStyleChange('backgroundImage', value)
+    emit('style-change', 'backgroundImage', value, 'inline')
   }
 
   // 处理背景尺寸变化
   function handleBackgroundSizeChange(value) {
     if (value) {
-      handleInlineStyleChange('backgroundSize', value)
+      emit('style-change', 'backgroundSize', value, 'inline')
     } else {
-      handleInlineStyleChange('backgroundSize', '')
+      emit('style-change', 'backgroundSize', '', 'inline')
     }
   }
 
-  // 处理自定义背景尺寸变化
-  function handleCustomBackgroundSizeChange(value) {
-    if (value) {
-      handleInlineStyleChange('backgroundSize', `${value}${sizeUnit.value}`)
+  // 处理自定义背景尺寸变化 - 只更新本地状态
+  function handleCustomBackgroundSizeInput(value) {
+    isEditing.value = true
+    localCustomBackgroundSize.value = value
+  }
+
+  // 处理自定义背景尺寸单位变化 - 立即提交（用户明确选择单位）
+  function handleCustomBackgroundSizeUnitChange(input, unit) {
+    localCustomBackgroundSize.value = input
+    sizeUnit.value = unit
+    if (input) {
+      emit('style-change', 'backgroundSize', `${input}${unit}`, 'inline')
     } else {
-      handleInlineStyleChange('backgroundSize', '')
+      emit('style-change', 'backgroundSize', '', 'inline')
+    }
+  }
+
+  // 失去焦点时提交自定义背景尺寸
+  function handleCustomBackgroundSizeBlur() {
+    isEditing.value = false
+    if (localCustomBackgroundSize.value) {
+      emit(
+        'style-change',
+        'backgroundSize',
+        `${localCustomBackgroundSize.value}${sizeUnit.value}`,
+        'inline'
+      )
+    } else {
+      emit('style-change', 'backgroundSize', '', 'inline')
     }
   }
 
   // 处理单位变化
   function handleSizeUnitChange(unit) {
     sizeUnit.value = unit
-    // 如果有自定义尺寸值，更新它
-    if (customBackgroundSize.value) {
-      handleInlineStyleChange('backgroundSize', `${customBackgroundSize.value}${unit}`)
+    if (localCustomBackgroundSize.value) {
+      emit('style-change', 'backgroundSize', `${localCustomBackgroundSize.value}${unit}`, 'inline')
     }
   }
 
   function handleInlineStyleChange(styleName, value) {
     emit('style-change', styleName, value, 'inline')
   }
+
+  // 初始化
+  initLocalState()
 </script>
 
 <style scoped>

@@ -12,7 +12,12 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiConsumes,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ImagesService } from './images.service';
 import { CreateImageGroupDto } from './dto/create-image-group.dto';
@@ -29,17 +34,19 @@ export class ImagesController {
 
   @Get('groups/list')
   @ApiOperation({ summary: '获取分组列表' })
-  async findAllGroups() {
-    return await this.imagesService.findAllGroups();
+  async findAllGroups(@NestRequest() req: any) {
+    const userId = req.user.userId;
+    return await this.imagesService.findAllGroups(userId);
   }
 
   @Post('groups/create')
   @ApiOperation({ summary: '创建分组' })
   async createGroup(
     @Body() createImageGroupDto: CreateImageGroupDto,
-    @NestRequest() req: any,
+    @NestRequest() req: any
   ) {
-    return await this.imagesService.createGroup(createImageGroupDto);
+    const userId = req.user.userId;
+    return await this.imagesService.createGroup(createImageGroupDto, userId);
   }
 
   @Post('groups/delete')
@@ -50,19 +57,14 @@ export class ImagesController {
 
   @Get('list')
   @ApiOperation({ summary: '获取图片列表' })
-  async findImages(
-    @Query() query: any,
-    @NestRequest() req: any,
-  ) {
+  async findImages(@Query() query: any, @NestRequest() req: any) {
     const userId = req.user.userId;
     return await this.imagesService.findImages(query, userId);
   }
 
   @Get('detail')
   @ApiOperation({ summary: '获取图片详情' })
-  async findOne(
-    @Query('id', ParseIntPipe) id: number,
-  ) {
+  async findOne(@Query('id', ParseIntPipe) id: number) {
     return await this.imagesService.findOne(id);
   }
 
@@ -89,12 +91,12 @@ export class ImagesController {
         }
         cb(null, true);
       },
-    }),
+    })
   )
   async uploadImage(
     @UploadedFile() file: Express.Multer.File,
     @Body() body: any,
-    @NestRequest() req: any,
+    @NestRequest() req: any
   ) {
     if (!file) {
       throw new Error('请选择要上传的文件');
@@ -103,8 +105,15 @@ export class ImagesController {
     const groupId = body.groupId ? parseInt(body.groupId) : null;
     const alt = body.alt || '';
     const customName = body.customName || '';
+    const userId = req.user.userId;
 
-    return await this.imagesService.saveImage(file, groupId, alt, customName);
+    return await this.imagesService.saveImage(
+      file,
+      groupId,
+      alt,
+      customName,
+      userId
+    );
   }
 
   @Post('delete')
@@ -115,7 +124,9 @@ export class ImagesController {
 
   @Post('update')
   @ApiOperation({ summary: '更新图片信息' })
-  async updateImage(@Body() body: { id: number; groupId?: number; alt?: string }) {
+  async updateImage(
+    @Body() body: { id: number; groupId?: number; alt?: string }
+  ) {
     const { id, ...data } = body;
     return await this.imagesService.updateImage(id, data);
   }

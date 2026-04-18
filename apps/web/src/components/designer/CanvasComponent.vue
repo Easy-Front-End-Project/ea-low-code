@@ -118,7 +118,9 @@
   const allChildren = computed(() => props.component.children || [])
 
   // 远程组件
-  const { isRemoteComponent, componentTag: remoteComponentTag } = useRemoteComponent(props.component)
+  const { isRemoteComponent, componentTag: remoteComponentTag } = useRemoteComponent(
+    props.component
+  )
   const componentTag = computed(() => remoteComponentTag.value)
 
   /** 是否不可选择 */
@@ -155,8 +157,7 @@
 
   /** 显示名称 */
   const displayName = computed(
-    () =>
-      componentMeta.value?.name || (isRemoteComponent.value ? '远程组件' : props.component.type)
+    () => componentMeta.value?.name || (isRemoteComponent.value ? '远程组件' : props.component.type)
   )
 
   /** 是否显示标签 */
@@ -387,6 +388,16 @@
         border-radius: 6px;
       }
     }
+  }
+
+  ea-row {
+    & > div > .canvas-component--container {
+      // flex: 1 0 auto;
+    }
+  }
+
+  ea-calendar {
+    width: 300px;
   }
 
   :deep(.slot-content-wrapper) {

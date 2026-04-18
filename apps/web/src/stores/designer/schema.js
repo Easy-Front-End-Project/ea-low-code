@@ -208,7 +208,11 @@ export const useSchemaStore = defineStore('schema', () => {
     rebuildAliasMap(pageSchema.value.components || [], componentAliasMap.value)
 
     // 清除选中状态
-    selectedComponentId.value = null
+    /**
+     * TODO: 不知道为什么这个会导致在 选中组件 下，点击组件的 基础样式 时
+     * 若更新某个输入框的值，导致组件被取消选中
+     */
+    // selectedComponentId.value = null
 
     // 使用 nextTick 确保状态更新后再重置标记
     setTimeout(() => {

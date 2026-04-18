@@ -7,6 +7,7 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { ImageGroup } from './image-group.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('images')
 export class Image {
@@ -31,6 +32,13 @@ export class Image {
   @ManyToOne(() => ImageGroup)
   @JoinColumn({ name: 'groupId' })
   group: ImageGroup;
+
+  @Column({ type: 'int', nullable: true })
+  userId: number | null;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'userId' })
+  user: User;
 
   @Column({ length: 100, nullable: true })
   alt: string;

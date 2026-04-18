@@ -6,9 +6,10 @@ import { DynamicDataController } from './dynamic-data.controller';
 import { DynamicDataService } from './dynamic-data.service';
 import { DynamicModel } from './entities/dynamic-model.entity';
 import { ModelField } from './entities/model-field.entity';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([DynamicModel, ModelField])],
+  imports: [TypeOrmModule.forFeature([DynamicModel, ModelField]), AuthModule],
   controllers: [ModelsController, DynamicDataController],
   providers: [ModelsService, DynamicDataService],
   exports: [ModelsService, DynamicDataService],

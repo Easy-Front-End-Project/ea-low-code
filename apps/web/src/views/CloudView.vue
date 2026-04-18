@@ -97,8 +97,7 @@
   const editingImage = ref(null)
 
   const allImageUrls = computed(() => {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
-    return imagesStore.images.map(img => `${baseUrl}${img.url}`)
+    return imagesStore.images.map(img => img.url)
   })
 
   onMounted(async () => {

@@ -47,11 +47,15 @@ export class ModelsService {
     private dataSource: DataSource
   ) {}
 
-  async findAll(keyword?: string): Promise<DynamicModel[]> {
+  async findAll(keyword?: string, userId?: number): Promise<DynamicModel[]> {
     const queryBuilder = this.modelRepo.createQueryBuilder('model');
 
+    if (userId) {
+      queryBuilder.where('model.userId = :userId', { userId });
+    }
+
     if (keyword) {
-      queryBuilder.where(
+      queryBuilder.andWhere(
         '(model.name LIKE :keyword OR model.description LIKE :keyword)',
         { keyword: `%${keyword}%` }
       );
@@ -66,6 +70,10 @@ export class ModelsService {
       throw new NotFoundException(`模型 ID ${id} 不存在`);
     }
     return model;
+  }
+
+  async findByTableName(tableName: string): Promise<DynamicModel | null> {
+    return await this.modelRepo.findOne({ where: { tableName } });
   }
 
   async findFields(
@@ -99,7 +107,10 @@ export class ModelsService {
     return { model, fields };
   }
 
-  async createModel(dto: CreateModelDto): Promise<DynamicModel> {
+  async createModel(
+    dto: CreateModelDto,
+    userId?: number
+  ): Promise<DynamicModel> {
     const existing = await this.modelRepo.findOne({
       where: { name: dto.name },
     });
@@ -113,6 +124,7 @@ export class ModelsService {
       name: dto.name,
       tableName,
       description: dto.description || '',
+      userId: userId || null,
     });
 
     const savedModel = await this.modelRepo.save(model);

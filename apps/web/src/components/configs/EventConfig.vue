@@ -225,6 +225,7 @@
 
   // 常用自定义事件列表
   const commonCustomEvents = [
+    { name: 'click', label: '点击' },
     { name: 'dblclick', label: '双击' },
     { name: 'mousedown', label: '鼠标按下' },
     { name: 'mouseup', label: '鼠标释放' },

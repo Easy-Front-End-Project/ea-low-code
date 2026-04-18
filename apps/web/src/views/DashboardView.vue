@@ -217,13 +217,7 @@
     return date.toLocaleDateString('zh-CN')
   }
 
-  // 页面加载时获取数据
-  onMounted(async () => {
-    // 获取用户信息（如果还没有）
-    if (!userStore.user) {
-      await userStore.fetchProfile()
-    }
-
+  async function fetchDashboardData() {
     // 并行获取统计数据
     try {
       const [statsData, recentProjectsData, activitiesData] = await Promise.all([
@@ -248,6 +242,16 @@
       console.error('获取仪表盘数据失败:', error)
       window.$message?.error('获取数据失败')
     }
+  }
+
+  // 页面加载时获取数据
+  onMounted(async () => {
+    // 获取用户信息（如果还没有）
+    if (!userStore.user) {
+      await userStore.fetchProfile()
+    }
+
+    fetchDashboardData()
   })
 
   // 跳转到项目列表
@@ -281,6 +285,8 @@
       await projectsStore.remove(project.id)
       window.$message?.success('删除成功')
       projectsStore.fetchProjects()
+
+      fetchDashboardData()
     } catch (error) {
       window.$message?.error(error.message || '删除失败')
     }
@@ -300,6 +306,7 @@
   // 创建成功回调
   function handleCreateSuccess() {
     projectsStore.fetchProjects()
+    fetchDashboardData()
   }
 </script>
 

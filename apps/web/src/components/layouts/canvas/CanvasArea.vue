@@ -16,6 +16,7 @@
         @dragover="handleDragOver"
         @drop="handleDrop"
         @click="handleCanvasClick"
+        @mousedown="handleCanvasMouseDown"
       >
         <!-- 网格背景 -->
         <div class="canvas-area__grid"></div>
@@ -143,11 +144,37 @@
     schemaStore.selectComponent(newComponent.id)
   }
 
+  // 记录最后一次鼠标按下的事件信息，用于区分真实点击和焦点转移
+  let lastMouseDownTarget = null
+  let lastMouseDownTime = 0
+
+  function handleCanvasMouseDown(event) {
+    // 只记录在画布容器或内容区域的真实点击
+    if (
+      event.target === canvasRef.value ||
+      event.target.classList.contains('canvas-area__content')
+    ) {
+      lastMouseDownTarget = event.target
+      lastMouseDownTime = Date.now()
+    }
+  }
+
   function handleCanvasClick(event) {
     if (
       event.target === canvasRef.value ||
       event.target.classList.contains('canvas-area__content')
     ) {
+      // 检查这次 click 是否有对应的 mousedown 事件
+      // 如果没有，说明是程序触发的（如焦点转移），不应该清除选中
+      const timeDiff = Date.now() - lastMouseDownTime
+      const hasCorrespondingMouseDown = lastMouseDownTarget === event.target && timeDiff < 500
+
+      if (!hasCorrespondingMouseDown) return
+
+      // 重置记录
+      lastMouseDownTarget = null
+      lastMouseDownTime = 0
+
       schemaStore.clearSelection()
     }
   }
@@ -231,5 +258,4 @@
       }
     }
   }
-
 </style>

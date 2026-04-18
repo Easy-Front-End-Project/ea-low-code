@@ -46,7 +46,7 @@
         </div>
 
         <!-- AI 创建 -->
-        <div v-if="currentType === 'ai'">
+        <!-- <div v-if="currentType === 'ai'">
           <div class="create-project-dialog__form-item">
             <label class="create-project-dialog__label">需求描述</label>
             <ea-input
@@ -60,7 +60,7 @@
             <label class="create-project-dialog__label">项目名称</label>
             <ea-input v-model="form.name" placeholder="请输入项目名称" clearable></ea-input>
           </div>
-        </div>
+        </div> -->
 
         <!-- 空白创建 -->
         <div v-if="currentType === 'blank'">
@@ -121,7 +121,7 @@ const form = ref({
 
 const createTypes = [
   { value: 'template', label: '模板创建', icon: 'clipboard' },
-  { value: 'ai', label: 'AI 创建', icon: 'robot' },
+  // { value: 'ai', label: 'AI 创建', icon: 'robot' },
   { value: 'blank', label: '空白创建', icon: 'file' },
 ]
 

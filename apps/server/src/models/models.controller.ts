@@ -1,4 +1,6 @@
-import { Controller, Get, Post, Body, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, ParseIntPipe, UseGuards, Request as NestRequest } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ModelsService } from './models.service';
 import { CreateModelDto } from './dto/create-model.dto';
 import { UpdateModelDto } from './dto/update-model.dto';
@@ -7,13 +9,17 @@ import { CreateFieldDto } from './dto/create-field.dto';
 import { UpdateFieldDto } from './dto/update-field.dto';
 import { DeleteFieldDto } from './dto/delete-field.dto';
 
+@ApiTags('模型管理')
 @Controller('models')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 export class ModelsController {
   constructor(private readonly modelsService: ModelsService) {}
 
   @Get('list')
-  async list(@Query('keyword') keyword?: string) {
-    return await this.modelsService.findAll(keyword);
+  async list(@Query('keyword') keyword?: string, @NestRequest() req?: any) {
+    const userId = req.user.userId;
+    return await this.modelsService.findAll(keyword, userId);
   }
 
   @Get('detail')
@@ -23,8 +29,9 @@ export class ModelsController {
   }
 
   @Post('create')
-  async create(@Body() dto: CreateModelDto) {
-    return await this.modelsService.createModel(dto);
+  async create(@Body() dto: CreateModelDto, @NestRequest() req: any) {
+    const userId = req.user.userId;
+    return await this.modelsService.createModel(dto, userId);
   }
 
   @Post('update')

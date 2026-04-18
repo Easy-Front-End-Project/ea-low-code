@@ -5,6 +5,7 @@ import { Project } from './entities/project.entity';
 import { PageSchema } from './entities/page-schema.entity';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { CreatePageDto, UpdatePageDto } from './dto/page.dto';
+import { getTemplateSchema } from './templates';
 
 @Injectable()
 export class PagesService {
@@ -143,12 +144,24 @@ export class PagesService {
 
     const savedProject = await this.projectRepository.save(project);
 
+    let schema: any = {
+      components: [],
+      config: {},
+    };
+
+    if (
+      createProjectDto.createType === 'template' &&
+      createProjectDto.templateId
+    ) {
+      const templateSchema = getTemplateSchema(createProjectDto.templateId);
+      if (templateSchema) {
+        schema = templateSchema;
+      }
+    }
+
     const defaultPage = this.pageSchemaRepository.create({
       name: defaultPageName,
-      schema: {
-        components: [],
-        config: {},
-      },
+      schema,
       sortOrder: 0,
       projectId: savedProject.id,
     });

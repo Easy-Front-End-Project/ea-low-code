@@ -51,7 +51,9 @@
             <label class="prop-label">X轴</label>
             <UnitInput
               :value="shadowX"
-              @update:value="handleShadowValueChange('x', $event)"
+              @update:value="handleShadowValueInput('x', $event)"
+              @unit-change="handleShadowValueUnitChange('x', $event)"
+              @blur="handleShadowValueBlur"
               placeholder="0"
             />
           </div>
@@ -59,7 +61,9 @@
             <label class="prop-label">Y轴</label>
             <UnitInput
               :value="shadowY"
-              @update:value="handleShadowValueChange('y', $event)"
+              @update:value="handleShadowValueInput('y', $event)"
+              @unit-change="handleShadowValueUnitChange('y', $event)"
+              @blur="handleShadowValueBlur"
               placeholder="0"
             />
           </div>
@@ -69,7 +73,9 @@
             <label class="prop-label">模糊</label>
             <UnitInput
               :value="shadowBlur"
-              @update:value="handleShadowValueChange('blur', $event)"
+              @update:value="handleShadowValueInput('blur', $event)"
+              @unit-change="handleShadowValueUnitChange('blur', $event)"
+              @blur="handleShadowValueBlur"
               placeholder="0"
             />
           </div>
@@ -77,7 +83,9 @@
             <label class="prop-label">扩展</label>
             <UnitInput
               :value="shadowSpread"
-              @update:value="handleShadowValueChange('spread', $event)"
+              @update:value="handleShadowValueInput('spread', $event)"
+              @unit-change="handleShadowValueUnitChange('spread', $event)"
+              @blur="handleShadowValueBlur"
               placeholder="0"
             />
           </div>
@@ -126,6 +134,21 @@
   // 当前选中的预设
   const selectedPreset = ref('')
 
+  // 本地状态：用于编辑期间暂存阴影值
+  const localShadowValues = ref({ x: '0', y: '0', blur: '0', spread: '0' })
+  const isEditingShadow = ref(false)
+  const currentEditingKey = ref(null)
+
+  // 初始化本地阴影值
+  function initLocalShadowValues() {
+    localShadowValues.value = {
+      x: shadowX.value,
+      y: shadowY.value,
+      blur: shadowBlur.value,
+      spread: shadowSpread.value,
+    }
+  }
+
   // 解析当前的 boxShadow 值
   const parsedShadow = computed(() => {
     const boxShadow = props.style?.boxShadow
@@ -169,10 +192,26 @@
   const shadowType = computed(() => parsedShadow.value.type)
 
   // 阴影各值
-  const shadowX = computed(() => parsedShadow.value.x)
-  const shadowY = computed(() => parsedShadow.value.y)
-  const shadowBlur = computed(() => parsedShadow.value.blur)
-  const shadowSpread = computed(() => parsedShadow.value.spread)
+  const shadowX = computed(() =>
+    isEditingShadow.value && currentEditingKey.value === 'x'
+      ? localShadowValues.value.x
+      : parsedShadow.value.x
+  )
+  const shadowY = computed(() =>
+    isEditingShadow.value && currentEditingKey.value === 'y'
+      ? localShadowValues.value.y
+      : parsedShadow.value.y
+  )
+  const shadowBlur = computed(() =>
+    isEditingShadow.value && currentEditingKey.value === 'blur'
+      ? localShadowValues.value.blur
+      : parsedShadow.value.blur
+  )
+  const shadowSpread = computed(() =>
+    isEditingShadow.value && currentEditingKey.value === 'spread'
+      ? localShadowValues.value.spread
+      : parsedShadow.value.spread
+  )
   const shadowColor = computed(() => parsedShadow.value.color)
 
   // 处理阴影类型变化
@@ -230,20 +269,53 @@
     selectedPreset.value = '' // 自定义时清空预设选择
   }
 
-  // 处理阴影数值变化
-  function handleShadowValueChange(key, value) {
+  // 处理阴影数值变化 - 只更新本地状态
+  function handleShadowValueInput(key, value) {
+    if (!isEditingShadow.value) {
+      initLocalShadowValues()
+    }
+    isEditingShadow.value = true
+    currentEditingKey.value = key
+    localShadowValues.value[key] = value
+  }
+
+  // 处理阴影数值单位变化 - 立即提交（用户明确选择单位）
+  function handleShadowValueUnitChange(key, input, unit) {
+    localShadowValues.value[key] = input
+    isEditingShadow.value = false
+    currentEditingKey.value = null
+
     if (shadowType.value === 'none') return
 
-    const x = key === 'x' ? value : shadowX.value
-    const y = key === 'y' ? value : shadowY.value
-    const blur = key === 'blur' ? value : shadowBlur.value
-    const spread = key === 'spread' ? value : shadowSpread.value
+    const x = localShadowValues.value.x
+    const y = localShadowValues.value.y
+    const blur = localShadowValues.value.blur
+    const spread = localShadowValues.value.spread
+
+    const inset = shadowType.value === 'inset' ? 'inset ' : ''
+    const boxShadow = `${inset}${x}${unit} ${y}px ${blur}px ${spread}px ${shadowColor.value}`
+
+    emit('style-change', 'boxShadow', boxShadow, 'inline')
+    selectedPreset.value = ''
+  }
+
+  // 失去焦点时提交阴影值
+  function handleShadowValueBlur() {
+    isEditingShadow.value = false
+    currentEditingKey.value = null
+
+    if (shadowType.value === 'none') return
+
+    const x = localShadowValues.value.x
+    const y = localShadowValues.value.y
+    const blur = localShadowValues.value.blur
+    const spread = localShadowValues.value.spread
 
     const inset = shadowType.value === 'inset' ? 'inset ' : ''
     const boxShadow = `${inset}${x}px ${y}px ${blur}px ${spread}px ${shadowColor.value}`
 
     emit('style-change', 'boxShadow', boxShadow, 'inline')
-    selectedPreset.value = '' // 自定义时清空预设选择
+    selectedPreset.value = ''
   }
 </script>
 

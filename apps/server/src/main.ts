@@ -7,7 +7,9 @@ import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api', {
+    exclude: ['/uploads/(.*)'],
+  });
 
   // CORS 配置
   const corsOrigin = process.env.CORS_ORIGIN?.split(',') || [

@@ -99,8 +99,7 @@
 
   const imageUrl = computed(() => {
     if (!props.image.url) return ''
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
-    return `${baseUrl}${props.image.url}`
+    return props.image.url
   })
 
   const groupName = computed(() => {
@@ -122,11 +121,14 @@
 
   function handleCopyUrl() {
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(imageUrl.value).then(() => {
-        window.$message?.success('地址已复制到剪贴板')
-      }).catch(() => {
-        fallbackCopy()
-      })
+      navigator.clipboard
+        .writeText(imageUrl.value)
+        .then(() => {
+          window.$message?.success('地址已复制到剪贴板')
+        })
+        .catch(() => {
+          fallbackCopy()
+        })
     } else {
       fallbackCopy()
     }

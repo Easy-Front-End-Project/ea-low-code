@@ -15,7 +15,6 @@
         >
           <PreviewComponent :component="child" />
         </div>
-
         <PreviewComponent v-else :component="child" />
       </template>
     </template>
@@ -45,7 +44,7 @@
 
   // 使用公共的组件渲染逻辑
   const { resolvedChildrenText, hasChildrenText, componentProps, componentEventListeners } =
-    useComponentRender(componentRefWrapper)
+    useComponentRender(componentRefWrapper, { skipSlot: true })
 
   // 是否为远程组件
   const isRemoteComponent = computed(() => {

@@ -252,6 +252,18 @@ export const formComponents = [
         default: true,
       },
       {
+        name: 'pattern',
+        label: '正则表达式',
+        type: PropTypes.STRING,
+        default: '',
+      },
+      {
+        name: 'required',
+        label: '必填',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+      {
         name: 'inputmode',
         label: '输入模式',
         type: PropTypes.STRING,
@@ -763,6 +775,12 @@ export const formComponents = [
           { label: '小', value: 'small' },
         ],
       },
+      {
+        name: 'required',
+        label: '必填',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
     ],
     events: [{ name: 'change', label: '选中值改变' }],
     slots: [{ name: 'default', label: '选项内容' }],
@@ -1093,6 +1111,12 @@ export const formComponents = [
       {
         name: 'filterable',
         label: '可搜索',
+        type: PropTypes.BOOLEAN,
+        default: false,
+      },
+      {
+        name: 'required',
+        label: '必填',
         type: PropTypes.BOOLEAN,
         default: false,
       },

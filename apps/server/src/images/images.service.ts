@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, In } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
@@ -15,24 +16,55 @@ import { CreateImageGroupDto } from './dto/create-image-group.dto';
 
 @Injectable()
 export class ImagesService {
+  private readonly serverUrl: string;
+
   constructor(
     @InjectRepository(Image)
     private imagesRepository: Repository<Image>,
     @InjectRepository(ImageGroup)
     private imageGroupsRepository: Repository<ImageGroup>,
-  ) {}
+    private configService: ConfigService
+  ) {
+    const port = this.configService.get('PORT', 3000);
+    const host = this.configService.get(
+      'SERVER_HOST',
+      `http://localhost:${port}`
+    );
+    this.serverUrl = host.replace(/\/$/, '');
+  }
 
-  async findAllGroups() {
+  private toFullUrl(relativeUrl: string): string {
+    if (!relativeUrl) return '';
+    if (
+      relativeUrl.startsWith('http://') ||
+      relativeUrl.startsWith('https://')
+    ) {
+      return relativeUrl;
+    }
+    return `${this.serverUrl}${relativeUrl}`;
+  }
+
+  private formatImage(image: Image): Image {
+    if (image?.url) {
+      image.url = this.toFullUrl(image.url);
+    }
+    return image;
+  }
+
+  async findAllGroups(userId?: number) {
     return await this.imageGroupsRepository.find({
-      where: { isActive: true },
+      where: { isActive: true, userId: userId || undefined },
       order: { createdAt: 'DESC' },
     });
   }
 
-  async createGroup(createImageGroupDto: CreateImageGroupDto) {
-    const existing = await this.imageGroupsRepository.findOne({
-      where: { name: createImageGroupDto.name },
-    });
+  async createGroup(createImageGroupDto: CreateImageGroupDto, userId?: number) {
+    const where: any = { name: createImageGroupDto.name };
+    if (userId) {
+      where.userId = userId;
+    }
+
+    const existing = await this.imageGroupsRepository.findOne({ where });
 
     if (existing) {
       throw new BadRequestException('分组名称已存在');
@@ -41,6 +73,7 @@ export class ImagesService {
     const group = this.imageGroupsRepository.create({
       ...createImageGroupDto,
       imageCount: 0,
+      userId: userId || null,
     });
 
     return await this.imageGroupsRepository.save(group);
@@ -69,6 +102,10 @@ export class ImagesService {
       .createQueryBuilder('image')
       .leftJoinAndSelect('image.group', 'group');
 
+    if (userId) {
+      queryBuilder.andWhere('image.userId = :userId', { userId });
+    }
+
     if (groupId) {
       queryBuilder.andWhere('image.groupId = :groupId', { groupId });
     }
@@ -76,7 +113,7 @@ export class ImagesService {
     if (keyword) {
       queryBuilder.andWhere(
         '(image.filename LIKE :keyword OR image.alt LIKE :keyword)',
-        { keyword: `%${keyword}%` },
+        { keyword: `%${keyword}%` }
       );
     }
 
@@ -87,7 +124,7 @@ export class ImagesService {
       .getManyAndCount();
 
     return {
-      list,
+      list: list.map((img) => this.formatImage(img)),
       total,
       page: Number(page),
       pageSize: Number(pageSize),
@@ -104,7 +141,7 @@ export class ImagesService {
       throw new NotFoundException('图片不存在');
     }
 
-    return image;
+    return this.formatImage(image);
   }
 
   getUploadDir(): string {
@@ -119,7 +156,7 @@ export class ImagesService {
       'images',
       String(year),
       month,
-      day,
+      day
     );
 
     if (!fs.existsSync(uploadDir)) {
@@ -140,7 +177,13 @@ export class ImagesService {
     return `${uuidv4()}${ext}`;
   }
 
-  async saveImage(file: Express.Multer.File, groupId?: number | null, alt?: string, customName?: string): Promise<Image> {
+  async saveImage(
+    file: Express.Multer.File,
+    groupId?: number | null,
+    alt?: string,
+    customName?: string,
+    userId?: number
+  ): Promise<Image> {
     if (!file) {
       throw new BadRequestException('请选择要上传的文件');
     }
@@ -165,12 +208,14 @@ export class ImagesService {
     const url = `${relativePath.replace(/\\/g, '/')}`;
 
     const imageData = {
-      filename: customName && customName.trim() ? customName.trim() : file.originalname,
+      filename:
+        customName && customName.trim() ? customName.trim() : file.originalname,
       url,
       mimeType: file.mimetype,
       size: file.size,
       groupId: groupId || null,
       alt: alt || '',
+      userId: userId || null,
     };
 
     const savedImage = await this.imagesRepository.save(imageData);
@@ -179,7 +224,7 @@ export class ImagesService {
       await this.updateGroupImageCount(groupId, 1);
     }
 
-    return savedImage as Image;
+    return this.formatImage(savedImage as Image);
   }
 
   async deleteImage(id: number) {
@@ -227,14 +272,14 @@ export class ImagesService {
       await this.updateGroupImageCount(data.groupId, 1);
     }
 
-    return updatedImage;
+    return this.formatImage(updatedImage);
   }
 
   private async updateGroupImageCount(groupId: number, delta: number) {
     await this.imageGroupsRepository.increment(
       { id: groupId },
       'imageCount',
-      delta,
+      delta
     );
   }
 }

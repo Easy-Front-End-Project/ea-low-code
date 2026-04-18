@@ -23,8 +23,9 @@
         <div class="prop-item flex-1">
           <label class="prop-label">展示层级(zIndex)</label>
           <EaInput
-            :model-value="positionStyle?.zIndex || ''"
-            @update:model-value="handleInlineStyleChange('zIndex', $event)"
+            :model-value="isEditing ? localZIndex : (positionStyle?.zIndex || '')"
+            @update:model-value="handleZIndexInput"
+            @blur="handleZIndexBlur"
             placeholder="层级"
           />
         </div>
@@ -49,16 +50,20 @@
           <div class="prop-item flex-1">
             <label class="prop-label">上 (top)</label>
             <UnitInput
-              :value="positionStyle?.top || ''"
-              @update:value="handleInlineStyleChange('top', $event)"
+              :value="isEditing && localTop ? localTop : (positionStyle?.top || '')"
+              @update:value="handlePositionValueInput('top', $event)"
+              @unit-change="handlePositionValueUnitChange('top', $event)"
+              @blur="handlePositionValueBlur('top')"
               placeholder="auto"
             />
           </div>
           <div class="prop-item flex-1">
             <label class="prop-label">右 (right)</label>
             <UnitInput
-              :value="positionStyle?.right || ''"
-              @update:value="handleInlineStyleChange('right', $event)"
+              :value="isEditing && localRight ? localRight : (positionStyle?.right || '')"
+              @update:value="handlePositionValueInput('right', $event)"
+              @unit-change="handlePositionValueUnitChange('right', $event)"
+              @blur="handlePositionValueBlur('right')"
               placeholder="auto"
             />
           </div>
@@ -67,16 +72,20 @@
           <div class="prop-item flex-1">
             <label class="prop-label">下 (bottom)</label>
             <UnitInput
-              :value="positionStyle?.bottom || ''"
-              @update:value="handleInlineStyleChange('bottom', $event)"
+              :value="isEditing && localBottom ? localBottom : (positionStyle?.bottom || '')"
+              @update:value="handlePositionValueInput('bottom', $event)"
+              @unit-change="handlePositionValueUnitChange('bottom', $event)"
+              @blur="handlePositionValueBlur('bottom')"
               placeholder="auto"
             />
           </div>
           <div class="prop-item flex-1">
             <label class="prop-label">左 (left)</label>
             <UnitInput
-              :value="positionStyle?.left || ''"
-              @update:value="handleInlineStyleChange('left', $event)"
+              :value="isEditing && localLeft ? localLeft : (positionStyle?.left || '')"
+              @update:value="handlePositionValueInput('left', $event)"
+              @unit-change="handlePositionValueUnitChange('left', $event)"
+              @blur="handlePositionValueBlur('left')"
               placeholder="auto"
             />
           </div>
@@ -87,7 +96,7 @@
 </template>
 
 <script setup>
-  import { computed } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import UnitInput from '../common/UnitInput.vue'
   import EaSelect from '../ea-ui-wrap/EaSelect.vue'
   import EaInput from '../ea-ui-wrap/EaInput.vue'
@@ -101,6 +110,34 @@
 
   const emit = defineEmits(['style-change'])
 
+  // 本地状态
+  const localZIndex = ref('')
+  const localTop = ref('')
+  const localRight = ref('')
+  const localBottom = ref('')
+  const localLeft = ref('')
+  const isEditing = ref(false)
+
+  // 初始化本地状态
+  function initLocalState() {
+    localZIndex.value = props.positionStyle?.zIndex || ''
+    localTop.value = props.positionStyle?.top || ''
+    localRight.value = props.positionStyle?.right || ''
+    localBottom.value = props.positionStyle?.bottom || ''
+    localLeft.value = props.positionStyle?.left || ''
+  }
+
+  // 监听外部 props 变化
+  watch(
+    () => props.positionStyle,
+    () => {
+      if (!isEditing.value) {
+        initLocalState()
+      }
+    },
+    { deep: true }
+  )
+
   // 是否为非 static 定位
   const isPositioned = computed(() => {
     const position = props.positionStyle?.position
@@ -111,7 +148,6 @@
   function handlePositionChange(value) {
     emit('style-change', 'position', value, 'position')
 
-    // 如果切换到 static 或空值，清除定位偏移值
     if (!value || value === 'static') {
       emit('style-change', 'top', '', 'position')
       emit('style-change', 'right', '', 'position')
@@ -120,9 +156,84 @@
     }
   }
 
+  // 处理 zIndex 变化 - 只更新本地状态
+  function handleZIndexInput(value) {
+    isEditing.value = true
+    localZIndex.value = value
+  }
+
+  // 失去焦点时提交 zIndex
+  function handleZIndexBlur() {
+    isEditing.value = false
+    emit('style-change', 'zIndex', localZIndex.value, 'position')
+  }
+
+  // 处理定位偏移值变化 - 只更新本地状态
+  function handlePositionValueInput(key, value) {
+    isEditing.value = true
+    switch (key) {
+      case 'top':
+        localTop.value = value
+        break
+      case 'right':
+        localRight.value = value
+        break
+      case 'bottom':
+        localBottom.value = value
+        break
+      case 'left':
+        localLeft.value = value
+        break
+    }
+  }
+
+  // 处理定位偏移值单位变化 - 立即提交（用户明确选择单位）
+  function handlePositionValueUnitChange(key, input, unit) {
+    switch (key) {
+      case 'top':
+        localTop.value = input
+        break
+      case 'right':
+        localRight.value = input
+        break
+      case 'bottom':
+        localBottom.value = input
+        break
+      case 'left':
+        localLeft.value = input
+        break
+    }
+    isEditing.value = false
+    emit('style-change', key, input ? `${input}${unit}` : '', 'position')
+  }
+
+  // 失去焦点时提交定位偏移值
+  function handlePositionValueBlur(key) {
+    isEditing.value = false
+    let value = ''
+    switch (key) {
+      case 'top':
+        value = localTop.value
+        break
+      case 'right':
+        value = localRight.value
+        break
+      case 'bottom':
+        value = localBottom.value
+        break
+      case 'left':
+        value = localLeft.value
+        break
+    }
+    emit('style-change', key, value, 'position')
+  }
+
   function handleInlineStyleChange(styleName, value) {
     emit('style-change', styleName, value, 'position')
   }
+
+  // 初始化
+  initLocalState()
 </script>
 
 <style scoped>
