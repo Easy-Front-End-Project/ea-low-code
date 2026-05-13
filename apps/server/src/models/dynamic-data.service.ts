@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
@@ -18,7 +18,16 @@ export class DynamicDataService {
     private dataSource: DataSource
   ) {}
 
+  private readonly IDENTIFIER_REGEX = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+
+  private validateIdentifier(name: string, label: string) {
+    if (!this.IDENTIFIER_REGEX.test(name)) {
+      throw new BadRequestException(`非法的${label}: ${name}`);
+    }
+  }
+
   async find(tableName: string, body?: any) {
+    this.validateIdentifier(tableName, '表名');
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     const where = this.buildWhere(body);
@@ -29,6 +38,7 @@ export class DynamicDataService {
   }
 
   async page(tableName: string, body?: any) {
+    this.validateIdentifier(tableName, '表名');
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     const page = Number(body?.page) || 0;
@@ -43,9 +53,11 @@ export class DynamicDataService {
   }
 
   async create(tableName: string, body: any) {
+    this.validateIdentifier(tableName, '表名');
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     const keys = Object.keys(body);
+    keys.forEach((k) => this.validateIdentifier(k, '列名'));
     const values = Object.values(body);
     const placeholders = keys.map(() => '?').join(', ');
     const sql = `INSERT INTO \`${tableName}\` (${keys.map((k) => `\`${k}\``).join(', ')}) VALUES (${placeholders})`;
@@ -55,9 +67,11 @@ export class DynamicDataService {
   }
 
   async update(tableName: string, body: any) {
+    this.validateIdentifier(tableName, '表名');
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     const { id, ...data } = body;
+    Object.keys(data).forEach((k) => this.validateIdentifier(k, '列名'));
     const setClause = Object.entries(data)
       .map(([k]) => `\`${k}\` = ?`)
       .join(', ');
@@ -69,6 +83,7 @@ export class DynamicDataService {
   }
 
   async delete(tableName: string, id: number) {
+    this.validateIdentifier(tableName, '表名');
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     const sql = `DELETE FROM \`${tableName}\` WHERE \`id\` = ?`;
@@ -88,6 +103,7 @@ export class DynamicDataService {
         value !== null &&
         value !== ''
       ) {
+        this.validateIdentifier(key, '列名');
         if (typeof value === 'string') {
           conditions.push(`\`${key}\` LIKE '%${value.replace(/'/g, "''")}%'`);
         } else {
