@@ -63,7 +63,7 @@
 
   // 画布样式
   const canvasStyle = computed(() => {
-    const { viewport } = schemaStore.pageSchema.meta
+    const { viewport } = schemaStore.pageSchema?.meta || {}
     const hasViewport = viewport?.width && viewport?.height
     return {
       width: hasViewport ? `${viewport.width}px` : '100%',
