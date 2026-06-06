@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <ea-dialog :visible="visible" title="选择变量" width="500px" @close="handleClose">
     <div class="variable-selector">
       <!-- 搜索框 -->
@@ -51,7 +51,7 @@
 
 <script setup>
   import { ref, computed } from 'vue'
-  import { useVariableStore } from '@/stores/designer/variable'
+  import { useVariableStore } from '@/components/designer/stores/variable'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
   const props = defineProps({

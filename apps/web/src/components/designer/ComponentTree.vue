@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <ea-dialog :visible="visible" title="组件大纲" width="400px" @close="handleClose">
     <ea-empty v-if="treeData.length === 0" description="暂无组件" icon="box-open" />
     <ea-tree
@@ -15,7 +15,7 @@
 
 <script setup>
   import { computed, onMounted } from 'vue'
-  import { useSchemaStore } from '@/stores/designer/schema'
+  import { useSchemaStore } from '@/components/designer/stores/schema'
 
   const props = defineProps({
     visible: {

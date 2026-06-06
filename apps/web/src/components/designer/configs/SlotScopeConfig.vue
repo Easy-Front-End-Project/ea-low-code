@@ -1,0 +1,105 @@
+﻿<template>
+  <div v-if="shouldShow" class="slot-scope-config-section">
+    <h4 class="section-title">插槽 Scope 绑定</h4>
+    <div class="scope-select">
+      <EaSelect
+        v-model="selectedScope"
+        placeholder="选择要绑定的 scope 数据"
+        clearable
+        @change="handleScopeChange"
+      >
+        <ea-option v-for="item in scopeOptions" :key="item.value" :value="item.value">
+          {{ item.label }}
+        </ea-option>
+      </EaSelect>
+    </div>
+  </div>
+</template>
+
+<script setup>
+  import { computed } from 'vue'
+  import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
+
+  const props = defineProps({
+    // 父组件的插槽定义
+    parentSlots: {
+      type: Array,
+      default: () => [],
+    },
+    // 当前组件插入的插槽名称
+    slotValue: {
+      type: String,
+      default: 'default',
+    },
+    // 当前选中的 scope 名称
+    scope: {
+      type: String,
+      default: '',
+    },
+  })
+
+  const emit = defineEmits(['scope-change'])
+
+  // 获取当前插槽的 slotScope 定义
+  const currentSlot = computed(() => {
+    return props.parentSlots.find(slot => slot.name === props.slotValue)
+  })
+
+  // 当前插槽可用的 scope 数据
+  const availableSlotScope = computed(() => {
+    return currentSlot.value?.slotScope || []
+  })
+
+  // 是否显示 scope 配置
+  const shouldShow = computed(() => {
+    return availableSlotScope.value.length > 0
+  })
+
+  // scope 选项
+  const scopeOptions = computed(() => {
+    return availableSlotScope.value.map(item => ({
+      label: `${item.label || item.name}`,
+      value: item.name,
+    }))
+  })
+
+  // 当前选中的 scope
+  const selectedScope = computed({
+    get() {
+      return props.scope || ''
+    },
+    set(value) {
+      emit('scope-change', value || '')
+    },
+  })
+
+  // 处理 scope 变更
+  function handleScopeChange(value) {
+    emit('scope-change', value || '')
+  }
+</script>
+
+<style scoped>
+  .slot-scope-config-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .section-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.75rem;
+  }
+
+  .scope-select {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .scope-select EaSelect {
+    width: 100%;
+  }
+</style>

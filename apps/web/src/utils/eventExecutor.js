@@ -1,11 +1,11 @@
-/**
+﻿/**
  * 事件执行器 - 统一处理组件事件执行逻辑
  * 用于 CanvasComponent 和 PreviewComponent 中的事件执行
  */
 
-import { useComponentInstanceStore } from '@/stores/designer/componentInstance'
-import { useVariableStore } from '@/stores/designer/variable'
-import { useSchemaStore } from '@/stores/designer/schema'
+import { useComponentInstanceStore } from '@/components/designer/stores/componentInstance'
+import { useVariableStore } from '@/components/designer/stores/variable'
+import { useSchemaStore } from '@/components/designer/stores/schema'
 import {
   resolveValue as resolveValueUtil,
   resolveComponentId as resolveComponentIdUtil,
