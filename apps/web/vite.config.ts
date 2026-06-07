@@ -12,7 +12,7 @@ export default defineConfig({
     vue({
       template: {
         compilerOptions: {
-          isCustomElement: tag => tag.startsWith('ea-'),
+          isCustomElement: (tag: string) => tag.startsWith('ea-'),
         },
       },
     }),
@@ -30,7 +30,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks(id) {
+        manualChunks(id: string) {
           // EA-UI 组件单独打包
           if (id.includes('easy-component-ui')) {
             return 'ea-ui'
