@@ -82,9 +82,9 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useUserStore } from '@/stores/user.js'
+import { useUserStore } from '@/stores/user'
 import { changePassword } from '@/api/auth'
 import { updateUser } from '@/api/user'
 
@@ -130,7 +130,7 @@ async function saveName() {
     userStore.user = { ...userStore.user, nickname: editName.value.trim() }
     window.$message?.success('昵称修改成功')
     showNameDialog.value = false
-  } catch (error) {
+  } catch (error: any) {
     window.$message?.error(error.message || '修改失败')
   } finally {
     savingName.value = false

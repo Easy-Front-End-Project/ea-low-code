@@ -18,7 +18,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
   import { useRoute } from 'vue-router'
   import { useSchemaStore } from '@/components/designer/stores/schema'
@@ -85,8 +85,7 @@
 
       await nextTick()
       scheduleReady()
-    } catch (error) {
-      console.error('加载预览数据失败:', error)
+    } catch (error: any) {
       const status = error?.response?.status
       if (status === 404) {
         loadError.value = '页面不存在或已被删除'
@@ -124,9 +123,9 @@
   }
 
   // 页面事件处理 - 与 PreviewMode 保持一致
-  const eventHandlers = new Map()
+  const eventHandlers = new Map<string, EventListener>()
 
-  function createEventHandler(eventConfig) {
+  function createEventHandler(eventConfig: any): EventListener {
     return async event => {
       await executeEvent(eventConfig, event)
     }
@@ -134,7 +133,7 @@
 
   function bindPageEvents() {
     unbindPageEvents()
-    pageEvents.value.forEach(eventConfig => {
+    pageEvents.value.forEach((eventConfig: any) => {
       const eventType = eventConfig.eventType
       if (!eventType) return
       const handler = createEventHandler(eventConfig)

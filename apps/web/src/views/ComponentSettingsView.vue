@@ -86,7 +86,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, computed, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useRemoteComponentStore } from '@/stores/designer/remoteComponent'
@@ -121,9 +121,9 @@
   })
 
   const configForm = ref({
-    props: [],
-    events: [],
-    slots: [],
+    props: [] as any[],
+    events: [] as any[],
+    slots: [] as any[],
   })
 
   const componentName = computed(() => form.value.name || '')
@@ -136,7 +136,7 @@
 
   onMounted(async () => {
     if (route.params.id) {
-      await loadComponentData(route.params.id)
+      await loadComponentData(route.params.id as string)
     } else {
       resetForm()
     }
@@ -153,10 +153,10 @@
 
   async function handleRetry() {
     loadError.value = ''
-    await loadComponentData(route.params.id)
+    await loadComponentData(route.params.id as string)
   }
 
-  async function loadComponentData(id) {
+  async function loadComponentData(id: string) {
     loading.value = true
     loadError.value = ''
 
@@ -249,7 +249,7 @@
       remoteStore.addComponent(componentData)
       window.$message?.success('组件创建成功')
     } else {
-      remoteStore.updateComponent(route.params.id, componentData)
+      remoteStore.updateComponent(Number(route.params.id), componentData)
       window.$message?.success('组件更新成功')
     }
   }
@@ -264,7 +264,7 @@
     })
   }
 
-  function handleRemoveProp(index) {
+  function handleRemoveProp(index: number) {
     configForm.value.props.splice(index, 1)
   }
 
@@ -272,7 +272,7 @@
     configForm.value.events.push({ name: '', label: '', description: '' })
   }
 
-  function handleRemoveEvent(index) {
+  function handleRemoveEvent(index: number) {
     configForm.value.events.splice(index, 1)
   }
 
@@ -280,7 +280,7 @@
     configForm.value.slots.push({ name: 'default', label: '默认插槽', description: '' })
   }
 
-  function handleRemoveSlot(index) {
+  function handleRemoveSlot(index: number) {
     configForm.value.slots.splice(index, 1)
   }
 </script>

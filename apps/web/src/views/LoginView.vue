@@ -284,11 +284,11 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, reactive } from 'vue'
   import { useRouter } from 'vue-router'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
-  import { useUserStore } from '@/stores/user.js'
+  import { useUserStore } from '@/stores/user'
 
   const router = useRouter()
   const userStore = useUserStore()
@@ -323,22 +323,22 @@
   const loading = ref(false)
   const sendingCode = ref(false)
   const codeCountdown = ref(0)
-  const confirmPasswordRef = ref(null)
-  const forgotConfirmPasswordRef = ref(null)
+  const confirmPasswordRef = ref<any>(null)
+  const forgotConfirmPasswordRef = ref<any>(null)
 
   // 显示提示消息
-  function showMessage(message, type = 'info') {
+  function showMessage(message: string, type: string = 'info') {
     if (window.$message) {
-      window.$message[type](message)
+      (window.$message as any)[type](message)
     } else {
       alert(message)
     }
   }
 
   // 显示警告对话框
-  function showAlert(message, title = '提示') {
+  function showAlert(message: string, title: string = '提示') {
     if (window.$alert) {
-      return window.$alert(message, title, {
+      return (window.$alert as any)(message, title, {
         confirmButtonText: '确定',
       })
     } else {
@@ -348,7 +348,7 @@
   }
 
   // 切换模式
-  function switchMode(mode) {
+  function switchMode(mode: string) {
     currentMode.value = mode
     // 重置所有表单
     resetForms()
@@ -400,7 +400,7 @@
   }
 
   // 验证忘记密码确认密码
-  function validateForgotConfirmPassword() {
+  function validateForgotConfirmPassword(): boolean {
     if (!forgotConfirmPasswordRef.value) return true
 
     if (forgotForm.newPassword !== forgotForm.confirmPassword) {
@@ -414,7 +414,7 @@
   }
 
   // 发送验证码
-  async function handleSendCode(email, purpose = 'register') {
+  async function handleSendCode(email: string, purpose: string = 'register') {
     if (!email) {
       showMessage('请先输入邮箱', 'warning')
       return
@@ -438,7 +438,7 @@
           clearInterval(timer)
         }
       }, 1000)
-    } catch (error) {
+    } catch (error: any) {
       showMessage(error.message || '发送验证码失败', 'error')
     } finally {
       sendingCode.value = false
@@ -461,7 +461,7 @@
       })
       showMessage('登录成功', 'success')
       await router.push({ name: 'dashboard' })
-    } catch (error) {
+    } catch (error: any) {
       showAlert(error.message || '登录失败')
     } finally {
       loading.value = false
@@ -493,7 +493,7 @@
       })
       await showAlert('注册成功，请登录')
       switchMode('login')
-    } catch (error) {
+    } catch (error: any) {
       showAlert(error.message || '注册失败')
     } finally {
       loading.value = false
@@ -524,7 +524,7 @@
       })
       await showAlert('密码重置成功，请登录')
       switchMode('login')
-    } catch (error) {
+    } catch (error: any) {
       showAlert(error.message || '密码重置失败')
     } finally {
       loading.value = false

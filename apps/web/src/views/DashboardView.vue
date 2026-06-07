@@ -159,11 +159,11 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, onMounted, computed } from 'vue'
   import { useRouter } from 'vue-router'
-  import { useUserStore } from '@/stores/user.js'
-  import { useProjectsStore } from '@/stores/projects.js'
+  import { useUserStore } from '@/stores/user'
+  import { useProjectsStore } from '@/stores/projects'
   import ProjectCard from '@/components/projects/ProjectCard.vue'
   import CreateProjectDialog from '@/components/projects/CreateProjectDialog.vue'
   import { getDashboardStats, getRecentProjects, getRecentActivities } from '@/api/stats'
@@ -182,14 +182,14 @@
   })
 
   // 最近项目
-  const recentProjects = ref([])
+  const recentProjects = ref<any[]>([])
 
   // 最近动态
-  const activities = ref([])
+  const activities = ref<any[]>([])
 
   // 获取活动图标
-  function getActivityIcon(type) {
-    const iconMap = {
+  function getActivityIcon(type: string) {
+    const iconMap: Record<string, string> = {
       create: 'plus',
       update: 'pen',
       delete: 'trash',
@@ -199,7 +199,7 @@
   }
 
   // 格式化时间
-  function formatTime(dateStr) {
+  function formatTime(dateStr: string) {
     if (!dateStr) return ''
     const date = new Date(dateStr)
     const now = new Date()
@@ -233,12 +233,12 @@
       recentProjects.value = recentProjectsData
 
       // 更新最近动态
-      activities.value = activitiesData.map(activity => ({
+      activities.value = activitiesData.map((activity: any) => ({
         type: activity.type,
         time: formatTime(activity.createdAt),
         text: activity.description,
       }))
-    } catch (error) {
+    } catch (error: any) {
       console.error('获取仪表盘数据失败:', error)
       window.$message?.error('获取数据失败')
     }
@@ -270,35 +270,35 @@
   }
 
   // 点击卡片进入项目设置
-  function handleCardClick(project) {
+  function handleCardClick(project: any) {
     router.push({ name: 'project-settings', params: { id: project.id } })
   }
 
   // 进入项目设置
-  function handleSettings(project) {
+  function handleSettings(project: any) {
     router.push({ name: 'project-settings', params: { id: project.id } })
   }
 
   // 删除项目
-  async function handleDelete(project) {
+  async function handleDelete(project: any) {
     try {
       await projectsStore.remove(project.id)
       window.$message?.success('删除成功')
       projectsStore.fetchProjects()
 
       fetchDashboardData()
-    } catch (error) {
+    } catch (error: any) {
       window.$message?.error(error.message || '删除失败')
     }
   }
 
   // 复制项目
-  async function handleClone(project) {
+  async function handleClone(project: any) {
     try {
       await projectsStore.clone(project.id)
       window.$message?.success('复制成功')
       projectsStore.fetchProjects()
-    } catch (error) {
+    } catch (error: any) {
       window.$message?.error(error.message || '复制失败')
     }
   }

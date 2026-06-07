@@ -55,10 +55,10 @@
   </ea-container>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useProjectsStore } from '@/stores/projects.js'
+import { useProjectsStore } from '@/stores/projects'
 import ProjectSearchBar from '@/components/projects/ProjectSearchBar.vue'
 import ProjectCard from '@/components/projects/ProjectCard.vue'
 import CreateProjectDialog from '@/components/projects/CreateProjectDialog.vue'
@@ -85,7 +85,7 @@ function handleRefresh() {
 }
 
 // 页码变化
-function handlePageChange(page) {
+function handlePageChange(page: number) {
   projectsStore.setPage(page)
   projectsStore.fetchProjects()
 }
@@ -118,12 +118,12 @@ async function handleDelete(project) {
 }
 
 // 复制项目
-async function handleClone(project) {
+async function handleClone(project: any) {
   try {
     await projectsStore.clone(project.id)
     window.$message?.success('复制成功')
     projectsStore.fetchProjects()
-  } catch (error) {
+  } catch (error: any) {
     window.$message?.error(error.message || '复制失败')
   }
 }

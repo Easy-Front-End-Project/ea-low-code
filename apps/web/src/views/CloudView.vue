@@ -80,9 +80,9 @@
   </ea-container>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, computed, onMounted } from 'vue'
-  import { useImagesStore } from '@/stores/images.js'
+  import { useImagesStore } from '@/stores/images'
   import ImageSearchBar from '@/components/images/ImageSearchBar.vue'
   import ImageCard from '@/components/images/ImageCard.vue'
   import UploadImageDialog from '@/components/images/UploadImageDialog.vue'
@@ -113,17 +113,17 @@
     Promise.all([imagesStore.fetchGroups(), imagesStore.fetchImages()])
   }
 
-  function handlePageChange(page) {
+  function handlePageChange(page: number) {
     imagesStore.setPage(page)
     imagesStore.fetchImages()
   }
 
-  function handleSizeChange(size) {
+  function handleSizeChange(size: number) {
     imagesStore.setPageSize(size)
     imagesStore.fetchImages()
   }
 
-  function handleDownload(image) {
+  function handleDownload(image: any) {
     const link = document.createElement('a')
     link.href = image.url
     link.download = image.filename
@@ -134,15 +134,15 @@
     window.$message?.success('开始下载')
   }
 
-  function handleEdit(image) {
+  function handleEdit(image: any) {
     editingImage.value = image
     showEditDialog.value = true
   }
 
-  async function handleDelete(image) {
+  async function handleDelete(image: any) {
     try {
       await imagesStore.removeImage(image.id)
-    } catch (error) {
+    } catch (error: any) {
       window.$message?.error(error.message || '删除失败')
     }
   }

@@ -79,7 +79,7 @@
   </ea-container>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
   import { useRemoteComponentStore } from '@/stores/designer/remoteComponent'
@@ -97,7 +97,7 @@
   const showPresetManager = ref(false)
   const componentForm = ref({ name: '' })
 
-  async function loadData(searchKeyword) {
+  async function loadData(searchKeyword?: string) {
     loading.value = true
     try {
       await remoteStore.loadConfig(searchKeyword)
@@ -108,7 +108,7 @@
 
   onMounted(() => loadData())
 
-  async function handleSearch(keyword) {
+  async function handleSearch(keyword: string) {
     remoteStore.setKeyword(keyword)
     await loadData(keyword)
   }
@@ -118,11 +118,11 @@
     loadData()
   }
 
-  function handlePageChange(page) {
+  function handlePageChange(page: number) {
     remoteStore.setPage(page)
   }
 
-  function handleSizeChange(size) {
+  function handleSizeChange(size: number) {
     remoteStore.setPageSize(size)
   }
 
@@ -139,17 +139,17 @@
     window.$message?.success('组件创建成功，请完善配置信息')
   }
 
-  function handleEdit(component) {
+  function handleEdit(component: any) {
     router.push({ name: 'component-settings', params: { id: component.id } })
   }
 
-  async function handleDelete(id) {
+  async function handleDelete(id: number) {
     if (!confirm('确定要删除这个远程组件吗？')) return
     await remoteStore.removeComponent(id)
     window.$message?.success('删除成功')
   }
 
-  async function handleToggleEnabled(id, enabled) {
+  async function handleToggleEnabled(id: number, enabled: boolean) {
     await remoteStore.toggleComponentEnabled(id, enabled)
   }
 </script>

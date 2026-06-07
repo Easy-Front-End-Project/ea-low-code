@@ -73,9 +73,9 @@
   </ea-container>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, onMounted } from 'vue'
-  import { useModelsStore } from '@/stores/models.js'
+  import { useModelsStore } from '@/stores/models'
   import ModelSearchBar from '@/components/models/ModelSearchBar.vue'
   import ModelListAside from '@/components/models/ModelListAside.vue'
   import ModelEditorTabs from '@/components/models/ModelEditorTabs.vue'
@@ -86,9 +86,9 @@
   const modelsStore = useModelsStore()
   const showCreateDialog = ref(false)
   const showFieldDialog = ref(false)
-  const editingModel = ref(null)
-  const editingField = ref(null)
-  const sortRules = ref([])
+  const editingModel = ref<any>(null)
+  const editingField = ref<any>(null)
+  const sortRules = ref<any[]>([])
 
   onMounted(() => {
     modelsStore.fetchModels()
@@ -102,24 +102,24 @@
     modelsStore.fetchModels()
   }
 
-  function handleSelectModel(model) {
+  function handleSelectModel(model: any) {
     modelsStore.selectModel(model?.id || null)
   }
 
-  function handleEditModel(model) {
+  function handleEditModel(model: any) {
     editingModel.value = model
     showCreateDialog.value = true
   }
 
-  async function handleDeleteModel(model) {
+  async function handleDeleteModel(model: any) {
     try {
       await modelsStore.removeModel(model.id)
-    } catch (error) {
+    } catch (error: any) {
       window.$message?.error(error.message || '删除失败')
     }
   }
 
-  async function handleModelSuccess(data) {
+  async function handleModelSuccess(data?: any) {
     showCreateDialog.value = false
     editingModel.value = null
     try {
@@ -133,7 +133,7 @@
       } else {
         await modelsStore.fetchModels()
       }
-    } catch (error) {
+    } catch (error: any) {
       window.$message?.error(error.message || '操作失败')
     }
   }
@@ -144,39 +144,39 @@
     }
   }
 
-  function handlePageChange(page) {
+  function handlePageChange(page: number) {
     modelsStore.setPage(page)
     if (modelsStore.selectedModelId) {
       modelsStore.fetchFields(modelsStore.selectedModelId)
     }
   }
 
-  function handleSizeChange(size) {
+  function handleSizeChange(size: number) {
     modelsStore.setPageSize(size)
     if (modelsStore.selectedModelId) {
       modelsStore.fetchFields(modelsStore.selectedModelId)
     }
   }
 
-  async function handleDeleteField(field) {
+  async function handleDeleteField(field: any) {
     try {
       await modelsStore.removeField(field.id)
-    } catch (error) {
+    } catch (error: any) {
       window.$message?.error(error.message || '删除失败')
     }
   }
 
-  async function handleSortFields(fieldIds) {
+  async function handleSortFields(fieldIds: number[]) {
     if (modelsStore.selectedModelId) {
       try {
         await modelsStore.reorderFields(modelsStore.selectedModelId, fieldIds)
-      } catch (error) {
+      } catch (error: any) {
         window.$message?.error(error.message || '排序失败')
       }
     }
   }
 
-  async function handleFieldSuccess(data) {
+  async function handleFieldSuccess(data?: any) {
     showFieldDialog.value = false
     editingField.value = null
     try {
@@ -187,23 +187,23 @@
       } else {
         handleRefreshFields()
       }
-    } catch (error) {
+    } catch (error: any) {
       window.$message?.error(error.message || '操作失败')
     }
   }
 
-  function handleAddSortRule(rule) {
+  function handleAddSortRule(rule: any) {
     sortRules.value.push({ ...rule, id: Date.now() })
   }
 
-  function handleUpdateSortRule(rule) {
+  function handleUpdateSortRule(rule: any) {
     const index = sortRules.value.findIndex(r => r.id === rule.id)
     if (index !== -1) {
       sortRules.value[index] = { ...sortRules.value[index], ...rule }
     }
   }
 
-  function handleDeleteSortRule(rule) {
+  function handleDeleteSortRule(rule: any) {
     sortRules.value = sortRules.value.filter(r => r.id !== rule.id)
   }
 </script>

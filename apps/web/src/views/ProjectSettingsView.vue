@@ -138,7 +138,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, onMounted, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { getProjectDetail, updateProject } from '@/api/projects'
@@ -148,7 +148,7 @@
   import PageCard from '@/components/pages/PageCard.vue'
   import CreatePageDialog from '@/components/pages/CreatePageDialog.vue'
   import EditPageDialog from '@/components/pages/EditPageDialog.vue'
-  import { usePagesStore } from '@/stores/pages.js'
+  import { usePagesStore } from '@/stores/pages'
 
   const route = useRoute()
   const router = useRouter()
@@ -181,8 +181,8 @@
 
   onMounted(async () => {
     if (route.params.id) {
-      await initProject(route.params.id)
-      await loadPagesData(route.params.id)
+      await initProject(route.params.id as string)
+      await loadPagesData(route.params.id as string)
     }
   })
 
@@ -217,7 +217,7 @@
       const project = await getProjectDetail(Number(id))
       form.value.name = project.name || ''
       form.value.description = project.description || ''
-    } catch (error) {
+    } catch (error: any) {
       console.error('加载项目数据失败:', error)
       const status = error?.response?.status
       if (status === 401) {
@@ -274,7 +274,7 @@
     }
   }
 
-  function handleCardClick(page) {
+  function handleCardClick(page: any) {
     router.push({ name: 'designer', params: { id: page.id } })
   }
 
@@ -317,7 +317,7 @@
         description: form.value.description,
       })
       window.$message?.success('保存成功')
-    } catch (error) {
+    } catch (error: any) {
       window.$message?.error(error.message || '保存失败')
     } finally {
       saving.value = false
