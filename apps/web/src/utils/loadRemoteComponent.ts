@@ -2,17 +2,17 @@ import * as Vue from "vue";
 
 /**
  * 加载远程 UMD 组件
- * @param {string} url - 远程组件 URL
- * @param {string} [exportName] - 导出的组件名，默认自动检测
+ * @param url - 远程组件 URL
+ * @param exportName - 导出的组件名，默认自动检测
  */
-export async function loadRemoteComponent(url, exportName) {
+export async function loadRemoteComponent(url: string, exportName?: string): Promise<any> {
   const script = await fetch(url).then((r) => r.text());
-  const module = { exports: {} };
+  const module = { exports: {} as Record<string, any> };
 
   new Function("module", "exports", "require", script)(
     module,
     module.exports,
-    (id) => (id === "vue" ? Vue : null),
+    (id: string) => (id === "vue" ? Vue : null),
   );
 
   const exports = module.exports;
@@ -26,7 +26,7 @@ export async function loadRemoteComponent(url, exportName) {
   return (
     exports.default ||
     exports.EaRemoteComponent ||
-    Object.values(exports).find((v) => v?.render || v?.setup) ||
+    Object.values(exports).find((v: any) => v?.render || v?.setup) ||
     exports
   );
 }
@@ -34,5 +34,5 @@ export async function loadRemoteComponent(url, exportName) {
 /**
  * 创建异步组件加载器（用于 defineAsyncComponent）
  */
-export const createRemoteComponent = (url, exportName) => () =>
+export const createRemoteComponent = (url: string, exportName?: string) => () =>
   loadRemoteComponent(url, exportName);

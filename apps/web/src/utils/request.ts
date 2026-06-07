@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getToken, clearAuth } from './storage.js'
+import { getToken, clearAuth } from './storage'
 
 // API 基础配置
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'
@@ -15,7 +15,7 @@ const request = axios.create({
 
 // 请求拦截器
 request.interceptors.request.use(
-  config => {
+  (config) => {
     // 从 storage 获取 token
     const token = getToken()
     if (token) {
@@ -23,18 +23,18 @@ request.interceptors.request.use(
     }
     return config
   },
-  error => {
+  (error) => {
     return Promise.reject(error)
   }
 )
 
 // 响应拦截器
 request.interceptors.response.use(
-  response => {
+  (response) => {
     // 直接返回响应数据
     return response.data
   },
-  error => {
+  (error) => {
     // 统一错误处理
     const message = error.response?.data?.message || '请求失败，请稍后重试'
 
@@ -64,18 +64,22 @@ request.interceptors.response.use(
   }
 )
 
+interface HttpRequestOptions {
+  method?: string
+  data?: Record<string, any>
+  params?: Record<string, any>
+  headers?: Record<string, string>
+  timeout?: number
+}
+
 /**
  * 封装请求方法
- * @param {string} url - 请求地址
- * @param {Object} options - 请求配置
- * @param {string} options.method - 请求方法 (get/post/put/delete)
- * @param {Object} options.data - 请求体数据
- * @param {Object} options.params - URL 参数
- * @param {Object} options.headers - 自定义请求头
- * @returns {Promise} 请求结果
+ * @param url - 请求地址
+ * @param options - 请求配置
+ * @returns 请求结果
  */
-export function httpRequest(url, options = {}) {
-  const { method = 'get', data, params, headers } = options
+export function httpRequest(url: string, options: HttpRequestOptions = {}): Promise<any> {
+  const { method = 'get', data, params, headers, timeout } = options
 
   return request({
     url,
@@ -83,6 +87,7 @@ export function httpRequest(url, options = {}) {
     data,
     params,
     headers,
+    timeout,
   })
 }
 

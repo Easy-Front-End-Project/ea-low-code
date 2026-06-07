@@ -1,10 +1,10 @@
 /**
  * 处理自定义 CSS，将 & 和 :host 替换为组件唯一类名
- * @param {string} css - 用户输入的 CSS
- * @param {string} className - 组件唯一类名
- * @returns {string} 处理后的 CSS
+ * @param css - 用户输入的 CSS
+ * @param className - 组件唯一类名
+ * @returns 处理后的 CSS
  */
-export function processCustomCSS(css, className) {
+export function processCustomCSS(css: string, className: string): string {
   if (!css || !css.trim()) return ''
 
   let processed = css.trim()
@@ -25,9 +25,9 @@ export function processCustomCSS(css, className) {
 
 /**
  * 生成组件唯一类名
- * @param {string} componentId - 组件 ID
- * @returns {string} 唯一类名
+ * @param componentId - 组件 ID
+ * @returns 唯一类名
  */
-export function generateCustomClassName(componentId) {
+export function generateCustomClassName(componentId: string): string {
   return `custom-${componentId}`
 }

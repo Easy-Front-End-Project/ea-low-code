@@ -7,7 +7,7 @@ import { getToken, setToken, removeToken, getUser, setUser, removeUser } from '@
 export const useUserStore = defineStore('user', () => {
   // State
   const user = ref<any>(null)
-  const token = ref<string>(getToken())
+  const token = ref<string | null>(getToken())
   const isLoggedIn = computed(() => !!token.value)
 
   // Actions
