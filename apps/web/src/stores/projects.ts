@@ -6,11 +6,11 @@ import {
   updateProject as updateProjectApi,
   deleteProject as deleteProjectApi,
   cloneProject as cloneProjectApi,
-} from '@/api/projects.js'
+} from '@/api/projects'
 
 export const useProjectsStore = defineStore('projects', () => {
   // State
-  const projects = ref([])
+  const projects = ref<any[]>([])
   const total = ref(0)
   const currentPage = ref(1)
   const pageSize = ref(12)
@@ -22,7 +22,7 @@ export const useProjectsStore = defineStore('projects', () => {
   const totalPages = computed(() => Math.ceil(total.value / pageSize.value))
 
   // Actions
-  async function fetchProjects(params = {}) {
+  async function fetchProjects(params: Record<string, any> = {}) {
     loading.value = true
     try {
       const queryParams = {
@@ -47,32 +47,32 @@ export const useProjectsStore = defineStore('projects', () => {
     }
   }
 
-  async function create(data) {
+  async function create(data: Record<string, any>) {
     return await createProjectApi(data)
   }
 
-  async function update(id, data) {
+  async function update(id: number, data: Record<string, any>) {
     return await updateProjectApi({ id, ...data })
   }
 
-  async function remove(id) {
+  async function remove(id: number) {
     return await deleteProjectApi(id)
   }
 
-  async function clone(id) {
+  async function clone(id: number) {
     return await cloneProjectApi(id)
   }
 
-  function setKeyword(value) {
+  function setKeyword(value: string) {
     keyword.value = value
     currentPage.value = 1
   }
 
-  function setPage(page) {
+  function setPage(page: number) {
     currentPage.value = page
   }
 
-  function setPageSize(size) {
+  function setPageSize(size: number) {
     pageSize.value = size
     currentPage.value = 1
   }

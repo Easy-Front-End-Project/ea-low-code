@@ -4,15 +4,15 @@ import * as componentApi from '@/api/component'
 
 export const useRemoteComponentStore = defineStore('remoteComponent', () => {
   const globalUrl = ref('')
-  const components = ref([])
-  const urlPresets = ref([])
+  const components = ref<any[]>([])
+  const urlPresets = ref<any[]>([])
   const keyword = ref('')
   const currentPage = ref(1)
   const pageSize = ref(12)
 
   const enabledComponents = computed(() => components.value.filter(comp => comp.enabled !== false))
 
-  function getFullUrl(component) {
+  function getFullUrl(component: any): string {
     const { url, urlPresetId } = component
 
     if (!url) return ''
@@ -77,7 +77,7 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
   const defaultUrlPreset = computed(() => urlPresets.value.find(p => p.isDefault) || null)
   const urlPresetCount = computed(() => urlPresets.value.length)
 
-  async function loadConfig(searchKeyword) {
+  async function loadConfig(searchKeyword?: string) {
     try {
       const kw = searchKeyword ?? keyword.value
       const [componentsResult, presetsResult] = await Promise.all([
@@ -92,36 +92,36 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
     }
   }
 
-  function setGlobalUrl(url) {
+  function setGlobalUrl(url: string) {
     globalUrl.value = url
   }
 
-  async function addComponent(componentData) {
+  async function addComponent(componentData: Record<string, any>) {
     const result = await componentApi.createComponent(componentData)
     await loadConfig()
     return result
   }
 
-  async function updateComponent(id, data) {
+  async function updateComponent(id: number, data: Record<string, any>) {
     await componentApi.updateComponent({ id: Number(id), ...data })
     await loadConfig()
   }
 
-  async function removeComponent(id) {
+  async function removeComponent(id: number) {
     await componentApi.deleteComponent(Number(id))
     await loadConfig()
   }
 
-  async function toggleComponentEnabled(id, enabled) {
+  async function toggleComponentEnabled(id: number, enabled: boolean) {
     await componentApi.toggleComponentEnabled(Number(id), enabled)
     await loadConfig()
   }
 
-  function getComponentById(id) {
+  function getComponentById(id: number): any {
     return components.value.find(c => c.id == id) || null
   }
 
-  async function fetchComponentDetail(id) {
+  async function fetchComponentDetail(id: number) {
     const detail = await componentApi.getComponentDetail(Number(id))
     const existingIndex = components.value.findIndex(c => c.id === detail.id)
     if (existingIndex >= 0) {
@@ -132,41 +132,41 @@ export const useRemoteComponentStore = defineStore('remoteComponent', () => {
     return detail
   }
 
-  async function addUrlPreset(presetData) {
+  async function addUrlPreset(presetData: Record<string, any>) {
     const result = await componentApi.createUrlPreset(presetData)
     await loadConfig()
     return result
   }
 
-  async function updateUrlPreset(id, data) {
+  async function updateUrlPreset(id: number, data: Record<string, any>) {
     await componentApi.updateUrlPreset({ id: Number(id), ...data })
     await loadConfig()
   }
 
-  async function removeUrlPreset(id) {
+  async function removeUrlPreset(id: number) {
     await componentApi.deleteUrlPreset(Number(id))
     await loadConfig()
   }
 
-  async function setDefaultUrlPreset(id) {
+  async function setDefaultUrlPreset(id: number) {
     await componentApi.setDefaultUrlPreset(Number(id))
     await loadConfig()
   }
 
-  function getUrlPresetById(id) {
+  function getUrlPresetById(id: number): any {
     return urlPresets.value.find(p => p.id == id) || null
   }
 
-  function setKeyword(value) {
+  function setKeyword(value: string) {
     keyword.value = value
     currentPage.value = 1
   }
 
-  function setPage(page) {
+  function setPage(page: number) {
     currentPage.value = page
   }
 
-  function setPageSize(size) {
+  function setPageSize(size: number) {
     pageSize.value = size
     currentPage.value = 1
   }

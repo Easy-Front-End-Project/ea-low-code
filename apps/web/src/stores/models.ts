@@ -11,17 +11,17 @@ import {
   updateField as updateFieldApi,
   deleteField as deleteFieldApi,
   sortFields as sortFieldsApi,
-} from '@/api/models.js'
+} from '@/api/models'
 
 export const useModelsStore = defineStore('models', () => {
-  const models = ref([])
-  const fields = ref([])
-  const currentModel = ref(null)
+  const models = ref<any[]>([])
+  const fields = ref<any[]>([])
+  const currentModel = ref<any>(null)
   const total = ref(0)
   const currentPage = ref(1)
   const pageSize = ref(50)
   const keyword = ref('')
-  const selectedModelId = ref(null)
+  const selectedModelId = ref<number | null>(null)
   const loading = ref(false)
   const fieldsLoading = ref(false)
 
@@ -43,7 +43,7 @@ export const useModelsStore = defineStore('models', () => {
     }
   }
 
-  async function fetchModelDetail(id) {
+  async function fetchModelDetail(id: number) {
     try {
       const { model, fields: fieldList } = await getModelDetail(id)
       currentModel.value = model
@@ -56,7 +56,7 @@ export const useModelsStore = defineStore('models', () => {
     }
   }
 
-  async function fetchFields(modelId, params = {}) {
+  async function fetchFields(modelId: number, params: Record<string, any> = {}) {
     fieldsLoading.value = true
     try {
       const queryParams = {
@@ -83,13 +83,13 @@ export const useModelsStore = defineStore('models', () => {
     }
   }
 
-  async function addModel(data) {
+  async function addModel(data: Record<string, any>) {
     const result = await createModelApi(data)
     await fetchModels()
     return result
   }
 
-  async function editModel(data) {
+  async function editModel(data: Record<string, any>) {
     const result = await updateModelApi(data)
     if (selectedModelId.value === data.id) {
       await fetchModelDetail(data.id)
@@ -98,7 +98,7 @@ export const useModelsStore = defineStore('models', () => {
     return result
   }
 
-  async function removeModel(id) {
+  async function removeModel(id: number) {
     const result = await deleteModelApi(id)
     window.$message?.success('模型删除成功')
     if (selectedModelId.value === id) {
@@ -110,7 +110,7 @@ export const useModelsStore = defineStore('models', () => {
     return result
   }
 
-  async function addField(data) {
+  async function addField(data: Record<string, any>) {
     const result = await createFieldApi(data)
     if (selectedModelId.value === data.modelId) {
       await fetchFields(selectedModelId.value)
@@ -118,7 +118,7 @@ export const useModelsStore = defineStore('models', () => {
     return result
   }
 
-  async function editField(data) {
+  async function editField(data: Record<string, any>) {
     const result = await updateFieldApi(data)
     if (selectedModelId.value && currentModel.value) {
       await fetchFields(selectedModelId.value)
@@ -126,7 +126,7 @@ export const useModelsStore = defineStore('models', () => {
     return result
   }
 
-  async function removeField(id) {
+  async function removeField(id: number) {
     const result = await deleteFieldApi(id)
     window.$message?.success('字段删除成功')
     if (selectedModelId.value) {
@@ -135,7 +135,7 @@ export const useModelsStore = defineStore('models', () => {
     return result
   }
 
-  async function reorderFields(modelId, fieldIds) {
+  async function reorderFields(modelId: number, fieldIds: number[]) {
     const result = await sortFieldsApi(modelId, fieldIds)
     if (selectedModelId.value === modelId) {
       await fetchFields(modelId)
@@ -143,7 +143,7 @@ export const useModelsStore = defineStore('models', () => {
     return result
   }
 
-  function selectModel(id) {
+  function selectModel(id: number | null) {
     selectedModelId.value = id
     if (id) {
       fetchModelDetail(id)
@@ -153,15 +153,15 @@ export const useModelsStore = defineStore('models', () => {
     }
   }
 
-  function setKeyword(value) {
+  function setKeyword(value: string) {
     keyword.value = value
   }
 
-  function setPage(page) {
+  function setPage(page: number) {
     currentPage.value = page
   }
 
-  function setPageSize(size) {
+  function setPageSize(size: number) {
     pageSize.value = size
     currentPage.value = 1
   }

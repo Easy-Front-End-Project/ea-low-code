@@ -1,29 +1,29 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { getProjectPages, createPage, updatePage, deletePage, clonePage } from '@/api/projects.js'
+import { getProjectPages, createPage, updatePage, deletePage, clonePage } from '@/api/projects'
 
 export const usePagesStore = defineStore('pages', () => {
-  const pages = ref([])
+  const pages = ref<any[]>([])
   const loading = ref(false)
   const total = ref(0)
   const currentPage = ref(1)
   const pageSize = ref(12)
   const keyword = ref('')
-  const currentProjectId = ref(null)
+  const currentProjectId = ref<number | null>(null)
 
   const hasPages = computed(() => pages.value.length > 0)
   const pageCount = computed(() => Math.ceil(total.value / pageSize.value))
 
-  function setPage(page) {
+  function setPage(page: number) {
     currentPage.value = page
   }
 
-  function setPageSize(size) {
+  function setPageSize(size: number) {
     pageSize.value = size
     currentPage.value = 1
   }
 
-  function setKeyword(value) {
+  function setKeyword(value: string) {
     keyword.value = value
     currentPage.value = 1
   }
@@ -37,7 +37,7 @@ export const usePagesStore = defineStore('pages', () => {
     currentProjectId.value = null
   }
 
-  async function fetchPages(projectId) {
+  async function fetchPages(projectId: number) {
     loading.value = true
     currentProjectId.value = projectId
 
@@ -55,28 +55,28 @@ export const usePagesStore = defineStore('pages', () => {
     }
   }
 
-  async function createPageAction(data) {
+  async function createPageAction(data: Record<string, any>) {
     await createPage(data)
     if (currentProjectId.value) {
       await fetchPages(currentProjectId.value)
     }
   }
 
-  async function updatePageAction(data) {
+  async function updatePageAction(data: Record<string, any>) {
     await updatePage(data)
     if (currentProjectId.value) {
       await fetchPages(currentProjectId.value)
     }
   }
 
-  async function removePage(pageId) {
+  async function removePage(pageId: number) {
     await deletePage(pageId)
     if (currentProjectId.value) {
       await fetchPages(currentProjectId.value)
     }
   }
 
-  async function clonePageAction(pageId) {
+  async function clonePageAction(pageId: number) {
     const result = await clonePage(pageId)
     if (currentProjectId.value) {
       await fetchPages(currentProjectId.value)

@@ -7,16 +7,16 @@ import {
   getImages,
   deleteImage as deleteImageApi,
   updateImage as updateImageApi,
-} from '@/api/images.js'
+} from '@/api/images'
 
 export const useImagesStore = defineStore('images', () => {
-  const images = ref([])
-  const groups = ref([])
+  const images = ref<any[]>([])
+  const groups = ref<any[]>([])
   const total = ref(0)
   const currentPage = ref(1)
   const pageSize = ref(20)
   const keyword = ref('')
-  const selectedGroupId = ref(null)
+  const selectedGroupId = ref<number | null>(null)
   const loading = ref(false)
   const groupLoading = ref(false)
 
@@ -48,7 +48,7 @@ export const useImagesStore = defineStore('images', () => {
     }
   }
 
-  async function fetchImages(params = {}) {
+  async function fetchImages(params: Record<string, any> = {}) {
     loading.value = true
     try {
       const queryParams = {
@@ -74,13 +74,13 @@ export const useImagesStore = defineStore('images', () => {
     }
   }
 
-  async function createGroup(data) {
+  async function createGroup(data: Record<string, any>) {
     const result = await createImageGroupApi(data)
     await fetchGroups()
     return result
   }
 
-  async function removeGroup(id) {
+  async function removeGroup(id: number) {
     const result = await deleteImageGroupApi(id)
     await fetchGroups()
     if (selectedGroupId.value === id) {
@@ -89,7 +89,7 @@ export const useImagesStore = defineStore('images', () => {
     return result
   }
 
-  async function removeImage(id) {
+  async function removeImage(id: number) {
     const result = await deleteImageApi(id)
     window.$message?.success('删除成功')
     await fetchImages()
@@ -97,28 +97,28 @@ export const useImagesStore = defineStore('images', () => {
     return result
   }
 
-  async function updateImageData(id, data) {
+  async function updateImageData(id: number, data: Record<string, any>) {
     const result = await updateImageApi({ id, ...data })
     await fetchImages()
     await fetchGroups()
     return result
   }
 
-  function setKeyword(value) {
+  function setKeyword(value: string) {
     keyword.value = value
     currentPage.value = 1
   }
 
-  function setGroupId(id) {
+  function setGroupId(id: number | null) {
     selectedGroupId.value = id
     currentPage.value = 1
   }
 
-  function setPage(page) {
+  function setPage(page: number) {
     currentPage.value = page
   }
 
-  function setPageSize(size) {
+  function setPageSize(size: number) {
     pageSize.value = size
     currentPage.value = 1
   }

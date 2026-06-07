@@ -1,24 +1,24 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { login as loginApi, getProfile, sendVerificationCode as sendCodeApi, resetPassword as resetPasswordApi } from '@/api/auth.js'
-import { createUser } from '@/api/user.js'
-import { getToken, setToken, removeToken, getUser, setUser, removeUser } from '@/utils/storage.js'
+import { login as loginApi, getProfile, sendVerificationCode as sendCodeApi, resetPassword as resetPasswordApi } from '@/api/auth'
+import { createUser } from '@/api/user'
+import { getToken, setToken, removeToken, getUser, setUser, removeUser } from '@/utils/storage'
 
 export const useUserStore = defineStore('user', () => {
   // State
-  const user = ref(null)
-  const token = ref(getToken())
+  const user = ref<any>(null)
+  const token = ref<string>(getToken())
   const isLoggedIn = computed(() => !!token.value)
 
   // Actions
 
   /**
    * 用户登录
-   * @param {Object} credentials - 登录凭证
-   * @param {string} credentials.username - 用户名/邮箱
-   * @param {string} credentials.password - 密码
+   * @param credentials - 登录凭证
+   * @param credentials.username - 用户名/邮箱
+   * @param credentials.password - 密码
    */
-  async function login(credentials) {
+  async function login(credentials: { username: string; password: string }) {
     const response = await loginApi(credentials)
     if (response.access_token) {
       token.value = response.access_token
@@ -33,13 +33,13 @@ export const useUserStore = defineStore('user', () => {
 
   /**
    * 用户注册
-   * @param {Object} data - 注册信息
-   * @param {string} data.username - 用户名
-   * @param {string} data.email - 邮箱
-   * @param {string} data.password - 密码
-   * @param {string} data.nickname - 昵称（可选）
+   * @param data - 注册信息
+   * @param data.username - 用户名
+   * @param data.email - 邮箱
+   * @param data.password - 密码
+   * @param data.nickname - 昵称（可选）
    */
-  async function register(data) {
+  async function register(data: { username: string; email: string; password: string; nickname?: string }) {
     return await createUser(data)
   }
 
@@ -54,21 +54,21 @@ export const useUserStore = defineStore('user', () => {
 
   /**
    * 发送验证码
-   * @param {string} email - 邮箱地址
-   * @param {string} [purpose] - 用途（register/resetPassword）
+   * @param email - 邮箱地址
+   * @param purpose - 用途（register/resetPassword）
    */
-  async function sendVerificationCode(email, purpose = 'register') {
+  async function sendVerificationCode(email: string, purpose: string = 'register') {
     return await sendCodeApi({ email, purpose })
   }
 
   /**
    * 重置密码
-   * @param {Object} data - 重置密码数据
-   * @param {string} data.email - 邮箱
-   * @param {string} data.newPassword - 新密码
-   * @param {string} data.code - 验证码
+   * @param data - 重置密码数据
+   * @param data.email - 邮箱
+   * @param data.newPassword - 新密码
+   * @param data.code - 验证码
    */
-  async function resetPassword(data) {
+  async function resetPassword(data: { email: string; newPassword: string; code: string }) {
     return await resetPasswordApi(data)
   }
 
