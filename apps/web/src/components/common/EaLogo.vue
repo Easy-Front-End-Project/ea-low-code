@@ -9,10 +9,13 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import router from '@/router'
 
-  const emit = defineEmits(['click'])
+  const emit = defineEmits<{
+    (e: 'click'): void
+  }>()
+
   function handleClick() {
     // emit('click')
     router.replace('/')

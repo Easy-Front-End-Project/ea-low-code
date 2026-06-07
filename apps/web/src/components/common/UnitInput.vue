@@ -19,46 +19,49 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed } from 'vue'
   import EaInput from '../ea-ui-wrap/EaInput.vue'
   import EaSelect from '../ea-ui-wrap/EaSelect.vue'
 
   // 预定义的单位类型
-  const UNIT_TYPES = {
+  const UNIT_TYPES: Record<string, string[]> = {
     css: ['px', '%', 'em', 'rem', 'vw', 'vh', 'auto'],
     time: ['s', 'm', 'h', 'd', 'w', 'M', 'y'],
   }
 
-  const props = defineProps({
-    value: {
-      type: String,
-      default: '',
-    },
-    units: {
-      type: Array,
-      default: () => [],
-    },
-    unitType: {
-      type: String,
-      default: 'css',
-      validator: value => ['css', 'time'].includes(value),
-    },
-    placeholder: {
-      type: String,
-      default: '',
-    },
+  interface ParsedResult {
+    input: string
+    unit: string
+  }
+
+  const props = withDefaults(defineProps<{
+    value?: string
+    units?: string[]
+    unitType?: string
+    placeholder?: string
+  }>(), {
+    value: '',
+    units: () => [],
+    unitType: 'css',
+    placeholder: '',
   })
 
   // 获取实际使用的单位列表
-  const actualUnits = computed(() => {
+  const actualUnits = computed<string[]>(() => {
     if (props.units && props.units.length > 0) {
       return props.units
     }
     return UNIT_TYPES[props.unitType] || UNIT_TYPES.css
   })
 
-  const emit = defineEmits(['update:value', 'input-change', 'unit-change', 'focus', 'blur'])
+  const emit = defineEmits<{
+    (e: 'update:value', value: string): void
+    (e: 'input-change', input: string, unit: string): void
+    (e: 'unit-change', input: string, unit: string): void
+    (e: 'focus', event: FocusEvent): void
+    (e: 'blur', event: FocusEvent): void
+  }>()
 
   // 判断是否为 auto 值
   const isAutoValue = computed(() => {
@@ -66,7 +69,7 @@
   })
 
   // 解析值和单位
-  const parsedValue = computed(() => {
+  const parsedValue = computed<ParsedResult>(() => {
     const str = String(props.value || '')
 
     // 如果是 auto，直接返回
@@ -97,7 +100,7 @@
   })
 
   // 处理输入值变化 - 支持数字或 auto
-  function handleInputChange(value) {
+  function handleInputChange(value: string | number) {
     const strValue = String(value || '')
       .trim()
       .toLowerCase()
@@ -124,11 +127,12 @@
   }
 
   // 处理单位变化
-  function handleUnitChange(unit) {
+  function handleUnitChange(unit: string | number | boolean | object | Array<unknown>) {
+    const unitStr = String(unit)
     const input = inputValue.value
-    const combinedValue = input ? `${input}${unit === 'auto' ? '' : unit}` : ''
+    const combinedValue = input ? `${input}${unitStr === 'auto' ? '' : unitStr}` : ''
     emit('update:value', combinedValue)
-    emit('unit-change', input, unit)
+    emit('unit-change', input, unitStr)
   }
 </script>
 

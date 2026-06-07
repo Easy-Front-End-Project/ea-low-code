@@ -9,29 +9,24 @@
   </ea-radio>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref } from 'vue'
 
-  const props = defineProps({
-    value: {
-      type: [String, Number, Boolean],
-      default: '',
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    name: {
-      type: String,
-      default: '',
-    },
+  const props = withDefaults(defineProps<{
+    value?: string | number | boolean
+    disabled?: boolean
+    name?: string
+  }>(), {
+    value: '',
+    disabled: false,
+    name: '',
   })
 
-  const radioRef = ref(null)
+  const radioRef = ref<HTMLElement | null>(null)
 
   // 暴露方法
   defineExpose({
-    focus: () => radioRef.value?.focus(),
-    blur: () => radioRef.value?.blur(),
+    focus: () => (radioRef.value as any)?.focus(),
+    blur: () => (radioRef.value as any)?.blur(),
   })
 </script>

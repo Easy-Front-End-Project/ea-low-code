@@ -2,7 +2,7 @@
   <div ref="editorContainer" class="monaco-editor-container" :style="{ height: height }"></div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
   import * as monaco from 'monaco-editor'
   import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
@@ -11,9 +11,14 @@
   import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
   import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 
+  interface ExtraLib {
+    content: string
+    filePath: string
+  }
+
   // 配置 Monaco Environment 以加载 Web Workers
   self.MonacoEnvironment = {
-    getWorker(_, label) {
+    getWorker(_: unknown, label: string) {
       if (label === 'json') {
         return new jsonWorker()
       }
@@ -30,34 +35,27 @@
     },
   }
 
-  const props = defineProps({
-    modelValue: {
-      type: String,
-      default: '',
-    },
-    language: {
-      type: String,
-      default: 'javascript',
-    },
-    height: {
-      type: String,
-      default: '200px',
-    },
-    extraLibs: {
-      type: Array,
-      default: () => [],
-    },
-    fixedOverflowWidgets: {
-      type: Boolean,
-      default: false,
-    },
+  const props = withDefaults(defineProps<{
+    modelValue?: string
+    language?: string
+    height?: string
+    extraLibs?: ExtraLib[]
+    fixedOverflowWidgets?: boolean
+  }>(), {
+    modelValue: '',
+    language: 'javascript',
+    height: '200px',
+    extraLibs: () => [],
+    fixedOverflowWidgets: false,
   })
 
-  const emit = defineEmits(['update:modelValue'])
+  const emit = defineEmits<{
+    (e: 'update:modelValue', value: string): void
+  }>()
 
-  const editorContainer = ref(null)
-  let editor = null
-  let resizeObserver = null
+  const editorContainer = ref<HTMLElement | null>(null)
+  let editor: monaco.editor.IStandaloneCodeEditor | null = null
+  let resizeObserver: ResizeObserver | null = null
 
   onMounted(async () => {
     await nextTick()
@@ -71,11 +69,12 @@
       // 配置 JavaScript 语言服务以启用代码提示
       if (props.language === 'javascript' || props.language === 'typescript') {
         console.log('[MonacoEditor] 配置 JavaScript/TypeScript 语言服务')
-        monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
-          target: monaco.languages.typescript.ScriptTarget.ES2020,
+        const tsLanguageService = monaco.languages.typescript as any
+        tsLanguageService.javascriptDefaults.setCompilerOptions({
+          target: tsLanguageService.ScriptTarget.ES2020,
           allowNonTsExtensions: true,
-          moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
-          module: monaco.languages.typescript.ModuleKind.CommonJS,
+          moduleResolution: tsLanguageService.ModuleResolutionKind.NodeJs,
+          module: tsLanguageService.ModuleKind.CommonJS,
           noEmit: true,
           esModuleInterop: true,
           allowJs: true,
@@ -87,7 +86,7 @@
         if (props.extraLibs && props.extraLibs.length > 0) {
           console.log('[MonacoEditor] 添加 extraLibs:', props.extraLibs)
           props.extraLibs.forEach(lib => {
-            monaco.languages.typescript.javascriptDefaults.addExtraLib(lib.content, lib.filePath)
+            tsLanguageService.javascriptDefaults.addExtraLib(lib.content, lib.filePath)
           })
         }
       }
@@ -115,7 +114,7 @@
 
       // 监听内容变化
       editor.onDidChangeModelContent(() => {
-        const value = editor.getValue()
+        const value = editor!.getValue()
         emit('update:modelValue', value)
       })
 
@@ -134,7 +133,7 @@
   // 监听外部值变化
   watch(
     () => props.modelValue,
-    newValue => {
+    (newValue: string | undefined) => {
       if (editor && newValue !== undefined && editor.getValue() !== newValue) {
         editor.setValue(newValue)
       }

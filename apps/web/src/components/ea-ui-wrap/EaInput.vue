@@ -25,69 +25,49 @@
   </ea-input>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, watch } from 'vue'
 
-  const props = defineProps({
-    modelValue: {
-      type: [String, Number],
-      default: '',
-    },
-    size: {
-      type: String,
-      default: 'default',
-    },
-    placeholder: {
-      type: String,
-      default: '',
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    clearable: {
-      type: Boolean,
-      default: false,
-    },
-    type: {
-      type: String,
-      default: 'text',
-    },
-    rows: {
-      type: Number,
-      default: 2,
-    },
-    name: {
-      type: String,
-      default: '',
-    },
-    pattern: {
-      type: String,
-      default: '',
-    },
-    required: {
-      type: Boolean,
-      default: false,
-    },
-    minlength: {
-      type: Number,
-      default: undefined,
-    },
-    maxlength: {
-      type: Number,
-      default: undefined,
-    },
+  const props = withDefaults(defineProps<{
+    modelValue?: string | number
+    size?: string
+    placeholder?: string
+    disabled?: boolean
+    clearable?: boolean
+    type?: string
+    rows?: number
+    name?: string
+    pattern?: string
+    required?: boolean
+    minlength?: number
+    maxlength?: number
+  }>(), {
+    modelValue: '',
+    size: 'default',
+    placeholder: '',
+    disabled: false,
+    clearable: false,
+    type: 'text',
+    rows: 2,
+    name: '',
+    pattern: '',
+    required: false,
   })
 
-  const emit = defineEmits(['update:modelValue', 'change', 'input', 'clear'])
+  const emit = defineEmits<{
+    (e: 'update:modelValue', value: string): void
+    (e: 'change', value: string): void
+    (e: 'input', value: string): void
+    (e: 'clear'): void
+  }>()
 
-  const inputRef = ref(null)
+  const inputRef = ref<HTMLElement | null>(null)
   const localValue = ref(props.modelValue !== undefined ? props.modelValue : '')
 
   // 监听外部值变化
   watch(
     () => props.modelValue,
-    newVal => {
+    (newVal: string | number | undefined) => {
       if (newVal !== undefined && newVal !== localValue.value) {
         localValue.value = newVal
       }
@@ -96,8 +76,8 @@
   )
 
   // 处理 input 事件
-  function handleInput(event) {
-    const value = event.target?.value
+  function handleInput(event: any) {
+    const value: string = (event.target as HTMLInputElement)?.value
     if (value !== localValue.value) {
       localValue.value = value
       emit('update:modelValue', value)
@@ -115,11 +95,11 @@
 
   // 暴露方法
   defineExpose({
-    focus: () => inputRef.value?.focus(),
-    blur: () => inputRef.value?.blur(),
-    select: () => inputRef.value?.select(),
-    checkValidity: () => inputRef.value?.checkValidity(),
-    reportValidity: () => inputRef.value?.reportValidity(),
-    setCustomValidity: message => inputRef.value?.setCustomValidity(message),
+    focus: () => (inputRef.value as any)?.focus(),
+    blur: () => (inputRef.value as any)?.blur(),
+    select: () => (inputRef.value as any)?.select(),
+    checkValidity: () => (inputRef.value as any)?.checkValidity(),
+    reportValidity: () => (inputRef.value as any)?.reportValidity(),
+    setCustomValidity: (message: string) => (inputRef.value as any)?.setCustomValidity(message),
   })
 </script>

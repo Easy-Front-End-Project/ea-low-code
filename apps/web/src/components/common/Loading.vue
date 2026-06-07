@@ -13,16 +13,13 @@
   </div>
 </template>
 
-<script setup>
-  defineProps({
-    loading: {
-      type: Boolean,
-      default: false,
-    },
-    text: {
-      type: String,
-      default: '加载中...',
-    },
+<script setup lang="ts">
+  withDefaults(defineProps<{
+    loading?: boolean
+    text?: string
+  }>(), {
+    loading: false,
+    text: '加载中...',
   })
 </script>
 

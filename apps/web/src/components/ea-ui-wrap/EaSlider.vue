@@ -19,65 +19,48 @@
   </ea-slider>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, watch } from 'vue'
 
-  const props = defineProps({
-    modelValue: {
-      type: Number,
-      default: 0,
-    },
-    min: {
-      type: Number,
-      default: 0,
-    },
-    max: {
-      type: Number,
-      default: 100,
-    },
-    step: {
-      type: Number,
-      default: 1,
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    vertical: {
-      type: Boolean,
-      default: false,
-    },
-    showTooltip: {
-      type: Boolean,
-      default: true,
-    },
-    placement: {
-      type: String,
-      default: 'top',
-    },
-    size: {
-      type: String,
-      default: '',
-    },
-    showStops: {
-      type: Boolean,
-      default: false,
-    },
-    showInput: {
-      type: Boolean,
-      default: false,
-    },
+  const props = withDefaults(defineProps<{
+    modelValue?: number
+    min?: number
+    max?: number
+    step?: number
+    disabled?: boolean
+    vertical?: boolean
+    showTooltip?: boolean
+    placement?: string
+    size?: string
+    showStops?: boolean
+    showInput?: boolean
+  }>(), {
+    modelValue: 0,
+    min: 0,
+    max: 100,
+    step: 1,
+    disabled: false,
+    vertical: false,
+    showTooltip: true,
+    placement: 'top',
+    size: '',
+    showStops: false,
+    showInput: false,
   })
 
-  const emit = defineEmits(['update:modelValue', 'change', 'input'])
+  const emit = defineEmits<{
+    (e: 'update:modelValue', value: number): void
+    (e: 'change', value: number): void
+    (e: 'input', value: number): void
+  }>()
 
-  const sliderRef = ref(null)
+  const sliderRef = ref<HTMLElement | null>(null)
   const localValue = ref(props.modelValue !== undefined ? props.modelValue : 0)
 
   // 监听外部值变化
   watch(
     () => props.modelValue,
-    newVal => {
+    (newVal: number | undefined) => {
       if (newVal !== undefined && newVal !== localValue.value) {
         localValue.value = newVal
       }
@@ -86,8 +69,8 @@
   )
 
   // 处理 change 事件
-  function handleChange(event) {
-    const value = event.detail?.value
+  function handleChange(event: any) {
+    const value: number = event.detail?.value
     if (value !== undefined && value !== localValue.value) {
       localValue.value = value
       emit('update:modelValue', value)
@@ -96,8 +79,8 @@
   }
 
   // 处理 input 事件（拖动时）
-  function handleInput(event) {
-    const value = event.detail?.value
+  function handleInput(event: any) {
+    const value: number = event.detail?.value
     if (value !== undefined) {
       localValue.value = value
       emit('update:modelValue', value)
@@ -107,6 +90,6 @@
 
   // 暴露方法
   defineExpose({
-    focus: () => sliderRef.value?.focus(),
+    focus: () => (sliderRef.value as any)?.focus(),
   })
 </script>

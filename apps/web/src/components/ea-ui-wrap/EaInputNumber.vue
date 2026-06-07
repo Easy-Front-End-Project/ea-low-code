@@ -11,45 +11,37 @@
   />
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, watch } from 'vue'
 
-  const props = defineProps({
-    modelValue: {
-      type: Number,
-      default: 0,
-    },
-    size: {
-      type: String,
-      default: 'default',
-    },
-    min: {
-      type: Number,
-      default: -Infinity,
-    },
-    max: {
-      type: Number,
-      default: Infinity,
-    },
-    step: {
-      type: Number,
-      default: 1,
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
+  const props = withDefaults(defineProps<{
+    modelValue?: number
+    size?: string
+    min?: number
+    max?: number
+    step?: number
+    disabled?: boolean
+  }>(), {
+    modelValue: 0,
+    size: 'default',
+    min: -Infinity,
+    max: Infinity,
+    step: 1,
+    disabled: false,
   })
 
-  const emit = defineEmits(['update:modelValue', 'change'])
+  const emit = defineEmits<{
+    (e: 'update:modelValue', value: number): void
+    (e: 'change', value: number): void
+  }>()
 
-  const inputRef = ref(null)
+  const inputRef = ref<HTMLElement | null>(null)
   const localValue = ref(props.modelValue !== undefined ? props.modelValue : 0)
 
   // 监听外部值变化
   watch(
     () => props.modelValue,
-    newVal => {
+    (newVal: number | undefined) => {
       if (newVal !== undefined && newVal !== localValue.value) {
         localValue.value = newVal
       }
@@ -58,8 +50,8 @@
   )
 
   // 处理 change 事件
-  function handleChange(event) {
-    const value = event.detail?.currentValue !== undefined ? event.detail.currentValue : event
+  function handleChange(event: any) {
+    const value: number = event.detail?.currentValue !== undefined ? event.detail.currentValue : event
     if (value !== undefined && value !== localValue.value) {
       localValue.value = value
       emit('update:modelValue', value)
@@ -69,7 +61,7 @@
 
   // 暴露方法
   defineExpose({
-    focus: () => inputRef.value?.focus(),
-    blur: () => inputRef.value?.blur(),
+    focus: () => (inputRef.value as any)?.focus(),
+    blur: () => (inputRef.value as any)?.blur(),
   })
 </script>

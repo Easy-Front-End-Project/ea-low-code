@@ -82,27 +82,40 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed, ref } from 'vue'
   import UnitInput from './UnitInput.vue'
 
-  const props = defineProps({
-    value: {
-      type: String,
-      default: '',
-    },
-    units: {
-      type: Array,
-      default: () => ['px', '%', 'em', 'rem', 'vw', 'vh'],
-    },
+  type Direction = 'top' | 'right' | 'bottom' | 'left'
+
+  interface ParsedValue {
+    input: string
+    unit: string
+  }
+
+  interface DirectionValues {
+    top: ParsedValue
+    right: ParsedValue
+    bottom: ParsedValue
+    left: ParsedValue
+  }
+
+  const props = withDefaults(defineProps<{
+    value?: string
+    units?: string[]
+  }>(), {
+    value: '',
+    units: () => ['px', '%', 'em', 'rem', 'vw', 'vh'],
   })
 
-  const emit = defineEmits(['update:value'])
+  const emit = defineEmits<{
+    (e: 'update:value', value: string): void
+  }>()
 
   // 是否链接四边（同步更新）
   const isLinked = ref(false)
   // 当前激活的方向（用于非链接状态下的高亮）
-  const activeDirection = ref(null)
+  const activeDirection = ref<Direction | null>(null)
 
   // 切换链接状态
   function toggleLink() {
@@ -110,7 +123,7 @@
   }
 
   // 处理 input focus
-  function handleFocus(direction) {
+  function handleFocus(direction: Direction) {
     if (!isLinked.value) {
       activeDirection.value = direction
     }
@@ -122,7 +135,7 @@
   }
 
   // 解析单个值（数字+单位）
-  function parseValue(val) {
+  function parseValue(val: string | undefined): ParsedValue {
     const str = String(val || '').trim()
     if (!str || str === 'auto') {
       return { input: str === 'auto' ? 'auto' : '', unit: props.units[0] }
@@ -140,10 +153,10 @@
   }
 
   // 解析 margin/padding 值
-  const values = computed(() => {
+  const values = computed<DirectionValues>(() => {
     const val = props.value?.trim() || ''
     if (!val) {
-      const empty = { input: '', unit: props.units[0] }
+      const empty: ParsedValue = { input: '', unit: props.units[0] }
       return { top: empty, right: empty, bottom: empty, left: empty }
     }
 
@@ -171,23 +184,23 @@
       }
     }
 
-    const empty = { input: '', unit: props.units[0] }
+    const empty: ParsedValue = { input: '', unit: props.units[0] }
     return { top: empty, right: empty, bottom: empty, left: empty }
   })
 
   // 将解析后的值格式化为 UnitInput 需要的字符串格式
-  function formatValueForUnitInput({ input, unit }) {
+  function formatValueForUnitInput({ input, unit }: ParsedValue): string {
     if (input === 'auto') return 'auto'
     if (!input || input === '') return `0${unit}`
     return `${input}${unit}`
   }
 
   // 处理输入值变化（来自 UnitInput 的 input-change 事件）
-  function handleInputChange(direction, input, unit) {
+  function handleInputChange(direction: Direction, input: string, unit: string) {
     const currentValues = values.value
     const newInput = input || ''
 
-    let newValues
+    let newValues: DirectionValues
 
     if (isLinked.value) {
       // 链接状态下，所有方向同步更新
@@ -208,10 +221,10 @@
   }
 
   // 处理单位变化（来自 UnitInput 的 unit-change 事件）
-  function handleUnitChange(direction, input, unit) {
+  function handleUnitChange(direction: Direction, input: string, unit: string) {
     const currentValues = values.value
 
-    let newValues
+    let newValues: DirectionValues
 
     if (isLinked.value) {
       // 链接状态下，所有方向同步更新单位，但保持各自的 input 值
@@ -233,7 +246,7 @@
   }
 
   // 生成并发送组合值
-  function emitCombinedValue(newValues) {
+  function emitCombinedValue(newValues: DirectionValues) {
     const { top, right, bottom, left } = newValues
 
     const topVal = formatValue(top)
@@ -264,7 +277,7 @@
   }
 
   // 格式化单个值
-  function formatValue({ input, unit }) {
+  function formatValue({ input, unit }: ParsedValue): string {
     if (input === 'auto') return 'auto'
     if (!input || input === '') return `0${unit}`
     return `${input}${unit}`

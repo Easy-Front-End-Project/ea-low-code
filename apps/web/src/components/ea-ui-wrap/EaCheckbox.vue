@@ -15,57 +15,43 @@
   </ea-checkbox>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, watch } from 'vue'
 
-  const props = defineProps({
-    modelValue: {
-      type: Boolean,
-      default: false,
-    },
-    value: {
-      type: String,
-      default: '',
-    },
-    label: {
-      type: String,
-      default: '',
-    },
-    name: {
-      type: String,
-      default: '',
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    checked: {
-      type: Boolean,
-      default: false,
-    },
-    indeterminate: {
-      type: Boolean,
-      default: false,
-    },
-    size: {
-      type: String,
-      default: 'default',
-    },
-    border: {
-      type: Boolean,
-      default: false,
-    },
+  const props = withDefaults(defineProps<{
+    modelValue?: boolean
+    value?: string
+    label?: string
+    name?: string
+    disabled?: boolean
+    checked?: boolean
+    indeterminate?: boolean
+    size?: string
+    border?: boolean
+  }>(), {
+    modelValue: false,
+    value: '',
+    label: '',
+    name: '',
+    disabled: false,
+    checked: false,
+    indeterminate: false,
+    size: 'default',
+    border: false,
   })
 
-  const emit = defineEmits(['update:modelValue', 'change'])
+  const emit = defineEmits<{
+    (e: 'update:modelValue', value: boolean): void
+    (e: 'change', value: boolean): void
+  }>()
 
-  const checkboxRef = ref(null)
+  const checkboxRef = ref<HTMLElement | null>(null)
   const localChecked = ref(props.modelValue || props.checked)
 
   // 监听外部值变化
   watch(
     () => props.modelValue,
-    (newVal) => {
+    (newVal: boolean) => {
       if (newVal !== localChecked.value) {
         localChecked.value = newVal
       }
@@ -76,7 +62,7 @@
   // 监听 checked 属性变化
   watch(
     () => props.checked,
-    (newVal) => {
+    (newVal: boolean) => {
       if (newVal !== localChecked.value) {
         localChecked.value = newVal
       }
@@ -84,8 +70,8 @@
   )
 
   // 处理 change 事件
-  function handleChange(event) {
-    const checked = event.detail?.checked
+  function handleChange(event: any) {
+    const checked: boolean = event.detail?.checked
 
     // 更新本地值
     localChecked.value = checked

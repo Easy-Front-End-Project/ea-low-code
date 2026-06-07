@@ -14,49 +14,43 @@
   </ea-select>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, watch } from 'vue'
 
-  const props = defineProps({
-    modelValue: {
-      type: [String, Number, Boolean, Object, Array],
-      default: '',
-    },
-    size: {
-      type: String,
-      default: 'default',
-    },
-    placeholder: {
-      type: String,
-      default: '',
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    clearable: {
-      type: Boolean,
-      default: false,
-    },
-    multiple: {
-      type: Boolean,
-      default: false,
-    },
+  type ModelValueType = string | number | boolean | object | Array<unknown>
+
+  const props = withDefaults(defineProps<{
+    modelValue?: ModelValueType
+    size?: string
+    placeholder?: string
+    disabled?: boolean
+    clearable?: boolean
+    multiple?: boolean
+  }>(), {
+    modelValue: '',
+    size: 'default',
+    placeholder: '',
+    disabled: false,
+    clearable: false,
+    multiple: false,
   })
 
-  const emit = defineEmits(['update:modelValue', 'change'])
+  const emit = defineEmits<{
+    (e: 'update:modelValue', value: ModelValueType): void
+    (e: 'change', value: ModelValueType): void
+  }>()
 
-  const selectRef = ref(null)
-  const localValue = ref(Array.isArray(props.modelValue) ? [...props.modelValue] : props.modelValue)
+  const selectRef = ref<HTMLElement | null>(null)
+  const localValue = ref(Array.isArray(props.modelValue) ? [...(props.modelValue as Array<unknown>)] : props.modelValue)
 
   // 监听 props.modelValue 变化，同步更新 localValue
-  watch(() => props.modelValue, (newVal) => {
-    localValue.value = Array.isArray(newVal) ? [...newVal] : newVal
+  watch(() => props.modelValue, (newVal: ModelValueType) => {
+    localValue.value = Array.isArray(newVal) ? [...(newVal as Array<unknown>)] : newVal
   })
 
   // 处理 change 事件
-  function handleChange(event) {
-    const value = event.detail?.value
+  function handleChange(event: any) {
+    const value: ModelValueType = event.detail?.value
 
     if (value !== undefined && value !== localValue.value) {
       localValue.value = value
@@ -73,7 +67,7 @@
 
   // 暴露方法
   defineExpose({
-    focus: () => selectRef.value?.focus(),
-    blur: () => selectRef.value?.blur(),
+    focus: () => (selectRef.value as any)?.focus(),
+    blur: () => (selectRef.value as any)?.blur(),
   })
 </script>
