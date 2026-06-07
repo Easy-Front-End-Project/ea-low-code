@@ -47,7 +47,7 @@
 
 <script setup>
 import { reactive, ref, watch } from 'vue'
-import { createImageGroup } from '@/api/images.js'
+import { createImageGroup } from '@/api/images'
 import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
 const props = defineProps({

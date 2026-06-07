@@ -141,7 +141,7 @@
 <script setup>
   import { ref, onMounted, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { getProjectDetail, updateProject } from '@/api/projects.js'
+  import { getProjectDetail, updateProject } from '@/api/projects'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import Loading from '@/components/common/Loading.vue'
   import PagesSearchBar from '@/components/pages/PagesSearchBar.vue'

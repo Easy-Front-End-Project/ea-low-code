@@ -65,7 +65,7 @@
 
 <script setup>
   import { reactive, ref, watch, computed } from 'vue'
-  import { updateImage } from '@/api/images.js'
+  import { updateImage } from '@/api/images'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
 

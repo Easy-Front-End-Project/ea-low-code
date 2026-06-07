@@ -22,7 +22,7 @@
   import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
   import { useRoute } from 'vue-router'
   import { useSchemaStore } from '@/components/designer/stores/schema'
-  import { getPageDetail } from '@/api/projects.js'
+  import { getPageDetail } from '@/api/projects'
   import PreviewComponent from '@/components/designer/preview/PreviewComponent.vue'
   import Loading from '@/components/common/Loading.vue'
   import { executeEvent } from '@/utils/eventExecutor'

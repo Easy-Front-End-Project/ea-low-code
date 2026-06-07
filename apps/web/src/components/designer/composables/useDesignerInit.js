@@ -1,6 +1,6 @@
-﻿import { ref, computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useSchemaStore } from '@/components/designer/stores/schema'
-import { getPageDetail } from '@/api/projects.js'
+import { getPageDetail } from '@/api/projects'
 import { useAutoSave } from '@/components/designer/composables/useAutoSave'
 
 export function useDesignerInit(pageId) {

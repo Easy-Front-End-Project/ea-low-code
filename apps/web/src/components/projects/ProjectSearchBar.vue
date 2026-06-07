@@ -40,7 +40,7 @@
 
 <script setup>
   import { ref, watch } from 'vue'
-  import { importProject } from '@/api/projects.js'
+  import { importProject } from '@/api/projects'
   import EaInput from '../ea-ui-wrap/EaInput.vue'
 
   const props = defineProps({

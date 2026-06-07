@@ -166,7 +166,7 @@
   import { useProjectsStore } from '@/stores/projects.js'
   import ProjectCard from '@/components/projects/ProjectCard.vue'
   import CreateProjectDialog from '@/components/projects/CreateProjectDialog.vue'
-  import { getDashboardStats, getRecentProjects, getRecentActivities } from '@/api/stats.js'
+  import { getDashboardStats, getRecentProjects, getRecentActivities } from '@/api/stats'
 
   const router = useRouter()
   const userStore = useUserStore()

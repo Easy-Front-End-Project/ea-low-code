@@ -103,7 +103,7 @@
 
 <script setup>
   import { ref, reactive, watch } from 'vue'
-  import { uploadImage } from '@/api/images.js'
+  import { uploadImage } from '@/api/images'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
 

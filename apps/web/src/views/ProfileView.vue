@@ -85,8 +85,8 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useUserStore } from '@/stores/user.js'
-import { changePassword } from '@/api/auth.js'
-import { updateUser } from '@/api/user.js'
+import { changePassword } from '@/api/auth'
+import { updateUser } from '@/api/user'
 
 const userStore = useUserStore()
 
