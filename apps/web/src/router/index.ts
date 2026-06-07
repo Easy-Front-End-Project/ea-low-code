@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useUserStore } from '@/stores/user.js'
-import { getToken } from '@/utils/storage.js'
+import { useUserStore } from '@/stores/user'
+import { getToken } from '@/utils/storage'
 import ProjectLayout from '@/layouts/ProjectLayout.vue'
 import DashboardView from '@/views/DashboardView.vue'
 import ProjectView from '@/views/ProjectView.vue'
@@ -140,7 +140,7 @@ router.beforeEach(async (to, from) => {
 const DEFAULT_TITLE = 'Easy Weave'
 
 router.afterEach(to => {
-  const title = to.meta?.title
+  const title = to.meta?.title as string | undefined
   document.title = title ? `${DEFAULT_TITLE} | ${title}` : DEFAULT_TITLE
 })
 
