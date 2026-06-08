@@ -1,5 +1,5 @@
-import { ComponentCategories } from './types'
-import type { ComponentMeta, CategoryItem, CategoryGrouped, ParentGroup, RemoteConfigStorage, StyleConfig } from './types'
+import { ComponentCategories } from '@ea-low-code/shared'
+import type { ComponentMeta, CategoryItem, CategoryGrouped, ParentGroup, RemoteConfigStorage, StyleConfig } from '@ea-low-code/shared'
 
 export type { StyleConfig }
 import { basicComponents } from './meta/basicComponents'

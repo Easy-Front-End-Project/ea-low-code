@@ -1,5 +1,5 @@
-import { ComponentCategories, PropTypes } from '../types'
-import type { ComponentMeta } from '../types'
+import { ComponentCategories, PropTypes } from '@ea-low-code/shared'
+import type { ComponentMeta } from '@ea-low-code/shared'
 
 // Feedback 反馈
 export const feedbackComponents: ComponentMeta[] = [

@@ -2,7 +2,7 @@ import { ref, computed, shallowRef, onMounted } from 'vue'
 import { loadRemoteComponent } from '@/utils/loadRemoteComponent'
 import { getRemoteComponentMetaList } from '@/components/designer/constants/componentMeta'
 import type { ComponentSchema } from '@/utils/schemaHelper'
-import type { RemoteConfig } from '@/components/designer/constants/types'
+import type { RemoteConfig } from '@ea-low-code/shared'
 
 /**
  * 远程组件加载 Composable

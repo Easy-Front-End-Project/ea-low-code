@@ -84,7 +84,7 @@
 <script setup lang="ts">
   import { ref, computed, watch } from 'vue'
   import { getCategories, getComponentsByParentGroup } from '@/components/designer/constants/componentMeta'
-  import { ComponentCategories } from '@/components/designer/constants/types'
+  import { ComponentCategories } from '@ea-low-code/shared'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
   interface ComponentGroup {

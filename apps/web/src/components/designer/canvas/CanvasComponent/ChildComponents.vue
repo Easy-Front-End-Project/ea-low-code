@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-  import { NON_SELECTABLE_TYPES, NON_SELECTABLE_IN_PARENT } from '@/components/designer/constants/componentTypes'
+  import { NON_SELECTABLE_TYPES, NON_SELECTABLE_IN_PARENT } from '@ea-low-code/shared'
   import type { ComponentSchema } from '@/utils/schemaHelper'
   import CanvasComponent from '../CanvasComponent.vue'
 

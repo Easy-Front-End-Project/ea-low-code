@@ -23,7 +23,9 @@
     /* Paths */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@ea-low-code/shared": ["../../packages/shared/src/index.ts"],
+      "@ea-low-code/shared/*": ["../../packages/shared/src/*/index.ts"]
     },
     "types": ["vite/client"]
   },

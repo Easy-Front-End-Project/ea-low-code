@@ -1,5 +1,5 @@
-import { ComponentCategories, PropTypes } from '../types'
-import type { ComponentMeta } from '../types'
+import { ComponentCategories, PropTypes } from '@ea-low-code/shared'
+import type { ComponentMeta } from '@ea-low-code/shared'
 
 // Form 表单组件
 export const formComponents: ComponentMeta[] = [

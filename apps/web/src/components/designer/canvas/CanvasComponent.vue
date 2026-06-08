@@ -70,7 +70,7 @@
   import { useRemoteComponent } from '@/components/designer/composables/useRemoteComponent'
   import { useComponentInstance } from '@/components/designer/composables/useComponentInstance'
   import { useComponentRender } from '@/components/designer/composables/useComponentRender'
-  import { CONTAINER_TYPES, NON_CONTAINER_TYPES, INLINE_BLOCK_TYPES, NON_SELECTABLE_TYPES, NON_SELECTABLE_IN_PARENT } from '@/components/designer/constants/componentTypes'
+  import { CONTAINER_TYPES, NON_CONTAINER_TYPES, INLINE_BLOCK_TYPES, NON_SELECTABLE_TYPES, NON_SELECTABLE_IN_PARENT } from '@ea-low-code/shared'
   import ComponentLabel from './CanvasComponent/ComponentLabel.vue'
   import ComponentActions from './CanvasComponent/ComponentActions.vue'
   import ChildComponents from './CanvasComponent/ChildComponents.vue'
