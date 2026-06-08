@@ -1,7 +1,8 @@
 import { ComponentCategories, PropTypes } from '../types'
+import type { ComponentMeta } from '../types'
 
 // Layout 布局组件
-export const layoutComponents = [
+export const layoutComponents: ComponentMeta[] = [
   {
     type: 'ea-container',
     name: '布局容器',

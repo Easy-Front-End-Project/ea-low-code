@@ -1,7 +1,8 @@
 import { ComponentCategories, PropTypes } from '../types'
+import type { ComponentMeta } from '../types'
 
 // Form 表单组件
-export const formComponents = [
+export const formComponents: ComponentMeta[] = [
   {
     type: 'form',
     name: '表单',

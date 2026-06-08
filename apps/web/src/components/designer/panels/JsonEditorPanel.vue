@@ -23,7 +23,6 @@
   import { ref, computed } from 'vue'
   // @ts-expect-error JS module without type declarations
   import { useSchemaStore } from '@/components/designer/stores/schema'
-  // @ts-expect-error JS module without type declarations
   import { exportSchemaToJson, importSchemaFromJson } from '@/utils/schemaHelper'
   import MonacoEditor from '@/components/common/MonacoEditor.vue'
   import Loading from '@/components/common/Loading.vue'

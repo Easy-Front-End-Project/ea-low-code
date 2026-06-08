@@ -1,7 +1,8 @@
 import { ComponentCategories, PropTypes } from '../types'
+import type { ComponentMeta } from '../types'
 
 // Basic 基础组件
-export const basicComponents = [
+export const basicComponents: ComponentMeta[] = [
   {
     type: 'ea-button',
     name: '按钮',
@@ -572,7 +573,7 @@ export const basicComponents = [
       },
     ],
     events: [],
-    slots: [{ name: 'default', label: '列插槽'}],
+    slots: [{ name: 'default', label: '列插槽' }],
     styleConfig: {
       parts: [
         {

@@ -1,7 +1,8 @@
 import { ComponentCategories, PropTypes } from '../types'
+import type { ComponentMeta } from '../types'
 
 // Feedback 反馈
-export const feedbackComponents = [
+export const feedbackComponents: ComponentMeta[] = [
   {
     type: 'ea-alert',
     name: '警告提示',

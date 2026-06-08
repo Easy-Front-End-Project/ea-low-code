@@ -1,7 +1,8 @@
 import { ComponentCategories, PropTypes } from '../types'
+import type { ComponentMeta } from '../types'
 
 // Data 数据展示
-export const dataComponents = [
+export const dataComponents: ComponentMeta[] = [
   {
     type: 'ea-avatar',
     name: '头像',

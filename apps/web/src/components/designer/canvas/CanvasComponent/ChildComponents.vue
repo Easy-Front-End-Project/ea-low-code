@@ -39,7 +39,6 @@
 </template>
 
 <script setup lang="ts">
-  // @ts-expect-error JS module without type declarations
   import { NON_SELECTABLE_TYPES, NON_SELECTABLE_IN_PARENT } from '@/components/designer/constants/componentTypes'
   import type { ComponentSchema } from '@/utils/schemaHelper'
   import CanvasComponent from '../CanvasComponent.vue'

@@ -1,7 +1,8 @@
 import { ComponentCategories, PropTypes } from '../types'
+import type { ComponentMeta } from '../types'
 
 // Navigation 导航
-export const navigationComponents = [
+export const navigationComponents: ComponentMeta[] = [
   {
     type: 'ea-breadcrumb',
     name: '面包屑',
@@ -625,7 +626,6 @@ export const navigationComponents = [
         label: '索引',
         type: PropTypes.NUMBER,
         default: 0,
-        readonly: true,
       },
       {
         name: 'simple',

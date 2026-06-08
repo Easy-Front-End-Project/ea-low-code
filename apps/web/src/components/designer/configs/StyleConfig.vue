@@ -59,7 +59,7 @@
       </template>
 
       <!-- 通用的 CSS 变量样式（不随 type 变化） -->
-      <template v-if="styleConfig?.cssVariables?.length > 0">
+      <template v-if="(styleConfig?.cssVariables?.length ?? 0) > 0">
         <div class="divider"></div>
         <h5 class="subsection-title">通用样式</h5>
         <div v-for="variable in styleConfig.cssVariables" :key="variable.name" class="prop-item">

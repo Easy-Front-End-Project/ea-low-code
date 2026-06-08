@@ -74,7 +74,6 @@
   import { useComponentInstance } from '@/components/designer/composables/useComponentInstance'
   // @ts-expect-error JS module without type declarations
   import { useComponentRender } from '@/components/designer/composables/useComponentRender'
-  // @ts-expect-error JS module without type declarations
   import { CONTAINER_TYPES, NON_CONTAINER_TYPES, INLINE_BLOCK_TYPES, NON_SELECTABLE_TYPES, NON_SELECTABLE_IN_PARENT } from '@/components/designer/constants/componentTypes'
   import ComponentLabel from './CanvasComponent/ComponentLabel.vue'
   import ComponentActions from './CanvasComponent/ComponentActions.vue'

@@ -83,9 +83,7 @@
 
 <script setup lang="ts">
   import { ref, computed, watch } from 'vue'
-  // @ts-expect-error JS module without type declarations
   import { getCategories, getComponentsByParentGroup } from '@/components/designer/constants/componentMeta'
-  // @ts-expect-error JS module without type declarations
   import { ComponentCategories } from '@/components/designer/constants/types'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 

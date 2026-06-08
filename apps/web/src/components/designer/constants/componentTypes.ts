@@ -3,7 +3,7 @@
  */
 
 // 容器类型组件
-export const CONTAINER_TYPES = [
+export const CONTAINER_TYPES: string[] = [
   'ea-container',
   'ea-card',
   'ea-header',
@@ -18,10 +18,10 @@ export const CONTAINER_TYPES = [
 ]
 
 // 非容器类型组件
-export const NON_CONTAINER_TYPES = ['ea-checkbox-group', 'ea-radio-group', 'ea-tree']
+export const NON_CONTAINER_TYPES: string[] = ['ea-checkbox-group', 'ea-radio-group', 'ea-tree']
 
 // 行内块级组件
-export const INLINE_BLOCK_TYPES = [
+export const INLINE_BLOCK_TYPES: string[] = [
   'ea-button',
   'ea-text',
   'ea-link',
@@ -36,10 +36,15 @@ export const INLINE_BLOCK_TYPES = [
 ]
 
 // 不可选择组件类型
-export const NON_SELECTABLE_TYPES = ['ea-option', 'ea-option-group', 'ea-radio']
+export const NON_SELECTABLE_TYPES: string[] = ['ea-option', 'ea-option-group', 'ea-radio']
 
 // 在父组件中不可选择的配置
-export const NON_SELECTABLE_IN_PARENT = [
+export interface NonSelectableInParent {
+  childType: string
+  parentType: string
+}
+
+export const NON_SELECTABLE_IN_PARENT: NonSelectableInParent[] = [
   { childType: 'ea-checkbox', parentType: 'ea-checkbox-group' },
   { childType: 'ea-radio', parentType: 'ea-radio-group' },
   { childType: 'ea-option', parentType: 'ea-option-group' },

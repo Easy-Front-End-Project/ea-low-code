@@ -1,9 +1,10 @@
 import { ComponentCategories, PropTypes } from '../types'
+import type { ComponentMeta } from '../types'
 
 /**
  * 项目级组件
  */
-export const projectComponents = [
+export const projectComponents: ComponentMeta[] = [
   {
     type: 'ea-backtop',
     name: '回到顶部',

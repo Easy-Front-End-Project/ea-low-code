@@ -1,4 +1,7 @@
 import { ComponentCategories } from './types'
+import type { ComponentMeta, CategoryItem, CategoryGrouped, ParentGroup, RemoteConfigStorage, StyleConfig } from './types'
+
+export type { StyleConfig }
 import { basicComponents } from './meta/basicComponents'
 import { dataComponents } from './meta/dataComponents'
 import { feedbackComponents } from './meta/feedbackComponents'
@@ -11,7 +14,7 @@ import { projectComponents } from './meta/projectComponents'
 const REMOTE_CONFIG_KEY = 'ea_lowcode_remote_config'
 
 // 组件元数据配置
-export const componentMetaList = [
+export const componentMetaList: ComponentMeta[] = [
   ...basicComponents,
   ...layoutComponents,
   ...formComponents,
@@ -21,19 +24,19 @@ export const componentMetaList = [
 ]
 
 // 所有组件元数据（包含项目级组件）
-export const allComponentMetaList = [...componentMetaList, ...projectComponents]
+export const allComponentMetaList: ComponentMeta[] = [...componentMetaList, ...projectComponents]
 
 // 根据分类获取组件
-export function getComponentsByCategory(category) {
+export function getComponentsByCategory(category: string): ComponentMeta[] {
   return componentMetaList.filter(comp => comp.category === category)
 }
 
 /**
  * 根据分类获取组件，并按是否为子组件分组
- * @param {string} category - 分类值
- * @returns {{ regular: ComponentMeta[], child: ComponentMeta[] }} 普通组件和子组件分组
+ * @param category - 分类值
+ * @returns 普通组件和子组件分组
  */
-export function getComponentsByCategoryGrouped(category) {
+export function getComponentsByCategoryGrouped(category: string): CategoryGrouped {
   const components = componentMetaList.filter(comp => comp.category === category)
   return {
     regular: components.filter(comp => !comp.isChildComponent),
@@ -43,16 +46,16 @@ export function getComponentsByCategoryGrouped(category) {
 
 /**
  * 根据分类获取组件，并按父子关系分组
- * @param {string} category - 分类值
- * @returns {{ parentType: string, parentName: string, components: ComponentMeta[] }[]} 按父组件分组的列表
+ * @param category - 分类值
+ * @returns 按父组件分组的列表
  */
-export function getComponentsByParentGroup(category) {
+export function getComponentsByParentGroup(category: string): ParentGroup[] {
   const components = componentMetaList.filter(comp => comp.category === category)
   const regular = components.filter(comp => !comp.isChildComponent)
   const children = components.filter(comp => comp.isChildComponent)
 
   // 创建父组件到子组件的映射
-  const parentMap = new Map()
+  const parentMap = new Map<string, ParentGroup>()
 
   // 初始化所有普通组件
   regular.forEach(comp => {
@@ -68,7 +71,7 @@ export function getComponentsByParentGroup(category) {
     const parentTypes = child.parentComponents || []
     parentTypes.forEach(parentType => {
       if (parentMap.has(parentType)) {
-        parentMap.get(parentType).components.push(child)
+        parentMap.get(parentType)!.components.push(child)
       }
     })
   })
@@ -80,7 +83,7 @@ export function getComponentsByParentGroup(category) {
 }
 
 // 根据类型获取组件元数据（包含项目级组件）
-export function getComponentMeta(type) {
+export function getComponentMeta(type: string): ComponentMeta | null {
   const meta = allComponentMetaList.find(comp => comp.type === type)
 
   if (!meta) return null
@@ -94,7 +97,7 @@ export function getComponentMeta(type) {
 }
 
 // 获取所有分类
-export function getCategories() {
+export function getCategories(): CategoryItem[] {
   return Object.entries(ComponentCategories).map(([key, value]) => ({
     key,
     value,
@@ -103,8 +106,8 @@ export function getCategories() {
 }
 
 // 获取分类标签
-function getCategoryLabel(category) {
-  const labels = {
+function getCategoryLabel(category: string): string {
+  const labels: Record<string, string> = {
     [ComponentCategories.BASIC]: '基础组件',
     [ComponentCategories.FORM]: '表单组件',
     [ComponentCategories.DATA]: '数据展示',
@@ -118,11 +121,11 @@ function getCategoryLabel(category) {
 
 /**
  * 获取完整 URL（拼接 globalUrl 和相对路径）
- * @param {string} url - 组件 URL
- * @param {string} globalUrl - 基础 URL
- * @returns {string} 完整 URL
+ * @param url - 组件 URL
+ * @param globalUrl - 基础 URL
+ * @returns 完整 URL
  */
-function getFullUrl(url, globalUrl) {
+function getFullUrl(url: string, globalUrl: string): string {
   if (!url) return ''
   // 如果已经是完整 URL，直接返回
   if (url.startsWith('http://') || url.startsWith('https://')) {
@@ -139,9 +142,9 @@ function getFullUrl(url, globalUrl) {
 
 /**
  * 获取存储的远程组件配置
- * @returns {Object} 远程组件配置对象 { globalUrl, components }
+ * @returns 远程组件配置对象
  */
-export function getRemoteConfig() {
+export function getRemoteConfig(): RemoteConfigStorage {
   try {
     const stored = localStorage.getItem(REMOTE_CONFIG_KEY)
     if (stored) {
@@ -155,17 +158,17 @@ export function getRemoteConfig() {
 
 /**
  * 获取存储的远程组件列表
- * @returns {Array} 远程组件配置列表
+ * @returns 远程组件配置列表
  */
-export function getRemoteComponents() {
+export function getRemoteComponents(): Array<Record<string, unknown>> {
   return getRemoteConfig().components || []
 }
 
 /**
  * 保存远程组件配置
- * @param {Array} components 远程组件配置列表
+ * @param components 远程组件配置列表
  */
-export function saveRemoteComponents(components) {
+export function saveRemoteComponents(components: Array<Record<string, unknown>>): void {
   const config = getRemoteConfig()
   config.components = components
   localStorage.setItem(REMOTE_CONFIG_KEY, JSON.stringify(config))
@@ -173,9 +176,9 @@ export function saveRemoteComponents(components) {
 
 /**
  * 添加远程组件
- * @param {Object} component 远程组件配置
+ * @param component 远程组件配置
  */
-export function addRemoteComponent(component) {
+export function addRemoteComponent(component: Record<string, unknown>): void {
   const config = getRemoteConfig()
   config.components.push({
     id: Date.now().toString(),
@@ -187,9 +190,9 @@ export function addRemoteComponent(component) {
 
 /**
  * 删除远程组件
- * @param {string} id 组件ID
+ * @param id 组件ID
  */
-export function removeRemoteComponent(id) {
+export function removeRemoteComponent(id: string): void {
   const config = getRemoteConfig()
   config.components = config.components.filter(c => c.id !== id)
   localStorage.setItem(REMOTE_CONFIG_KEY, JSON.stringify(config))
@@ -197,25 +200,25 @@ export function removeRemoteComponent(id) {
 
 /**
  * 获取所有远程组件的元数据（包含本地存储的）
- * @returns {Array} 远程组件元数据列表
+ * @returns 远程组件元数据列表
  */
-export function getRemoteComponentMetaList() {
+export function getRemoteComponentMetaList(): ComponentMeta[] {
   const config = getRemoteConfig()
   const remoteComponents = config.components || []
   return remoteComponents.map(comp => ({
     type: `remote-${comp.id}`,
-    name: comp.name || '远程组件',
+    name: (comp.name as string) || '远程组件',
     category: ComponentCategories.REMOTE,
-    icon: comp.icon || 'Link',
+    icon: (comp.icon as string) || 'Link',
     isRemote: true,
     remoteConfig: {
-      id: comp.id,
-      url: getFullUrl(comp.url, config.globalUrl),
-      styleUrl: comp.styleUrl || '',
-      exportName: comp.exportName,
+      id: comp.id as string,
+      url: getFullUrl(comp.url as string, config.globalUrl),
+      styleUrl: (comp.styleUrl as string) || '',
+      exportName: comp.exportName as string,
     },
-    props: comp.props || [],
-    events: comp.events || [],
-    slots: comp.slots || [{ name: 'default', label: '默认插槽' }],
+    props: (comp.props as ComponentMeta['props']) || [],
+    events: (comp.events as ComponentMeta['events']) || [],
+    slots: (comp.slots as ComponentMeta['slots']) || [{ name: 'default', label: '默认插槽' }],
   }))
 }
