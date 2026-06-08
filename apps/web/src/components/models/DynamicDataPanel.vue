@@ -191,23 +191,25 @@
 </script>
 
 <style lang="scss" scoped>
-  .dynamic-data-panel {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(dynamic-data-panel) {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 
-    &__info-header {
+    @include e(info-header) {
       display: flex;
       align-items: center;
       gap: 0.75rem;
     }
 
-    &__title {
+    @include e(title) {
       font-size: 1rem;
       font-weight: 600;
     }
 
-    &__stats {
+    @include e(stats) {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -215,7 +217,7 @@
       font-size: 0.875rem;
     }
 
-    &__api-item {
+    @include e(api-item) {
       margin-bottom: 1rem;
       padding: 0.75rem;
       border-radius: 6px;
@@ -227,21 +229,21 @@
       }
     }
 
-    &__api-header {
+    @include e(api-header) {
       display: flex;
       align-items: center;
       gap: 0.5rem;
       margin-bottom: 0.5rem;
     }
 
-    &__api-url {
+    @include e(api-url) {
       flex: 1;
       font-size: 0.8125rem;
       color: var(--ea-text-regular);
       word-break: break-all;
     }
 
-    &__api-body {
+    @include e(api-body) {
       margin: 0;
       padding: 0.75rem;
       font-size: 0.8125rem;

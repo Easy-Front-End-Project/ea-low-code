@@ -71,12 +71,14 @@
 </script>
 
 <style lang="scss" scoped>
-  .pages-search-bar {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(pages-search-bar) {
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    &__left {
+    @include e(left) {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -86,7 +88,7 @@
       }
     }
 
-    &__right {
+    @include e(right) {
       display: flex;
       align-items: center;
       gap: 8px;

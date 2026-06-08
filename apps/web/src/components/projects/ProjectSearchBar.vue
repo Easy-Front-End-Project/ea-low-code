@@ -119,14 +119,16 @@
 </script>
 
 <style lang="scss" scoped>
-  .project-search-bar {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(project-search-bar) {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 16px 0;
     border-bottom: 1px solid var(--ea-border-light);
 
-    &__left {
+    @include e(left) {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -136,7 +138,7 @@
       }
     }
 
-    &__right {
+    @include e(right) {
       display: flex;
       align-items: center;
       gap: 12px;

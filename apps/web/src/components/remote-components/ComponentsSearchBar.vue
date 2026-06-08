@@ -74,7 +74,7 @@
   @import '@/styles/mixins/bem.scss';
 
   @include b(components-search-bar) {
-    &__main {
+    @include e(main) {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -104,19 +104,19 @@
       border-radius: 8px;
       border: 1px solid #e5e7eb;
       padding: 1rem;
+    }
 
-      &-title {
-        margin: 0 0 0.5rem 0;
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #374151;
-      }
+    @include e(presets-title) {
+      margin: 0 0 0.5rem 0;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #374151;
+    }
 
-      &-content {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-      }
+    @include e(presets-content) {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
   }
 </style>

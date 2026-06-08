@@ -292,8 +292,10 @@
 </script>
 
 <style lang="scss" scoped>
-  .upload-image-dialog {
-    &__dropzone {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(upload-image-dialog) {
+    @include e(dropzone) {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -316,24 +318,24 @@
       }
     }
 
-    &__text {
+    @include e(text) {
       margin-top: 12px;
       font-size: 14px;
       color: var(--ea-text-regular);
     }
 
-    &__link {
+    @include e(link) {
       color: #667eea;
       font-weight: 500;
     }
 
-    &__hint {
+    @include e(hint) {
       margin-top: 8px;
       font-size: 12px;
       color: var(--ea-text-secondary);
     }
 
-    &__file-list {
+    @include e(file-list) {
       margin-top: 16px;
       display: flex;
       flex-direction: column;
@@ -342,7 +344,7 @@
       overflow-y: auto;
     }
 
-    &__file-item {
+    @include e(file-item) {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -351,7 +353,7 @@
       border-radius: 6px;
     }
 
-    &__file-preview {
+    @include e(file-preview) {
       width: 48px;
       height: 48px;
       display: flex;
@@ -369,7 +371,7 @@
       }
     }
 
-    &__file-info {
+    @include e(file-info) {
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -377,11 +379,11 @@
       min-width: 0;
     }
 
-    &__name-input {
+    @include e(name-input) {
       width: 100%;
     }
 
-    &__file-name {
+    @include e(file-name) {
       font-size: 13px;
       color: var(--ea-text-regular);
       overflow: hidden;
@@ -389,31 +391,31 @@
       white-space: nowrap;
     }
 
-    &__file-size {
+    @include e(file-size) {
       font-size: 12px;
       color: var(--ea-text-secondary);
     }
 
-    &__form {
+    @include e(form) {
       margin-top: 20px;
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
 
-    &__form-item {
+    @include e(form-item) {
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
 
-    &__label {
+    @include e(label) {
       font-size: 13px;
       font-weight: 500;
       color: var(--ea-text-primary);
     }
 
-    &__footer {
+    @include e(footer) {
       display: flex;
       justify-content: flex-end;
       gap: 12px;

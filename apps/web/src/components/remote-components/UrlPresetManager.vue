@@ -1,17 +1,17 @@
 <template>
   <ea-dialog :visible="visible" title="URL 预设管理" width="700px" @close="handleClose">
     <div class="url-preset-manager">
-      <div class="preset-list">
-        <form class="preset-form" @submit.prevent>
-          <div class="preset-header">
-            <div class="col-name">预设名称</div>
-            <div class="col-url">基础 URL</div>
-            <div class="col-default">默认</div>
-            <div class="col-action">操作</div>
+      <div class="url-preset-manager__list">
+        <form class="url-preset-manager__form" @submit.prevent>
+          <div class="url-preset-manager__header">
+            <div class="url-preset-manager__col-name">预设名称</div>
+            <div class="url-preset-manager__col-url">基础 URL</div>
+            <div class="url-preset-manager__col-default">默认</div>
+            <div class="url-preset-manager__col-action">操作</div>
           </div>
 
-          <div v-for="preset in localPresets" :key="preset.id" class="preset-item">
-            <div class="col-name">
+          <div v-for="preset in localPresets" :key="preset.id" class="url-preset-manager__item">
+            <div class="url-preset-manager__col-name">
               <EaInput
                 v-model="preset.name"
                 size="small"
@@ -19,7 +19,7 @@
                 @input="(val) => handleUpdate(preset.id, 'name', val)"
               />
             </div>
-            <div class="col-url">
+            <div class="url-preset-manager__col-url">
               <EaInput
                 v-model="preset.url"
                 size="small"
@@ -27,7 +27,7 @@
                 @input="(val) => handleUpdate(preset.id, 'url', val)"
               />
             </div>
-            <div class="col-default">
+            <div class="url-preset-manager__col-default">
               <ea-button
                 :type="preset.isDefault ? 'primary' : 'default'"
                 size="small"
@@ -38,7 +38,7 @@
                 {{ preset.isDefault ? '默认' : '设为默认' }}
               </ea-button>
             </div>
-            <div class="col-action">
+            <div class="url-preset-manager__col-action">
               <ea-button
                 icon="xmark"
                 type="danger"
@@ -51,14 +51,14 @@
 
           <ea-empty
             v-if="localPresets.length === 0"
-            class="empty-state"
+            class="url-preset-manager__empty"
             description="暂无 URL 预设，点击下方按钮添加"
           ></ea-empty>
         </form>
       </div>
     </div>
 
-    <div slot="footer" class="dialog-footer">
+    <div slot="footer" class="url-preset-manager__footer">
       <ea-button type="primary" icon="plus" size="small" @click="handleAddPreset">
         添加预设
       </ea-button>
@@ -159,82 +159,84 @@
   }
 </script>
 
-<style scoped>
-  .url-preset-manager {
+<style lang="scss" scoped>
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(url-preset-manager) {
     min-height: 300px;
     max-height: 500px;
     overflow-y: auto;
-  }
 
-  .preset-form {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
+    @include e(form) {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
 
-  .preset-header {
-    display: flex;
-    align-items: center;
-    padding: 0.5rem 0.75rem;
-    background-color: #f3f4f6;
-    border-radius: 0.375rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #4b5563;
-  }
+    @include e(header) {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 0.75rem;
+      background-color: #f3f4f6;
+      border-radius: 0.375rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #4b5563;
+    }
 
-  .preset-item {
-    display: flex;
-    align-items: center;
-    padding: 0.5rem 0.75rem;
-    background-color: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.375rem;
-    transition: all 0.2s;
-  }
+    @include e(item) {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 0.75rem;
+      background-color: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.375rem;
+      transition: all 0.2s;
 
-  .preset-item:hover {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-  }
+      &:hover {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+      }
+    }
 
-  .col-name {
-    flex: 2;
-    min-width: 120px;
-    padding-right: 0.5rem;
-  }
+    @include e(col-name) {
+      flex: 2;
+      min-width: 120px;
+      padding-right: 0.5rem;
+    }
 
-  .col-url {
-    flex: 4;
-    min-width: 200px;
-    padding-right: 0.5rem;
-  }
+    @include e(col-url) {
+      flex: 4;
+      min-width: 200px;
+      padding-right: 0.5rem;
+    }
 
-  .col-default {
-    width: 90px;
-    min-width: 80px;
-    padding-right: 0.5rem;
-    display: flex;
-    justify-content: center;
-  }
+    @include e(col-default) {
+      width: 90px;
+      min-width: 80px;
+      padding-right: 0.5rem;
+      display: flex;
+      justify-content: center;
+    }
 
-  .col-action {
-    width: 50px;
-    display: flex;
-    justify-content: center;
-  }
+    @include e(col-action) {
+      width: 50px;
+      display: flex;
+      justify-content: center;
+    }
 
-  .empty-state {
-    padding: 3rem 1rem;
-    border: 2px dashed #e5e7eb;
-    border-radius: 0.5rem;
-  }
+    @include e(empty) {
+      padding: 3rem 1rem;
+      border: 2px dashed #e5e7eb;
+      border-radius: 0.5rem;
+    }
 
-  .dialog-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    border-top: 1px solid #e5e7eb;
+    @include e(footer) {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      border-top: 1px solid #e5e7eb;
+    }
   }
 </style>

@@ -177,26 +177,28 @@
 </script>
 
 <style lang="scss" scoped>
-  .create-field-dialog {
-    &__form {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(create-field-dialog) {
+    @include e(form) {
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
 
-    &__item {
+    @include e(item) {
       display: flex;
       flex-direction: column;
       gap: 6px;
 
-      &--row {
+      @include m(row) {
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
       }
     }
 
-    &__label {
+    @include e(label) {
       font-size: 13px;
       color: var(--ea-text-regular);
       font-weight: 500;
@@ -207,7 +209,7 @@
       }
     }
 
-    &__input-row {
+    @include e(input-row) {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -217,7 +219,7 @@
       }
     }
 
-    &__switch-item {
+    @include e(switch-item) {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -229,7 +231,7 @@
       }
     }
 
-    &__footer {
+    @include e(footer) {
       display: flex;
       justify-content: flex-end;
       gap: 12px;

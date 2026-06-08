@@ -121,20 +121,22 @@
 </script>
 
 <style lang="scss" scoped>
-  .create-model-dialog {
-    &__form {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(create-model-dialog) {
+    @include e(form) {
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
 
-    &__item {
+    @include e(item) {
       display: flex;
       flex-direction: column;
       gap: 6px;
     }
 
-    &__label {
+    @include e(label) {
       font-size: 13px;
       color: var(--ea-text-regular);
       font-weight: 500;
@@ -145,7 +147,7 @@
       }
     }
 
-    &__footer {
+    @include e(footer) {
       display: flex;
       justify-content: flex-end;
       gap: 12px;

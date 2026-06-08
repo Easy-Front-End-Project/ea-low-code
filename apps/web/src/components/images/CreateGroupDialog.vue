@@ -127,20 +127,22 @@ function resetForm() {
 </script>
 
 <style lang="scss" scoped>
-.create-group-dialog {
-  &__form {
+@import '@/styles/mixins/bem.scss';
+
+@include b(create-group-dialog) {
+  @include e(form) {
     display: flex;
     flex-direction: column;
     gap: 20px;
   }
 
-  &__form-item {
+  @include e(form-item) {
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
 
-  &__label {
+  @include e(label) {
     font-size: 13px;
     font-weight: 500;
     color: var(--ea-text-primary);
@@ -151,7 +153,7 @@ function resetForm() {
     }
   }
 
-  &__footer {
+  @include e(footer) {
     display: flex;
     justify-content: flex-end;
     gap: 12px;

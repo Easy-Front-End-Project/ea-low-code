@@ -47,12 +47,14 @@ defineEmits<{
 </script>
 
 <style lang="scss" scoped>
-.model-list-aside {
+@import '@/styles/mixins/bem.scss';
+
+@include b(model-list-aside) {
   display: flex;
   flex-direction: column;
   height: 100%;
 
-  &__header {
+  @include e(header) {
     padding: 16px;
     font-size: 14px;
     font-weight: 600;
@@ -60,13 +62,13 @@ defineEmits<{
     border-bottom: 1px solid var(--ea-border-light);
   }
 
-  &__list {
+  @include e(list) {
     flex: 1;
     overflow-y: auto;
     padding: 8px;
   }
 
-  &__empty {
+  @include e(empty) {
     padding: 24px 12px;
   }
 }

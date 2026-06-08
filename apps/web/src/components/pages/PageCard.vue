@@ -92,7 +92,9 @@
 </script>
 
 <style lang="scss" scoped>
-  .page-card {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(page-card) {
     cursor: pointer;
 
     &::part(header) {
@@ -103,7 +105,7 @@
       padding: 0;
     }
 
-    &__header {
+    @include e(header) {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -112,7 +114,7 @@
       min-height: 60px;
     }
 
-    &__title {
+    @include e(title) {
       font-size: 16px;
       font-weight: 600;
       color: #ffffff;
@@ -122,19 +124,19 @@
       white-space: nowrap;
     }
 
-    &__tags {
+    @include e(tags) {
       display: flex;
       gap: 12px;
       margin-left: 16px;
     }
 
-    &__body {
+    @include e(body) {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    &__description {
+    @include e(description) {
       font-size: 14px;
       color: var(--ea-text-secondary);
       line-height: 1.5;
@@ -146,7 +148,7 @@
       margin: 0;
     }
 
-    &__meta {
+    @include e(meta) {
       display: flex;
       align-items: center;
       gap: 16px;
@@ -160,7 +162,7 @@
       }
     }
 
-    &__actions {
+    @include e(actions) {
       display: flex;
       justify-content: space-around;
       padding: 12px 0;

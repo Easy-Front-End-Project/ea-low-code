@@ -43,7 +43,9 @@ defineEmits<{
 </script>
 
 <style lang="scss" scoped>
-.model-list-item {
+@import '@/styles/mixins/bem.scss';
+
+@include b(model-list-item) {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -57,17 +59,17 @@ defineEmits<{
     background-color: var(--ea-fill-light, #f5f7fa);
   }
 
-  &--active {
+  @include m(active) {
     background-color: var(--ea-primary-light, #ecf5ff);
     border-left: 3px solid var(--ea-primary, #409eff);
   }
 
-  &__body {
+  @include e(body) {
     flex: 1;
     min-width: 0;
   }
 
-  &__desc {
+  @include e(desc) {
     font-size: 13px;
     color: var(--ea-text-primary);
     overflow: hidden;
@@ -75,7 +77,7 @@ defineEmits<{
     white-space: nowrap;
   }
 
-  &__name {
+  @include e(name) {
     font-size: 11px;
     color: var(--ea-text-secondary);
     margin-top: 2px;
@@ -85,7 +87,7 @@ defineEmits<{
     font-family: monospace;
   }
 
-  &__actions {
+  @include e(actions) {
     display: flex;
     align-items: center;
     gap: 4px;

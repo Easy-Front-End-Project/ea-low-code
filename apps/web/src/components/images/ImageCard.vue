@@ -204,7 +204,9 @@
 </script>
 
 <style lang="scss" scoped>
-  .image-card {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(image-card) {
     cursor: pointer;
 
     &::part(header) {
@@ -220,7 +222,7 @@
       flex: 1;
     }
 
-    &__header {
+    @include e(header) {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -228,13 +230,13 @@
       overflow: hidden;
     }
 
-    &__img {
+    @include e(img) {
       max-width: 100%;
       max-height: 160px;
       border-radius: 4px;
     }
 
-    &__url {
+    @include e(url) {
       display: flex;
       align-items: center;
       gap: 6px;
@@ -262,13 +264,13 @@
       }
     }
 
-    &__body {
+    @include e(body) {
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
 
-    &__info {
+    @include e(info) {
       display: flex;
       align-items: center;
       gap: 6px;
@@ -282,7 +284,7 @@
       }
     }
 
-    &__description {
+    @include e(description) {
       font-size: 12px;
       color: var(--ea-text-secondary);
       overflow: hidden;
@@ -293,18 +295,18 @@
       line-height: 1.5;
     }
 
-    &__footer {
+    @include e(footer) {
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
 
-    &__time {
+    @include e(time) {
       font-size: 12px;
       color: var(--ea-text-secondary);
     }
 
-    &__actions {
+    @include e(actions) {
       display: flex;
       align-items: center;
       gap: 8px;

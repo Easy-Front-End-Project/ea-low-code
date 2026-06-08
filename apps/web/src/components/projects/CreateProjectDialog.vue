@@ -202,14 +202,16 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-.create-project-dialog {
-  &__types {
+@import '@/styles/mixins/bem.scss';
+
+@include b(create-project-dialog) {
+  @include e(types) {
     display: flex;
     gap: 16px;
     margin-bottom: 24px;
   }
 
-  &__type {
+  @include e(type) {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -226,7 +228,7 @@ watch(
       border-color: var(--ea-primary);
     }
 
-    &.is-active {
+    @include when(active) {
       border-color: var(--ea-primary);
       background: var(--ea-primary-light);
     }
@@ -241,7 +243,7 @@ watch(
     }
   }
 
-  &__form {
+  @include e(form) {
     &-item {
       margin-bottom: 20px;
 
@@ -251,25 +253,25 @@ watch(
     }
   }
 
-  &__label {
+  @include e(label) {
     display: block;
     font-size: 14px;
     color: var(--ea-text-regular);
     margin-bottom: 8px;
   }
 
-  &__required {
+  @include e(required) {
     color: var(--ea-danger);
     margin-left: 4px;
   }
 
-  &__templates {
+  @include e(templates) {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
 
-  &__template {
+  @include e(template) {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -283,7 +285,7 @@ watch(
       border-color: var(--ea-primary);
     }
 
-    &.is-active {
+    @include when(active) {
       border-color: var(--ea-primary);
       background: var(--ea-primary-light);
 
@@ -298,7 +300,7 @@ watch(
     }
   }
 
-  &__footer {
+  @include e(footer) {
     display: flex;
     justify-content: flex-end;
     gap: 12px;

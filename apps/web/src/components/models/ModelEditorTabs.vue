@@ -92,8 +92,10 @@
 </script>
 
 <style lang="scss" scoped>
-  .model-editor-tabs {
-    &__placeholder {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(model-editor-tabs) {
+    @include e(placeholder) {
       display: flex;
       align-items: center;
       justify-content: center;

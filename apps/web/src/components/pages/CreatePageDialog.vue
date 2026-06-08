@@ -111,8 +111,10 @@
 </script>
 
 <style lang="scss" scoped>
-  .create-page-dialog {
-    &__form-item {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(create-page-dialog) {
+    @include e(form-item) {
       margin-bottom: 20px;
 
       &:last-child {
@@ -120,19 +122,19 @@
       }
     }
 
-    &__label {
+    @include e(label) {
       display: block;
       font-size: 14px;
       color: var(--ea-text-regular);
       margin-bottom: 8px;
     }
 
-    &__required {
+    @include e(required) {
       color: var(--ea-danger);
       margin-left: 4px;
     }
 
-    &__footer {
+    @include e(footer) {
       display: flex;
       justify-content: flex-end;
       gap: 12px;

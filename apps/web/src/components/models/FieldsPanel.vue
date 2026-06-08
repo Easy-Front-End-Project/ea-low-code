@@ -171,6 +171,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @import '@/styles/mixins/bem.scss';
+
   ea-table {
     width: 100%;
 
@@ -179,25 +181,25 @@
     }
   }
 
-  .fields-panel {
+  @include b(fields-panel) {
     display: flex;
     flex-direction: column;
     height: 100%;
 
-    &__toolbar {
+    @include e(toolbar) {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 12px 0;
     }
 
-    &__toolbar-right {
+    @include e(toolbar-right) {
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    &__footer {
+    @include e(footer) {
       display: flex;
       justify-content: flex-end;
       padding: 16px 0 8px;

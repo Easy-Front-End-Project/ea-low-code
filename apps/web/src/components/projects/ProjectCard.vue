@@ -118,14 +118,16 @@
 </script>
 
 <style lang="scss" scoped>
-  .project-card {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(project-card) {
     cursor: pointer;
 
     &::part(header) {
       padding: 0;
     }
 
-    &__header {
+    @include e(header) {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -134,7 +136,7 @@
       min-height: 80px;
     }
 
-    &__title {
+    @include e(title) {
       font-size: 16px;
       font-weight: 600;
       color: #ffffff;
@@ -144,12 +146,12 @@
       white-space: nowrap;
     }
 
-    &__actions {
+    @include e(actions) {
       flex-shrink: 0;
       margin-left: 8px;
     }
 
-    &__settings-btn {
+    @include e(settings-btn) {
       padding: 4px;
       opacity: 0.8;
       transition: opacity 0.2s;
@@ -159,13 +161,13 @@
       }
     }
 
-    &__body {
+    @include e(body) {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    &__info {
+    @include e(info) {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -179,7 +181,7 @@
       }
     }
 
-    &__description {
+    @include e(description) {
       font-size: 12px;
       color: var(--ea-text-secondary);
       overflow: hidden;
@@ -191,13 +193,13 @@
       min-height: 36px;
     }
 
-    &__footer {
+    @include e(footer) {
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
 
-    &__time {
+    @include e(time) {
       font-size: 12px;
       color: var(--ea-text-secondary);
     }

@@ -191,8 +191,10 @@
 </script>
 
 <style lang="scss" scoped>
-  .edit-image-dialog {
-    &__preview {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(edit-image-dialog) {
+    @include e(preview) {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -209,31 +211,31 @@
       }
     }
 
-    &__form {
+    @include e(form) {
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
 
-    &__form-item {
+    @include e(form-item) {
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
 
-    &__label {
+    @include e(label) {
       font-size: 13px;
       font-weight: 500;
       color: var(--ea-text-primary);
     }
 
-    &__hint {
+    @include e(hint) {
       font-size: 12px;
       color: var(--ea-text-secondary);
       margin-top: 4px;
     }
 
-    &__footer {
+    @include e(footer) {
       display: flex;
       justify-content: flex-end;
       gap: 12px;

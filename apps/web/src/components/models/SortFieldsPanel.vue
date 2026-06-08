@@ -130,25 +130,27 @@
 </script>
 
 <style lang="scss" scoped>
-  .sort-fields-panel {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(sort-fields-panel) {
     display: flex;
     flex-direction: column;
     height: 100%;
 
-    &__toolbar {
+    @include e(toolbar) {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 12px 0;
     }
 
-    &__toolbar-right {
+    @include e(toolbar-right) {
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    &__table {
+    @include e(table) {
       flex: 1;
       overflow: auto;
 
