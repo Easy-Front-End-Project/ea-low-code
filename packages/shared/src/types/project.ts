@@ -3,7 +3,7 @@
  * 统一项目、页面、数据源、模型等业务类型
  */
 
-import type { PageSchema, VariableItem } from './schema'
+import type { PageSchema, VariableItem } from './schema.js'
 
 // ==================== 项目 ====================
 

@@ -2,12 +2,15 @@
 import eslint from '@eslint/js';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import rootConfig from '../../eslint.config.js';
 
 export default tseslint.config(
+  ...rootConfig,
+
   {
     ignores: ['eslint.config.mjs'],
   },
-  eslint.configs.recommended,
+
   ...tseslint.configs.recommendedTypeChecked,
   {
     languageOptions: {

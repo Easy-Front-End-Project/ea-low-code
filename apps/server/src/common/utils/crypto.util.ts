@@ -1,6 +1,6 @@
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt'
 
-export const SALT_ROUNDS = 10;
+export const SALT_ROUNDS = 10
 
 /**
  * 哈希密码
@@ -8,7 +8,7 @@ export const SALT_ROUNDS = 10;
  * @returns 哈希后的密码
  */
 export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, SALT_ROUNDS);
+  return bcrypt.hash(password, SALT_ROUNDS)
 }
 
 /**
@@ -18,5 +18,5 @@ export async function hashPassword(password: string): Promise<string> {
  * @returns 是否匹配
  */
 export async function comparePassword(password: string, hash: string): Promise<boolean> {
-  return bcrypt.compare(password, hash);
+  return bcrypt.compare(password, hash)
 }

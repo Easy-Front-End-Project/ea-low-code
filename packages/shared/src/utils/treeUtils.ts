@@ -3,7 +3,7 @@
  * 提供查找、遍历、插入、删除、移动等树操作方法
  */
 
-import type { ComponentSchema } from '../types'
+import type { ComponentSchema } from '../types/index.js'
 
 /**
  * 根据 ID 查找组件

@@ -3,8 +3,8 @@
  * 校验组件元数据的合法性
  */
 
-import type { ComponentMeta, PropDefinition, ValidationResult } from '../types'
-import { PROP_TYPES } from '../constants'
+import type { ComponentMeta, PropDefinition, ValidationResult } from '../types/index.js'
+import { PROP_TYPES } from '../constants/index.js'
 
 /** 合法的属性类型集合 */
 const VALID_PROP_TYPES = new Set<string>(Object.values(PROP_TYPES))

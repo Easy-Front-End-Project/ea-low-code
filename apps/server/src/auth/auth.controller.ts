@@ -1,26 +1,14 @@
-import {
-  Controller,
-  Post,
-  Body,
-  UseGuards,
-  Get,
-  Request,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-} from '@nestjs/swagger';
-import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto';
-import { SendVerificationCodeDto } from './dto/send-verification-code.dto';
-import { VerifyCodeDto } from './dto/verify-code.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { Controller, Post, Body, UseGuards, Get, Request } from '@nestjs/common'
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
+import { AuthService } from './auth.service'
+import { LoginDto } from './dto/login.dto'
+import { SendVerificationCodeDto } from './dto/send-verification-code.dto'
+import { VerifyCodeDto } from './dto/verify-code.dto'
+import { ResetPasswordDto } from './dto/reset-password.dto'
+import { JwtAuthGuard } from './guards/jwt-auth.guard'
 
 interface RequestWithUser extends Request {
-  user: { userId: number; username: string };
+  user: { userId: number; username: string }
 }
 
 @ApiTags('认证授权')
@@ -53,7 +41,7 @@ export class AuthController {
   })
   @ApiResponse({ status: 401, description: '用户名或密码错误' })
   async login(@Body() loginDto: LoginDto) {
-    return await this.authService.login(loginDto);
+    return await this.authService.login(loginDto)
   }
 
   @UseGuards(JwtAuthGuard)
@@ -80,9 +68,9 @@ export class AuthController {
   })
   @ApiResponse({ status: 401, description: '未授权' })
   async getProfile(@Request() req: RequestWithUser) {
-    const user = await this.authService.findById(req.user.userId);
-    const { password, ...result } = user;
-    return result;
+    const user = await this.authService.findById(req.user.userId)
+    const { password, ...result } = user
+    return result
   }
 
   @Post('send-verification-code')
@@ -101,7 +89,7 @@ export class AuthController {
   })
   @ApiResponse({ status: 400, description: '发送失败或邮箱已注册/未注册' })
   async sendVerificationCode(@Body() dto: SendVerificationCodeDto) {
-    return await this.authService.sendVerificationCode(dto.email, dto.purpose);
+    return await this.authService.sendVerificationCode(dto.email, dto.purpose)
   }
 
   @Post('verify-code')
@@ -119,7 +107,7 @@ export class AuthController {
     },
   })
   async verifyCode(@Body() dto: VerifyCodeDto) {
-    return await this.authService.verifyCode(dto.email, dto.code, dto.purpose);
+    return await this.authService.verifyCode(dto.email, dto.code, dto.purpose)
   }
 
   @Post('reset-password')
@@ -136,7 +124,7 @@ export class AuthController {
   @ApiResponse({ status: 400, description: '验证码无效或已过期' })
   @ApiResponse({ status: 404, description: '用户不存在' })
   async resetPassword(@Body() dto: ResetPasswordDto) {
-    return await this.authService.resetPassword(dto);
+    return await this.authService.resetPassword(dto)
   }
 
   @UseGuards(JwtAuthGuard)
@@ -156,12 +144,8 @@ export class AuthController {
   @ApiResponse({ status: 401, description: '未授权' })
   async changePassword(
     @Request() req: RequestWithUser,
-    @Body() dto: { oldPassword: string; newPassword: string },
+    @Body() dto: { oldPassword: string; newPassword: string }
   ) {
-    return await this.authService.changePassword(
-      req.user.userId,
-      dto.oldPassword,
-      dto.newPassword,
-    );
+    return await this.authService.changePassword(req.user.userId, dto.oldPassword, dto.newPassword)
   }
 }

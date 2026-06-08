@@ -5,48 +5,48 @@ import {
   ManyToOne,
   JoinColumn,
   CreateDateColumn,
-} from 'typeorm';
-import { DynamicModel } from './dynamic-model.entity';
+} from 'typeorm'
+import { DynamicModel } from './dynamic-model.entity'
 
 @Entity('model_fields')
 export class ModelField {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @Column({ type: 'int' })
-  modelId: number;
+  modelId: number
 
   @ManyToOne(() => DynamicModel)
   @JoinColumn({ name: 'modelId' })
-  model: DynamicModel;
+  model: DynamicModel
 
   @Column({ length: 100 })
-  fieldName: string;
+  fieldName: string
 
   @Column({ length: 200 })
-  fieldLabel: string;
+  fieldLabel: string
 
   @Column({ length: 50 })
-  fieldType: string;
+  fieldType: string
 
   @Column({ type: 'int', nullable: true })
-  fieldLength: number | null;
+  fieldLength: number | null
 
   @Column({ default: false })
-  isNullable: boolean;
+  isNullable: boolean
 
   @Column({ default: false })
-  isUnique: boolean;
+  isUnique: boolean
 
   @Column({ type: 'varchar', length: 500, nullable: true })
-  defaultValue: string | null;
+  defaultValue: string | null
 
   @Column({ default: 0 })
-  sortOrder: number;
+  sortOrder: number
 
   @Column({ default: false })
-  isSystem: boolean;
+  isSystem: boolean
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date
 }

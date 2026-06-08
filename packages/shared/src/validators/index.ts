@@ -1,2 +1,2 @@
-export * from './schemaValidator'
-export * from './componentValidator'
+export * from './schemaValidator.js'
+export * from './componentValidator.js'

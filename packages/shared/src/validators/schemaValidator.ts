@@ -3,7 +3,7 @@
  * 校验页面 Schema 结构的合法性
  */
 
-import type { ComponentSchema, ValidationResult } from '../types'
+import type { ComponentSchema, ValidationResult } from '../types/index.js'
 
 /**
  * 校验页面 Schema

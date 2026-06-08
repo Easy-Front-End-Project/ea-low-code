@@ -6,36 +6,36 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
-} from 'typeorm';
-import { User } from '../../users/entities/user.entity';
+} from 'typeorm'
+import { User } from '../../users/entities/user.entity'
 
 @Entity('dynamic_models')
 export class DynamicModel {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @Column({ length: 100, unique: true })
-  name: string;
+  name: string
 
   @Column({ length: 100, unique: true })
-  tableName: string;
+  tableName: string
 
   @Column({ length: 500, nullable: true })
-  description: string;
+  description: string
 
   @Column({ default: true })
-  isActive: boolean;
+  isActive: boolean
 
   @Column({ type: 'int', nullable: true })
-  userId: number | null;
+  userId: number | null
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user: User
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt: Date
 }

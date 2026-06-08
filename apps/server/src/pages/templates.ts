@@ -1,5 +1,4 @@
-const generateId = () =>
-  `comp_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+const generateId = () => `comp_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`
 
 export const TEMPLATES: Record<string, { name: string; schema: any }> = {
   dashboard: {
@@ -1182,8 +1181,7 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                               type: 'ea-descriptions-item',
                               props: {
                                 label: '2024-01-12',
-                                children:
-                                  '新版本v2.5.0已发布，新增数据导出功能和性能优化。',
+                                children: '新版本v2.5.0已发布，新增数据导出功能和性能优化。',
                               },
                               slots: {},
                               style: {},
@@ -1195,8 +1193,7 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                               type: 'ea-descriptions-item',
                               props: {
                                 label: '2024-01-10',
-                                children:
-                                  '请各位同事及时更新个人资料，确保联系方式准确无误。',
+                                children: '请各位同事及时更新个人资料，确保联系方式准确无误。',
                               },
                               slots: {},
                               style: {},
@@ -1543,8 +1540,7 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
                                 name: 'email',
                                 type: 'email',
                                 label: '邮箱',
-                                pattern:
-                                  '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$',
+                                pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$',
                                 required: true,
                                 clearable: true,
                                 placeholder: '请输入邮箱地址',
@@ -2653,9 +2649,9 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
       ],
     },
   },
-};
+}
 
 export function getTemplateSchema(templateId: string): any | null {
-  const template = TEMPLATES[templateId];
-  return template ? JSON.parse(JSON.stringify(template.schema)) : null;
+  const template = TEMPLATES[templateId]
+  return template ? JSON.parse(JSON.stringify(template.schema)) : null
 }

@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Query,
-  ParseIntPipe,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, ParseIntPipe, UseGuards } from '@nestjs/common'
 import {
   ApiTags,
   ApiOperation,
@@ -14,13 +6,13 @@ import {
   ApiBearerAuth,
   ApiQuery,
   ApiBody,
-} from '@nestjs/swagger';
-import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { DeleteUserDto } from './dto/delete-user.dto';
-import { User } from './entities/user.entity';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+} from '@nestjs/swagger'
+import { UsersService } from './users.service'
+import { CreateUserDto } from './dto/create-user.dto'
+import { UpdateUserDto } from './dto/update-user.dto'
+import { DeleteUserDto } from './dto/delete-user.dto'
+import { User } from './entities/user.entity'
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 
 @ApiTags('用户管理')
 @Controller('users')
@@ -35,7 +27,7 @@ export class UsersController {
   @ApiResponse({ status: 201, description: '用户创建成功', type: User })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   async create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    return await this.usersService.create(createUserDto);
+    return await this.usersService.create(createUserDto)
   }
 
   @UseGuards(JwtAuthGuard)
@@ -45,7 +37,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: '获取成功', type: [User] })
   @ApiResponse({ status: 401, description: '未授权' })
   async findAll(): Promise<User[]> {
-    return await this.usersService.findAll();
+    return await this.usersService.findAll()
   }
 
   @UseGuards(JwtAuthGuard)
@@ -60,7 +52,7 @@ export class UsersController {
   @ApiResponse({ status: 404, description: '用户不存在' })
   @ApiResponse({ status: 401, description: '未授权' })
   async findOne(@Query('id', ParseIntPipe) id: number): Promise<User> {
-    return await this.usersService.findOne(id);
+    return await this.usersService.findOne(id)
   }
 
   @UseGuards(JwtAuthGuard)
@@ -74,7 +66,7 @@ export class UsersController {
   @ApiResponse({ status: 404, description: '用户不存在' })
   @ApiResponse({ status: 401, description: '未授权' })
   async update(@Body() updateUserDto: UpdateUserDto): Promise<User> {
-    return await this.usersService.update(updateUserDto.id, updateUserDto.data);
+    return await this.usersService.update(updateUserDto.id, updateUserDto.data)
   }
 
   @UseGuards(JwtAuthGuard)
@@ -84,10 +76,8 @@ export class UsersController {
   @ApiResponse({ status: 200, description: '删除成功' })
   @ApiResponse({ status: 404, description: '用户不存在' })
   @ApiResponse({ status: 401, description: '未授权' })
-  async remove(
-    @Body() deleteUserDto: DeleteUserDto,
-  ): Promise<{ message: string }> {
-    await this.usersService.remove(deleteUserDto.id);
-    return { message: `User with ID ${deleteUserDto.id} has been deleted` };
+  async remove(@Body() deleteUserDto: DeleteUserDto): Promise<{ message: string }> {
+    await this.usersService.remove(deleteUserDto.id)
+    return { message: `User with ID ${deleteUserDto.id} has been deleted` }
   }
 }

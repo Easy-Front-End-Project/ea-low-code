@@ -3,8 +3,8 @@
  * 提供支持 Schema 结构的深拷贝方法
  */
 
-import type { ComponentSchema, PageSchema } from '../types'
-import { generateComponentId } from './idGenerator'
+import type { ComponentSchema, PageSchema } from '../types/index.js'
+import { generateComponentId } from './idGenerator.js'
 
 /**
  * 深拷贝对象

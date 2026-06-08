@@ -1,7 +1,7 @@
-import { DataSource } from 'typeorm';
+import { DataSource } from 'typeorm'
 
 export class CustomDataSource extends DataSource {
   public async buildMetadatas(): Promise<void> {
-    return super.buildMetadatas();
+    return super.buildMetadatas()
   }
 }

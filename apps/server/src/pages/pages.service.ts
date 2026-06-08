@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
-import { Project } from './entities/project.entity';
-import { PageSchema } from './entities/page-schema.entity';
-import { CreateProjectDto } from './dto/create-project.dto';
-import { CreatePageDto, UpdatePageDto } from './dto/page.dto';
-import { getTemplateSchema } from './templates';
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository, In } from 'typeorm'
+import { Project } from './entities/project.entity'
+import { PageSchema } from './entities/page-schema.entity'
+import { CreateProjectDto } from './dto/create-project.dto'
+import { CreatePageDto, UpdatePageDto } from './dto/page.dto'
+import { getTemplateSchema } from './templates'
 
 @Injectable()
 export class PagesService {
@@ -17,7 +17,7 @@ export class PagesService {
   ) {}
 
   async findAll(userId: number, query: any) {
-    const { page = 1, pageSize = 12, keyword } = query;
+    const { page = 1, pageSize = 12, keyword } = query
 
     const queryBuilder = this.projectRepository
       .createQueryBuilder('p')
@@ -27,23 +27,23 @@ export class PagesService {
         'user.username',
         'user.email',
       ])
-      .where('p.userId = :userId', { userId });
+      .where('p.userId = :userId', { userId })
 
     if (keyword) {
       queryBuilder.andWhere('p.name LIKE :keyword', {
         keyword: `%${keyword}%`,
-      });
+      })
     }
 
     // 先获取总数
-    const total = await queryBuilder.getCount();
+    const total = await queryBuilder.getCount()
 
     // 使用 getRawMany 获取原始数据，包含 addSelect 的字段
     const rawList = await queryBuilder
       .orderBy('p.createdAt', 'DESC')
       .skip((page - 1) * pageSize)
       .take(pageSize)
-      .getRawMany();
+      .getRawMany()
 
     return {
       list: rawList.map((project: any) => ({
@@ -60,39 +60,39 @@ export class PagesService {
       total,
       page,
       pageSize,
-    };
+    }
   }
 
   async findOne(id: number, userId: number) {
     const project = await this.projectRepository.findOne({
       where: { id, userId },
       relations: ['user', 'pages'],
-    });
+    })
     if (!project) {
-      throw new NotFoundException('项目不存在');
+      throw new NotFoundException('项目不存在')
     }
     return {
       ...project,
       pageCount: project.pages?.length || 0,
-    };
+    }
   }
 
   async findProjectPages(projectId: number, userId: number) {
     const project = await this.projectRepository.findOne({
       where: { id: projectId, userId },
-    });
+    })
 
     if (!project) {
-      throw new NotFoundException('项目不存在');
+      throw new NotFoundException('项目不存在')
     }
 
     const pages = await this.pageSchemaRepository.find({
       where: { projectId },
       order: { sortOrder: 'ASC', createdAt: 'ASC' },
-    });
+    })
 
     return {
-      list: pages.map((page) => ({
+      list: pages.map(page => ({
         id: page.id,
         name: page.name,
         description: page.description || null,
@@ -103,21 +103,21 @@ export class PagesService {
         updatedAt: page.updatedAt,
       })),
       total: pages.length,
-    };
+    }
   }
 
   async findPageDetail(pageId: number, userId: number) {
     const page = await this.pageSchemaRepository.findOne({
       where: { id: pageId },
       relations: ['project'],
-    });
+    })
 
     if (!page) {
-      throw new NotFoundException('页面不存在');
+      throw new NotFoundException('页面不存在')
     }
 
     if (page.project.userId !== userId) {
-      throw new NotFoundException('无权访问此页面');
+      throw new NotFoundException('无权访问此页面')
     }
 
     return {
@@ -129,33 +129,30 @@ export class PagesService {
       sortOrder: page.sortOrder,
       createdAt: page.createdAt,
       updatedAt: page.updatedAt,
-    };
+    }
   }
 
   async create(userId: number, createProjectDto: CreateProjectDto) {
-    const defaultPageName = '首页';
+    const defaultPageName = '首页'
 
     const project = this.projectRepository.create({
       name: createProjectDto.name,
       description: createProjectDto.description,
       userId,
       isPublished: false,
-    });
+    })
 
-    const savedProject = await this.projectRepository.save(project);
+    const savedProject = await this.projectRepository.save(project)
 
     let schema: any = {
       components: [],
       config: {},
-    };
+    }
 
-    if (
-      createProjectDto.createType === 'template' &&
-      createProjectDto.templateId
-    ) {
-      const templateSchema = getTemplateSchema(createProjectDto.templateId);
+    if (createProjectDto.createType === 'template' && createProjectDto.templateId) {
+      const templateSchema = getTemplateSchema(createProjectDto.templateId)
       if (templateSchema) {
-        schema = templateSchema;
+        schema = templateSchema
       }
     }
 
@@ -164,20 +161,20 @@ export class PagesService {
       schema,
       sortOrder: 0,
       projectId: savedProject.id,
-    });
+    })
 
-    await this.pageSchemaRepository.save(defaultPage);
+    await this.pageSchemaRepository.save(defaultPage)
 
-    return savedProject;
+    return savedProject
   }
 
   async createPage(userId: number, createPageDto: CreatePageDto) {
     const project = await this.projectRepository.findOne({
       where: { id: createPageDto.projectId, userId },
-    });
+    })
 
     if (!project) {
-      throw new NotFoundException('项目不存在');
+      throw new NotFoundException('项目不存在')
     }
 
     const maxSortOrder = await this.pageSchemaRepository
@@ -186,112 +183,114 @@ export class PagesService {
       .where('ps.projectId = :projectId', {
         projectId: createPageDto.projectId,
       })
-      .getRawOne();
+      .getRawOne()
 
     const page = this.pageSchemaRepository.create({
       name: createPageDto.name,
       description: createPageDto.description,
       schema: {
+        version: '1.0',
         components: [],
-        config: {},
+        layout: { type: 'default', config: {} },
+        meta: { title: createPageDto.name, description: '', viewport: {} },
       },
       sortOrder: (parseInt(maxSortOrder?.maxSort) || 0) + 1,
       projectId: createPageDto.projectId,
-    });
+    })
 
-    return await this.pageSchemaRepository.save(page);
+    return await this.pageSchemaRepository.save(page)
   }
 
   async update(id: number, userId: number, updateData: Record<string, any>) {
-    const project = await this.findOne(id, userId);
-    Object.assign(project, updateData);
-    delete (project as any).pageCount;
-    return await this.projectRepository.save(project);
+    const project = await this.findOne(id, userId)
+    Object.assign(project, updateData)
+    delete (project as any).pageCount
+    return await this.projectRepository.save(project)
   }
 
   async updatePage(userId: number, updatePageDto: UpdatePageDto) {
-    const { id, ...updateData } = updatePageDto;
+    const { id, ...updateData } = updatePageDto
 
     const page = await this.pageSchemaRepository.findOne({
       where: { id },
       relations: ['project'],
-    });
+    })
 
     if (!page) {
-      throw new NotFoundException('页面不存在');
+      throw new NotFoundException('页面不存在')
     }
 
     if (page.project.userId !== userId) {
-      throw new NotFoundException('无权操作此页面');
+      throw new NotFoundException('无权操作此页面')
     }
 
-    Object.assign(page, updateData);
-    return await this.pageSchemaRepository.save(page);
+    Object.assign(page, updateData)
+    return await this.pageSchemaRepository.save(page)
   }
 
   async remove(id: number, userId: number) {
-    const project = await this.findOne(id, userId);
-    await this.pageSchemaRepository.delete({ projectId: id });
-    return await this.projectRepository.remove(project);
+    const project = await this.findOne(id, userId)
+    await this.pageSchemaRepository.delete({ projectId: id })
+    return await this.projectRepository.remove(project)
   }
 
   async clone(id: number, userId: number) {
-    const source = await this.findOne(id, userId);
+    const source = await this.findOne(id, userId)
 
     const newProject = this.projectRepository.create({
       name: `${source.name} (副本)`,
       description: source.description,
       userId,
       isPublished: false,
-    });
+    })
 
-    const savedProject = await this.projectRepository.save(newProject);
+    const savedProject = await this.projectRepository.save(newProject)
 
     if (source.pages && source.pages.length > 0) {
-      const newPages = source.pages.map((page) =>
+      const newPages = source.pages.map(page =>
         this.pageSchemaRepository.create({
           name: `${page.name}`,
           schema: JSON.parse(JSON.stringify(page.schema)),
           sortOrder: page.sortOrder,
           projectId: savedProject.id,
         })
-      );
+      )
 
-      await this.pageSchemaRepository.save(newPages);
+      await this.pageSchemaRepository.save(newPages)
     }
 
-    return savedProject;
+    return savedProject
   }
 
   async removePage(pageId: number, userId: number) {
     const page = await this.pageSchemaRepository.findOne({
       where: { id: pageId },
-    });
+    })
     if (!page) {
-      throw new Error('页面不存在');
+      throw new Error('页面不存在')
     }
     const project = await this.projectRepository.findOne({
       where: { id: page.projectId, userId },
-    });
+    })
     if (!project) {
-      throw new Error('无权限操作此页面');
+      throw new Error('无权限操作此页面')
     }
-    await this.pageSchemaRepository.remove(page);
-    return { success: true, message: '页面删除成功' };
+    await this.pageSchemaRepository.remove(page)
+    return { success: true, message: '页面删除成功' }
   }
 
   async clonePage(pageId: number, userId: number) {
     const source = await this.pageSchemaRepository.findOne({
       where: { id: pageId },
-    });
+    })
     if (!source) {
-      throw new Error('源页面不存在');
+      throw new Error('源页面不存在')
     }
     const project = await this.projectRepository.findOne({
       where: { id: source.projectId, userId },
-    });
+    })
     if (!project) {
-      throw new Error('无权限操作此页面');
+      throw new Error('无权限操作此页面')
     }
 
     const clonedPage = this.pageSchemaRepository.create({
@@ -300,8 +299,8 @@ export class PagesService {
       schema: source.schema ? JSON.parse(JSON.stringify(source.schema)) : null,
       sortOrder: 0,
       projectId: project.id,
-    });
+    })
 
-    return await this.pageSchemaRepository.save(clonedPage);
+    return await this.pageSchemaRepository.save(clonedPage)
   }
 }

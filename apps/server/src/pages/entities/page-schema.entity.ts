@@ -6,45 +6,45 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
-} from 'typeorm';
-import { ApiProperty } from '@nestjs/swagger';
-import { Project } from './project.entity';
-import type { PageSchema as PageSchemaType } from '@ea-low-code/shared';
+} from 'typeorm'
+import { ApiProperty } from '@nestjs/swagger'
+import { Project } from './project.entity'
+import type { PageSchema as PageSchemaType } from '@ea-low-code/shared'
 
 @Entity('page_schemas')
 export class PageSchema {
   @ApiProperty({ description: '页面ID', example: 1 })
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @ApiProperty({ description: '页面名称', example: '首页' })
   @Column({ length: 100 })
-  name: string;
+  name: string
 
   @ApiProperty({ description: '页面描述', required: false })
   @Column({ type: 'text', nullable: true })
-  description?: string;
+  description?: string
 
   @ApiProperty({ description: '页面 Schema（组件树 JSON）', required: false })
   @Column({ type: 'json', nullable: true })
-  schema?: PageSchemaType;
+  schema?: PageSchemaType
 
   @ApiProperty({ description: '排序顺序', default: 0 })
   @Column({ default: 0 })
-  sortOrder: number;
+  sortOrder: number
 
   @Column({ type: 'int', nullable: false })
-  projectId: number;
+  projectId: number
 
   @ManyToOne(() => Project, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'projectId' })
-  project: Project;
+  project: Project
 
   @ApiProperty({ description: '创建时间' })
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date
 
   @ApiProperty({ description: '更新时间' })
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt: Date
 }

@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, MoreThanOrEqual } from 'typeorm';
-import { Project } from '../pages/entities/project.entity';
-import { RemoteComponent } from '../components/entities/remote-component.entity';
+import { Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository, MoreThanOrEqual } from 'typeorm'
+import { Project } from '../pages/entities/project.entity'
+import { RemoteComponent } from '../components/entities/remote-component.entity'
 
 @Injectable()
 export class StatsService {
@@ -10,28 +10,28 @@ export class StatsService {
     @InjectRepository(Project)
     private projectsRepository: Repository<Project>,
     @InjectRepository(RemoteComponent)
-    private componentsRepository: Repository<RemoteComponent>,
+    private componentsRepository: Repository<RemoteComponent>
   ) {}
 
   async getDashboardStats(userId: number) {
     const projectCount = await this.projectsRepository.count({
       where: { userId },
-    });
+    })
 
     const projects = await this.projectsRepository.find({
       where: { userId },
       relations: ['pages'],
-    });
+    })
 
-    let pageCount = 0;
-    let pageComponentCount = 0;
+    let pageCount = 0
+    let pageComponentCount = 0
 
     for (const project of projects) {
       if (project.pages) {
-        pageCount += project.pages.length;
+        pageCount += project.pages.length
         for (const page of project.pages) {
           if (page.schema) {
-            pageComponentCount += this.countComponents(page.schema);
+            pageComponentCount += this.countComponents(page.schema)
           }
         }
       }
@@ -39,12 +39,12 @@ export class StatsService {
 
     const remoteComponentCount = await this.componentsRepository.count({
       where: { userId },
-    });
+    })
 
-    const componentCount = pageComponentCount + remoteComponentCount;
+    const componentCount = pageComponentCount + remoteComponentCount
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
 
     const [todayProjectUpdates, todayComponentUpdates] = await Promise.all([
       this.projectsRepository.count({
@@ -59,14 +59,14 @@ export class StatsService {
           updatedAt: MoreThanOrEqual(today),
         },
       }),
-    ]);
+    ])
 
     return {
       projectCount,
       pageCount,
       componentCount,
       todayActivityCount: todayProjectUpdates + todayComponentUpdates,
-    };
+    }
   }
 
   async getRecentProjects(userId: number, limit: number = 4) {
@@ -81,7 +81,7 @@ export class StatsService {
       .where('p.userId = :userId', { userId })
       .orderBy('p.updatedAt', 'DESC')
       .take(limit)
-      .getRawMany();
+      .getRawMany()
 
     return projects.map((project: any) => ({
       id: project.p_id,
@@ -93,7 +93,7 @@ export class StatsService {
       userAccount: project.user_email || '',
       createdAt: project.p_createdAt,
       updatedAt: project.p_updatedAt,
-    }));
+    }))
   }
 
   async getRecentActivities(userId: number, limit: number = 10) {
@@ -110,25 +110,23 @@ export class StatsService {
         take: Math.floor(limit / 2),
         select: ['id', 'name', 'createdAt', 'updatedAt'],
       }),
-    ]);
+    ])
 
-    const activities = [];
+    const activities = []
 
     for (const project of recentProjects) {
-      const isNew = project.createdAt.getTime() === project.updatedAt.getTime();
+      const isNew = project.createdAt.getTime() === project.updatedAt.getTime()
       activities.push({
         id: project.id,
         type: isNew ? 'create' : 'update',
         category: 'project',
-        description: isNew
-          ? `创建了项目 "${project.name}"`
-          : `更新了项目 "${project.name}"`,
+        description: isNew ? `创建了项目 "${project.name}"` : `更新了项目 "${project.name}"`,
         createdAt: project.updatedAt,
-      });
+      })
     }
 
     for (const component of recentComponents) {
-      const isNew = component.createdAt.getTime() === component.updatedAt.getTime();
+      const isNew = component.createdAt.getTime() === component.updatedAt.getTime()
       activities.push({
         id: component.id,
         type: isNew ? 'create' : 'update',
@@ -137,40 +135,37 @@ export class StatsService {
           ? `添加了远程组件 "${component.name}"`
           : `更新了组件 "${component.name}"`,
         createdAt: component.updatedAt,
-      });
+      })
     }
 
-    activities.sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    );
+    activities.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
-    return activities.slice(0, limit);
+    return activities.slice(0, limit)
   }
 
   private countComponents(schema: any): number {
-    let count = 0;
+    let count = 0
 
     if (!schema || typeof schema !== 'object') {
-      return count;
+      return count
     }
 
     if (schema.componentName || schema.type === 'component') {
-      count++;
+      count++
     }
 
     if (schema.children && Array.isArray(schema.children)) {
       for (const child of schema.children) {
-        count += this.countComponents(child);
+        count += this.countComponents(child)
       }
     }
 
     if (schema.components && Array.isArray(schema.components)) {
       for (const component of schema.components) {
-        count += this.countComponents(component);
+        count += this.countComponents(component)
       }
     }
 
-    return count;
+    return count
   }
 }

@@ -1,7 +1,7 @@
-import { Controller, Get, UseGuards, Request as NestRequest } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { StatsService } from './stats.service';
+import { Controller, Get, UseGuards, Request as NestRequest } from '@nestjs/common'
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger'
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
+import { StatsService } from './stats.service'
 
 @ApiTags('统计数据')
 @Controller('stats')
@@ -25,8 +25,8 @@ export class StatsController {
     },
   })
   async getDashboardStats(@NestRequest() req: any) {
-    const userId = req.user.userId;
-    return await this.statsService.getDashboardStats(userId);
+    const userId = req.user.userId
+    return await this.statsService.getDashboardStats(userId)
   }
 
   @Get('recent-projects')
@@ -46,8 +46,8 @@ export class StatsController {
     },
   })
   async getRecentProjects(@NestRequest() req: any) {
-    const userId = req.user.userId;
-    return await this.statsService.getRecentProjects(userId);
+    const userId = req.user.userId
+    return await this.statsService.getRecentProjects(userId)
   }
 
   @Get('activities')
@@ -67,7 +67,7 @@ export class StatsController {
     },
   })
   async getRecentActivities(@NestRequest() req: any) {
-    const userId = req.user.userId;
-    return await this.statsService.getRecentActivities(userId);
+    const userId = req.user.userId
+    return await this.statsService.getRecentActivities(userId)
   }
 }

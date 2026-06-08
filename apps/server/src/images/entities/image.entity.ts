@@ -5,44 +5,44 @@ import {
   ManyToOne,
   JoinColumn,
   CreateDateColumn,
-} from 'typeorm';
-import { ImageGroup } from './image-group.entity';
-import { User } from '../../users/entities/user.entity';
+} from 'typeorm'
+import { ImageGroup } from './image-group.entity'
+import { User } from '../../users/entities/user.entity'
 
 @Entity('images')
 export class Image {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @Column({ length: 255 })
-  filename: string;
+  filename: string
 
   @Column({ length: 500 })
-  url: string;
+  url: string
 
   @Column({ length: 20 })
-  mimeType: string;
+  mimeType: string
 
   @Column({ type: 'int' })
-  size: number;
+  size: number
 
   @Column({ nullable: true })
-  groupId: number | null;
+  groupId: number | null
 
   @ManyToOne(() => ImageGroup)
   @JoinColumn({ name: 'groupId' })
-  group: ImageGroup;
+  group: ImageGroup
 
   @Column({ type: 'int', nullable: true })
-  userId: number | null;
+  userId: number | null
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user: User
 
   @Column({ length: 100, nullable: true })
-  alt: string;
+  alt: string
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date
 }

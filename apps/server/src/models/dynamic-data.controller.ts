@@ -7,11 +7,11 @@ import {
   UseGuards,
   ForbiddenException,
   Request as NestRequest,
-} from '@nestjs/common';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { DynamicDataService } from './dynamic-data.service';
-import { ModelsService } from './models.service';
+} from '@nestjs/common'
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger'
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
+import { DynamicDataService } from './dynamic-data.service'
+import { ModelsService } from './models.service'
 
 @ApiTags('动态数据')
 @Controller('dynamic')
@@ -24,66 +24,50 @@ export class DynamicDataController {
   ) {}
 
   private async validateOwnership(tableName: string, userId: number) {
-    const model = await this.modelsService.findByTableName(tableName);
+    const model = await this.modelsService.findByTableName(tableName)
     if (!model) {
-      throw new ForbiddenException('模型不存在');
+      throw new ForbiddenException('模型不存在')
     }
     if (model.userId && model.userId !== userId) {
-      throw new ForbiddenException('无权访问此数据模型');
+      throw new ForbiddenException('无权访问此数据模型')
     }
-    return model;
+    return model
   }
 
   @Post('data/get')
-  async find(
-    @Query('tableName') tableName: string,
-    @Body() body?: any,
-    @NestRequest() req?: any
-  ) {
+  async find(@Query('tableName') tableName: string, @Body() body?: any, @NestRequest() req?: any) {
     if (!tableName) {
-      throw new Error('tableName is required');
+      throw new Error('tableName is required')
     }
-    await this.validateOwnership(tableName, req.user.userId);
-    return await this.dynamicDataService.find(tableName, body);
+    await this.validateOwnership(tableName, req.user.userId)
+    return await this.dynamicDataService.find(tableName, body)
   }
 
   @Post('data/page')
-  async page(
-    @Query('tableName') tableName: string,
-    @Body() body?: any,
-    @NestRequest() req?: any
-  ) {
+  async page(@Query('tableName') tableName: string, @Body() body?: any, @NestRequest() req?: any) {
     if (!tableName) {
-      throw new Error('tableName is required');
+      throw new Error('tableName is required')
     }
-    await this.validateOwnership(tableName, req.user.userId);
-    return await this.dynamicDataService.page(tableName, body);
+    await this.validateOwnership(tableName, req.user.userId)
+    return await this.dynamicDataService.page(tableName, body)
   }
 
   @Post('data/create')
-  async create(
-    @Query('tableName') tableName: string,
-    @Body() body: any,
-    @NestRequest() req?: any
-  ) {
+  async create(@Query('tableName') tableName: string, @Body() body: any, @NestRequest() req?: any) {
     if (!tableName) {
-      throw new Error('tableName is required');
+      throw new Error('tableName is required')
     }
-    await this.validateOwnership(tableName, req.user.userId);
-    return await this.dynamicDataService.create(tableName, body);
+    await this.validateOwnership(tableName, req.user.userId)
+    return await this.dynamicDataService.create(tableName, body)
   }
 
   @Post('data/update')
-  async update(
-    @Query('tableName') tableName: string,
-    @Body() body: any,
-    @NestRequest() req?: any
-  ) {
+  async update(@Query('tableName') tableName: string, @Body() body: any, @NestRequest() req?: any) {
     if (!tableName) {
-      throw new Error('tableName is required');
+      throw new Error('tableName is required')
     }
-    await this.validateOwnership(tableName, req.user.userId);
-    return await this.dynamicDataService.update(tableName, body);
+    await this.validateOwnership(tableName, req.user.userId)
+    return await this.dynamicDataService.update(tableName, body)
   }
 
   @Post('data/delete')
@@ -93,9 +77,9 @@ export class DynamicDataController {
     @NestRequest() req?: any
   ) {
     if (!tableName) {
-      throw new Error('tableName is required');
+      throw new Error('tableName is required')
     }
-    await this.validateOwnership(tableName, req.user.userId);
-    return await this.dynamicDataService.delete(tableName, body.id);
+    await this.validateOwnership(tableName, req.user.userId)
+    return await this.dynamicDataService.delete(tableName, body.id)
   }
 }

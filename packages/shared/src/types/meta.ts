@@ -109,11 +109,11 @@ export interface ComponentMeta {
   isChildComponent?: boolean
   parentComponents?: string[]
   isRemote?: boolean
-  remoteConfig?: import('./schema').RemoteConfig
+  remoteConfig?: import('./schema.js').RemoteConfig
   props: PropDefinition[]
   events: EventDefinition[]
   slots: SlotDefinition[]
-  styleConfig?: import('./style').StyleConfig
+  styleConfig?: import('./style.js').StyleConfig
   childComponents?: string[]
   defaultSlot?: string
   isService?: boolean

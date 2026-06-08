@@ -1,26 +1,26 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import * as nodemailer from 'nodemailer';
-import { Transporter } from 'nodemailer';
+import { Injectable, Logger } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import * as nodemailer from 'nodemailer'
+import { Transporter } from 'nodemailer'
 
 @Injectable()
 export class EmailService {
-  private transporter: Transporter;
-  private readonly logger = new Logger(EmailService.name);
+  private transporter: Transporter
+  private readonly logger = new Logger(EmailService.name)
 
   constructor(private configService: ConfigService) {
-    this.initializeTransporter();
+    this.initializeTransporter()
   }
 
   private initializeTransporter() {
-    const host = this.configService.get<string>('SMTP_HOST', 'smtp.qq.com');
-    const port = this.configService.get<number>('SMTP_PORT', 587);
-    const user = this.configService.get<string>('SMTP_USER');
-    const pass = this.configService.get<string>('SMTP_PASS');
+    const host = this.configService.get<string>('SMTP_HOST', 'smtp.qq.com')
+    const port = this.configService.get<number>('SMTP_PORT', 587)
+    const user = this.configService.get<string>('SMTP_USER')
+    const pass = this.configService.get<string>('SMTP_PASS')
 
     if (!user || !pass) {
-      this.logger.warn('SMTP 配置不完整，邮件服务将使用控制台输出模式');
-      return;
+      this.logger.warn('SMTP 配置不完整，邮件服务将使用控制台输出模式')
+      return
     }
 
     this.transporter = nodemailer.createTransport({
@@ -31,16 +31,16 @@ export class EmailService {
         user,
         pass,
       },
-    });
+    })
 
     // 验证连接
-    this.transporter.verify((error) => {
+    this.transporter.verify(error => {
       if (error) {
-        this.logger.error('SMTP 连接验证失败:', error.message);
+        this.logger.error('SMTP 连接验证失败:', error.message)
       } else {
-        this.logger.log('SMTP 连接验证成功');
+        this.logger.log('SMTP 连接验证成功')
       }
-    });
+    })
   }
 
   /**
@@ -52,12 +52,12 @@ export class EmailService {
   async sendVerificationCode(to: string, code: string, purpose: string = '注册'): Promise<boolean> {
     // 如果没有配置 SMTP，使用控制台输出模式（开发环境）
     if (!this.transporter) {
-      this.logger.log(`[邮件模拟] 发送验证码到 ${to}: ${code} (用途: ${purpose})`);
-      return true;
+      this.logger.log(`[邮件模拟] 发送验证码到 ${to}: ${code} (用途: ${purpose})`)
+      return true
     }
 
-    const subject = `EA-LowCode - ${purpose}验证码`;
-    const html = this.generateVerificationEmailTemplate(code, purpose);
+    const subject = `EA-LowCode - ${purpose}验证码`
+    const html = this.generateVerificationEmailTemplate(code, purpose)
 
     try {
       const info = await this.transporter.sendMail({
@@ -65,13 +65,13 @@ export class EmailService {
         to,
         subject,
         html,
-      });
+      })
 
-      this.logger.log(`验证码邮件已发送: ${info.messageId}`);
-      return true;
+      this.logger.log(`验证码邮件已发送: ${info.messageId}`)
+      return true
     } catch (error) {
-      this.logger.error('发送验证码邮件失败:', error.message);
-      return false;
+      this.logger.error('发送验证码邮件失败:', error.message)
+      return false
     }
   }
 
@@ -165,6 +165,6 @@ export class EmailService {
   </div>
 </body>
 </html>
-    `;
+    `
   }
 }

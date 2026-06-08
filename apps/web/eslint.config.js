@@ -4,14 +4,15 @@ import js from '@eslint/js'
 import pluginVue from 'eslint-plugin-vue'
 import pluginOxlint from 'eslint-plugin-oxlint'
 import skipFormatting from 'eslint-config-prettier/flat'
+import rootConfig from '../../eslint.config.js'
 
 export default defineConfig([
+  ...rootConfig,
+
   {
     name: 'app/files-to-lint',
-    files: ['**/*.{vue,js,mjs,jsx}'],
+    files: ['**/*.{vue,js,mjs,jsx,ts,tsx}'],
   },
-
-  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
 
   {
     languageOptions: {
@@ -21,13 +22,10 @@ export default defineConfig([
     },
   },
 
-  js.configs.recommended,
   ...pluginVue.configs['flat/essential'],
 
   ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
 
-  skipFormatting,
-  
   {
     name: 'app/web-components-slot',
     files: ['**/*.vue'],

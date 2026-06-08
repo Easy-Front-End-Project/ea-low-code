@@ -6,36 +6,36 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
-} from 'typeorm';
-import { User } from '../../users/entities/user.entity';
+} from 'typeorm'
+import { User } from '../../users/entities/user.entity'
 
 @Entity('image_groups')
 export class ImageGroup {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @Column({ length: 50 })
-  name: string;
+  name: string
 
   @Column({ length: 200, nullable: true })
-  description: string;
+  description: string
 
   @Column({ default: 0 })
-  imageCount: number;
+  imageCount: number
 
   @Column({ default: true })
-  isActive: boolean;
+  isActive: boolean
 
   @Column({ type: 'int', nullable: true })
-  userId: number | null;
+  userId: number | null
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user: User
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt: Date
 }
