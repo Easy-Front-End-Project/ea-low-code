@@ -1,1 +1,2 @@
-// 校验器
+export * from './schemaValidator'
+export * from './componentValidator'
