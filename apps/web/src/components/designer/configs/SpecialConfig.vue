@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <!-- 根据 specialConfig.type 渲染对应的特殊配置组件 -->
   <div class="special-config-renderer">
     <component
@@ -10,31 +10,30 @@
   </div>
 </template>
 
-<script setup>
-  import { computed } from 'vue'
+<script setup lang="ts">
+  import { computed, type Component } from 'vue'
   import SelectOptionsConfig from '@/components/designer/configs/special/SelectOptionsConfig.vue'
   import CheckboxGroupConfig from '@/components/designer/configs/special/CheckboxGroupConfig.vue'
   import RadioGroupConfig from '@/components/designer/configs/special/RadioGroupConfig.vue'
   import DropdownOptionsConfig from '@/components/designer/configs/special/DropdownOptionsConfig.vue'
 
-  /**
-   * 特殊配置渲染器
-   */
-  const props = defineProps({
-    // 当前选中的组件
-    component: {
-      type: Object,
-      default: null,
-    },
-    // 组件元数据中的 specialConfig
-    specialConfig: {
-      type: Object,
-      default: null,
-    },
+  interface SpecialConfig {
+    type?: string
+    propName?: string
+  }
+
+  interface Props {
+    component?: Record<string, any> | null
+    specialConfig?: SpecialConfig | null
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    component: null,
+    specialConfig: null,
   })
 
   // 配置类型到组件的映射表（策略模式）
-  const configMap = {
+  const configMap: Record<string, Component> = {
     selectOptions: SelectOptionsConfig,
     checkboxGroupOptions: CheckboxGroupConfig,
     radioGroupOptions: RadioGroupConfig,

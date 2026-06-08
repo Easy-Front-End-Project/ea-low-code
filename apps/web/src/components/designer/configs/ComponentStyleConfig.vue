@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="props-section">
     <h4 class="section-title">组件样式</h4>
     <div class="space-y-3">
@@ -66,44 +66,51 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed } from 'vue'
-  import { getComponentMeta } from '@/components/designer/constants/componentMeta'
+  import { getComponentMeta, type StyleConfig } from '@/components/designer/constants/componentMeta'
   import UnitInput from '@/components/common/UnitInput.vue'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaColorPicker from '@/components/ea-ui-wrap/EaColorPicker.vue'
 
-  const props = defineProps({
-    componentType: {
-      type: String,
-      default: '',
-    },
-    componentProps: {
-      type: Object,
-      default: () => ({}),
-    },
-    cssVariables: {
-      type: Object,
-      default: () => ({}),
-    },
-    meta: {
-      type: Object,
-      default: null,
-    },
+  interface DynamicCssVariable {
+    key: string
+    name: string
+    label: string
+    type: string
+    default: string
+  }
+
+  interface Props {
+    componentType?: string
+    componentProps?: Record<string, any>
+    cssVariables?: Record<string, string>
+    meta?: Record<string, any> | null
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    componentType: '',
+    componentProps: () => ({}),
+    cssVariables: () => ({}),
+    meta: null,
   })
 
-  const emit = defineEmits(['css-variable-change'])
+  const emit = defineEmits<{
+    'css-variable-change': [variableName: string, value: string]
+  }>()
+
+  const emptyStyleConfig: StyleConfig = { parts: [], cssVariables: [], dynamicCssVariables: {} }
 
   // 获取组件的样式配置（优先使用传入的 meta，回退到内置 getComponentMeta）
   const styleConfig = computed(() => {
-    if (props.meta) return props.meta.styleConfig || null
-    if (!props.componentType) return null
+    if (props.meta) return props.meta.styleConfig || emptyStyleConfig
+    if (!props.componentType) return emptyStyleConfig
     const meta = getComponentMeta(props.componentType)
-    return meta?.styleConfig || null
+    return meta?.styleConfig || emptyStyleConfig
   })
 
   // 动态生成 CSS 变量列表
-  const dynamicCssVariablesList = computed(() => {
+  const dynamicCssVariablesList = computed<DynamicCssVariable[]>(() => {
     const config = styleConfig.value?.dynamicCssVariables
     if (!config) return []
 
@@ -111,7 +118,7 @@
     const rawType = props.componentProps?.type
     const type = rawType || 'normal'
 
-    return Object.entries(config).map(([key, variableConfig]) => {
+    return Object.entries(config).map(([key, variableConfig]: [string, any]) => {
       // 替换模板中的 {type} 为实际的类型值
       const variableName = variableConfig.template.replace('{type}', type)
       // 获取对应类型的默认值，优先使用 type 对应的值，其次使用 normal 作为回退
@@ -129,12 +136,12 @@
   })
 
   // 处理 CSS 变量样式变更
-  function handleCssVariableChange(variableName, value) {
+  function handleCssVariableChange(variableName: string, value: string) {
     emit('css-variable-change', variableName, value)
   }
 
   // 检查值是否包含 CSS 单位
-  function hasUnit(value) {
+  function hasUnit(value: string | undefined): boolean {
     if (!value || typeof value !== 'string') return false
     // 匹配常见的 CSS 单位：px, %, em, rem, vw, vh, pt, pc, in, cm, mm, ex, ch, vmin, vmax
     return /^[\d.]+(px|%|em|rem|vw|vh|pt|pc|in|cm|mm|ex|ch|vmin|vmax)$/i.test(value)

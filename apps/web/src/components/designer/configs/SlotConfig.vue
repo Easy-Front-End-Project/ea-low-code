@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div v-if="shouldShow" class="slot-config-section">
     <h4 class="section-title">目标插槽</h4>
     <div class="prop-item">
@@ -14,24 +14,28 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed } from 'vue'
   import VariableBindingInput from '@/components/designer/common/VariableBindingInput.vue'
 
-  const props = defineProps({
-    // 父组件的插槽定义
-    parentSlots: {
-      type: Array,
-      default: () => [],
-    },
-    // 当前组件的 slot 值
-    slotValue: {
-      type: String,
-      default: 'default',
-    },
+  interface SlotDefinition {
+    name: string
+    label?: string
+  }
+
+  interface Props {
+    parentSlots?: SlotDefinition[]
+    slotValue?: string
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    parentSlots: () => [],
+    slotValue: 'default',
   })
 
-  const emit = defineEmits(['slot-change'])
+  const emit = defineEmits<{
+    'slot-change': [value: string]
+  }>()
 
   // 是否显示插槽配置（只有父组件有除 default 外的其他插槽时才显示）
   const shouldShow = computed(() => {
@@ -48,7 +52,7 @@
   })
 
   // 处理插槽变更
-  function handleSlotChange(value) {
+  function handleSlotChange(value: any) {
     // 如果值是变量绑定格式，提取实际值
     if (value && typeof value === 'object' && value.type === 'variable') {
       emit('slot-change', value.value)

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="config-group">
     <h5 class="group-title">文字</h5>
     <div class="space-y-3">
@@ -159,25 +159,30 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed } from 'vue'
   import UnitInput from '@/components/common/UnitInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
   import EaColorPicker from '@/components/ea-ui-wrap/EaColorPicker.vue'
 
-  const props = defineProps({
-    style: {
-      type: Object,
-      default: () => ({}),
-    },
+  type FontStyleType = 'bold' | 'italic' | 'underline'
+
+  interface Props {
+    style?: Record<string, string>
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    style: () => ({}),
   })
 
-  const emit = defineEmits(['style-change'])
+  const emit = defineEmits<{
+    'style-change': [styleName: string, value: string, styleType: string]
+  }>()
 
   // 字体样式状态
   const isBold = computed(() => {
     const weight = props.style?.fontWeight
-    return weight === 'bold' || weight === '700' || weight === 700
+    return weight === 'bold' || weight === '700'
   })
 
   const isItalic = computed(() => props.style?.fontStyle === 'italic')
@@ -188,7 +193,7 @@
   const textAlign = computed(() => props.style?.textAlign || 'left')
 
   // 切换字体样式
-  function toggleFontStyle(type) {
+  function toggleFontStyle(type: FontStyleType) {
     switch (type) {
       case 'bold':
         handleInlineStyleChange('fontWeight', isBold.value ? '' : 'bold')
@@ -203,12 +208,12 @@
   }
 
   // 设置文本对齐
-  function setTextAlign(align) {
+  function setTextAlign(align: string) {
     handleInlineStyleChange('textAlign', align)
   }
 
   // 处理样式变更
-  function handleInlineStyleChange(styleName, value) {
+  function handleInlineStyleChange(styleName: string, value: any) {
     emit('style-change', styleName, value, 'inline')
   }
 </script>

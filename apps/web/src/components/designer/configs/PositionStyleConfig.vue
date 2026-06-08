@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="config-group">
     <h5 class="group-title">定位</h5>
     <div class="space-y-3">
@@ -95,20 +95,25 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed, ref, watch } from 'vue'
   import UnitInput from '@/components/common/UnitInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
-  const props = defineProps({
-    positionStyle: {
-      type: Object,
-      default: () => ({}),
-    },
+  type PositionKey = 'top' | 'right' | 'bottom' | 'left'
+
+  interface Props {
+    positionStyle?: Record<string, string>
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    positionStyle: () => ({}),
   })
 
-  const emit = defineEmits(['style-change'])
+  const emit = defineEmits<{
+    'style-change': [styleName: string, value: string, styleType: string]
+  }>()
 
   // 本地状态
   const localZIndex = ref('')
@@ -145,7 +150,7 @@
   })
 
   // 处理定位方式变化
-  function handlePositionChange(value) {
+  function handlePositionChange(value: any) {
     emit('style-change', 'position', value, 'position')
 
     if (!value || value === 'static') {
@@ -157,7 +162,7 @@
   }
 
   // 处理 zIndex 变化 - 只更新本地状态
-  function handleZIndexInput(value) {
+  function handleZIndexInput(value: string) {
     isEditing.value = true
     localZIndex.value = value
   }
@@ -169,7 +174,7 @@
   }
 
   // 处理定位偏移值变化 - 只更新本地状态
-  function handlePositionValueInput(key, value) {
+  function handlePositionValueInput(key: PositionKey, value: string) {
     isEditing.value = true
     switch (key) {
       case 'top':
@@ -188,7 +193,7 @@
   }
 
   // 处理定位偏移值单位变化 - 立即提交（用户明确选择单位）
-  function handlePositionValueUnitChange(key, input, unit) {
+  function handlePositionValueUnitChange(key: PositionKey, input: string, unit?: string) {
     switch (key) {
       case 'top':
         localTop.value = input
@@ -204,11 +209,11 @@
         break
     }
     isEditing.value = false
-    emit('style-change', key, input ? `${input}${unit}` : '', 'position')
+    emit('style-change', key, input ? `${input}${unit ?? 'px'}` : '', 'position')
   }
 
   // 失去焦点时提交定位偏移值
-  function handlePositionValueBlur(key) {
+  function handlePositionValueBlur(key: PositionKey) {
     isEditing.value = false
     let value = ''
     switch (key) {
@@ -228,7 +233,7 @@
     emit('style-change', key, value, 'position')
   }
 
-  function handleInlineStyleChange(styleName, value) {
+  function handleInlineStyleChange(styleName: string, value: any) {
     emit('style-change', styleName, value, 'position')
   }
 

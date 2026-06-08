@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="config-group">
     <h5 class="group-title">自定义样式</h5>
     <div class="space-y-3">
@@ -50,18 +50,21 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref } from 'vue'
-  import { useGlobalDialogs } from '@/components/designer/composables/useGlobalDialogs.js'
+  import { useGlobalDialogs } from '@/components/designer/composables/useGlobalDialogs'
 
-  const props = defineProps({
-    customCSS: {
-      type: String,
-      default: '',
-    },
+  interface Props {
+    customCSS?: string
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    customCSS: '',
   })
 
-  const emit = defineEmits(['style-change'])
+  const emit = defineEmits<{
+    'style-change': [styleName: string, value: string, styleType: string]
+  }>()
 
   const { openEditor } = useGlobalDialogs()
 

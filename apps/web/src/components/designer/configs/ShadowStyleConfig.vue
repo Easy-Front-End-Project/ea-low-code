@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="config-group">
     <h5 class="group-title">阴影</h5>
     <div class="space-y-3">
@@ -95,32 +95,59 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed, ref } from 'vue'
   import UnitInput from '@/components/common/UnitInput.vue'
   import EaColorPicker from '@/components/ea-ui-wrap/EaColorPicker.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
 
-  const props = defineProps({
-    style: {
-      type: Object,
-      default: () => ({}),
-    },
+  type ShadowKey = 'x' | 'y' | 'blur' | 'spread'
+
+  interface SegmentedOption {
+    label: string
+    value: string
+  }
+
+  interface ShadowPreset {
+    x: string
+    y: string
+    blur: string
+    spread: string
+    color: string
+  }
+
+  interface ParsedShadow {
+    type: string
+    x: string
+    y: string
+    blur: string
+    spread: string
+    color: string
+  }
+
+  interface Props {
+    style?: Record<string, string>
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    style: () => ({}),
   })
 
-  const emit = defineEmits(['style-change'])
+  const emit = defineEmits<{
+    'style-change': [styleName: string, value: string, styleType: string]
+  }>()
 
-  const shadowTypeRef = ref(null)
+  const shadowTypeRef = ref<HTMLElement | null>(null)
 
   // 阴影类型选项
-  const shadowTypeOptions = [
+  const shadowTypeOptions: SegmentedOption[] = [
     { label: '无', value: 'none' },
     { label: '内阴影', value: 'inset' },
     { label: '外阴影', value: 'outset' },
   ]
 
   // 推荐阴影预设
-  const shadowPresets = {
+  const shadowPresets: Record<string, ShadowPreset> = {
     light: { x: '0', y: '2', blur: '4', spread: '0', color: 'rgba(0,0,0,0.1)' },
     dark: { x: '0', y: '4', blur: '8', spread: '0', color: 'rgba(0,0,0,0.3)' },
     outer: { x: '0', y: '8', blur: '16', spread: '0', color: 'rgba(0,0,0,0.15)' },
@@ -135,9 +162,9 @@
   const selectedPreset = ref('')
 
   // 本地状态：用于编辑期间暂存阴影值
-  const localShadowValues = ref({ x: '0', y: '0', blur: '0', spread: '0' })
+  const localShadowValues = ref<Record<ShadowKey, string>>({ x: '0', y: '0', blur: '0', spread: '0' })
   const isEditingShadow = ref(false)
-  const currentEditingKey = ref(null)
+  const currentEditingKey = ref<ShadowKey | null>(null)
 
   // 初始化本地阴影值
   function initLocalShadowValues() {
@@ -150,7 +177,7 @@
   }
 
   // 解析当前的 boxShadow 值
-  const parsedShadow = computed(() => {
+  const parsedShadow = computed<ParsedShadow>(() => {
     const boxShadow = props.style?.boxShadow
     if (!boxShadow || boxShadow === 'none') {
       return { type: 'none', x: '0', y: '0', blur: '0', spread: '0', color: '#000000' }
@@ -215,7 +242,7 @@
   const shadowColor = computed(() => parsedShadow.value.color)
 
   // 处理阴影类型变化
-  function handleShadowTypeChange(event) {
+  function handleShadowTypeChange(event: CustomEvent) {
     const type = event.detail?.value
 
     if (type === 'none') {
@@ -236,7 +263,7 @@
   }
 
   // 处理推荐阴影选择
-  function handlePresetChange(preset) {
+  function handlePresetChange(preset: any) {
     selectedPreset.value = preset
 
     if (!preset || !shadowPresets[preset]) return
@@ -259,7 +286,7 @@
   }
 
   // 处理阴影颜色变化
-  function handleShadowColorChange(color) {
+  function handleShadowColorChange(color: string) {
     if (shadowType.value === 'none') return
 
     const inset = shadowType.value === 'inset' ? 'inset ' : ''
@@ -270,7 +297,7 @@
   }
 
   // 处理阴影数值变化 - 只更新本地状态
-  function handleShadowValueInput(key, value) {
+  function handleShadowValueInput(key: ShadowKey, value: string) {
     if (!isEditingShadow.value) {
       initLocalShadowValues()
     }
@@ -280,7 +307,7 @@
   }
 
   // 处理阴影数值单位变化 - 立即提交（用户明确选择单位）
-  function handleShadowValueUnitChange(key, input, unit) {
+  function handleShadowValueUnitChange(key: ShadowKey, input: string, unit?: string) {
     localShadowValues.value[key] = input
     isEditingShadow.value = false
     currentEditingKey.value = null
@@ -293,7 +320,7 @@
     const spread = localShadowValues.value.spread
 
     const inset = shadowType.value === 'inset' ? 'inset ' : ''
-    const boxShadow = `${inset}${x}${unit} ${y}px ${blur}px ${spread}px ${shadowColor.value}`
+    const boxShadow = `${inset}${x}${unit ?? 'px'} ${y}px ${blur}px ${spread}px ${shadowColor.value}`
 
     emit('style-change', 'boxShadow', boxShadow, 'inline')
     selectedPreset.value = ''

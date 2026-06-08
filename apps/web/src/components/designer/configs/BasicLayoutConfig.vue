@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="config-group">
     <h5 class="group-title">基础</h5>
     <div class="space-y-3">
@@ -27,7 +27,6 @@
         <SpaceInput
           :value="localMargin"
           @update:value="handleMarginChange"
-          @unit-change="handleMarginUnitChange"
           @blur="handleMarginBlur"
         />
       </div>
@@ -36,7 +35,6 @@
         <SpaceInput
           :value="localPadding"
           @update:value="handlePaddingChange"
-          @unit-change="handlePaddingUnitChange"
           @blur="handlePaddingBlur"
         />
       </div>
@@ -59,20 +57,23 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, computed, watch } from 'vue'
   import UnitInput from '@/components/common/UnitInput.vue'
   import SpaceInput from '@/components/common/SpaceInput.vue'
   import EaSlider from '@/components/ea-ui-wrap/EaSlider.vue'
 
-  const props = defineProps({
-    style: {
-      type: Object,
-      default: () => ({}),
-    },
+  interface Props {
+    style?: Record<string, string>
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    style: () => ({}),
   })
 
-  const emit = defineEmits(['style-change'])
+  const emit = defineEmits<{
+    'style-change': [styleName: string, value: string, styleType: string]
+  }>()
 
   // 本地状态：用于编辑期间暂存值，避免频繁触发父组件更新
   const localWidth = ref(props.style?.width || '')
@@ -94,7 +95,7 @@
   // 监听外部 props 变化，同步到本地状态（当其他地方修改时）
   watch(
     () => props.style,
-    newStyle => {
+    () => {
       if (!isEditing.value) {
         initLocalState()
       }
@@ -106,54 +107,54 @@
   const isEditing = ref(false)
 
   const opacityValue = computed(() => {
-    const val = parseFloat(localOpacity.value)
+    const val = localOpacity.value
     return isNaN(val) ? 1 : Math.max(0, Math.min(1, val))
   })
 
   // 处理透明度变化 - 立即提交（滑块操作需要实时反馈）
-  function handleOpacityChange(value) {
+  function handleOpacityChange(value: number) {
     localOpacity.value = value
     emit('style-change', 'opacity', String(value), 'inline')
   }
 
   // 处理宽度变化 - 只更新本地状态
-  function handleWidthChange(value) {
+  function handleWidthChange(value: string) {
     isEditing.value = true
     localWidth.value = value
   }
 
   // 处理宽度单位变化 - 立即提交（用户明确选择单位）
-  function handleWidthUnitChange(input, unit) {
+  function handleWidthUnitChange(input: string, unit: string) {
     localWidth.value = input ? `${input}${unit}` : ''
     commitStyleChange('width', localWidth.value)
   }
 
   // 处理高度变化 - 只更新本地状态
-  function handleHeightChange(value) {
+  function handleHeightChange(value: string) {
     isEditing.value = true
     localHeight.value = value
   }
 
   // 处理高度单位变化 - 立即提交
-  function handleHeightUnitChange(input, unit) {
+  function handleHeightUnitChange(input: string, unit: string) {
     localHeight.value = input ? `${input}${unit}` : ''
     commitStyleChange('height', localHeight.value)
   }
 
   // 处理外边距变化 - 只更新本地状态
-  function handleMarginChange(value) {
+  function handleMarginChange(value: string) {
     isEditing.value = true
     localMargin.value = value
   }
 
   // 处理内边距变化 - 只更新本地状态
-  function handlePaddingChange(value) {
+  function handlePaddingChange(value: string) {
     isEditing.value = true
     localPadding.value = value
   }
 
   // 提交样式变更到父组件
-  function commitStyleChange(styleName, value) {
+  function commitStyleChange(styleName: string, value: string) {
     emit('style-change', styleName, value, 'inline')
   }
 

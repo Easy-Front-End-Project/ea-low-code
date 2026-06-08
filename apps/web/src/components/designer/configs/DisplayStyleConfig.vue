@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="config-group">
     <h5 class="group-title">布局</h5>
     <div class="space-y-4">
@@ -88,21 +88,29 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed } from 'vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
 
-  const props = defineProps({
-    style: {
-      type: Object,
-      default: () => ({}),
-    },
+  interface SegmentedOption {
+    label: string
+    value: string
+  }
+
+  interface Props {
+    style?: Record<string, string>
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    style: () => ({}),
   })
 
-  const emit = defineEmits(['style-change'])
+  const emit = defineEmits<{
+    'style-change': [styleName: string, value: string, styleType: string]
+  }>()
 
   // Display options - 使用静态数据避免重复创建
-  const displayOptions = [
+  const displayOptions: SegmentedOption[] = [
     { label: '块级', value: 'block' },
     { label: '行内', value: 'inline' },
     { label: '行内块', value: 'inline-block' },
@@ -111,7 +119,7 @@
   ]
 
   // Flex direction options
-  const flexDirectionOptions = [
+  const flexDirectionOptions: SegmentedOption[] = [
     { label: '水平', value: 'row' },
     { label: '反向水平', value: 'row-reverse' },
     { label: '垂直', value: 'column' },
@@ -141,7 +149,7 @@
   })
 
   // 处理 display 变化
-  function handleDisplayChange(e) {
+  function handleDisplayChange(e: CustomEvent) {
     const newDisplay = e.detail.value
     emit('style-change', 'display', newDisplay, 'inline')
 
@@ -155,19 +163,19 @@
   }
 
   // Flex 相关处理函数
-  function handleFlexDirectionChange(e) {
+  function handleFlexDirectionChange(e: CustomEvent) {
     emit('style-change', 'flexDirection', e.detail.value, 'inline')
   }
 
-  function handleFlexWrapChange(value) {
+  function handleFlexWrapChange(value: any) {
     emit('style-change', 'flexWrap', value, 'inline')
   }
 
-  function handleJustifyContentChange(value) {
+  function handleJustifyContentChange(value: any) {
     emit('style-change', 'justifyContent', value, 'inline')
   }
 
-  function handleAlignItemsChange(value) {
+  function handleAlignItemsChange(value: any) {
     emit('style-change', 'alignItems', value, 'inline')
   }
 </script>

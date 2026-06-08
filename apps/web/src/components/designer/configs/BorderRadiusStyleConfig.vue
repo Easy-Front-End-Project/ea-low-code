@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="config-group">
     <h5 class="group-title">边框 & 圆角</h5>
     <div class="space-y-3">
@@ -52,20 +52,23 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed, ref, watch } from 'vue'
   import SpaceInput from '@/components/common/SpaceInput.vue'
   import EaColorPicker from '@/components/ea-ui-wrap/EaColorPicker.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
 
-  const props = defineProps({
-    style: {
-      type: Object,
-      default: () => ({}),
-    },
+  interface Props {
+    style?: Record<string, string>
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    style: () => ({}),
   })
 
-  const emit = defineEmits(['style-change'])
+  const emit = defineEmits<{
+    'style-change': [styleName: string, value: string, styleType: string]
+  }>()
 
   // 本地状态
   const localBorderWidth = ref('')
@@ -165,12 +168,12 @@
   })
 
   // 处理边框样式变化
-  function handleBorderStyleChange(style) {
+  function handleBorderStyleChange(style: any) {
     emit('style-change', 'borderStyle', style, 'inline')
   }
 
   // 处理边框宽度变化 - 只更新本地状态
-  function handleBorderWidthInput(value) {
+  function handleBorderWidthInput(value: string) {
     isEditing.value = true
     localBorderWidth.value = value
   }
@@ -182,7 +185,7 @@
   }
 
   // 提交边框宽度变更
-  function commitBorderWidthChange(value) {
+  function commitBorderWidthChange(value: string) {
     if (!value) {
       emit('style-change', 'borderTopWidth', '', 'inline')
       emit('style-change', 'borderRightWidth', '', 'inline')
@@ -217,7 +220,7 @@
   }
 
   // 处理圆角变化 - 只更新本地状态
-  function handleRadiusInput(value) {
+  function handleRadiusInput(value: string) {
     isEditing.value = true
     localRadius.value = value
   }
@@ -229,7 +232,7 @@
   }
 
   // 提交圆角变更
-  function commitRadiusChange(value) {
+  function commitRadiusChange(value: string) {
     if (!value) {
       emit('style-change', 'borderTopLeftRadius', '', 'inline')
       emit('style-change', 'borderTopRightRadius', '', 'inline')
@@ -263,7 +266,7 @@
     }
   }
 
-  function handleInlineStyleChange(styleName, value) {
+  function handleInlineStyleChange(styleName: string, value: any) {
     emit('style-change', styleName, value, 'inline')
   }
 

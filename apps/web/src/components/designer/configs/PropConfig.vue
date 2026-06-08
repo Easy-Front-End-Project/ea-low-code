@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div v-if="propList?.length > 0" class="props-section">
     <h4 class="section-title">属性</h4>
     <div class="space-y-3">
@@ -24,27 +24,40 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { toRefs } from 'vue'
   import VariableBindingInput from '@/components/designer/common/VariableBindingInput.vue'
 
-  const props = defineProps({
-    props: {
-      type: Array,
-      default: () => [],
-    },
-    componentProps: {
-      type: Object,
-      default: () => ({}),
-    },
+  interface PropDefinition {
+    name: string
+    label: string
+    type?: string
+    options?: any[]
+    description?: string | {
+      type?: string
+      props?: Record<string, any>
+      content?: string
+    }
+  }
+
+  interface Props {
+    props?: PropDefinition[]
+    componentProps?: Record<string, any>
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    props: () => [],
+    componentProps: () => ({}),
   })
 
   const { props: propList } = toRefs(props)
 
-  const emit = defineEmits(['prop-change'])
+  const emit = defineEmits<{
+    'prop-change': [propName: string, value: any]
+  }>()
 
   // 获取 description 组件类型
-  function getDescriptionComponent(description) {
+  function getDescriptionComponent(description: PropDefinition['description']): string | null {
     if (!description) return null
     if (typeof description === 'string') {
       return 'ea-text'
@@ -53,7 +66,7 @@
   }
 
   // 获取 description props
-  function getDescriptionProps(description) {
+  function getDescriptionProps(description: PropDefinition['description']): Record<string, any> {
     if (!description) return {}
     if (typeof description === 'string') {
       return { size: 'small', type: 'info' }
@@ -62,7 +75,7 @@
   }
 
   // 获取 description 内容
-  function getDescriptionContent(description) {
+  function getDescriptionContent(description: PropDefinition['description']): string {
     if (!description) return ''
     if (typeof description === 'string') {
       return description
@@ -71,7 +84,7 @@
   }
 
   // 处理属性变更
-  function handlePropChange(propName, value) {
+  function handlePropChange(propName: string, value: any) {
     emit('prop-change', propName, value)
   }
 </script>

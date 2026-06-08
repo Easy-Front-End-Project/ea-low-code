@@ -198,7 +198,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, computed } from 'vue'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
@@ -210,21 +210,36 @@
   import CustomCodeActionConfig from './special/CustomCodeActionConfig.vue'
   import { generateUniqueId } from '@/utils/schemaHelper'
 
-  const props = defineProps({
-    events: {
-      type: Array,
-      default: () => [],
-    },
-    componentEvents: {
-      type: Array,
-      default: () => [],
-    },
+  interface EventItem {
+    name: string
+    label: string
+  }
+
+  interface ComponentEvent {
+    id: string
+    name: string
+    eventType: string
+    customEventType: string
+    action: string
+    actionConfig: Record<string, any>
+  }
+
+  interface Props {
+    events?: EventItem[]
+    componentEvents?: ComponentEvent[]
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    events: () => [],
+    componentEvents: () => [],
   })
 
-  const emit = defineEmits(['event-change'])
+  const emit = defineEmits<{
+    'event-change': [events: ComponentEvent[]]
+  }>()
 
   // 常用自定义事件列表
-  const commonCustomEvents = [
+  const commonCustomEvents: EventItem[] = [
     { name: 'click', label: '点击' },
     { name: 'dblclick', label: '双击' },
     { name: 'mousedown', label: '鼠标按下' },
@@ -263,12 +278,12 @@
   // 弹框显示状态
   const dialogVisible = ref(false)
   // 本地事件列表
-  const localEvents = ref([])
+  const localEvents = ref<ComponentEvent[]>([])
   // 当前选中的事件
-  const selectedEvent = ref(null)
+  const selectedEvent = ref<ComponentEvent | null>(null)
 
   // 检查是否是预定义事件
-  function isPredefinedEvent(eventType) {
+  function isPredefinedEvent(eventType: string): boolean {
     if (!eventType) return false
 
     const isSystemEvent = availableEvents.value.some(e => e.name === eventType)
@@ -279,7 +294,7 @@
   }
 
   // 创建默认动作配置
-  function createDefaultActionConfig(action) {
+  function createDefaultActionConfig(action: string): Record<string, any> {
     switch (action) {
       case 'message':
         return {
@@ -335,7 +350,7 @@
   }
 
   // 处理事件类型改变
-  function handleEventTypeChange(value) {
+  function handleEventTypeChange(value: any) {
     if (!selectedEvent.value) return
 
     if (value === 'custom') {
@@ -364,7 +379,7 @@
   function handleAddNewEvent() {
     const defaultEvent = availableEvents.value[0] || { name: 'click', label: '点击' }
 
-    const newEvent = {
+    const newEvent: ComponentEvent = {
       id: generateId(),
       name: `event${localEvents.value.length + 1}`,
       eventType: defaultEvent.name,
@@ -377,19 +392,19 @@
   }
 
   // 选择事件
-  function handleSelectEvent(event) {
+  function handleSelectEvent(event: ComponentEvent) {
     selectedEvent.value = { ...event }
   }
 
   // 动作类型改变
-  function handleActionChange(action) {
+  function handleActionChange(action: any) {
     if (!selectedEvent.value) return
     selectedEvent.value.action = action
     selectedEvent.value.actionConfig = createDefaultActionConfig(action)
   }
 
   // 删除事件
-  function handleDeleteEvent(eventId) {
+  function handleDeleteEvent(eventId: string) {
     const index = localEvents.value.findIndex(e => e.id === eventId)
     if (index > -1) {
       localEvents.value.splice(index, 1)
@@ -400,7 +415,7 @@
   }
 
   // 编辑已有事件
-  function handleEditEvent(event) {
+  function handleEditEvent(event: ComponentEvent) {
     localEvents.value = JSON.parse(JSON.stringify(props.componentEvents || []))
     selectedEvent.value = localEvents.value.find(e => e.id === event.id) || null
     dialogVisible.value = true
@@ -425,7 +440,7 @@
   }
 
   // 生成唯一ID
-  function generateId() {
+  function generateId(): string {
     return generateUniqueId('event')
   }
 </script>

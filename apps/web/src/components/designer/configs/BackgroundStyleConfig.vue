@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="config-group">
     <h5 class="group-title">背景</h5>
     <div class="space-y-3">
@@ -95,21 +95,24 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed, ref, watch } from 'vue'
   import UnitInput from '@/components/common/UnitInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
   import EaColorPicker from '@/components/ea-ui-wrap/EaColorPicker.vue'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
-  const props = defineProps({
-    style: {
-      type: Object,
-      default: () => ({}),
-    },
+  interface Props {
+    style?: Record<string, string>
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    style: () => ({}),
   })
 
-  const emit = defineEmits(['style-change'])
+  const emit = defineEmits<{
+    'style-change': [styleName: string, value: string, styleType: string]
+  }>()
 
   // 本地状态：用于编辑期间暂存值
   const localBackgroundImage = ref('')
@@ -130,7 +133,7 @@
   // 监听外部 props 变化
   watch(
     () => props.style,
-    newStyle => {
+    () => {
       if (!isEditing.value) {
         initLocalState()
       }
@@ -163,7 +166,7 @@
   const sizeUnit = ref('px')
 
   // 处理背景图片变化 - 只更新本地状态
-  function handleBackgroundImageInput(value) {
+  function handleBackgroundImageInput(value: string) {
     isEditing.value = true
     localBackgroundImage.value = value
   }
@@ -184,7 +187,7 @@
   }
 
   // 处理背景尺寸变化
-  function handleBackgroundSizeChange(value) {
+  function handleBackgroundSizeChange(value: any) {
     if (value) {
       emit('style-change', 'backgroundSize', value, 'inline')
     } else {
@@ -193,13 +196,13 @@
   }
 
   // 处理自定义背景尺寸变化 - 只更新本地状态
-  function handleCustomBackgroundSizeInput(value) {
+  function handleCustomBackgroundSizeInput(value: string) {
     isEditing.value = true
     localCustomBackgroundSize.value = value
   }
 
   // 处理自定义背景尺寸单位变化 - 立即提交（用户明确选择单位）
-  function handleCustomBackgroundSizeUnitChange(input, unit) {
+  function handleCustomBackgroundSizeUnitChange(input: string, unit: string) {
     localCustomBackgroundSize.value = input
     sizeUnit.value = unit
     if (input) {
@@ -225,14 +228,14 @@
   }
 
   // 处理单位变化
-  function handleSizeUnitChange(unit) {
+  function handleSizeUnitChange(unit: string) {
     sizeUnit.value = unit
     if (localCustomBackgroundSize.value) {
       emit('style-change', 'backgroundSize', `${localCustomBackgroundSize.value}${unit}`, 'inline')
     }
   }
 
-  function handleInlineStyleChange(styleName, value) {
+  function handleInlineStyleChange(styleName: string, value: any) {
     emit('style-change', styleName, value, 'inline')
   }
 

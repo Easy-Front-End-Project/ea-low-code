@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div v-if="shouldShow" class="slot-scope-config-section">
     <h4 class="section-title">插槽 Scope 绑定</h4>
     <div class="scope-select">
@@ -16,29 +16,35 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed } from 'vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
 
-  const props = defineProps({
-    // 父组件的插槽定义
-    parentSlots: {
-      type: Array,
-      default: () => [],
-    },
-    // 当前组件插入的插槽名称
-    slotValue: {
-      type: String,
-      default: 'default',
-    },
-    // 当前选中的 scope 名称
-    scope: {
-      type: String,
-      default: '',
-    },
+  interface SlotScopeItem {
+    name: string
+    label?: string
+  }
+
+  interface SlotDefinition {
+    name: string
+    slotScope?: SlotScopeItem[]
+  }
+
+  interface Props {
+    parentSlots?: SlotDefinition[]
+    slotValue?: string
+    scope?: string
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    parentSlots: () => [],
+    slotValue: 'default',
+    scope: '',
   })
 
-  const emit = defineEmits(['scope-change'])
+  const emit = defineEmits<{
+    'scope-change': [value: string]
+  }>()
 
   // 获取当前插槽的 slotScope 定义
   const currentSlot = computed(() => {
@@ -65,16 +71,16 @@
 
   // 当前选中的 scope
   const selectedScope = computed({
-    get() {
+    get(): string {
       return props.scope || ''
     },
-    set(value) {
+    set(value: string) {
       emit('scope-change', value || '')
     },
   })
 
   // 处理 scope 变更
-  function handleScopeChange(value) {
+  function handleScopeChange(value: any) {
     emit('scope-change', value || '')
   }
 </script>

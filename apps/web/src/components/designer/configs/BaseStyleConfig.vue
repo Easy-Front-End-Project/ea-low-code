@@ -26,7 +26,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import DisplayStyleConfig from './DisplayStyleConfig.vue'
   import BasicLayoutConfig from './BasicLayoutConfig.vue'
   import BorderRadiusStyleConfig from './BorderRadiusStyleConfig.vue'
@@ -36,24 +36,23 @@
   import TextStyleConfig from './TextStyleConfig.vue'
   import CustomStyleConfig from './CustomStyleConfig.vue'
 
-  defineProps({
-    style: {
-      type: Object,
-      default: () => ({}),
-    },
-    positionStyle: {
-      type: Object,
-      default: () => ({}),
-    },
-    customCSS: {
-      type: String,
-      default: '',
-    },
+  interface Props {
+    style?: Record<string, string>
+    positionStyle?: Record<string, string>
+    customCSS?: string
+  }
+
+  withDefaults(defineProps<Props>(), {
+    style: () => ({}),
+    positionStyle: () => ({}),
+    customCSS: '',
   })
 
-  const emit = defineEmits(['style-change'])
+  const emit = defineEmits<{
+    'style-change': [styleName: string, value: string, styleType: string]
+  }>()
 
-  function handleStyleChange(styleName, value, styleType) {
+  function handleStyleChange(styleName: string, value: string, styleType: string) {
     emit('style-change', styleName, value, styleType)
   }
 </script>
