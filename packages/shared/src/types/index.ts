@@ -1,1 +1,1 @@
-// Schema 类型定义
+export * from './schema'
