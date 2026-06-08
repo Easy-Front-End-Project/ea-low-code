@@ -168,10 +168,10 @@ export interface ValidationResult {
 
 // ==================== 函数执行上下文 ====================
 
-/** 函数执行上下文 */
+/** 函数执行上下文（宽松类型，用于 new Function() 注入） */
 export interface FunctionExecutionContext {
-  $component?: Record<string, unknown>
-  $vars?: Record<string, unknown>
-  $alias?: Record<string, unknown>
-  $utils?: Record<string, unknown>
+  $component?: Record<string, any>
+  $vars?: Record<string, any>
+  $alias?: Record<string, any>
+  $utils?: Record<string, any>
 }
