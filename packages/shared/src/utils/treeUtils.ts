@@ -217,7 +217,7 @@ export function moveComponent(
   if (targetParentId) {
     const sourcePath = findComponentPath(components, sourceId)
     const targetPath = findComponentPath(components, targetParentId)
-    if (sourcePath && targetPath && targetPath.startsWith(sourcePath.join(','))) {
+    if (sourcePath && targetPath && targetPath.join(',').startsWith(sourcePath.join(','))) {
       return components
     }
   }
