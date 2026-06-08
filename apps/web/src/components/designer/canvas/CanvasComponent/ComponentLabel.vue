@@ -7,10 +7,12 @@
   </div>
 </template>
 
-<script setup>
-defineProps({
-  name: { type: String, required: true },
-  slotName: { type: String, default: null },
+<script setup lang="ts">
+withDefaults(defineProps<{
+  name: string
+  slotName?: string | null
+}>(), {
+  slotName: null,
 })
 </script>
 

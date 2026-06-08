@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <!-- 自定义样式 -->
   <component :is="'style'" v-if="processedCustomCSS">{{ processedCustomCSS }}</component>
   <div
@@ -17,7 +17,7 @@
     <ComponentLabel
       v-if="showLabel && !isNonSelectable"
       :name="displayName"
-      :slot-name="props.component.props?.slot"
+      :slot-name="componentSlotName"
     />
 
     <!-- 操作按钮 -->
@@ -60,35 +60,43 @@
   </div>
 </template>
 
-<script setup>
-  import { computed, ref, defineOptions, toRef } from 'vue'
+<script setup lang="ts">
+  import { computed, ref, toRef } from 'vue'
+  // @ts-expect-error JS module without type declarations
   import { useSchemaStore } from '@/components/designer/stores/schema'
   import { getComponentMeta } from '@/components/designer/constants/componentMeta'
   import { processCustomCSS } from '@/utils/cssProcessor'
   import { cloneComponentSchema } from '@/utils/schemaHelper'
+  import type { ComponentSchema } from '@/utils/schemaHelper'
+  // @ts-expect-error JS module without type declarations
   import { useRemoteComponent } from '@/components/designer/composables/useRemoteComponent'
+  // @ts-expect-error JS module without type declarations
   import { useComponentInstance } from '@/components/designer/composables/useComponentInstance'
+  // @ts-expect-error JS module without type declarations
   import { useComponentRender } from '@/components/designer/composables/useComponentRender'
-  import {
-    CONTAINER_TYPES,
-    NON_CONTAINER_TYPES,
-    INLINE_BLOCK_TYPES,
-    NON_SELECTABLE_TYPES,
-    NON_SELECTABLE_IN_PARENT,
-  } from '@/components/designer/constants/componentTypes'
+  // @ts-expect-error JS module without type declarations
+  import { CONTAINER_TYPES, NON_CONTAINER_TYPES, INLINE_BLOCK_TYPES, NON_SELECTABLE_TYPES, NON_SELECTABLE_IN_PARENT } from '@/components/designer/constants/componentTypes'
   import ComponentLabel from './CanvasComponent/ComponentLabel.vue'
   import ComponentActions from './CanvasComponent/ComponentActions.vue'
   import ChildComponents from './CanvasComponent/ChildComponents.vue'
 
   defineOptions({ name: 'CanvasComponent' })
 
-  const props = defineProps({
-    component: { type: Object, required: true },
-    selected: { type: Boolean, default: false },
-    parentComponent: { type: Object, default: null },
+  const props = withDefaults(defineProps<{
+    component: ComponentSchema
+    selected?: boolean
+    parentComponent?: ComponentSchema | null
+  }>(), {
+    selected: false,
+    parentComponent: null,
   })
 
-  const emit = defineEmits(['select', 'delete', 'copy', 'drop-to-parent'])
+  const emit = defineEmits<{
+    select: [componentId: string]
+    delete: [componentId: string]
+    copy: [component: ComponentSchema]
+    'drop-to-parent': [payload: { componentMeta: any; parentId: string; slotName: string }]
+  }>()
 
   // ==================== Stores ====================
   const schemaStore = useSchemaStore()
@@ -101,7 +109,7 @@
   /** 拖拽计数器（处理嵌套元素拖拽） */
   const dragCounter = ref(0)
   /** 组件引用 */
-  const componentRef = ref(null)
+  const componentRef = ref<any>(null)
 
   // ==================== Composables ====================
   // 使用公共的组件渲染逻辑
@@ -116,6 +124,8 @@
   const componentMeta = computed(() => getComponentMeta(props.component.type))
   /** 所有子组件 */
   const allChildren = computed(() => props.component.children || [])
+  /** 组件插槽名称 */
+  const componentSlotName = computed(() => (props.component.props?.slot as string) || undefined)
 
   // 远程组件
   const { isRemoteComponent, componentTag: remoteComponentTag } = useRemoteComponent(
@@ -127,7 +137,7 @@
   const isNonSelectable = computed(() => {
     if (NON_SELECTABLE_TYPES.includes(props.component.type)) return true
     return NON_SELECTABLE_IN_PARENT.some(
-      config =>
+      (config: any) =>
         config.childType === props.component.type &&
         config.parentType === props.parentComponent?.type
     )
@@ -205,14 +215,16 @@
 
   // 拖拽处理
   /** 拖拽悬停处理 */
-  function handleDragOver(event) {
+  function handleDragOver(event: DragEvent) {
     if (!isContainer.value || isNonSelectable.value) return
     event.preventDefault()
-    event.dataTransfer.dropEffect = 'copy'
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'copy'
+    }
   }
 
   /** 拖拽进入处理 */
-  function handleDragEnter(event) {
+  function handleDragEnter(event: DragEvent) {
     if (!isContainer.value || isNonSelectable.value) return
     event.preventDefault()
     dragCounter.value++
@@ -227,14 +239,14 @@
   }
 
   /** 拖拽放置处理 */
-  function handleDrop(event) {
+  function handleDrop(event: DragEvent) {
     if (!isContainer.value || isNonSelectable.value) return
     event.preventDefault()
 
     dragCounter.value = 0
     isDropTarget.value = false
 
-    const data = event.dataTransfer.getData('application/json')
+    const data = event.dataTransfer?.getData('application/json')
     if (!data) return
 
     try {

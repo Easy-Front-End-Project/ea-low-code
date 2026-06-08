@@ -6,6 +6,12 @@ export interface ComponentSchema {
   events: Array<Record<string, unknown>>
   children: ComponentSchema[]
   slots: Record<string, unknown>
+  positionStyle?: Record<string, string>
+  cssVariables?: Record<string, string>
+  customCSS?: string
+  isRemote?: boolean
+  remoteConfig?: { id: string; url: string; styleUrl?: string; exportName: string }
+  childrenText?: string
 }
 
 export interface PageSchema {

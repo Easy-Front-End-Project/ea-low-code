@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <template v-for="child in children" :key="child.id">
     <!-- 非可选择组件 -->
     <component
@@ -38,30 +38,39 @@
   </template>
 </template>
 
-<script setup>
+<script setup lang="ts">
+  // @ts-expect-error JS module without type declarations
   import { NON_SELECTABLE_TYPES, NON_SELECTABLE_IN_PARENT } from '@/components/designer/constants/componentTypes'
+  import type { ComponentSchema } from '@/utils/schemaHelper'
   import CanvasComponent from '../CanvasComponent.vue'
 
-  defineProps({
-    children: { type: Array, required: true },
-    parentComponent: { type: Object, required: true },
-    selectedComponentId: { type: String, default: null },
+  withDefaults(defineProps<{
+    children: ComponentSchema[]
+    parentComponent: ComponentSchema
+    selectedComponentId?: string | null
+  }>(), {
+    selectedComponentId: null,
   })
 
-  defineEmits(['select', 'delete', 'copy', 'drop-to-parent'])
+  defineEmits<{
+    select: [componentId: string]
+    delete: [componentId: string]
+    copy: [component: ComponentSchema]
+    'drop-to-parent': [payload: { componentMeta: any; parentId: string; slotName: string }]
+  }>()
 
   /** 检查组件类型是否不可选择 */
-  function isNonSelectableType(type, parentType) {
+  function isNonSelectableType(type: string, parentType: string): boolean {
     if (NON_SELECTABLE_TYPES.includes(type)) return true
     return NON_SELECTABLE_IN_PARENT.some(
-      config => config.childType === type && config.parentType === parentType
+      (config: any) => config.childType === type && config.parentType === parentType
     )
   }
 
   /** 获取子组件的属性（排除 slot 和 children） */
-  function getChildComponentProps(child) {
+  function getChildComponentProps(child: ComponentSchema): Record<string, unknown> {
     const props = child.props || {}
-    const resolvedProps = {}
+    const resolvedProps: Record<string, unknown> = {}
 
     for (const [key, value] of Object.entries(props)) {
       if (key === 'slot') continue

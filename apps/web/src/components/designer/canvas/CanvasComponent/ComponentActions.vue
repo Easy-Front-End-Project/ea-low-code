@@ -17,8 +17,11 @@
   </div>
 </template>
 
-<script setup>
-defineEmits(['delete', 'copy'])
+<script setup lang="ts">
+defineEmits<{
+  delete: []
+  copy: []
+}>()
 </script>
 
 <style lang="scss" scoped>

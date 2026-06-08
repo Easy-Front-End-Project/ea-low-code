@@ -62,6 +62,8 @@ export interface ComponentMeta {
   events?: EventDefinition[]
   slots: SlotDefinition[]
   styleConfig?: StyleConfig
+  childComponents?: string[]
+  defaultSlot?: string
 }
 
 export interface CategoryItem {

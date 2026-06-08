@@ -48,15 +48,24 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, computed, onMounted } from 'vue'
+  // @ts-expect-error JS module without type declarations
   import { useSchemaStore } from '@/components/designer/stores/schema'
+  import type { ComponentSchema } from '@/utils/schemaHelper'
   import CanvasComponent from './CanvasComponent.vue'
   import CanvasToolbar from '@/components/designer/common/CanvasToolbar.vue'
   import Loading from '@/components/common/Loading.vue'
 
+  interface DragComponentData {
+    type: string
+    props?: Array<{ name: string; default?: unknown }>
+    isRemote?: boolean
+    remoteConfig?: { id: string; url: string; styleUrl?: string; exportName: string }
+  }
+
   const schemaStore = useSchemaStore()
-  const canvasRef = ref(null)
+  const canvasRef = ref<HTMLDivElement | null>(null)
   const isLoading = ref(true)
 
   const components = computed(() => schemaStore.components)
@@ -100,14 +109,16 @@
     }
   })
 
-  function handleDragOver(event) {
+  function handleDragOver(event: DragEvent) {
     event.preventDefault()
-    event.dataTransfer.dropEffect = 'copy'
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'copy'
+    }
   }
 
-  function handleDrop(event) {
+  function handleDrop(event: DragEvent) {
     event.preventDefault()
-    const data = event.dataTransfer.getData('application/json')
+    const data = event.dataTransfer?.getData('application/json')
     if (!data) return
 
     try {
@@ -117,12 +128,12 @@
     }
   }
 
-  function handleDropToParent({ componentMeta, parentId, slotName = 'default' }) {
+  function handleDropToParent({ componentMeta, parentId, slotName = 'default' }: { componentMeta: DragComponentData; parentId: string | null; slotName?: string }) {
     addComponentWithMeta(componentMeta, parentId, slotName)
   }
 
-  function addComponentWithMeta(componentMeta, parentId = null, slotName = 'default') {
-    const defaultProps = {}
+  function addComponentWithMeta(componentMeta: DragComponentData, parentId: string | null = null, slotName: string = 'default') {
+    const defaultProps: Record<string, unknown> = {}
 
     if (componentMeta.props) {
       componentMeta.props.forEach(prop => {
@@ -134,7 +145,7 @@
       defaultProps.slot = slotName
     }
 
-    const newComponent = schemaStore.addComponent(componentMeta.type, defaultProps, parentId)
+    const newComponent = schemaStore.addComponent(componentMeta.type, defaultProps, parentId) as ComponentSchema
 
     if (componentMeta.isRemote && componentMeta.remoteConfig) {
       newComponent.isRemote = true
@@ -145,24 +156,24 @@
   }
 
   // 记录最后一次鼠标按下的事件信息，用于区分真实点击和焦点转移
-  let lastMouseDownTarget = null
+  let lastMouseDownTarget: EventTarget | null = null
   let lastMouseDownTime = 0
 
-  function handleCanvasMouseDown(event) {
+  function handleCanvasMouseDown(event: MouseEvent) {
     // 只记录在画布容器或内容区域的真实点击
     if (
       event.target === canvasRef.value ||
-      event.target.classList.contains('canvas-area__content')
+      (event.target instanceof HTMLElement && event.target.classList.contains('canvas-area__content'))
     ) {
       lastMouseDownTarget = event.target
       lastMouseDownTime = Date.now()
     }
   }
 
-  function handleCanvasClick(event) {
+  function handleCanvasClick(event: MouseEvent) {
     if (
       event.target === canvasRef.value ||
-      event.target.classList.contains('canvas-area__content')
+      (event.target instanceof HTMLElement && event.target.classList.contains('canvas-area__content'))
     ) {
       // 检查这次 click 是否有对应的 mousedown 事件
       // 如果没有，说明是程序触发的（如焦点转移），不应该清除选中
@@ -179,15 +190,15 @@
     }
   }
 
-  function handleComponentSelect(componentId) {
+  function handleComponentSelect(componentId: string) {
     schemaStore.selectComponent(componentId)
   }
 
-  function handleComponentDelete(componentId) {
+  function handleComponentDelete(componentId: string) {
     schemaStore.removeComponent(componentId)
   }
 
-  function handleComponentCopy(copiedComponent) {
+  function handleComponentCopy(copiedComponent: ComponentSchema) {
     schemaStore.addComponentBySchema(copiedComponent)
     schemaStore.selectComponent(copiedComponent.id)
   }
