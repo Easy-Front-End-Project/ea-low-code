@@ -48,8 +48,8 @@ export class AuthService {
       throw new UnauthorizedException('用户名或密码错误')
     }
 
-    delete user.password
-    return user
+    const { password: _, ...userWithoutPassword } = user
+    return userWithoutPassword
   }
 
   /**
@@ -140,12 +140,12 @@ export class AuthService {
    * @param code - 验证码
    * @param purpose - 用途
    */
-  verifyCode(
+  async verifyCode(
     email: string,
     code: string,
     purpose: string = 'register'
   ): Promise<{ valid: boolean }> {
-    const isValid = this.verificationCodeService.verifyCode(email, code, purpose)
+    const isValid = await this.verificationCodeService.verifyCode(email, code, purpose)
     return { valid: isValid }
   }
 
