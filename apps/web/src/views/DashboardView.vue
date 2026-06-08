@@ -311,13 +311,14 @@
 </script>
 
 <style lang="scss" scoped>
-  .dashboard {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(dashboard) {
     padding: 24px;
     max-width: 1440px;
     margin: 0 auto;
 
-    // 欢迎区域
-    &__welcome {
+    @include e(welcome) {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -326,31 +327,30 @@
       background: linear-gradient(135deg, #409eff 0%, #64b5f6 100%);
       border-radius: 12px;
       color: #fff;
-
-      &-content {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-
-      &-title {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin: 0;
-        font-size: 24px;
-        font-weight: 600;
-      }
-
-      &-subtitle {
-        margin: 0;
-        font-size: 14px;
-        opacity: 0.9;
-      }
     }
 
-    // 统计区域
-    &__stats {
+    @include e(welcome-content) {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    @include e(welcome-title) {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    @include e(welcome-subtitle) {
+      margin: 0;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    @include e(stats) {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 24px;
@@ -361,7 +361,7 @@
       }
     }
 
-    &__stat-card {
+    @include e(stat-card) {
       cursor: pointer;
       transition: transform 0.2s;
 
@@ -370,7 +370,7 @@
       }
     }
 
-    &__stat-title {
+    @include e(stat-title) {
       display: flex;
       align-items: center;
       gap: 6px;
@@ -378,8 +378,7 @@
       color: var(--ea-text-secondary);
     }
 
-    // 中间区域
-    &__middle {
+    @include e(middle) {
       display: grid;
       grid-template-columns: 2fr 1fr;
       gap: 24px;
@@ -390,14 +389,13 @@
       }
     }
 
-    // 区域标题
-    &__section-header {
+    @include e(section-header) {
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
 
-    &__section-title {
+    @include e(section-title) {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -406,7 +404,7 @@
       color: var(--ea-text-primary);
     }
 
-    &__project-grid {
+    @include e(project-grid) {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 16px;
@@ -420,13 +418,13 @@
       }
     }
 
-    &__action-list {
+    @include e(action-list) {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    &__action-item {
+    @include e(action-item) {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -440,7 +438,7 @@
       }
     }
 
-    &__action-icon {
+    @include e(action-icon) {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -448,35 +446,35 @@
       height: 36px;
       border-radius: 8px;
 
-      &--primary {
+      @include m(primary) {
         background: linear-gradient(135deg, #409eff 0%, #64b5f6 100%);
       }
 
-      &--success {
+      @include m(success) {
         background: linear-gradient(135deg, #67c23a 0%, #85ce61 100%);
       }
 
-      &--warning {
+      @include m(warning) {
         background: linear-gradient(135deg, #e6a23c 0%, #ebb563 100%);
       }
 
-      &--info {
+      @include m(info) {
         background: linear-gradient(135deg, #909399 0%, #a6a9ad 100%);
       }
     }
 
-    &__action-text {
+    @include e(action-text) {
       font-size: 14px;
       color: var(--ea-text-primary);
     }
 
-    &__activity-list {
+    @include e(activity-list) {
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
 
-    &__activity-item {
+    @include e(activity-item) {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -485,7 +483,7 @@
       background-color: var(--ea-fill-light);
     }
 
-    &__activity-icon {
+    @include e(activity-icon) {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -494,35 +492,35 @@
       border-radius: 50%;
       flex-shrink: 0;
 
-      &--create {
+      @include m(create) {
         background: linear-gradient(135deg, #67c23a 0%, #85ce61 100%);
       }
 
-      &--update {
+      @include m(update) {
         background: linear-gradient(135deg, #409eff 0%, #64b5f6 100%);
       }
 
-      &--delete {
+      @include m(delete) {
         background: linear-gradient(135deg, #f56c6c 0%, #f78989 100%);
       }
 
-      &--clone {
+      @include m(clone) {
         background: linear-gradient(135deg, #e6a23c 0%, #ebb563 100%);
       }
     }
 
-    &__activity-content {
+    @include e(activity-content) {
       display: flex;
       flex-direction: column;
       gap: 4px;
     }
 
-    &__activity-time {
+    @include e(activity-time) {
       font-size: 12px;
       color: var(--ea-text-secondary);
     }
 
-    &__activity-text {
+    @include e(activity-text) {
       font-size: 14px;
       color: var(--ea-text-primary);
     }

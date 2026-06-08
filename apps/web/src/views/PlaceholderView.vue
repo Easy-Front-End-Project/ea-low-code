@@ -8,20 +8,22 @@
 </template>
 
 <style lang="scss" scoped>
-.placeholder-view {
+@import '@/styles/mixins/bem.scss';
+
+@include b(placeholder-view) {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 64px);
 
-  &__empty {
+  @include e(empty) {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 16px;
   }
 
-  &__text {
+  @include e(text) {
     font-size: 14px;
     color: var(--ea-text-secondary);
   }

@@ -292,12 +292,12 @@
     height: 100%;
     padding: 1rem;
 
-    &__container {
+    @include e(container) {
       margin-top: 1rem;
       height: calc(100% - 80px);
     }
 
-    &__tabs {
+    @include e(tabs) {
       width: 100%;
       height: 100%;
 

@@ -209,33 +209,35 @@
 </script>
 
 <style lang="scss" scoped>
-  .model-view {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(model-view) {
     height: 100%;
 
-    &__header {
+    @include e(header) {
       padding: 0;
     }
 
-    &__main {
+    @include e(main) {
       padding: 0;
       overflow: hidden;
     }
 
-    &__content {
+    @include e(content) {
       height: 100%;
     }
 
-    &__aside {
+    @include e(aside) {
       border-right: 1px solid var(--ea-border-light);
       overflow-y: auto;
     }
 
-    &__editor {
+    @include e(editor) {
       overflow-y: auto;
       padding: 16px;
     }
 
-    &__empty-editor {
+    @include e(empty-editor) {
       display: flex;
       align-items: center;
       justify-content: center;

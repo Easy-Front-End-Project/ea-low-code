@@ -511,7 +511,7 @@
     // 验证确认密码
     validateForgotConfirmPassword()
     if (forgotForm.newPassword !== forgotForm.confirmPassword) {
-      showMessage('两次输入的密码不一致', 'warning')
+      showMessage('两次输入的新密码不一致', 'warning')
       return
     }
 
@@ -533,12 +533,14 @@
 </script>
 
 <style lang="scss" scoped>
-  .login-page {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(login-page) {
     display: flex;
     min-height: 100vh;
     background: linear-gradient(135deg, #f5f7fa 0%, #e4e7ed 100%);
 
-    &__left {
+    @include e(left) {
       flex: 1;
       display: flex;
       align-items: center;
@@ -551,19 +553,19 @@
       }
     }
 
-    &__illustration {
+    @include e(illustration) {
       position: relative;
       width: 400px;
       height: 300px;
     }
 
-    &__cube {
+    @include e(cube) {
       position: absolute;
       border-radius: 8px;
       background: linear-gradient(135deg, #409eff 0%, #337ecc 100%);
       box-shadow: 0 8px 32px rgba(64, 158, 255, 0.3);
 
-      &--1 {
+      @include m(1) {
         width: 80px;
         height: 80px;
         top: 50px;
@@ -572,7 +574,7 @@
         opacity: 0.9;
       }
 
-      &--2 {
+      @include m(2) {
         width: 60px;
         height: 60px;
         top: 100px;
@@ -582,7 +584,7 @@
         background: linear-gradient(135deg, #67c23a 0%, #529b2e 100%);
       }
 
-      &--3 {
+      @include m(3) {
         width: 40px;
         height: 40px;
         bottom: 80px;
@@ -593,7 +595,7 @@
       }
     }
 
-    &__platform {
+    @include e(platform) {
       position: absolute;
       bottom: 50px;
       left: 50%;
@@ -605,7 +607,7 @@
       opacity: 0.3;
     }
 
-    &__right {
+    @include e(right) {
       flex: 1;
       display: flex;
       align-items: center;
@@ -613,7 +615,7 @@
       padding: 40px 20px;
     }
 
-    &__form-container {
+    @include e(form-container) {
       width: 100%;
       max-width: 400px;
       background: #fff;
@@ -622,7 +624,7 @@
       box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
     }
 
-    &__title {
+    @include e(title) {
       font-size: 28px;
       font-weight: 600;
       color: #303133;
@@ -630,39 +632,39 @@
       margin-bottom: 8px;
     }
 
-    &__subtitle {
+    @include e(subtitle) {
       font-size: 14px;
       color: #909399;
       text-align: center;
       margin-bottom: 32px;
     }
 
-    &__form {
+    @include e(form) {
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
 
-    &__form-item {
+    @include e(form-item) {
       width: 100%;
     }
 
-    &__code-wrapper {
+    @include e(code-wrapper) {
       display: flex;
       gap: 12px;
       align-items: center;
     }
 
-    &__code-input {
+    @include e(code-input) {
       flex: 1;
     }
 
-    &__submit {
+    @include e(submit) {
       width: 100%;
       margin-top: 8px;
     }
 
-    &__footer {
+    @include e(footer) {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -671,18 +673,20 @@
       position: relative;
     }
 
-    &__footer-text {
+    @include e(footer-text) {
       font-size: 14px;
       color: #606266;
     }
 
-    &__link--right {
-      position: absolute;
-      right: 0;
-      color: #909399 !important;
+    @include e(link) {
+      @include m(right) {
+        position: absolute;
+        right: 0;
+        color: #909399 !important;
 
-      &:hover {
-        color: #606266 !important;
+        &:hover {
+          color: #606266 !important;
+        }
       }
     }
 

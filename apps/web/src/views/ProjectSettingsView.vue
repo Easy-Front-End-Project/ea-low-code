@@ -326,20 +326,22 @@
 </script>
 
 <style lang="scss" scoped>
+  @import '@/styles/mixins/bem.scss';
+
   ea-empty::part(container) {
     height: 100%;
   }
 
-  .project-settings-view {
+  @include b(project-settings-view) {
     height: 100%;
     padding: 1rem;
 
-    &__container {
+    @include e(container) {
       margin-top: 1rem;
       height: calc(100% - 80px);
     }
 
-    &__tabs {
+    @include e(tabs) {
       width: 100%;
       height: 100%;
 
@@ -349,25 +351,25 @@
     }
   }
 
-  .pages-panel {
+  @include b(pages-panel) {
     height: 100%;
 
-    &__header {
+    @include e(header) {
       padding: 0;
     }
 
-    &__main {
+    @include e(main) {
       padding: 12px 0;
       overflow-y: auto;
     }
 
-    &__grid {
+    @include e(grid) {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 20px;
     }
 
-    &__footer {
+    @include e(footer) {
       padding: 0 24px;
       display: flex;
       align-items: center;
@@ -375,13 +377,14 @@
       border-top: 1px solid var(--ea-border-light);
     }
 
-    &__pagination {
+    @include e(pagination) {
       width: 100%;
       display: flex;
       justify-content: flex-end;
       align-items: center;
     }
   }
+
   ea-tab-panel[name='pages'] {
     height: 100%;
 

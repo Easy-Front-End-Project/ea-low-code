@@ -135,38 +135,40 @@ function handleCreateSuccess() {
 </script>
 
 <style lang="scss" scoped>
-.project-view {
+@import '@/styles/mixins/bem.scss';
+
+@include b(project-view) {
   height: 100%;
 
-  &__header {
+  @include e(header) {
     padding: 0;
   }
 
-  &__main {
+  @include e(main) {
     padding: 12px 0;
     overflow-y: auto;
   }
 
-  &__empty {
+  @include e(empty) {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 400px;
+  }
 
-    &-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
+  @include e(empty-content) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
 
-      p {
-        font-size: 14px;
-        color: var(--ea-text-secondary);
-      }
+    p {
+      font-size: 14px;
+      color: var(--ea-text-secondary);
     }
   }
 
-  &__grid {
+  @include e(grid) {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 24px;
@@ -174,7 +176,7 @@ function handleCreateSuccess() {
     margin: 0 auto;
   }
 
-  &__footer {
+  @include e(footer) {
     padding: 0 24px;
     display: flex;
     align-items: center;
@@ -182,7 +184,7 @@ function handleCreateSuccess() {
     border-top: 1px solid var(--ea-border-light);
   }
 
-  &__pagination {
+  @include e(pagination) {
     width: 100%;
     display: flex;
     justify-content: flex-end;
