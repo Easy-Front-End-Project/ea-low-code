@@ -37,6 +37,9 @@ apps/*/node_modules
 apps/*/dist
 packages/*/node_modules
 packages/*/dist
+packages/shared/src/**/*.js
+packages/shared/src/**/*.d.ts
+packages/shared/src/**/*.js.map
 
 # Editor directories and files
 .vscode/*
