@@ -1,23 +1,32 @@
-﻿import { onMounted, onBeforeUnmount } from 'vue'
+import type { Ref } from 'vue'
+import { onMounted, onBeforeUnmount } from 'vue'
 import { useComponentInstanceStore } from '@/components/designer/stores/componentInstance'
 import { executeEvent } from '@/utils/eventExecutor'
+import type { EventConfig } from '@/utils/schemaHelper'
+
+interface UseComponentInstanceOptions {
+  componentId: string
+  componentType: string
+  componentRef: Ref<HTMLElement | { $el: HTMLElement } | null>
+  events?: EventConfig[]
+}
 
 /**
  * 组件实例管理 Composable
- * @param {Object} options - 配置选项
- * @param {string} options.componentId - 组件ID
- * @param {string} options.componentType - 组件类型
- * @param {Ref} options.componentRef - 组件引用
- * @param {Array} options.events - 组件事件配置列表
+ * @param options - 配置选项
+ * @param options.componentId - 组件ID
+ * @param options.componentType - 组件类型
+ * @param options.componentRef - 组件引用
+ * @param options.events - 组件事件配置列表
  */
-export function useComponentInstance({ componentId, componentType, componentRef, events = [] }) {
+export function useComponentInstance({ componentId, componentType, componentRef, events = [] }: UseComponentInstanceOptions): void {
   const instanceStore = useComponentInstanceStore()
 
   /**
    * 触发组件的 load 事件
    * 用于在组件加载完成后自动执行配置的动作（如接口请求）
    */
-  function triggerLoadEvent() {
+  function triggerLoadEvent(): void {
     const loadEvent = events?.find(e => e.eventType === 'load')
     if (loadEvent) {
       executeEvent(loadEvent, null)
@@ -35,15 +44,15 @@ export function useComponentInstance({ componentId, componentType, componentRef,
       customElements.whenDefined(tagName).then(() => {
         const ref = componentRef.value
         if (!ref) return
-        const element = ref.$el || ref
+        const element = (ref as { $el?: HTMLElement }).$el || ref
         if (element) {
-          instanceStore.registerInstance(componentId, element)
+          instanceStore.registerInstance(componentId, element as HTMLElement)
           // 触发组件的 load 事件
           triggerLoadEvent()
         }
       })
     } else {
-      instanceStore.registerInstance(componentId, componentRef.value)
+      instanceStore.registerInstance(componentId, componentRef.value as HTMLElement)
       // 触发组件的 load 事件
       triggerLoadEvent()
     }
