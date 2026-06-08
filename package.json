@@ -44,6 +44,9 @@
     "apps/web/**/*.{js,mjs,jsx,ts,tsx,vue}": [
       "eslint --fix --cache"
     ],
+    "apps/web/**/*.{vue,scss}": [
+      "stylelint --fix"
+    ],
     "apps/server/**/*.ts": [
       "eslint --fix"
     ],
