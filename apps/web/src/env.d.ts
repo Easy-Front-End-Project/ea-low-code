@@ -15,3 +15,24 @@ declare module 'easy-component-ui' {
   const content: void
   export default content
 }
+
+interface MessageFunction {
+  (options: Record<string, unknown>): void
+  success: (msg: string) => void
+  error: (msg: string) => void
+  warning: (msg: string) => void
+  info: (msg: string) => void
+}
+
+interface NotifyFunction {
+  (options: Record<string, unknown>): void
+  success: (msg: string) => void
+  error: (msg: string) => void
+  warning: (msg: string) => void
+  info: (msg: string) => void
+}
+
+interface Window {
+  $message?: MessageFunction
+  $notify?: NotifyFunction
+}

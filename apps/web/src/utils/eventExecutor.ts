@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 事件执行器 - 统一处理组件事件执行逻辑
  * 用于 CanvasComponent 和 PreviewComponent 中的事件执行
  */
@@ -10,13 +10,54 @@ import {
   resolveValue as resolveValueUtil,
   resolveComponentId as resolveComponentIdUtil,
 } from '@/utils/schemaHelper'
+import type { ActionConfig, EventConfig } from '@/utils/schemaHelper'
+
+/**
+ * 组件操作上下文
+ */
+interface ComponentContext {
+  get: (id: string) => HTMLElement | null
+  setProp: (id: string, prop: string, value: unknown) => boolean
+  getProp: (id: string, prop: string) => unknown
+  call: (id: string, method: string, ...args: unknown[]) => unknown
+}
+
+/**
+ * 变量操作上下文
+ */
+interface VarsContext {
+  get: (name: string) => unknown
+  set: (name: string, value: unknown) => void
+  call: (name: string, ...args: unknown[]) => unknown
+}
+
+/**
+ * 别名操作上下文
+ */
+interface AliasContext {
+  get: (alias: string) => string | null
+  find: (alias: string) => unknown
+  getElement: (alias: string) => HTMLElement | null
+  setProp: (alias: string, prop: string, value: unknown) => void
+  getProp: (alias: string, prop: string) => unknown
+  call: (alias: string, method: string, ...args: unknown[]) => void
+}
+
+/**
+ * 执行上下文
+ */
+interface ExecutionContext {
+  $component: ComponentContext
+  $vars: VarsContext
+  $alias: AliasContext
+}
 
 /**
  * 创建事件执行上下文
  * 提供 $component、$vars、$event、$alias 等辅助对象
- * @returns {Object} 执行上下文对象
+ * @returns 执行上下文对象
  */
-export function createExecutionContext() {
+export function createExecutionContext(): ExecutionContext {
   const instanceStore = useComponentInstanceStore()
   const variableStore = useVariableStore()
   const schemaStore = useSchemaStore()
@@ -24,16 +65,16 @@ export function createExecutionContext() {
   return {
     // 组件操作
     $component: {
-      get: id => instanceStore.getComponentElement(id),
-      setProp: (id, prop, value) => instanceStore.setComponentProp(id, prop, value),
-      getProp: (id, prop) => instanceStore.getComponentProp(id, prop),
-      call: (id, method, ...args) => instanceStore.callComponentMethod(id, method, ...args),
+      get: (id: string) => instanceStore.getComponentElement(id),
+      setProp: (id: string, prop: string, value: unknown) => instanceStore.setComponentProp(id, prop, value),
+      getProp: (id: string, prop: string) => instanceStore.getComponentProp(id, prop),
+      call: (id: string, method: string, ...args: unknown[]) => instanceStore.callComponentMethod(id, method, ...args),
     },
     // 变量操作
     $vars: {
-      get: name => variableStore.getVariableDefaultValue(name),
-      set: (name, value) => variableStore.updateVariableByName(name, { defaultValue: value }),
-      call: (name, ...args) => {
+      get: (name: string) => variableStore.getVariableDefaultValue(name),
+      set: (name: string, value: unknown) => variableStore.updateVariableByName(name, { defaultValue: value }),
+      call: (name: string, ...args: unknown[]) => {
         const funcCode = variableStore.getVariableDefaultValue(name)
         if (typeof funcCode !== 'string') {
           console.warn(`变量 ${name} 不是函数类型或没有定义`)
@@ -41,42 +82,44 @@ export function createExecutionContext() {
         }
         try {
           // 创建函数执行上下文
+          // eslint-disable-next-line no-new-func
           const fn = new Function(
             '$component',
             '$vars',
             '$alias',
             ...args.map((_, i) => `arg${i}`),
             funcCode
-          )
+          ) as any
+
           return fn(
             {
-              get: id => instanceStore.getComponentElement(id),
-              setProp: (id, prop, value) => instanceStore.setComponentProp(id, prop, value),
-              getProp: (id, prop) => instanceStore.getComponentProp(id, prop),
-              call: (id, method, ...args) => instanceStore.callComponentMethod(id, method, ...args),
+              get: (id: string) => instanceStore.getComponentElement(id),
+              setProp: (id: string, prop: string, value: unknown) => instanceStore.setComponentProp(id, prop, value),
+              getProp: (id: string, prop: string) => instanceStore.getComponentProp(id, prop),
+              call: (id: string, method: string, ...args: unknown[]) => instanceStore.callComponentMethod(id, method, ...args),
             },
             {
-              get: n => variableStore.getVariableDefaultValue(n),
-              set: (n, v) => variableStore.updateVariableByName(n, { defaultValue: v }),
+              get: (n: string) => variableStore.getVariableDefaultValue(n),
+              set: (n: string, v: unknown) => variableStore.updateVariableByName(n, { defaultValue: v }),
             },
             {
-              get: alias => schemaStore.getComponentIdByAlias(alias),
-              find: alias => schemaStore.findComponentByAlias(alias),
-              getElement: alias => {
+              get: (alias: string) => schemaStore.getComponentIdByAlias(alias),
+              find: (alias: string) => schemaStore.findComponentByAlias(alias),
+              getElement: (alias: string) => {
                 const id = schemaStore.getComponentIdByAlias(alias)
                 return id ? instanceStore.getComponentElement(id) : null
               },
-              setProp: (alias, prop, value) => {
+              setProp: (alias: string, prop: string, value: unknown) => {
                 const id = schemaStore.getComponentIdByAlias(alias)
                 if (id) {
                   instanceStore.setComponentProp(id, prop, value)
                 }
               },
-              getProp: (alias, prop) => {
+              getProp: (alias: string, prop: string) => {
                 const id = schemaStore.getComponentIdByAlias(alias)
                 return id ? instanceStore.getComponentProp(id, prop) : null
               },
-              call: (alias, method, ...args) => {
+              call: (alias: string, method: string, ...args: unknown[]) => {
                 const id = schemaStore.getComponentIdByAlias(alias)
                 if (id) {
                   instanceStore.callComponentMethod(id, method, ...args)
@@ -88,7 +131,7 @@ export function createExecutionContext() {
         } catch (error) {
           console.error(`执行函数变量 ${name} 失败:`, error)
           if (window.$message) {
-            window.$message.error(`函数执行失败: ${error.message}`)
+            window.$message.error(`函数执行失败: ${(error as Error).message}`)
           }
           return null
         }
@@ -96,23 +139,23 @@ export function createExecutionContext() {
     },
     // 别名操作
     $alias: {
-      get: alias => schemaStore.getComponentIdByAlias(alias),
-      find: alias => schemaStore.findComponentByAlias(alias),
-      getElement: alias => {
+      get: (alias: string) => schemaStore.getComponentIdByAlias(alias),
+      find: (alias: string) => schemaStore.findComponentByAlias(alias),
+      getElement: (alias: string) => {
         const id = schemaStore.getComponentIdByAlias(alias)
         return id ? instanceStore.getComponentElement(id) : null
       },
-      setProp: (alias, prop, value) => {
+      setProp: (alias: string, prop: string, value: unknown) => {
         const id = schemaStore.getComponentIdByAlias(alias)
         if (id) {
           instanceStore.setComponentProp(id, prop, value)
         }
       },
-      getProp: (alias, prop) => {
+      getProp: (alias: string, prop: string) => {
         const id = schemaStore.getComponentIdByAlias(alias)
         return id ? instanceStore.getComponentProp(id, prop) : null
       },
-      call: (alias, method, ...args) => {
+      call: (alias: string, method: string, ...args: unknown[]) => {
         const id = schemaStore.getComponentIdByAlias(alias)
         if (id) {
           instanceStore.callComponentMethod(id, method, ...args)
@@ -124,28 +167,28 @@ export function createExecutionContext() {
 
 /**
  * 解析值（处理变量绑定）
- * @param {*} value - 原始值
- * @returns {*} 解析后的值
+ * @param value - 原始值
+ * @returns 解析后的值
  */
-export function resolveValue(value) {
+export function resolveValue(value: unknown): unknown {
   const variableStore = useVariableStore()
   const context = createExecutionContext()
 
   return resolveValueUtil(
     value,
     variableStore.getVariableDefaultValue.bind(variableStore),
-    name => variableStore.getVariableByName(name)?.type,
+    (name: string) => variableStore.getVariableByName(name)?.type,
     context
   )
 }
 
 /**
  * 执行自定义代码
- * @param {string} code - 用户编写的代码
- * @param {Object} context - 执行上下文
- * @param {Event} originalEvent - 原始事件对象
+ * @param code - 用户编写的代码
+ * @param context - 执行上下文
+ * @param originalEvent - 原始事件对象
  */
-export function executeCustomCode(code, context, originalEvent) {
+export function executeCustomCode(code: string, context: ExecutionContext, originalEvent: Event | null): void {
   if (!code) return
 
   try {
@@ -157,22 +200,23 @@ export function executeCustomCode(code, context, originalEvent) {
       ${code}
     `
 
-    const fn = new Function('event', '$component', '$vars', '$alias', wrappedCode)
+    // eslint-disable-next-line no-new-func
+    const fn = new Function('event', '$component', '$vars', '$alias', wrappedCode) as any
     fn(originalEvent, $component, $vars, $alias)
   } catch (error) {
     console.error('执行自定义代码失败:', error)
     if (window.$message) {
-      window.$message.error('代码执行失败: ' + error.message)
+      window.$message.error('代码执行失败: ' + (error as Error).message)
     }
   }
 }
 
 /**
  * 执行 API 请求
- * @param {Object} actionConfig - 请求配置
- * @param {Object} context - 执行上下文
+ * @param actionConfig - 请求配置
+ * @param context - 执行上下文
  */
-export async function executeApiRequest(actionConfig, context) {
+export async function executeApiRequest(actionConfig: ActionConfig, context: ExecutionContext): Promise<any> {
   const {
     url,
     method = 'GET',
@@ -190,11 +234,11 @@ export async function executeApiRequest(actionConfig, context) {
   try {
     // 构建查询参数
     const queryParams = new URLSearchParams()
-    params.forEach(param => {
+    params.forEach((param: { key: string; value: string }) => {
       if (param.key) {
         // 解析值（支持变量绑定）
         const resolvedValue = resolveTemplateString(param.value, context)
-        queryParams.append(param.key, resolvedValue)
+        queryParams.append(param.key, String(resolvedValue))
       }
     })
 
@@ -206,7 +250,7 @@ export async function executeApiRequest(actionConfig, context) {
     }
 
     // 构建请求选项
-    const fetchOptions = {
+    const fetchOptions: RequestInit = {
       method: method.toUpperCase(),
       headers: {
         'Content-Type': 'application/json',
@@ -215,8 +259,8 @@ export async function executeApiRequest(actionConfig, context) {
 
     // 添加 body（非 GET 请求）
     if (method.toUpperCase() !== 'GET' && body.length > 0) {
-      const bodyObj = {}
-      body.forEach(item => {
+      const bodyObj: Record<string, unknown> = {}
+      body.forEach((item: { key: string; value: string }) => {
         if (item.key) {
           const resolvedValue = resolveTemplateString(item.value, context)
           bodyObj[item.key] = resolvedValue
@@ -247,7 +291,7 @@ export async function executeApiRequest(actionConfig, context) {
   } catch (error) {
     console.error('API 请求失败:', error)
     if (window.$message) {
-      window.$message.error('请求失败: ' + error.message)
+      window.$message.error('请求失败: ' + (error as Error).message)
     }
     throw error
   }
@@ -255,31 +299,30 @@ export async function executeApiRequest(actionConfig, context) {
 
 /**
  * 解析模板字符串（支持 {{variable}} 语法）
- * @param {string} template - 模板字符串
- * @param {Object} context - 执行上下文
- * @returns {string} 解析后的字符串
+ * @param template - 模板字符串
+ * @param context - 执行上下文
+ * @returns 解析后的字符串
  */
-function resolveTemplateString(template, context) {
+function resolveTemplateString(template: string, context: ExecutionContext): string {
   if (!template || typeof template !== 'string') {
     return template
   }
 
   // 支持 {{variable}} 语法
-  return template.replace(/\{\{([^}]+)\}\}/g, (match, varName) => {
+  return template.replace(/\{\{([^}]+)\}\}/g, (match: string, varName: string) => {
     const trimmedName = varName.trim()
     const value = context.$vars?.get(trimmedName)
-    return value !== undefined ? value : match
+    return value !== undefined ? String(value) : match
   })
 }
 
 /**
  * 显示消息
- * @param {string} message - 消息内容
- * @param {string} type - 消息类型: 'success' | 'error' | 'warning' | 'info'
+ * @param actionConfig - 消息配置
  */
-export function showMessage(actionConfig) {
+export function showMessage(actionConfig: ActionConfig): void {
   if (window.$message && actionConfig.message) {
-    window.$message(actionConfig)
+    window.$message(actionConfig as any)
   } else if (actionConfig.message) {
     alert(actionConfig.message)
   }
@@ -287,11 +330,11 @@ export function showMessage(actionConfig) {
 
 /**
  * 显示通知
- * @param {Object} actionConfig - 通知配置
+ * @param actionConfig - 通知配置
  */
-export function showNotification(actionConfig) {
+export function showNotification(actionConfig: ActionConfig): void {
   if (window.$notify && actionConfig.message) {
-    window.$notify(actionConfig)
+    window.$notify(actionConfig as any)
   } else if (actionConfig.message) {
     alert(
       actionConfig.title ? `${actionConfig.title}: ${actionConfig.message}` : actionConfig.message
@@ -301,11 +344,11 @@ export function showNotification(actionConfig) {
 
 /**
  * 调用组件方法
- * @param {string} componentId - 组件ID
- * @param {string} methodName - 方法名
- * @param {Array} methodArgs - 方法参数
+ * @param componentId - 组件ID
+ * @param methodName - 方法名
+ * @param methodArgs - 方法参数
  */
-export function callComponentMethod(componentId, methodName, methodArgs = []) {
+export function callComponentMethod(componentId: string, methodName: string, methodArgs: unknown[] = []): void {
   const instanceStore = useComponentInstanceStore()
   const resolvedId = resolveComponentId(componentId)
   if (resolvedId && methodName) {
@@ -315,10 +358,10 @@ export function callComponentMethod(componentId, methodName, methodArgs = []) {
 
 /**
  * 解析组件ID（支持 alias: 前缀）
- * @param {string} componentIdOrAlias - 组件ID或别名（如：alias:submitBtn 或 button_123）
- * @returns {string|null} 解析后的组件ID
+ * @param componentIdOrAlias - 组件ID或别名（如：alias:submitBtn 或 button_123）
+ * @returns 解析后的组件ID
  */
-function resolveComponentId(componentIdOrAlias) {
+function resolveComponentId(componentIdOrAlias: string | null | undefined): string | null {
   const schemaStore = useSchemaStore()
   return resolveComponentIdUtil(
     componentIdOrAlias,
@@ -328,11 +371,11 @@ function resolveComponentId(componentIdOrAlias) {
 
 /**
  * 设置组件属性
- * @param {string} componentId - 组件ID（支持 alias: 前缀）
- * @param {string} propName - 属性名
- * @param {*} propValue - 属性值
+ * @param componentId - 组件ID（支持 alias: 前缀）
+ * @param propName - 属性名
+ * @param propValue - 属性值
  */
-export function setComponentProp(componentId, propName, propValue) {
+export function setComponentProp(componentId: string, propName: string, propValue: unknown): void {
   const instanceStore = useComponentInstanceStore()
   const resolvedId = resolveComponentId(componentId)
 
@@ -345,10 +388,10 @@ export function setComponentProp(componentId, propName, propValue) {
 /**
  * 执行事件配置
  * 统一的事件执行入口
- * @param {Object} eventConfig - 事件配置
- * @param {Event} originalEvent - 原始事件对象
+ * @param eventConfig - 事件配置
+ * @param originalEvent - 原始事件对象
  */
-export async function executeEvent(eventConfig, originalEvent) {
+export async function executeEvent(eventConfig: EventConfig | null | undefined, originalEvent: Event | null): Promise<void> {
   if (!eventConfig) return
 
   const context = createExecutionContext()
@@ -365,21 +408,21 @@ export async function executeEvent(eventConfig, originalEvent) {
       break
 
     case 'custom':
-      executeCustomCode(actionConfig.code, context, originalEvent)
+      executeCustomCode(actionConfig.code || '', context, originalEvent)
       break
 
     case 'callMethod':
       callComponentMethod(
-        actionConfig.targetComponentId,
-        actionConfig.methodName,
+        actionConfig.targetComponentId || '',
+        actionConfig.methodName || '',
         actionConfig.methodArgs || []
       )
       break
 
     case 'setProp':
       setComponentProp(
-        actionConfig.targetComponentId,
-        actionConfig.propName,
+        actionConfig.targetComponentId || '',
+        actionConfig.propName || '',
         actionConfig.propValue
       )
       break
@@ -396,10 +439,10 @@ export async function executeEvent(eventConfig, originalEvent) {
 /**
  * 通过别名执行事件
  * 支持使用别名而不是ID来操作组件
- * @param {Object} eventConfig - 事件配置
- * @param {Event} originalEvent - 原始事件对象
+ * @param eventConfig - 事件配置
+ * @param originalEvent - 原始事件对象
  */
-export async function executeEventWithAlias(eventConfig, originalEvent) {
+export async function executeEventWithAlias(eventConfig: EventConfig | null | undefined, originalEvent: Event | null): Promise<void> {
   if (!eventConfig) return
 
   const schemaStore = useSchemaStore()
