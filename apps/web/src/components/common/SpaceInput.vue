@@ -285,18 +285,20 @@
 </script>
 
 <style lang="scss" scoped>
-  .space-input-wrapper {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(space-input-wrapper) {
     display: flex;
     align-items: center;
     flex-direction: column;
     gap: 12px;
   }
 
-  .space-visual {
+  @include b(space-visual) {
     flex-shrink: 0;
   }
 
-  .space-box {
+  @include b(space-box) {
     width: 80px;
     height: 80px;
     border: 1px dashed #dcdfe6;
@@ -306,35 +308,33 @@
     background-color: #f5f7fa;
     transition: border-color 0.2s;
 
-    /* 链接状态 - 四边都高亮 */
-    &.is-linked {
+    @include when(linked) {
       border-color: #409eff;
       border-style: solid;
     }
 
-    /* 各个方向的高亮状态 */
-    &.is-top-active {
+    @include when(top-active) {
       border-top-color: #409eff;
       border-top-style: solid;
     }
 
-    &.is-right-active {
+    @include when(right-active) {
       border-right-color: #409eff;
       border-right-style: solid;
     }
 
-    &.is-bottom-active {
+    @include when(bottom-active) {
       border-bottom-color: #409eff;
       border-bottom-style: solid;
     }
 
-    &.is-left-active {
+    @include when(left-active) {
       border-left-color: #409eff;
       border-left-style: solid;
     }
   }
 
-  .space-inner {
+  @include b(space-inner) {
     width: 40px;
     height: 40px;
     border: 1px solid #dcdfe6;
@@ -359,32 +359,32 @@
     }
   }
 
-  .space-controls {
+  @include b(space-controls) {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
 
-  .space-row {
+  @include b(space-row) {
     display: flex;
     gap: 12px;
   }
 
-  .space-item {
+  @include b(space-item) {
     display: flex;
     align-items: center;
     gap: 6px;
     flex: 1;
   }
 
-  .space-label {
+  @include b(space-label) {
     display: block;
     font-size: 12px;
     color: #606266;
   }
 
-  .space-unit-input {
+  @include b(space-unit-input) {
     flex: 1;
   }
 </style>

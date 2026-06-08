@@ -137,23 +137,25 @@
 </script>
 
 <style lang="scss" scoped>
-  .prop-input {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(prop-input) {
     flex: 1;
-  }
 
-  .prop-input::part(original) {
-    &::-webkit-inner-spin-button,
-    &::-webkit-outer-spin-button {
+    &::part(original) {
+      &::-webkit-inner-spin-button,
+      &::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      &::-ms-clear {
+        display: none;
+      }
+
       -webkit-appearance: none;
-      margin: 0;
+      -moz-appearance: textfield;
+      appearance: none;
     }
-
-    &::-ms-clear {
-      display: none;
-    }
-
-    -webkit-appearance: none;
-    -moz-appearance: textfield;
-    appearance: none;
   }
 </style>

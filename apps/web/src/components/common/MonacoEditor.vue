@@ -152,8 +152,10 @@
   })
 </script>
 
-<style scoped>
-  .monaco-editor-container {
+<style lang="scss" scoped>
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(monaco-editor-container) {
     width: 100%;
     border: 1px solid #e5e7eb;
     border-radius: 4px;

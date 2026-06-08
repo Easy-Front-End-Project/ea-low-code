@@ -24,18 +24,20 @@
 </script>
 
 <style lang="scss" scoped>
-  .loading-wrapper {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(loading-wrapper) {
     position: relative;
     height: 100%;
 
-    &__content {
+    @include e(content) {
       height: 100%;
-      &.is-loading {
+      @include when(loading) {
         pointer-events: none;
       }
     }
 
-    &__overlay {
+    @include e(overlay) {
       position: absolute;
       inset: 0;
       display: flex;
@@ -51,7 +53,7 @@
       }
     }
 
-    &__spinner {
+    @include e(spinner) {
       width: 40px;
       height: 40px;
       border: 3px solid var(--ea-border-light);
@@ -60,7 +62,7 @@
       animation: spin 1s linear infinite;
     }
 
-    &__text {
+    @include e(text) {
       font-size: 14px;
       color: var(--ea-text-secondary);
       margin: 0;
