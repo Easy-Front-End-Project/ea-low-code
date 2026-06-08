@@ -21,7 +21,6 @@
 
 <script setup lang="ts">
   import { ref, computed } from 'vue'
-  // @ts-expect-error JS module without type declarations
   import { useSchemaStore } from '@/components/designer/stores/schema'
   import { exportSchemaToJson, importSchemaFromJson } from '@/utils/schemaHelper'
   import MonacoEditor from '@/components/common/MonacoEditor.vue'
