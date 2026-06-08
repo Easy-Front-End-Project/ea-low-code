@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "dev:clean": "rimraf node_modules/.vite node_modules/.vite-temp && vite",
-    "build": "vite build",
+    "type-check": "vue-tsc --noEmit",
+    "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "lint": "run-s lint:*",
     "lint:oxlint": "oxlint . --fix",
