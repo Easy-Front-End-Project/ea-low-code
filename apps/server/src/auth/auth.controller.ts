@@ -69,8 +69,8 @@ export class AuthController {
   @ApiResponse({ status: 401, description: '未授权' })
   async getProfile(@Request() req: RequestWithUser) {
     const user = await this.authService.findById(req.user.userId)
-    const { password, ...result } = user
-    return result
+    delete user.password
+    return user
   }
 
   @Post('send-verification-code')

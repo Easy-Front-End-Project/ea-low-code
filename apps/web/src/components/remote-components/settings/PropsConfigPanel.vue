@@ -42,7 +42,6 @@
 <script setup lang="ts">
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
-  import EaSwitch from '@/components/ea-ui-wrap/EaSwitch.vue'
 
   interface PropItem {
     name?: string

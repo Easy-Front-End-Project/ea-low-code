@@ -1,4 +1,3 @@
-const generateId = () => `comp_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`
 
 export const TEMPLATES: Record<string, { name: string; schema: any }> = {
   dashboard: {

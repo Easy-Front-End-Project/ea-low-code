@@ -46,7 +46,7 @@ interface RemoteComponentItem {
   [key: string]: unknown
 }
 
-const emit = defineEmits<{
+const _emit = defineEmits<{
   'open-manager': []
 }>()
 

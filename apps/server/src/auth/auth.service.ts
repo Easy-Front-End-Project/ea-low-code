@@ -48,8 +48,8 @@ export class AuthService {
       throw new UnauthorizedException('用户名或密码错误')
     }
 
-    const { password: _, ...result } = user
-    return result
+    delete user.password
+    return user
   }
 
   /**
@@ -140,7 +140,7 @@ export class AuthService {
    * @param code - 验证码
    * @param purpose - 用途
    */
-  async verifyCode(
+  verifyCode(
     email: string,
     code: string,
     purpose: string = 'register'

@@ -371,7 +371,7 @@ export function executeFunctionCode(code: string, context: FunctionExecutionCont
     `
 
     // 创建函数，注入上下文变量
-    // eslint-disable-next-line no-new-func
+     
     const fn = new Function('$component', '$vars', '$alias', '$utils', wrappedCode) as any
 
     // 执行函数并返回结果
@@ -411,7 +411,7 @@ export function executeFunctionCodeSync(code: string, context: FunctionExecution
     `
 
     // 创建函数并执行
-    // eslint-disable-next-line no-new-func
+     
     const fn = new Function('$component', '$vars', '$alias', '$utils', wrappedCode) as any
 
     return fn(

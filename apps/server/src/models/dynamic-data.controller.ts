@@ -3,7 +3,6 @@ import {
   Post,
   Body,
   Query,
-  Get,
   UseGuards,
   ForbiddenException,
   Request as NestRequest,

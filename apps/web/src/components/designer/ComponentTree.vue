@@ -30,7 +30,7 @@
     props?: Record<string, any>
   }
 
-  const props = defineProps<{
+  const _props = defineProps<{
     visible?: boolean
   }>()
 

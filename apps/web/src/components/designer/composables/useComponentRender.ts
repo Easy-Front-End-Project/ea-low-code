@@ -4,7 +4,6 @@ import { useVariableStore } from '@/components/designer/stores/variable'
 import { executeEvent, createExecutionContext } from '@/utils/eventExecutor'
 import { resolveValue as resolveValueUtil } from '@/utils/schemaHelper'
 import type { ComponentSchema, EventConfig } from '@/utils/schemaHelper'
-import type { VariableItem } from '@/components/designer/stores/variable'
 
 interface UseComponentRenderOptions {
   skipSlot?: boolean

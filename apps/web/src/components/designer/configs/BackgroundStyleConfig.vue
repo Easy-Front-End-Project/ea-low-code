@@ -227,14 +227,6 @@
     }
   }
 
-  // 处理单位变化
-  function handleSizeUnitChange(unit: string) {
-    sizeUnit.value = unit
-    if (localCustomBackgroundSize.value) {
-      emit('style-change', 'backgroundSize', `${localCustomBackgroundSize.value}${unit}`, 'inline')
-    }
-  }
-
   function handleInlineStyleChange(styleName: string, value: any) {
     emit('style-change', styleName, value, 'inline')
   }

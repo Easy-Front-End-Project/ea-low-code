@@ -43,7 +43,6 @@
 
 <script setup lang="ts">
   import { ref, reactive, watch, computed } from 'vue'
-  import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
 
   interface FieldItem {

@@ -14,7 +14,7 @@
   import { useDesignerInit } from '@/components/designer/composables/useDesignerInit'
 
   const route = useRoute()
-  const { isLoading, isDirty, triggerAutoSave, loadPageSchema, getLeaveGuard } = useDesignerInit(
+  const { isLoading, isDirty, triggerAutoSave: _triggerAutoSave, loadPageSchema, getLeaveGuard } = useDesignerInit(
     route.params.id
   )
 

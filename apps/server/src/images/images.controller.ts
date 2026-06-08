@@ -17,8 +17,6 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { ImagesService } from './images.service'
 import { CreateImageGroupDto } from './dto/create-image-group.dto'
 import { DeleteImageGroupDto } from './dto/delete-image-group.dto'
-import { diskStorage } from 'multer'
-import { extname } from 'path'
 
 @ApiTags('图片管理')
 @Controller('images')

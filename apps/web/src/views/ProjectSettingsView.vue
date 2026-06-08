@@ -242,7 +242,7 @@
 
     try {
       await pagesStore.fetchPages(id)
-    } catch (error) {
+    } catch {
       window.$message?.error('加载页面列表失败')
     }
   }

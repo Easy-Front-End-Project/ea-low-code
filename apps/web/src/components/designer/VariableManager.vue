@@ -368,7 +368,7 @@ return Date.now() + 60 * 60 * 24 * 7 * 1000;`
       variableStore.updateVariable(editingVariableId.value, { defaultValue: parsedValue })
 
       handleCloseEditor()
-    } catch (error) {
+    } catch {
       alert('JSON 格式错误，请检查输入')
     }
   }

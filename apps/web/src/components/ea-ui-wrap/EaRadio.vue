@@ -12,7 +12,7 @@
 <script setup lang="ts">
   import { ref } from 'vue'
 
-  const props = withDefaults(defineProps<{
+  const _props = withDefaults(defineProps<{
     value?: string | number | boolean
     disabled?: boolean
     name?: string

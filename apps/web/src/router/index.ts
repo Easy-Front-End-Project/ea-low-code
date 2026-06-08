@@ -106,7 +106,7 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach(async (to, from) => {
+router.beforeEach(async (to, _from) => {
   const userStore = useUserStore()
   const hasToken = !!getToken()
 
@@ -119,7 +119,7 @@ router.beforeEach(async (to, from) => {
   if (hasToken && !userStore.user) {
     try {
       await userStore.fetchProfile()
-    } catch (error) {
+    } catch {
       // fetchProfile failed silently
     }
   }

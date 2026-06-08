@@ -5,7 +5,7 @@ import { defineStore } from 'pinia'
  * 组件实例类型
  * 可能是 HTMLElement、Vue 组件实例、或 Ref 包装的对象
  */
-type ComponentInstance = HTMLElement | Record<string, any> // eslint-disable-line @typescript-eslint/no-explicit-any
+type ComponentInstance = HTMLElement | Record<string, any>  
 
 /**
  * 组件实例管理器
@@ -53,8 +53,8 @@ export const useComponentInstanceStore = defineStore('componentInstance', () => 
   function getComponentElement(componentId: string): HTMLElement | null {
     const instance = instanceMap.value.get(componentId)
     if (!instance) return null
-    if ((instance as any)._isRef || (instance as any).__v_isRef) { // eslint-disable-line @typescript-eslint/no-explicit-any
-      return (instance as any).value // eslint-disable-line @typescript-eslint/no-explicit-any
+    if ((instance as any)._isRef || (instance as any).__v_isRef) {  
+      return (instance as any).value  
     }
     return instance as HTMLElement
   }
@@ -74,14 +74,14 @@ export const useComponentInstanceStore = defineStore('componentInstance', () => 
     }
 
     // 直接调用方法
-    if (typeof (element as any)[methodName] === 'function') { // eslint-disable-line @typescript-eslint/no-explicit-any
-      return (element as any)[methodName](...args) // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (typeof (element as any)[methodName] === 'function') {  
+      return (element as any)[methodName](...args)  
     }
 
     // 尝试调用 setXXX 方法（设置属性）
     if (methodName.startsWith('set')) {
       const propName = methodName.replace('set', '').toLowerCase()
-      ;(element as any)[propName] = args[0] // eslint-disable-line @typescript-eslint/no-explicit-any
+      ;(element as any)[propName] = args[0]  
       return true
     }
 
@@ -103,7 +103,7 @@ export const useComponentInstanceStore = defineStore('componentInstance', () => 
       return false
     }
 
-    ;(element as any)[propName] = value // eslint-disable-line @typescript-eslint/no-explicit-any
+    ;(element as any)[propName] = value  
     return true
   }
 
@@ -120,7 +120,7 @@ export const useComponentInstanceStore = defineStore('componentInstance', () => 
       return undefined
     }
 
-    return (element as any)[propName] // eslint-disable-line @typescript-eslint/no-explicit-any
+    return (element as any)[propName]  
   }
 
   /**

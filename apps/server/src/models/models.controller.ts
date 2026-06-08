@@ -72,7 +72,7 @@ export class ModelsController {
   @Post('fields/update')
   async updateField(@Body() dto: UpdateFieldDto) {
     const { id, ...data } = dto
-    return await this.modelsService.updateField(id, data as Partial<UpdateFieldDto>)
+    return await this.modelsService.updateField(id, data)
   }
 
   @Post('fields/delete')

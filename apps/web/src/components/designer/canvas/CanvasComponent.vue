@@ -173,7 +173,7 @@
 
   /** 组件内部样式（排除定位相关属性） */
   const componentInnerStyle = computed(() => {
-    // eslint-disable-next-line no-unused-vars
+     
     const { position, top, right, bottom, left, zIndex, overflow, ...restStyle } =
       props.component.style || {}
     return { ...restStyle, ...props.component.cssVariables }

@@ -6,7 +6,6 @@ import { DynamicModel } from './entities/dynamic-model.entity'
 import { ModelField } from './entities/model-field.entity'
 import { CreateModelDto } from './dto/create-model.dto'
 import { CreateFieldDto } from './dto/create-field.dto'
-import { UpdateFieldDto } from './dto/update-field.dto'
 
 const FIELD_TYPE_MAP: Record<string, string> = {
   text: 'varchar',

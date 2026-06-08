@@ -184,7 +184,7 @@
       })
       const data = await res.json()
       window.$message?.success(`共 ${data.length || 0} 条数据`)
-    } catch (e) {
+    } catch {
       window.$message?.error('获取数据失败')
     }
   }

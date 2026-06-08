@@ -12,7 +12,7 @@
 <script setup lang="ts">
   import router from '@/router'
 
-  const emit = defineEmits<{
+  const _emit = defineEmits<{
     (e: 'click'): void
   }>()
 

@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, Like, In } from 'typeorm'
+import { Repository } from 'typeorm'
 import { ConfigService } from '@nestjs/config'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -209,7 +209,7 @@ export class ImagesService {
       await this.updateGroupImageCount(groupId, 1)
     }
 
-    return this.formatImage(savedImage as Image)
+    return this.formatImage(savedImage)
   }
 
   async deleteImage(id: number) {

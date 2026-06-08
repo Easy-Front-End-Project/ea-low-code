@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, In } from 'typeorm'
+import { Repository } from 'typeorm'
 import { Project } from './entities/project.entity'
 import { PageSchema } from './entities/page-schema.entity'
 import { CreateProjectDto } from './dto/create-project.dto'

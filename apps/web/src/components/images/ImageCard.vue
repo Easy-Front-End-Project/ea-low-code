@@ -126,7 +126,7 @@
         await customElements.whenDefined('ea-image-preview')
         const list = props.previewList.length > 0 ? props.previewList : [imageUrl.value]
         imageRef.value.previewSrcList = list
-      } catch (e) {
+      } catch {
         // 预览组件不可用时静默失败
       }
     }
@@ -157,7 +157,7 @@
     try {
       document.execCommand('copy')
       window.$message?.success('地址已复制到剪贴板')
-    } catch (e) {
+    } catch {
       window.$message?.error('复制失败，请手动复制')
     }
     document.body.removeChild(textarea)

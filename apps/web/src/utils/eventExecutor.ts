@@ -82,7 +82,7 @@ export function createExecutionContext(): ExecutionContext {
         }
         try {
           // 创建函数执行上下文
-          // eslint-disable-next-line no-new-func
+           
           const fn = new Function(
             '$component',
             '$vars',
@@ -200,7 +200,7 @@ export function executeCustomCode(code: string, context: ExecutionContext, origi
       ${code}
     `
 
-    // eslint-disable-next-line no-new-func
+     
     const fn = new Function('event', '$component', '$vars', '$alias', wrappedCode) as any
     fn(originalEvent, $component, $vars, $alias)
   } catch (error) {

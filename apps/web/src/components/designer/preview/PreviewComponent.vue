@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref, onMounted, shallowRef, toRef, type Ref } from 'vue'
+  import { computed, ref, onMounted, shallowRef, toRef } from 'vue'
   import { getRemoteComponentMetaList } from '@/components/designer/constants/componentMeta'
   import { loadRemoteComponent } from '@/utils/loadRemoteComponent'
   import { useComponentInstance } from '@/components/designer/composables/useComponentInstance'
