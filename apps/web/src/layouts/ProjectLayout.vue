@@ -59,10 +59,10 @@
   </ea-container>
 </template>
 
-<script setup>
-  import { ref, computed } from 'vue'
+<script setup lang="ts">
+  import { computed } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { useUserStore } from '@/stores/user.js'
+  import { useUserStore } from '@/stores/user'
   import EaLogo from '@/components/common/EaLogo.vue'
 
   const route = useRoute()
@@ -70,7 +70,7 @@
   const userStore = useUserStore()
   // 当前激活的菜单
   const activeMenu = computed(() => {
-    const pathMap = {
+    const pathMap: Record<string, string> = {
       '/': 'home',
       '/projects': 'projects',
       '/components': 'components',
@@ -95,12 +95,12 @@
 
   // 用户头像文字
   const avatarText = computed(() => {
-    const username = userStore.user?.username
+    const username = userStore.user?.username as string | undefined
     return username?.charAt(0)?.toUpperCase() || 'U'
   })
 
   // 菜单选择
-  function handleMenuSelect({ detail }) {
+  function handleMenuSelect({ detail }: { detail: { index: string } }) {
     const { index } = detail
 
     if (index === 'logout') {
@@ -109,7 +109,7 @@
       return
     }
 
-    const routeMap = {
+    const routeMap: Record<string, string> = {
       home: '/',
       projects: '/projects',
       components: '/components',
