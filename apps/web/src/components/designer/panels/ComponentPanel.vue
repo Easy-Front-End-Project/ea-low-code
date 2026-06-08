@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="component-panel">
     <!-- 搜索框 -->
     <div class="component-panel__search">
@@ -81,38 +81,62 @@
   </div>
 </template>
 
-<script setup>
-  import { ref, computed, onMounted, watch } from 'vue'
+<script setup lang="ts">
+  import { ref, computed, watch } from 'vue'
+  // @ts-expect-error JS module without type declarations
   import { getCategories, getComponentsByParentGroup } from '@/components/designer/constants/componentMeta'
+  // @ts-expect-error JS module without type declarations
   import { ComponentCategories } from '@/components/designer/constants/types'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
-  const searchQuery = ref('')
-  const expandedCategories = ref([])
+  interface ComponentGroup {
+    parentType: string
+    parentName: string
+    components: ComponentItem[]
+  }
 
-  const hiddenChildComponentsInPanel = [
+  interface ComponentItem {
+    type: string
+    name: string
+    isChildComponent?: boolean
+    isService?: boolean
+    [key: string]: unknown
+  }
+
+  interface CategoryWithGroups {
+    key: string
+    value: string
+    label: string
+    groups: ComponentGroup[]
+    componentCount: number
+  }
+
+  const searchQuery = ref('')
+  const expandedCategories = ref<string[]>([])
+
+  const hiddenChildComponentsInPanel: string[] = [
     'ea-option',
     'ea-option-group',
     'ea-dropdown-item',
     'ea-dropdown-menu',
   ]
 
-  const categories = computed(() => {
-    const cats = getCategories().filter(cat => cat.value !== ComponentCategories.REMOTE)
+  const categories = computed<CategoryWithGroups[]>(() => {
+    const cats = (getCategories() as Array<{ key: string; value: string; label: string }>).filter(cat => cat.value !== ComponentCategories.REMOTE)
 
     return cats.map(cat => {
       const groups = getComponentsByParentGroup(cat.value)
-        .map(group => ({
+        .map((group: any) => ({
           ...group,
-          components: group.components.filter(
+          components: (group.components as ComponentItem[]).filter(
             comp =>
               (!comp.isChildComponent || !hiddenChildComponentsInPanel.includes(comp.type)) &&
               !comp.isService
           ),
         }))
-        .filter(group => group.components.length > 0)
+        .filter((group: any) => group.components.length > 0)
 
-      const componentCount = groups.reduce((sum, group) => sum + group.components.length, 0)
+      const componentCount = groups.reduce((sum: number, group: ComponentGroup) => sum + group.components.length, 0)
 
       return {
         ...cat,
@@ -122,7 +146,7 @@
     })
   })
 
-  const filteredCategories = computed(() => {
+  const filteredCategories = computed<CategoryWithGroups[]>(() => {
     if (!searchQuery.value.trim()) {
       return categories.value
     }
@@ -144,26 +168,26 @@
       .filter(cat => cat.groups.length > 0)
       .map(cat => ({
         ...cat,
-        componentCount: cat.groups.reduce((sum, group) => sum + group.components.length, 0),
+        componentCount: cat.groups.reduce((sum: number, group: ComponentGroup) => sum + group.components.length, 0),
       }))
   })
 
   // 监听分类变化，自动展开
   watch(
     () => filteredCategories.value,
-    cats => {
+    (cats: CategoryWithGroups[]) => {
       expandedCategories.value = cats.map(cat => cat.key)
     },
     { immediate: true }
   )
 
-  function handleCollapseChange(e) {
+  function handleCollapseChange(e: CustomEvent<{ active: string[] }>) {
     expandedCategories.value = e.detail.active
   }
 
-  function handleDragStart(event, component) {
-    event.dataTransfer.setData('application/json', JSON.stringify(component))
-    event.dataTransfer.effectAllowed = 'copy'
+  function handleDragStart(event: DragEvent, component: ComponentItem) {
+    event.dataTransfer!.setData('application/json', JSON.stringify(component))
+    event.dataTransfer!.effectAllowed = 'copy'
   }
 </script>
 

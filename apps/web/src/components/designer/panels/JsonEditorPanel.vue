@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="json-editor-panel h-full flex flex-col">
     <!-- JSON 编辑器工具栏 -->
     <div class="json-editor-toolbar">
@@ -19,19 +19,21 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, computed } from 'vue'
+  // @ts-expect-error JS module without type declarations
   import { useSchemaStore } from '@/components/designer/stores/schema'
+  // @ts-expect-error JS module without type declarations
   import { exportSchemaToJson, importSchemaFromJson } from '@/utils/schemaHelper'
   import MonacoEditor from '@/components/common/MonacoEditor.vue'
   import Loading from '@/components/common/Loading.vue'
 
   const schemaStore = useSchemaStore()
-  const fileInput = ref(null)
+  const fileInput = ref<HTMLInputElement | null>(null)
 
   const jsonContent = computed({
     get: () => JSON.stringify(schemaStore.pageSchema, null, 2),
-    set: val => {
+    set: (val: string) => {
       try {
         schemaStore.importSchema(JSON.parse(val))
       } catch {
@@ -56,14 +58,15 @@
     fileInput.value?.click()
   }
 
-  function handleFileChange(event) {
-    const file = event.target.files[0]
+  function handleFileChange(event: Event) {
+    const target = event.target as HTMLInputElement
+    const file = target.files?.[0]
     if (!file) return
 
     const reader = new FileReader()
-    reader.onload = e => {
+    reader.onload = (e: ProgressEvent<FileReader>) => {
       try {
-        const json = e.target.result
+        const json = e.target?.result as string
         const schema = importSchemaFromJson(json)
         if (schema) {
           schemaStore.importSchema(schema)
@@ -71,12 +74,12 @@
         } else {
           alert('Schema 解析失败，请检查文件格式。')
         }
-      } catch (error) {
+      } catch (error: any) {
         alert('文件读取失败：' + error.message)
       }
     }
     reader.readAsText(file)
-    event.target.value = ''
+    target.value = ''
   }
 </script>
 

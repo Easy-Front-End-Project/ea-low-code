@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="page-settings-panel flex flex-col h-full w-full">
     <!-- 内容区域 -->
     <div class="flex-1 overflow-y-auto p-y-4">
@@ -48,22 +48,28 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, watch, computed } from 'vue'
+  // @ts-expect-error JS module without type declarations
   import { useSchemaStore } from '@/components/designer/stores/schema'
   import { usePagesStore } from '@/stores/pages'
   import { useRoute } from 'vue-router'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
+  interface PageMeta {
+    title: string
+    description: string
+  }
+
   const schemaStore = useSchemaStore()
   const pagesStore = usePagesStore()
   const route = useRoute()
 
-  const currentPageId = computed(() => route.params.id)
+  const currentPageId = computed(() => route.params.id as string | undefined)
   const isSaving = ref(false)
 
   // 页面元信息
-  const pageMeta = ref({
+  const pageMeta = ref<PageMeta>({
     title: '',
     description: '',
   })
@@ -71,15 +77,10 @@
   // 是否使用项目默认配置
   const useProjectDefault = ref(true)
 
-  // 计算是否继承项目默认
-  // const isBacktopInherited = computed(() => {
-  //   return useProjectDefault.value
-  // })
-
   // 从 schema 同步页面元信息
   watch(
     () => schemaStore.pageSchema.meta,
-    newMeta => {
+    (newMeta: any) => {
       if (newMeta) {
         pageMeta.value = {
           title: newMeta.title || '',
@@ -93,7 +94,7 @@
   // 从 schema 同步页面设置
   watch(
     () => schemaStore.pageSchema.settings,
-    newSettings => {
+    (newSettings: any) => {
       if (newSettings?.backtop && Object.keys(newSettings.backtop).length > 0) {
         useProjectDefault.value = false
       } else {
@@ -120,21 +121,14 @@
           name: pageMeta.value.title,
           description: pageMeta.value.description,
         })
-        window.$message?.success('页面信息已保存')
-      } catch (error) {
-        window.$message?.error('保存失败: ' + (error.message || '未知错误'))
+        ;(window as any).$message?.success('页面信息已保存')
+      } catch (error: any) {
+        ;(window as any).$message?.error('保存失败: ' + (error.message || '未知错误'))
       } finally {
         isSaving.value = false
       }
     }
   }
-
-  // 处理继承切换
-  // function handleInheritChange() {
-  //   if (useProjectDefault.value) {
-  //     schemaStore.updatePageSettings({ backtop: undefined })
-  //   }
-  // }
 </script>
 
 <style scoped>

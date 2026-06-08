@@ -33,18 +33,28 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRemoteComponentStore } from '@/stores/designer/remoteComponent'
 import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
-const emit = defineEmits(['open-manager'])
+interface RemoteComponentItem {
+  type: string
+  name: string
+  icon?: string
+  isRemote?: boolean
+  [key: string]: unknown
+}
+
+const emit = defineEmits<{
+  'open-manager': []
+}>()
 
 const remoteStore = useRemoteComponentStore()
 const searchQuery = ref('')
 
-const filteredComponents = computed(() => {
-  const list = remoteStore.enabledComponentMetaList
+const filteredComponents = computed<RemoteComponentItem[]>(() => {
+  const list = remoteStore.enabledComponentMetaList as RemoteComponentItem[]
   if (!searchQuery.value.trim()) return list
 
   const query = searchQuery.value.toLowerCase()
@@ -55,13 +65,13 @@ const filteredComponents = computed(() => {
   )
 })
 
-function handleDragStart(event, component) {
-  event.dataTransfer.setData('application/json', JSON.stringify(component))
-  event.dataTransfer.effectAllowed = 'copy'
+function handleDragStart(event: DragEvent, component: RemoteComponentItem) {
+  event.dataTransfer!.setData('application/json', JSON.stringify(component))
+  event.dataTransfer!.effectAllowed = 'copy'
 }
 
 onMounted(() => {
-  if (!remoteStore.isLoaded) remoteStore.loadConfig()
+  remoteStore.loadConfig()
 })
 </script>
 
