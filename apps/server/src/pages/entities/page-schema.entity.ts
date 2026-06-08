@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Project } from './project.entity';
+import type { PageSchema as PageSchemaType } from '@ea-low-code/shared';
 
 @Entity('page_schemas')
 export class PageSchema {
@@ -26,7 +27,7 @@ export class PageSchema {
 
   @ApiProperty({ description: '页面 Schema（组件树 JSON）', required: false })
   @Column({ type: 'json', nullable: true })
-  schema?: Record<string, any>;
+  schema?: PageSchemaType;
 
   @ApiProperty({ description: '排序顺序', default: 0 })
   @Column({ default: 0 })
