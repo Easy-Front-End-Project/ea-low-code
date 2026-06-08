@@ -41,30 +41,53 @@
   </ea-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, reactive, watch, computed } from 'vue'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
 
-  const props = defineProps({
-    visible: { type: Boolean, default: false },
-    fields: { type: Array, default: () => [] },
-    sortRule: { type: Object, default: null },
-    existingFieldIds: { type: Array, default: () => [] },
+  interface FieldItem {
+    id: number
+    fieldName: string
+    fieldLabel: string
+  }
+
+  interface SortRule {
+    id?: number
+    fieldId?: number
+    fieldName?: string
+    fieldLabel?: string
+    sortType?: string
+  }
+
+  interface Props {
+    visible?: boolean
+    fields?: FieldItem[]
+    sortRule?: SortRule | null
+    existingFieldIds?: number[]
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    fields: () => [],
+    sortRule: null,
+    existingFieldIds: () => [],
   })
 
-  const emit = defineEmits(['update:visible', 'success'])
+  const emit = defineEmits<{
+    'update:visible': [val: boolean]
+    'success': [data: Record<string, any>]
+  }>()
 
   const isEdit = ref(false)
 
   const form = reactive({
-    fieldId: undefined,
+    fieldId: undefined as number | undefined,
     fieldName: '',
     fieldLabel: '',
     sortType: 'default',
   })
 
-  const SORT_TYPE_LABELS = {
+  const SORT_TYPE_LABELS: Record<string, string> = {
     default: '默认',
     asc: '升序',
     desc: '降序',
@@ -84,7 +107,7 @@
     isEdit.value = false
   }
 
-  function handleFieldChange(fieldId) {
+  function handleFieldChange(fieldId: any) {
     const field = (props.fields || []).find(f => f.id === fieldId)
     if (field) {
       form.fieldName = field.fieldName
@@ -94,7 +117,7 @@
 
   watch(
     () => props.visible,
-    val => {
+    (val: boolean) => {
       if (val) {
         if (props.sortRule) {
           isEdit.value = true
@@ -122,7 +145,7 @@
     }
 
     const selectedField = (props.fields || []).find(f => f.id === form.fieldId)
-    const data = {
+    const data: Record<string, any> = {
       fieldId: form.fieldId,
       fieldName: selectedField?.fieldName || form.fieldName,
       fieldLabel: selectedField?.fieldLabel || form.fieldLabel,

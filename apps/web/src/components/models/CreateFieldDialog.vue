@@ -64,19 +64,38 @@
   </ea-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, reactive, watch } from 'vue'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
   import EaSwitch from '@/components/ea-ui-wrap/EaSwitch.vue'
 
-  const props = defineProps({
-    visible: { type: Boolean, default: false },
-    modelId: { type: Number, default: null },
-    field: { type: Object, default: null },
+  interface FieldItem {
+    id?: number
+    fieldLabel?: string
+    fieldName?: string
+    fieldType?: string
+    isNullable?: boolean
+    isUnique?: boolean
+    sortOrder?: number
+  }
+
+  interface Props {
+    visible?: boolean
+    modelId?: number | null
+    field?: FieldItem | null
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    visible: false,
+    modelId: null,
+    field: null,
   })
 
-  const emit = defineEmits(['update:visible', 'success'])
+  const emit = defineEmits<{
+    'update:visible': [val: boolean]
+    'success': [data: Record<string, any>]
+  }>()
 
   const isEdit = ref(false)
 
@@ -86,7 +105,7 @@
     fieldType: 'text',
     isNullable: false,
     isUnique: false,
-    sortOrder: undefined,
+    sortOrder: undefined as number | undefined,
   })
 
   function resetForm() {
@@ -101,7 +120,7 @@
 
   watch(
     () => props.visible,
-    val => {
+    (val: boolean) => {
       if (val) {
         if (props.field) {
           isEdit.value = true
@@ -134,7 +153,7 @@
       return
     }
 
-    const data = {
+    const data: Record<string, any> = {
       modelId: props.modelId,
       fieldLabel: form.fieldLabel.trim(),
       fieldName: form.fieldName.trim(),

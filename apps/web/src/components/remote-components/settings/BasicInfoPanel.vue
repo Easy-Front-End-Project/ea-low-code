@@ -69,22 +69,33 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 import EaSwitch from '@/components/ea-ui-wrap/EaSwitch.vue'
 
-const props = defineProps({
-  form: {
-    type: Object,
-    required: true,
-  },
-  computedFullUrl: {
-    type: String,
-    default: '',
-  },
+interface FormData {
+  name: string
+  url: string
+  exportName?: string
+  type?: string
+  icon?: string
+  styleUrl?: string
+  enabled?: boolean
+  description?: string
+}
+
+interface Props {
+  form: FormData
+  computedFullUrl?: string
+}
+
+withDefaults(defineProps<Props>(), {
+  computedFullUrl: '',
 })
 
-defineEmits(['select-preset'])
+defineEmits<{
+  'select-preset': []
+}>()
 </script>
 
 <style lang="scss" scoped>

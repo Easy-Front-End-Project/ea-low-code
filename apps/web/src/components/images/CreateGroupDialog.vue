@@ -45,19 +45,22 @@
   </ea-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { reactive, ref, watch } from 'vue'
 import { createImageGroup } from '@/api/images'
 import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
-const props = defineProps({
-  visible: {
-    type: Boolean,
-    default: false,
-  },
-})
+interface Props {
+  visible?: boolean
+}
 
-const emit = defineEmits(['update:visible', 'success', 'close'])
+const props = defineProps<Props>()
+
+const emit = defineEmits<{
+  'update:visible': [val: boolean]
+  'success': []
+  'close': []
+}>()
 
 const submitting = ref(false)
 
@@ -68,14 +71,14 @@ const formData = reactive({
 
 watch(
   () => props.visible,
-  val => {
+  (val: boolean) => {
     if (val) {
       resetForm()
     }
   }
 )
 
-function handleVisibleChange(val) {
+function handleVisibleChange(val: boolean) {
   emit('update:visible', val)
 }
 
@@ -101,7 +104,7 @@ async function handleSubmit() {
     window.$message?.success('创建成功')
     emit('success')
     handleClose()
-  } catch (error) {
+  } catch (error: any) {
     console.error('创建分组失败:', error)
     const message = error.response?.data?.message || error.message || '创建失败'
     window.$message?.error(message)

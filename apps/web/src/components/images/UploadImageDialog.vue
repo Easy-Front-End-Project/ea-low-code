@@ -101,45 +101,58 @@
   </ea-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, reactive, watch } from 'vue'
   import { uploadImage } from '@/api/images'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
 
-  const props = defineProps({
-    visible: {
-      type: Boolean,
-      default: false,
-    },
-    groupOptions: {
-      type: Array,
-      default: () => [],
-    },
+  interface GroupOption {
+    id: number
+    name: string
+  }
+
+  interface SelectedFileItem {
+    file: File
+    preview: string
+    customName: string
+  }
+
+  interface Props {
+    visible?: boolean
+    groupOptions?: GroupOption[]
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    groupOptions: () => [],
   })
 
-  const emit = defineEmits(['update:visible', 'success', 'close'])
+  const emit = defineEmits<{
+    'update:visible': [val: boolean]
+    'success': []
+    'close': []
+  }>()
 
-  const fileInputRef = ref(null)
-  const selectedFiles = ref([])
+  const fileInputRef = ref<HTMLInputElement | null>(null)
+  const selectedFiles = ref<SelectedFileItem[]>([])
   const isDragOver = ref(false)
   const uploading = ref(false)
 
   const formData = reactive({
-    groupId: null,
+    groupId: undefined as number | undefined,
     alt: '',
   })
 
   watch(
     () => props.visible,
-    val => {
+    (val: boolean) => {
       if (val) {
         resetForm()
       }
     }
   )
 
-  function handleVisibleChange(val) {
+  function handleVisibleChange(val: boolean) {
     emit('update:visible', val)
   }
 
@@ -155,19 +168,20 @@
     isDragOver.value = false
   }
 
-  function handleDrop(e) {
+  function handleDrop(e: DragEvent) {
     isDragOver.value = false
-    const files = Array.from(e.dataTransfer.files)
+    const files = Array.from(e.dataTransfer!.files)
     addFiles(files)
   }
 
-  function handleFileChange(event) {
-    const files = Array.from(event.target.files)
+  function handleFileChange(event: Event) {
+    const target = event.target as HTMLInputElement
+    const files = Array.from(target.files || [])
     addFiles(files)
-    event.target.value = ''
+    target.value = ''
   }
 
-  function addFiles(files) {
+  function addFiles(files: File[]) {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
     const maxSize = 10 * 1024 * 1024 // 10MB
 
@@ -187,7 +201,7 @@
     })
   }
 
-  function removeFile(index) {
+  function removeFile(index: number) {
     const removed = selectedFiles.value.splice(index, 1)[0]
     if (removed.preview) {
       URL.revokeObjectURL(removed.preview)
@@ -257,12 +271,12 @@
       }
     })
     selectedFiles.value = []
-    formData.groupId = null
+    formData.groupId = undefined
     formData.alt = ''
     uploading.value = false
   }
 
-  function formatSize(bytes) {
+  function formatSize(bytes?: number): string {
     if (!bytes) return '0 B'
     const units = ['B', 'KB', 'MB']
     let size = bytes

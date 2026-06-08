@@ -34,30 +34,34 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref } from 'vue'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
-  defineProps({
-    componentCount: {
-      type: Number,
-      default: 0,
-    },
-    enabledCount: {
-      type: Number,
-      default: 0,
-    },
-    urlPresetCount: {
-      type: Number,
-      default: 0,
-    },
-    defaultUrlPreset: {
-      type: Object,
-      default: null,
-    },
+  interface UrlPreset {
+    name?: string
+  }
+
+  interface Props {
+    componentCount?: number
+    enabledCount?: number
+    urlPresetCount?: number
+    defaultUrlPreset?: UrlPreset | null
+  }
+
+  withDefaults(defineProps<Props>(), {
+    componentCount: 0,
+    enabledCount: 0,
+    urlPresetCount: 0,
+    defaultUrlPreset: null,
   })
 
-  const emit = defineEmits(['search', 'create', 'refresh', 'manage-presets'])
+  const emit = defineEmits<{
+    'search': [keyword: string]
+    'create': []
+    'refresh': []
+    'manage-presets': []
+  }>()
 
   const localKeyword = ref('')
 

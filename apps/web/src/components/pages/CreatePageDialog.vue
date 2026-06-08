@@ -36,23 +36,24 @@
   </ea-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, computed, watch } from 'vue'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
-  import { usePagesStore } from '@/stores/pages.js'
+  import { usePagesStore } from '@/stores/pages'
 
-  const props = defineProps({
-    visible: {
-      type: Boolean,
-      default: false,
-    },
-    projectId: {
-      type: [Number, String],
-      default: null,
-    },
+  interface Props {
+    visible?: boolean
+    projectId?: number | string | null
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    visible: false,
+    projectId: null,
   })
 
-  const emit = defineEmits(['update:visible'])
+  const emit = defineEmits<{
+    'update:visible': [val: boolean]
+  }>()
   const pagesStore = usePagesStore()
 
   const loading = ref(false)
@@ -71,7 +72,7 @@
     }
   }
 
-  function handleVisibleChange(val) {
+  function handleVisibleChange(val: boolean) {
     emit('update:visible', val)
   }
 
@@ -92,7 +93,7 @@
       })
       window.$message?.success('创建成功')
       handleClose()
-    } catch (error) {
+    } catch (error: any) {
       window.$message?.error(error.message || '创建失败')
     } finally {
       loading.value = false
@@ -101,7 +102,7 @@
 
   watch(
     () => props.visible,
-    val => {
+    (val: boolean) => {
       if (val) {
         resetForm()
       }

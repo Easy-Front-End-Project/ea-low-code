@@ -28,17 +28,27 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
-  defineProps({
-    slots: {
-      type: Array,
-      default: () => [],
-    },
+  interface SlotItem {
+    name?: string
+    label?: string
+    description?: string
+  }
+
+  interface Props {
+    slots?: SlotItem[]
+  }
+
+  withDefaults(defineProps<Props>(), {
+    slots: () => [],
   })
 
-  defineEmits(['add', 'remove'])
+  defineEmits<{
+    'add': []
+    'remove': [index: number]
+  }>()
 </script>
 
 <style lang="scss" scoped>

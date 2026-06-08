@@ -39,20 +39,40 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed, ref } from 'vue'
   import CreateSortDialog from './CreateSortDialog.vue'
 
-  const props = defineProps({
-    fields: { type: Array, default: () => [] },
-    allFields: { type: Array, default: () => [] },
-    sortRules: { type: Array, default: () => [] },
+  interface SortRule {
+    id?: number
+    fieldId?: number
+    fieldName?: string
+    fieldLabel?: string
+    sortType?: string
+    sortTypeLabel?: string
+  }
+
+  interface Props {
+    fields?: any[]
+    allFields?: any[]
+    sortRules?: SortRule[]
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    fields: () => [],
+    allFields: () => [],
+    sortRules: () => [],
   })
 
-  const emit = defineEmits(['add-sort', 'update-sort', 'delete-sort', 'refresh'])
+  const emit = defineEmits<{
+    'add-sort': [rule: any]
+    'update-sort': [rule: any]
+    'delete-sort': [rule: SortRule]
+    'refresh': []
+  }>()
 
   const showDialog = ref(false)
-  const editingRule = ref(null)
+  const editingRule = ref<SortRule | null>(null)
 
   const tableData = computed(() => {
     return (props.sortRules || []).map(rule => ({
@@ -67,7 +87,7 @@
     return (props.sortRules || [])
       .filter(r => r !== editingRule.value)
       .map(r => r.fieldId)
-      .filter(Boolean)
+      .filter(Boolean) as number[]
   })
 
   function handleAdd() {
@@ -75,12 +95,12 @@
     showDialog.value = true
   }
 
-  async function handleCellClick(e) {
+  async function handleCellClick(e: CustomEvent) {
     if (!e?.detail) return
     const { target, rowData } = e.detail
     if (!target || !rowData?._raw) return
     const action = target.getAttribute('data-action')
-    const rawRule = rowData._raw
+    const rawRule: SortRule = rowData._raw
     if (action === 'edit') {
       editingRule.value = rawRule
       showDialog.value = true
@@ -98,7 +118,7 @@
     }
   }
 
-  function handleSuccess(data) {
+  function handleSuccess(data: Record<string, any>) {
     if (editingRule.value) {
       emit('update-sort', Object.assign({}, data, { id: editingRule.value.id }))
     } else {

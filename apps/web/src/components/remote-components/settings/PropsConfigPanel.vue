@@ -39,19 +39,31 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
   import EaSwitch from '@/components/ea-ui-wrap/EaSwitch.vue'
 
-  defineProps({
-    props: {
-      type: Array,
-      default: () => [],
-    },
+  interface PropItem {
+    name?: string
+    label?: string
+    type?: string
+    defaultValue?: string
+    required?: boolean
+  }
+
+  interface Props {
+    props?: PropItem[]
+  }
+
+  withDefaults(defineProps<Props>(), {
+    props: () => [],
   })
 
-  defineEmits(['add', 'remove'])
+  defineEmits<{
+    'add': []
+    'remove': [index: number]
+  }>()
 </script>
 
 <style lang="scss" scoped>

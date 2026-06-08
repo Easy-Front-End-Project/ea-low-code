@@ -37,16 +37,30 @@
   </ea-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, reactive, watch } from 'vue'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
-  const props = defineProps({
-    visible: { type: Boolean, default: false },
-    model: { type: Object, default: null },
+  interface ModelItem {
+    id?: number
+    name?: string
+    description?: string
+  }
+
+  interface Props {
+    visible?: boolean
+    model?: ModelItem | null
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    visible: false,
+    model: null,
   })
 
-  const emit = defineEmits(['update:visible', 'success'])
+  const emit = defineEmits<{
+    'update:visible': [val: boolean]
+    'success': [data: Record<string, any>]
+  }>()
 
   const isEdit = ref(false)
 
@@ -63,7 +77,7 @@
 
   watch(
     () => props.visible,
-    val => {
+    (val: boolean) => {
       if (val) {
         if (props.model) {
           isEdit.value = true
@@ -88,7 +102,7 @@
       return
     }
 
-    const data = {
+    const data: Record<string, any> = {
       name: form.name.trim(),
       description: form.description.trim(),
     }

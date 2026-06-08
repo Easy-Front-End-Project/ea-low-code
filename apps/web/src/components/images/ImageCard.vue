@@ -79,23 +79,36 @@
   </ea-card>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed, ref, onMounted, nextTick } from 'vue'
 
-  const props = defineProps({
-    image: {
-      type: Object,
-      required: true,
-    },
-    previewList: {
-      type: Array,
-      default: () => [],
-    },
+  interface ImageItem {
+    url?: string
+    filename: string
+    alt?: string
+    size?: number
+    mimeType?: string
+    createdAt?: string
+    group?: { name: string } | null
+  }
+
+  interface Props {
+    image: ImageItem
+    previewList?: string[]
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    previewList: () => [],
   })
 
-  defineEmits(['preview', 'download', 'edit', 'delete'])
+  defineEmits<{
+    'preview': [image: ImageItem]
+    'download': [image: ImageItem]
+    'edit': [image: ImageItem]
+    'delete': [image: ImageItem]
+  }>()
 
-  const imageRef = ref(null)
+  const imageRef = ref<any>(null)
 
   const imageUrl = computed(() => {
     if (!props.image.url) return ''
@@ -150,7 +163,7 @@
     document.body.removeChild(textarea)
   }
 
-  function formatSize(bytes) {
+  function formatSize(bytes?: number): string {
     if (!bytes) return '0 B'
     const units = ['B', 'KB', 'MB', 'GB']
     let size = bytes
@@ -164,9 +177,9 @@
     return `${size.toFixed(1)} ${units[unitIndex]}`
   }
 
-  function formatMimeType(mimeType) {
+  function formatMimeType(mimeType?: string): string {
     if (!mimeType) return '未知'
-    const map = {
+    const map: Record<string, string> = {
       'image/jpeg': 'JPEG',
       'image/png': 'PNG',
       'image/gif': 'GIF',
@@ -176,7 +189,7 @@
     return map[mimeType] || mimeType.split('/')[1]?.toUpperCase() || mimeType
   }
 
-  function formatTime(date) {
+  function formatTime(date?: string): string {
     if (!date) return ''
     const d = new Date(date)
     const now = new Date()

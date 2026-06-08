@@ -67,26 +67,37 @@
   </ea-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, watch } from 'vue'
   import { useRemoteComponentStore } from '@/stores/designer/remoteComponent'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
-  const props = defineProps({
-    visible: {
-      type: Boolean,
-      default: false,
-    },
+  interface UrlPreset {
+    id: string | number
+    name: string
+    url: string
+    isDefault: boolean
+    [key: string]: any
+  }
+
+  interface Props {
+    visible?: boolean
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    visible: false,
   })
 
-  const emit = defineEmits(['close'])
+  const emit = defineEmits<{
+    'close': []
+  }>()
 
   const remoteStore = useRemoteComponentStore()
-  const localPresets = ref([])
-  const updateTimers = new Map()
+  const localPresets = ref<UrlPreset[]>([])
+  const updateTimers = new Map<string, ReturnType<typeof setTimeout>>()
 
   watch(
-    () => [props.visible, remoteStore.urlPresets],
+    () => [props.visible, remoteStore.urlPresets] as const,
     ([visible]) => {
       if (visible) {
         localPresets.value = (remoteStore.urlPresets || []).map(p => ({ ...p }))
@@ -107,7 +118,7 @@
     })
   }
 
-  function handleUpdate(id, field, value) {
+  function handleUpdate(id: string | number, field: string, value: string) {
     const preset = localPresets.value.find(p => p.id === id)
     if (!preset) return
     preset[field] = value
@@ -118,7 +129,7 @@
 
     const timer = setTimeout(async () => {
       try {
-        await remoteStore.updateUrlPreset(id, { [field]: value })
+        await remoteStore.updateUrlPreset(id as number, { [field]: value })
       } catch (error) {
         console.error('更新预设失败:', error)
         window.$message?.error('更新失败')
@@ -130,18 +141,18 @@
     updateTimers.set(timerKey, timer)
   }
 
-  async function handleSetDefault(id) {
-    await remoteStore.setDefaultUrlPreset(id)
+  async function handleSetDefault(id: string | number) {
+    await remoteStore.setDefaultUrlPreset(id as number)
   }
 
-  async function handleDeletePreset(id) {
+  async function handleDeletePreset(id: string | number) {
     try {
       await window.$confirm('确定要删除这个 URL 预设吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
       })
-      await remoteStore.removeUrlPreset(id)
+      await remoteStore.removeUrlPreset(id as number)
     } catch {
       // 用户取消删除，不做任何操作
     }

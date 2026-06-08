@@ -38,60 +38,62 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, watch, onMounted, nextTick } from 'vue'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
 
-  const props = defineProps({
-    keyword: {
-      type: String,
-      default: '',
-    },
-    groupId: {
-      type: [Number, String],
-      default: null,
-    },
-    groupOptions: {
-      type: Array,
-      default: () => [],
-    },
+  interface GroupOption {
+    value: number | string | null
+    label: string
+  }
+
+  interface Props {
+    keyword?: string
+    groupId?: number | string | null
+    groupOptions?: GroupOption[]
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    keyword: '',
+    groupId: null,
+    groupOptions: () => [],
   })
 
-  const emit = defineEmits([
-    'update:keyword',
-    'update:groupId',
-    'search',
-    'upload',
-    'create-group',
-    'refresh',
-  ])
+  const emit = defineEmits<{
+    'update:keyword': [val: string]
+    'update:groupId': [val: number | string | null]
+    'search': []
+    'upload': []
+    'create-group': []
+    'refresh': []
+  }>()
 
   const localKeyword = ref(props.keyword)
-  const localGroupId = ref(props.groupId)
+  const localGroupId = ref<string | number | undefined>(props.groupId ?? undefined)
   const isInitialized = ref(false)
 
   watch(
     () => props.keyword,
-    val => {
+    (val: string) => {
       localKeyword.value = val
     }
   )
 
   watch(
     () => props.groupId,
-    val => {
+    (val: number | string | null) => {
       localGroupId.value = val
     }
   )
 
-  watch(localKeyword, val => {
+  watch(localKeyword, (val: string) => {
     emit('update:keyword', val)
   })
 
-  watch(localGroupId, (newVal, oldVal) => {
-    const normalizedValue = newVal === '' ? null : newVal
-    emit('update:groupId', normalizedValue)
+  watch(localGroupId, (newVal: string | number | undefined, oldVal: string | number | undefined) => {
+    const normalizedValue = newVal === '' ? undefined : newVal
+    emit('update:groupId', normalizedValue ?? null)
 
     if (isInitialized.value && newVal !== oldVal) {
       emit('search')

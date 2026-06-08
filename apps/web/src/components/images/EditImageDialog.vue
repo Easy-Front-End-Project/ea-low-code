@@ -63,35 +63,45 @@
   </ea-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { reactive, ref, watch, computed } from 'vue'
   import { updateImage } from '@/api/images'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
 
-  const props = defineProps({
-    visible: {
-      type: Boolean,
-      default: false,
-    },
-    image: {
-      type: Object,
-      default: null,
-    },
-    groupOptions: {
-      type: Array,
-      default: () => [],
-    },
-  })
+  interface ImageItem {
+    id: number
+    url?: string
+    filename?: string
+    groupId?: number | null
+    alt?: string
+  }
 
-  const emit = defineEmits(['update:visible', 'success', 'close'])
+  interface GroupOption {
+    id: number
+    name: string
+  }
+
+  interface Props {
+    visible?: boolean
+    image?: ImageItem | null
+    groupOptions?: GroupOption[]
+  }
+
+  const props = defineProps<Props>()
+
+  const emit = defineEmits<{
+    'update:visible': [val: boolean]
+    'success': []
+    'close': []
+  }>()
 
   const submitting = ref(false)
   const originalExt = ref('')
 
   const formData = reactive({
     filename: '',
-    groupId: null,
+    groupId: undefined as number | undefined,
     alt: '',
   })
 
@@ -102,7 +112,7 @@
 
   watch(
     () => props.visible,
-    val => {
+    (val: boolean) => {
       if (val && props.image) {
         initFormData()
       }
@@ -111,28 +121,28 @@
 
   watch(
     () => props.image,
-    newImage => {
+    (newImage: ImageItem | null | undefined) => {
       if (props.visible && newImage) {
         initFormData()
       }
     }
   )
 
-  function handleVisibleChange(val) {
+  function handleVisibleChange(val: boolean) {
     emit('update:visible', val)
   }
 
   function initFormData() {
     const originalFilename = props.image?.filename || ''
     formData.filename = originalFilename
-    formData.groupId = props.image?.groupId || null
+    formData.groupId = props.image?.groupId ?? undefined
     formData.alt = props.image?.alt || ''
 
     const ext = originalFilename.match(/\.[^.]+$/)
     originalExt.value = ext ? ext[0] : ''
   }
 
-  function ensureExtension(filename) {
+  function ensureExtension(filename: string): string {
     if (!filename) return filename
 
     const currentExt = filename.match(/\.[^.]+$/)
@@ -156,7 +166,7 @@
     try {
       const finalFilename = ensureExtension(formData.filename.trim())
       await updateImage({
-        id: props.image.id,
+        id: props.image!.id,
         filename: finalFilename,
         groupId: formData.groupId,
         alt: formData.alt.trim(),
@@ -165,7 +175,7 @@
       window.$message?.success('保存成功')
       emit('success')
       handleClose()
-    } catch (error) {
+    } catch (error: any) {
       console.error('更新图片信息失败:', error)
       const message = error.response?.data?.message || error.message || '保存失败'
       window.$message?.error(message)

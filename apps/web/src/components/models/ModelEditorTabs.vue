@@ -37,46 +37,56 @@
   </ea-tabs>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref } from 'vue'
   import FieldsPanel from './FieldsPanel.vue'
   import SortFieldsPanel from './SortFieldsPanel.vue'
   import DynamicDataPanel from './DynamicDataPanel.vue'
 
-  defineProps({
-    model: { type: Object, default: null },
-    fields: { type: Array, default: () => [] },
-    loading: { type: Boolean, default: false },
-    total: { type: Number, default: 0 },
-    currentPage: { type: Number, default: 1 },
-    pageSize: { type: Number, default: 50 },
-    sortRules: { type: Array, default: () => [] },
+  interface Props {
+    model?: any
+    fields?: any[]
+    loading?: boolean
+    total?: number
+    currentPage?: number
+    pageSize?: number
+    sortRules?: any[]
+  }
+
+  withDefaults(defineProps<Props>(), {
+    model: null,
+    fields: () => [],
+    loading: false,
+    total: 0,
+    currentPage: 1,
+    pageSize: 50,
+    sortRules: () => [],
   })
 
-  const emit = defineEmits([
-    'add-field',
-    'edit-field',
-    'delete-field',
-    'sort-fields',
-    'page-change',
-    'size-change',
-    'refresh',
-    'add-sort-rule',
-    'update-sort-rule',
-    'delete-sort-rule',
-  ])
+  const emit = defineEmits<{
+    'add-field': []
+    'edit-field': [field: any]
+    'delete-field': [field: any]
+    'sort-fields': [event: any]
+    'page-change': [page: number]
+    'size-change': [size: number]
+    'refresh': []
+    'add-sort-rule': [rule: any]
+    'update-sort-rule': [rule: any]
+    'delete-sort-rule': [rule: any]
+  }>()
 
   const activeTab = ref('fields')
 
-  function handleAddSort(rule) {
+  function handleAddSort(rule: any) {
     emit('add-sort-rule', rule)
   }
 
-  function handleUpdateSort(rule) {
+  function handleUpdateSort(rule: any) {
     emit('update-sort-rule', rule)
   }
 
-  function handleDeleteSort(rule) {
+  function handleDeleteSort(rule: any) {
     emit('delete-sort-rule', rule)
   }
 </script>

@@ -55,17 +55,29 @@
   </ea-card>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import EaSwitch from '@/components/ea-ui-wrap/EaSwitch.vue'
 
-  defineProps({
-    component: {
-      type: Object,
-      required: true,
-    },
-  })
+  interface ComponentItem {
+    id: string | number
+    name: string
+    type?: string
+    url?: string
+    description?: string
+    enabled?: boolean
+  }
 
-  defineEmits(['edit', 'delete', 'toggle-enabled'])
+  interface Props {
+    component: ComponentItem
+  }
+
+  defineProps<Props>()
+
+  defineEmits<{
+    'edit': [component: ComponentItem]
+    'delete': [id: string | number]
+    'toggle-enabled': [id: string | number, val: any]
+  }>()
 </script>
 
 <style lang="scss" scoped>

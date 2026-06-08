@@ -19,13 +19,27 @@
   </div>
 </template>
 
-<script setup>
-defineProps({
-  model: { type: Object, required: true },
-  isSelected: { type: Boolean, default: false },
+<script setup lang="ts">
+interface ModelItem {
+  id: number
+  name: string
+  description?: string
+}
+
+interface Props {
+  model: ModelItem
+  isSelected?: boolean
+}
+
+withDefaults(defineProps<Props>(), {
+  isSelected: false,
 })
 
-defineEmits(['select', 'edit', 'delete'])
+defineEmits<{
+  'select': []
+  'edit': [model: ModelItem]
+  'delete': [model: ModelItem]
+}>()
 </script>
 
 <style lang="scss" scoped>

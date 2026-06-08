@@ -60,30 +60,48 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed, ref } from 'vue'
 
-  const tableRef = ref(null)
+  interface FieldItem {
+    fieldLabel?: string
+    fieldName?: string
+    fieldType?: string
+    sortOrder?: number
+    isNullable?: boolean
+    isUnique?: boolean
+    isSystem?: boolean
+  }
 
-  const props = defineProps({
-    fields: { type: Array, default: () => [] },
-    loading: { type: Boolean, default: false },
-    total: { type: Number, default: 0 },
-    currentPage: { type: Number, default: 1 },
-    pageSize: { type: Number, default: 50 },
+  interface Props {
+    fields?: FieldItem[]
+    loading?: boolean
+    total?: number
+    currentPage?: number
+    pageSize?: number
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    fields: () => [],
+    loading: false,
+    total: 0,
+    currentPage: 1,
+    pageSize: 50,
   })
 
-  const emit = defineEmits([
-    'add-field',
-    'edit-field',
-    'delete-field',
-    'sort-fields',
-    'page-change',
-    'size-change',
-    'refresh',
-  ])
+  const emit = defineEmits<{
+    'add-field': []
+    'edit-field': [field: FieldItem]
+    'delete-field': [field: FieldItem]
+    'sort-fields': [event: any]
+    'page-change': [page: number]
+    'size-change': [size: number]
+    'refresh': []
+  }>()
 
-  const FIELD_TYPE_LABELS = {
+  const tableRef = ref<any>(null)
+
+  const FIELD_TYPE_LABELS: Record<string, string> = {
     text: '文本',
     number: '数字',
     date: '日期',
@@ -96,7 +114,7 @@
     return (props.fields || []).map(field => ({
       fieldLabel: field.fieldLabel || '',
       fieldName: field.fieldName || '',
-      fieldTypeLabel: FIELD_TYPE_LABELS[field.fieldType] || field.fieldType || '',
+      fieldTypeLabel: FIELD_TYPE_LABELS[field.fieldType || ''] || field.fieldType || '',
       sortOrder: String(field.sortOrder ?? ''),
       nullableLabel: field.isNullable ? '否' : '是',
       uniqueLabel: field.isUnique ? '是' : '否',
@@ -109,12 +127,12 @@
     return props.total > 0 ? props.total : props.fields.length
   })
 
-  async function handleCellClick(e) {
+  async function handleCellClick(e: CustomEvent) {
     if (!e?.detail) return
     const { target, rowData } = e.detail
     if (!target || !rowData?._raw) return
     const action = target.getAttribute('data-action')
-    const rawField = rowData._raw
+    const rawField: FieldItem = rowData._raw
     if (rawField.isSystem) return
     if (action === 'edit') {
       emit('edit-field', rawField)
@@ -140,7 +158,7 @@
 
     const rows = tbody.querySelectorAll('tr')
     const data = tableRef.value.data || []
-    rows.forEach((tr, index) => {
+    rows.forEach((tr: HTMLTableRowElement, index: number) => {
       const row = data[index]
       if (row?.isSystem) {
         const lastTd = tr.querySelector('td:last-child')

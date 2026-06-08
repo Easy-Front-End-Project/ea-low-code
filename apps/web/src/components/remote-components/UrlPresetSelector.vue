@@ -45,25 +45,35 @@
   </ea-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { useRemoteComponentStore } from '@/stores/designer/remoteComponent'
 
-  const props = defineProps({
-    visible: {
-      type: Boolean,
-      default: false,
-    },
-    modelValue: {
-      type: [Number, String],
-      default: '',
-    },
+  interface UrlPreset {
+    id: string | number
+    name: string
+    url: string
+    isDefault?: boolean
+  }
+
+  interface Props {
+    visible?: boolean
+    modelValue?: number | string
+  }
+
+  withDefaults(defineProps<Props>(), {
+    visible: false,
+    modelValue: '',
   })
 
-  const emit = defineEmits(['update:modelValue', 'close', 'manage'])
+  const emit = defineEmits<{
+    'update:modelValue': [val: number | string]
+    'close': []
+    'manage': []
+  }>()
 
   const remoteStore = useRemoteComponentStore()
 
-  function handleSelect(preset) {
+  function handleSelect(preset: UrlPreset) {
     emit('update:modelValue', preset.id)
     emit('close')
   }

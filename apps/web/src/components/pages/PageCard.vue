@@ -35,19 +35,29 @@
   </ea-card>
 </template>
 
-<script setup>
-  import { computed } from 'vue'
+<script setup lang="ts">
+  interface PageItem {
+    id: number
+    name?: string
+    description?: string
+    updatedAt?: string
+  }
 
-  const props = defineProps({
-    page: {
-      type: Object,
-      required: true,
-    },
-  })
+  interface Props {
+    page: PageItem
+  }
 
-  const emit = defineEmits(['card-click', 'edit', 'clone', 'delete', 'preview'])
+  const props = defineProps<Props>()
 
-  function formatTime(date) {
+  const emit = defineEmits<{
+    'card-click': [page: PageItem]
+    'edit': [page: PageItem]
+    'clone': [page: PageItem]
+    'delete': [page: PageItem]
+    'preview': [page: PageItem]
+  }>()
+
+  function formatTime(date?: string): string {
     if (!date) return ''
     const d = new Date(date)
     const now = new Date()

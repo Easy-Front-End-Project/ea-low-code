@@ -18,16 +18,32 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import ModelListItem from './ModelListItem.vue'
 
-defineProps({
-  models: { type: Array, default: () => [] },
-  selectedId: { type: Number, default: null },
-  loading: { type: Boolean, default: false },
+interface ModelItem {
+  id: number
+  name: string
+  description?: string
+}
+
+interface Props {
+  models?: ModelItem[]
+  selectedId?: number | null
+  loading?: boolean
+}
+
+withDefaults(defineProps<Props>(), {
+  models: () => [],
+  selectedId: null,
+  loading: false,
 })
 
-defineEmits(['select', 'edit', 'delete'])
+defineEmits<{
+  'select': [model: ModelItem]
+  'edit': [model: ModelItem]
+  'delete': [model: ModelItem]
+}>()
 </script>
 
 <style lang="scss" scoped>

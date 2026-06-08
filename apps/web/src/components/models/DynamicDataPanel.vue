@@ -37,12 +37,36 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed } from 'vue'
 
-  const props = defineProps({
-    model: { type: Object, required: true },
-    fields: { type: Array, default: () => [] },
+  interface ModelData {
+    name: string
+    tableName: string
+  }
+
+  interface FieldData {
+    fieldName: string
+    fieldType: string
+    isSystem?: boolean
+    defaultValue?: any
+  }
+
+  interface ApiItem {
+    method: string
+    path: string
+    url: string
+    tagType: string
+    example: string
+  }
+
+  interface Props {
+    model: ModelData
+    fields?: FieldData[]
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    fields: () => [],
   })
 
   const userFields = computed(() => props.fields.filter(f => !f.isSystem))
@@ -50,7 +74,7 @@
   const baseUrl = 'http://localhost:3000/api'
   const tableName = computed(() => props.model.tableName)
 
-  const SAMPLE_MAP = {
+  const SAMPLE_MAP: Record<string, any> = {
     text: '字符串',
     number: 0,
     date: '2024-01-01',
@@ -59,7 +83,7 @@
     json: '{}',
   }
 
-  function fieldSample(field) {
+  function fieldSample(field: FieldData): any {
     if (
       field.defaultValue !== null &&
       field.defaultValue !== undefined &&
@@ -71,7 +95,7 @@
   }
 
   const createBody = computed(() => {
-    const obj = {}
+    const obj: Record<string, any> = {}
     for (const f of userFields.value) {
       obj[f.fieldName] = fieldSample(f)
     }
@@ -82,7 +106,7 @@
     return { id: 1, ...createBody.value }
   })
 
-  const apiList = computed(() => {
+  const apiList = computed<ApiItem[]>(() => {
     const tn = tableName.value
     return [
       {
@@ -123,7 +147,7 @@
     ]
   })
 
-  function buildExample(type) {
+  function buildExample(type: string): string {
     switch (type) {
       case 'get':
         return (
@@ -145,7 +169,7 @@
     }
   }
 
-  function copyApi(api) {
+  function copyApi(api: ApiItem) {
     const text = `${api.method} ${api.url}\n\nBody:\n${api.example}`
     navigator.clipboard.writeText(text).then(() => {
       window.$message?.success('已复制到剪贴板')

@@ -94,18 +94,22 @@
   </ea-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useProjectsStore } from '@/stores/projects.js'
+import { useProjectsStore } from '@/stores/projects'
 
-const props = defineProps({
-  visible: {
-    type: Boolean,
-    default: false,
-  },
+interface Props {
+  visible?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  visible: false,
 })
 
-const emit = defineEmits(['update:visible', 'success'])
+const emit = defineEmits<{
+  'update:visible': [val: boolean]
+  'success': []
+}>()
 
 const projectsStore = useProjectsStore()
 
@@ -149,7 +153,7 @@ function resetForm() {
   selectedTemplate.value = ''
 }
 
-function handleVisibleChange(val) {
+function handleVisibleChange(val: boolean) {
   emit('update:visible', val)
 }
 
@@ -163,7 +167,7 @@ async function handleSubmit() {
 
   loading.value = true
   try {
-    const data = {
+    const data: Record<string, any> = {
       name: form.value.name.trim(),
       description: form.value.description,
       createType: currentType.value,
@@ -179,7 +183,7 @@ async function handleSubmit() {
     window.$message?.success('创建成功')
     emit('success')
     handleClose()
-  } catch (error) {
+  } catch (error: any) {
     window.$message?.error(error.message || '创建失败')
   } finally {
     loading.value = false
@@ -189,7 +193,7 @@ async function handleSubmit() {
 // 监听 visible 变化，打开时重置表单
 watch(
   () => props.visible,
-  (val) => {
+  (val: boolean) => {
     if (val) {
       resetForm()
     }

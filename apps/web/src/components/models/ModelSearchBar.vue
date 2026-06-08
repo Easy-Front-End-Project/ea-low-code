@@ -25,29 +25,35 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, watch } from 'vue'
   import EaInput from '../ea-ui-wrap/EaInput.vue'
 
-  const props = defineProps({
-    keyword: {
-      type: String,
-      default: '',
-    },
+  interface Props {
+    keyword?: string
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    keyword: '',
   })
 
-  const emit = defineEmits(['update:keyword', 'search', 'create', 'refresh'])
+  const emit = defineEmits<{
+    'update:keyword': [val: string]
+    'search': []
+    'create': []
+    'refresh': []
+  }>()
 
   const localKeyword = ref(props.keyword)
 
   watch(
     () => props.keyword,
-    val => {
+    (val: string) => {
       localKeyword.value = val
     }
   )
 
-  watch(localKeyword, val => {
+  watch(localKeyword, (val: string) => {
     emit('update:keyword', val)
   })
 

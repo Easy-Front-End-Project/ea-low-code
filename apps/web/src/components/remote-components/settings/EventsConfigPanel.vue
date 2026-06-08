@@ -26,17 +26,27 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
-defineProps({
-  events: {
-    type: Array,
-    default: () => [],
-  },
+interface EventItem {
+  name?: string
+  label?: string
+  description?: string
+}
+
+interface Props {
+  events?: EventItem[]
+}
+
+withDefaults(defineProps<Props>(), {
+  events: () => [],
 })
 
-defineEmits(['add', 'remove'])
+defineEmits<{
+  'add': []
+  'remove': [index: number]
+}>()
 </script>
 
 <style lang="scss" scoped>

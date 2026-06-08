@@ -48,17 +48,30 @@
   </ea-card>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed } from 'vue'
 
-  const props = defineProps({
-    project: {
-      type: Object,
-      required: true,
-    },
-  })
+  interface ProjectItem {
+    name: string
+    userName?: string
+    userAccount?: string
+    pageCount?: number
+    description?: string
+    updatedAt?: string
+  }
 
-  const emit = defineEmits(['card-click', 'settings', 'delete', 'clone'])
+  interface Props {
+    project: ProjectItem
+  }
+
+  const props = defineProps<Props>()
+
+  const emit = defineEmits<{
+    'card-click': []
+    'settings': []
+    'delete': []
+    'clone': []
+  }>()
 
   const userInfo = computed(() => {
     const { userName, userAccount } = props.project
@@ -73,7 +86,7 @@
     emit('card-click')
   }
 
-  function handleCommand({ detail }) {
+  function handleCommand({ detail }: { detail: { command: string } }) {
     switch (detail.command) {
       case 'settings':
         emit('settings')
@@ -87,7 +100,7 @@
     }
   }
 
-  function formatTime(date) {
+  function formatTime(date?: string): string {
     if (!date) return ''
     const d = new Date(date)
     const now = new Date()
