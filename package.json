@@ -11,6 +11,7 @@
     "dev": "npm run dev -w apps/web",
     "dev:web": "npm run dev -w apps/web",
     "dev:server": "npm run dev -w apps/server",
+    "dev:all": "run-p dev:web dev:server",
     "build": "npm run build -w apps/web",
     "build:web": "npm run build -w apps/web",
     "build:server": "npm run build -w apps/server",
