@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="global-dialog-container">
     <!-- 全局变量选择器 -->
     <VariableSelector
@@ -80,9 +80,9 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref } from 'vue'
-  import { useGlobalDialogs } from '@/components/designer/composables/useGlobalDialogs.js'
+  import { useGlobalDialogs } from '@/components/designer/composables/useGlobalDialogs'
   import VariableSelector from '@/components/designer/VariableSelector.vue'
   import VariableManager from '@/components/designer/VariableManager.vue'
   import ComponentSelector from '@/components/designer/common/ComponentSelector.vue'
@@ -106,11 +106,11 @@
   // API 帮助显示状态
   const showApiHelp = ref(false)
 
-  function handleSelectVariable(variableName) {
+  function handleSelectVariable(variableName: string) {
     confirmVariableSelection(variableName)
   }
 
-  function handleSelectComponent(componentId) {
+  function handleSelectComponent(componentId: string) {
     confirmComponentSelection(componentId)
   }
 

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <ea-dialog :visible="visible" title="组件大纲" width="400px" @close="handleClose">
     <ea-empty v-if="treeData.length === 0" description="暂无组件" icon="box-open" />
     <ea-tree
@@ -13,18 +13,30 @@
   </ea-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed, onMounted } from 'vue'
   import { useSchemaStore } from '@/components/designer/stores/schema'
 
-  const props = defineProps({
-    visible: {
-      type: Boolean,
-      default: false,
-    },
-  })
+  interface TreeNode {
+    id: string
+    name: string
+    children?: TreeNode[]
+  }
 
-  const emit = defineEmits(['close'])
+  interface ComponentItem {
+    id: string
+    type: string
+    children?: ComponentItem[]
+    props?: Record<string, any>
+  }
+
+  const props = defineProps<{
+    visible?: boolean
+  }>()
+
+  const emit = defineEmits<{
+    close: []
+  }>()
 
   const schemaStore = useSchemaStore()
 
@@ -37,26 +49,26 @@
   // 将组件列表转换为树形数据
   const treeData = computed(() => {
     const components = schemaStore.pageSchema?.components || []
-    return components.map(component => convertToTreeNode(component))
+    return components.map((component: ComponentItem) => convertToTreeNode(component))
   })
 
   // 转换组件为树节点
-  function convertToTreeNode(component) {
-    const node = {
+  function convertToTreeNode(component: ComponentItem): TreeNode {
+    const node: TreeNode = {
       id: component.id,
       name: getComponentName(component),
     }
 
     // 如果有子组件，递归转换
     if (component.children && component.children.length > 0) {
-      node.children = component.children.map(child => convertToTreeNode(child))
+      node.children = component.children.map((child: ComponentItem) => convertToTreeNode(child))
     }
 
     return node
   }
 
   // 获取组件显示名称
-  function getComponentName(component) {
+  function getComponentName(component: ComponentItem): string {
     // 优先使用 children 属性（文本内容）
     if (component.props?.children) {
       return `${component.type} - ${component.props.children}`
@@ -73,7 +85,7 @@
   }
 
   // 处理节点点击
-  function handleNodeClick(data) {
+  function handleNodeClick(data: { id?: string }) {
     if (data.id) {
       schemaStore.selectComponent(data.id)
       handleClose()

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <ea-container class="h-screen w-screen" direction="vertical">
     <!-- 顶部工具栏 -->
     <ea-header v-show="!isPreviewMode" height="60px" class="designer-layout__header">
@@ -87,7 +87,7 @@
   </ea-container>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, computed, defineAsyncComponent } from 'vue'
   import { useSchemaStore } from '@/components/designer/stores/schema'
   import Toolbar from './header/Toolbar.vue'
@@ -108,14 +108,20 @@
   const leftAsideCollapsed = ref(false)
   const rightAsideCollapsed = ref(false)
 
-  const leftPanelItems = [
+  interface LeftPanelItem {
+    key: string
+    label: string
+    title: string
+  }
+
+  const leftPanelItems: LeftPanelItem[] = [
     { key: 'components', label: '组件', title: '组件库' },
     { key: 'remote', label: '远程', title: '远程组件' },
     { key: 'page', label: '页面', title: '页面设置' },
     { key: 'json', label: 'JSON', title: 'JSON 编辑' },
   ]
 
-  function switchLeftPanel(key) {
+  function switchLeftPanel(key: string) {
     if (activeLeftPanel.value === key) {
       leftAsideCollapsed.value = !leftAsideCollapsed.value
     } else {

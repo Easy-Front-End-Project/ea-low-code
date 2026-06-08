@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <ea-dialog :visible="visible" title="选择变量" width="500px" @close="handleClose">
     <div class="variable-selector">
       <!-- 搜索框 -->
@@ -49,25 +49,36 @@
   </ea-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, computed } from 'vue'
   import { useVariableStore } from '@/components/designer/stores/variable'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
-  const props = defineProps({
-    visible: {
-      type: Boolean,
-      default: false,
-    },
-  })
+  type VariableType = 'string' | 'number' | 'boolean' | 'array' | 'object' | 'function'
 
-  const emit = defineEmits(['select', 'close', 'add-variable'])
+  interface VariableItem {
+    id: string
+    name: string
+    type: VariableType
+    defaultValue: any
+    remark: string
+  }
+
+  defineProps<{
+    visible?: boolean
+  }>()
+
+  const emit = defineEmits<{
+    select: [name: string]
+    close: []
+    'add-variable': []
+  }>()
 
   const variableStore = useVariableStore()
   const searchKeyword = ref('')
 
   // 类型标签映射
-  const typeLabels = {
+  const typeLabels: Record<string, string> = {
     string: '字符串',
     number: '数字',
     boolean: '布尔值',
@@ -79,23 +90,23 @@
   // 过滤后的变量列表
   const filteredVariables = computed(() => {
     // 使用副本避免直接引用 store 中的响应式数组
-    const variables = [...variableStore.variables]
+    const variables: VariableItem[] = [...variableStore.variables]
     if (!searchKeyword.value) {
       return variables
     }
     const keyword = searchKeyword.value.toLowerCase()
     return variables.filter(
-      v => v.name.toLowerCase().includes(keyword) || v.remark.toLowerCase().includes(keyword)
+      (v: VariableItem) => v.name.toLowerCase().includes(keyword) || v.remark.toLowerCase().includes(keyword)
     )
   })
 
   // 获取类型标签
-  function getTypeLabel(type) {
+  function getTypeLabel(type: string): string {
     return typeLabels[type] || type
   }
 
   // 格式化值显示
-  function formatValue(value, type) {
+  function formatValue(value: any, type: string): string {
     if (value === null || value === undefined) {
       return 'null'
     }
@@ -109,7 +120,7 @@
   }
 
   // 选择变量
-  function handleSelect(variable) {
+  function handleSelect(variable: VariableItem) {
     emit('select', variable.name)
   }
 

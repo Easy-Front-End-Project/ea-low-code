@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="variable-binding-input">
     <!-- 输入框区域 -->
     <div class="input-wrapper">
@@ -96,58 +96,57 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed } from 'vue'
-  import { useGlobalDialogs } from '@/components/designer/composables/useGlobalDialogs.js'
+  import { useGlobalDialogs } from '@/components/designer/composables/useGlobalDialogs'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
   import EaSwitch from '@/components/ea-ui-wrap/EaSwitch.vue'
   import EaColorPicker from '@/components/ea-ui-wrap/EaColorPicker.vue'
   import UnitInput from '@/components/common/UnitInput.vue'
 
-  const props = defineProps({
-    value: {
-      type: [Object, String, Number, Boolean, Array],
-      default: '',
-    },
-    inputType: {
-      type: String,
-      default: '',
-    },
-    // PropTypes 类型（当 inputType 为空时使用）
-    type: {
-      type: String,
-      default: '',
-    },
-    options: {
-      type: Array,
-      default: () => [],
-    },
-    placeholder: {
-      type: String,
-      default: '',
-    },
+  interface OptionItem {
+    value: string | number
+    label: string
+  }
+
+  type InputType = 'input' | 'select' | 'multi-select' | 'switch' | 'unit' | 'time' | 'color' | 'array' | 'object'
+
+  const props = withDefaults(defineProps<{
+    value?: any
+    inputType?: InputType | ''
+    type?: string
+    options?: OptionItem[]
+    placeholder?: string
+  }>(), {
+    value: '',
+    inputType: '',
+    type: '',
+    options: () => [],
+    placeholder: '',
   })
 
-  const emit = defineEmits(['update:value'])
+  const emit = defineEmits<{
+    'update:value': [value: any]
+  }>()
 
   const { openVariableSelector, openEditor } = useGlobalDialogs()
 
   // 判断当前值是否是变量绑定
   const isVariable = computed(() => {
-    return props.value && typeof props.value === 'object' && props.value.type === 'variable'
+    return props.value && typeof props.value === 'object' && (props.value as Record<string, any>).type === 'variable'
   })
 
   // 获取变量名
   const variableName = computed(() => {
     if (isVariable.value) {
-      return props.value.value
+      return (props.value as Record<string, any>).value
     }
     return ''
   })
 
   // 根据 type 获取 inputType
-  function getInputTypeFromPropType(propType) {
+  function getInputTypeFromPropType(propType: string): InputType {
     if (propType === 'select') {
       return 'select'
     }
@@ -176,7 +175,7 @@
   }
 
   // 解析后的 inputType
-  const resolvedInputType = computed(() => {
+  const resolvedInputType = computed<InputType>(() => {
     // 如果直接指定了 inputType，优先使用
     if (props.inputType) {
       return props.inputType
@@ -189,8 +188,8 @@
   })
 
   // 根据 type 获取 placeholder
-  function getPlaceholderFromPropType(propType) {
-    const placeholders = {
+  function getPlaceholderFromPropType(propType: string): string {
+    const placeholders: Record<string, string> = {
       string: '请输入文本',
       number: '请输入数字',
       color: '请选择颜色',
@@ -250,29 +249,29 @@
 
   // 编辑器按钮文本
   const editorButtonText = computed(() => {
-    const hasValue = props.value && Object.keys(props.value).length > 0
+    const hasValue = props.value && typeof props.value === 'object' && Object.keys(props.value).length > 0
     return hasValue ? '编辑' : resolvedInputType.value === 'array' ? '编辑数组' : '编辑对象'
   })
 
   // 处理输入变化
-  function handleInputChange(event) {
+  function handleInputChange(event: any) {
     const value = event.detail?.value !== undefined ? event.detail.value : event
     emit('update:value', convertValue(value))
   }
 
   // 处理 Switch 变化
-  function handleSwitchChange(value) {
+  function handleSwitchChange(value: boolean | string | number) {
     emit('update:value', convertValue(value))
   }
 
   // 处理颜色变化
-  function handleColorChange(event) {
+  function handleColorChange(event: any) {
     const value = event.detail?.value
     emit('update:value', convertValue(value))
   }
 
   // 处理多选变化
-  function handleMultiSelectChange(event) {
+  function handleMultiSelectChange(event: any) {
     const value = event.detail?.value !== undefined ? event.detail.value : event
     if (!value) return
 
@@ -284,7 +283,7 @@
   }
 
   // 根据 type 转换值
-  function convertValue(value) {
+  function convertValue(value: any): any {
     // 获取实际使用的 type（优先使用 props.type）
     const propType = props.type || props.inputType
 
@@ -330,7 +329,7 @@
   // 打开编辑器
   async function handleOpenEditor() {
     // 将值转换为 JSON 字符串显示
-    let initialValue
+    let initialValue: string
     try {
       if (props.value && typeof props.value === 'object') {
         initialValue = JSON.stringify(props.value, null, 2)
@@ -365,7 +364,7 @@
       }
 
       emit('update:value', parsedValue)
-    } catch (error) {
+    } catch (error: any) {
       // 用户取消或 JSON 格式错误
       if (error.message !== 'User cancelled') {
         alert('JSON 格式错误，请检查输入')

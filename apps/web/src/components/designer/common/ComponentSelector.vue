@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <ea-dialog
     :visible="visible"
     title="选择组件"
@@ -23,27 +23,41 @@
   </ea-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed } from 'vue'
   import { useSchemaStore } from '@/components/designer/stores/schema'
 
-  defineProps({
-    visible: {
-      type: Boolean,
-      default: false,
-    },
-  })
+  interface ComponentItem {
+    id: string
+    type: string
+    children?: ComponentItem[]
+    props?: Record<string, any>
+  }
 
-  const emit = defineEmits(['select', 'close'])
+  interface FlatComponent {
+    id: string
+    name: string
+    level: number
+    children?: ComponentItem[]
+  }
+
+  defineProps<{
+    visible?: boolean
+  }>()
+
+  const emit = defineEmits<{
+    select: [id: string]
+    close: []
+  }>()
 
   const schemaStore = useSchemaStore()
 
   // 扁平化组件列表（用于选择器）
   const flattenComponents = computed(() => {
-    const result = []
+    const result: FlatComponent[] = []
     const components = schemaStore.pageSchema?.components || []
 
-    function flatten(components, level = 0) {
+    function flatten(components: ComponentItem[], level = 0) {
       for (const comp of components) {
         result.push({
           id: comp.id,
@@ -62,7 +76,7 @@
   })
 
   // 获取组件显示名称
-  function getComponentName(component) {
+  function getComponentName(component: ComponentItem): string {
     if (component.props?.children) {
       return `${component.type} - ${String(component.props.children).slice(0, 20)}`
     }
@@ -75,7 +89,7 @@
     return component.type
   }
 
-  function handleSelect(id) {
+  function handleSelect(id: string) {
     emit('select', id)
   }
 

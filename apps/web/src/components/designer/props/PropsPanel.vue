@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="props-panel">
     <!-- 内容区域 -->
     <div class="props-panel__content">
@@ -157,7 +157,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed, ref, watch } from 'vue'
   import { useSchemaStore } from '@/components/designer/stores/schema'
   import { useRemoteComponentStore } from '@/stores/designer/remoteComponent'
@@ -171,6 +171,46 @@
   import SpecialConfigRenderer from '@/components/designer/configs/SpecialConfig.vue'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
+  interface ComponentProp {
+    name: string
+    label: string
+    type: string
+  }
+
+  interface ComponentEvent {
+    name: string
+    label: string
+    description?: string
+  }
+
+  interface ComponentMeta {
+    type: string
+    name: string
+    category: string
+    icon: string
+    isRemote?: boolean
+    remoteConfig?: Record<string, any>
+    props: ComponentProp[]
+    events: ComponentEvent[]
+    slots?: Array<{ name: string; label: string }>
+    specialConfig?: { type: string; [key: string]: any }
+  }
+
+  interface SelectedComponent {
+    id: string
+    type: string
+    alias?: string
+    isRemote?: boolean
+    remoteConfig?: { exportName?: string; url?: string; id?: string; [key: string]: any }
+    props?: Record<string, any>
+    style?: Record<string, any>
+    positionStyle?: Record<string, any>
+    customCSS?: string
+    cssVariables?: Record<string, any>
+    events?: any[]
+    children?: SelectedComponent[]
+  }
+
   const schemaStore = useSchemaStore()
   const remoteStore = useRemoteComponentStore()
 
@@ -179,7 +219,7 @@
   const activeTab = ref('pageStyle')
 
   /** 当前选中的组件 */
-  const selectedComponent = computed(() => schemaStore.selectedComponent)
+  const selectedComponent = computed(() => schemaStore.selectedComponent as SelectedComponent | null)
 
   // 只在从页面切换到组件或从组件切换到页面时重置 tab
   watch(
@@ -293,7 +333,7 @@
 
   // ==================== 组件元数据 ====================
   /** 当前组件元数据 */
-  const componentMeta = computed(() => {
+  const componentMeta = computed<ComponentMeta | null>(() => {
     if (!selectedComponent.value) return null
 
     const isRemote =
@@ -301,16 +341,16 @@
 
     if (isRemote) {
       const remoteMeta = remoteStore.enabledComponentMetaList.find(
-        m =>
-          m.type === selectedComponent.value.type ||
-          m.remoteConfig?.id == selectedComponent.value.remoteConfig?.id
+        (m: any) =>
+          m.type === selectedComponent.value!.type ||
+          m.remoteConfig?.id == selectedComponent.value!.remoteConfig?.id
       )
-      if (remoteMeta) return remoteMeta
+      if (remoteMeta) return remoteMeta as ComponentMeta
 
       // 旧架构（localStorage）
       const legacyMetaList = getRemoteComponentMetaList()
-      const legacyMeta = legacyMetaList.find(m => m.type === selectedComponent.value.type)
-      if (legacyMeta) return legacyMeta
+      const legacyMeta = legacyMetaList.find((m: any) => m.type === selectedComponent.value!.type)
+      if (legacyMeta) return legacyMeta as ComponentMeta
 
       const rc = selectedComponent.value.remoteConfig
       const rawProps = selectedComponent.value.props || {}
@@ -336,12 +376,12 @@
       }
     }
 
-    return getComponentMeta(selectedComponent.value.type)
+    return getComponentMeta(selectedComponent.value.type) as ComponentMeta
   })
 
   /** 排除 slot 的组件属性 */
   const componentPropsWithoutSlot = computed(() =>
-    (componentMeta.value?.props || []).filter(prop => prop.name !== 'slot')
+    (componentMeta.value?.props || []).filter((prop: ComponentProp) => prop.name !== 'slot')
   )
 
   /** 是否有特殊配置 */
@@ -350,36 +390,36 @@
   )
 
   /** 父组件元数据 */
-  const parentComponentMeta = computed(() => {
+  const parentComponentMeta = computed<ComponentMeta | null>(() => {
     if (!selectedComponent.value) return null
 
-    const parent = schemaStore.findParentComponent(selectedComponent.value.id)
+    const parent = schemaStore.findParentComponent(selectedComponent.value.id) as SelectedComponent | null
     if (!parent) return null
 
     const isRemote = parent.type?.startsWith('remote-') || parent.isRemote
     if (isRemote) {
       const remoteMeta = remoteStore.enabledComponentMetaList.find(
-        m => m.type === parent.type || m.remoteConfig?.id == parent.remoteConfig?.id
+        (m: any) => m.type === parent.type || m.remoteConfig?.id == parent.remoteConfig?.id
       )
-      if (remoteMeta) return remoteMeta
+      if (remoteMeta) return remoteMeta as ComponentMeta
 
       // 旧架构
       const legacyMetaList = getRemoteComponentMetaList()
-      return legacyMetaList.find(m => m.type === parent.type)
+      return legacyMetaList.find((m: any) => m.type === parent.type) as ComponentMeta | null
     }
 
-    return getComponentMeta(parent.type)
+    return getComponentMeta(parent.type) as ComponentMeta
   })
 
   // ==================== 事件处理 ====================
   /** 属性变更处理 */
-  function handlePropChange(propName, value) {
+  function handlePropChange(propName: string, value: any) {
     if (!selectedComponent.value) return
     schemaStore.updateComponentProps(selectedComponent.value.id, { [propName]: value })
   }
 
   /** 样式变更处理 */
-  function handleStyleChange(styleName, value, styleType = 'inline') {
+  function handleStyleChange(styleName: string, value: any, styleType = 'inline') {
     if (selectedComponent.value) {
       if (styleType === 'customCSS') {
         schemaStore.updateComponentStyle(selectedComponent.value.id, value, 'customCSS')
@@ -405,7 +445,7 @@
   }
 
   /** CSS 变量变更处理 */
-  function handleCssVariableChange(variableName, value) {
+  function handleCssVariableChange(variableName: string, value: any) {
     if (!selectedComponent.value) return
     schemaStore.updateComponentStyle(
       selectedComponent.value.id,
@@ -415,7 +455,7 @@
   }
 
   /** 事件变更处理 */
-  function handleEventChange(events) {
+  function handleEventChange(events: any[]) {
     if (selectedComponent.value) {
       schemaStore.updateComponentEvents(selectedComponent.value.id, events)
     } else {
@@ -425,13 +465,13 @@
   }
 
   /** 插槽变更处理 */
-  function handleSlotChange(slotValue) {
+  function handleSlotChange(slotValue: string) {
     if (!selectedComponent.value) return
     schemaStore.updateComponentProps(selectedComponent.value.id, { slot: slotValue })
   }
 
   /** Scope 变更处理 */
-  function handleScopeChange(scope) {
+  function handleScopeChange(scope: string) {
     if (!selectedComponent.value) return
     schemaStore.updateComponentProps(selectedComponent.value.id, { scope })
   }

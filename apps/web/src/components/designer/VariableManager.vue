@@ -27,7 +27,7 @@
               <EaSelect
                 v-model="variable.type"
                 size="small"
-                @change="(val) => handleTypeChange(variable.id, val)"
+                @change="(val: any) => handleTypeChange(variable.id, val as VariableType)"
               >
                 <ea-option value="string">字符串</ea-option>
                 <ea-option value="number">数字</ea-option>
@@ -130,36 +130,45 @@
   </ea-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, watch, computed } from 'vue'
   import { useVariableStore } from '@/components/designer/stores/variable'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
   import MonacoEditor from '@/components/common/MonacoEditor.vue'
 
-  const props = defineProps({
-    visible: {
-      type: Boolean,
-      default: false,
-    },
-  })
+  type VariableType = 'string' | 'number' | 'boolean' | 'array' | 'object' | 'function'
 
-  const emit = defineEmits(['close'])
+  interface VariableItem {
+    id: string
+    name: string
+    type: VariableType
+    defaultValue: any
+    remark: string
+  }
+
+  defineProps<{
+    visible?: boolean
+  }>()
+
+  const emit = defineEmits<{
+    close: []
+  }>()
 
   const variableStore = useVariableStore()
 
   // 本地变量列表（避免直接操作 store）
-  const localVariables = ref([])
+  const localVariables = ref<VariableItem[]>([])
 
   // MonacoEditor 弹窗状态
   const editorVisible = ref(false)
   const editorValue = ref('')
-  const editingVariableId = ref(null)
-  const editingVariableType = ref('')
+  const editingVariableId = ref<string | null>(null)
+  const editingVariableType = ref<VariableType | ''>('')
 
   // 编辑器标题
   const editorTitle = computed(() => {
-    const typeMap = {
+    const typeMap: Record<string, string> = {
       array: '编辑数组',
       object: '编辑对象',
       function: '编辑函数',
@@ -175,8 +184,8 @@
   // 监听 store 变化，同步到本地
   watch(
     () => variableStore.variables,
-    newVariables => {
-      localVariables.value = newVariables.map(v => ({ ...v }))
+    (newVariables: VariableItem[]) => {
+      localVariables.value = newVariables.map((v: VariableItem) => ({ ...v }))
     },
     { immediate: true, deep: true }
   )
@@ -197,14 +206,14 @@
   }
 
   // 类型改变处理
-  function handleTypeChange(id, newType) {
+  function handleTypeChange(id: string, newType: VariableType) {
     handleUpdate(id, 'type', newType)
 
     // 根据新类型设置默认值
-    const variable = variableStore.variables.find(v => v.id === id)
+    const variable = variableStore.variables.find((v: VariableItem) => v.id === id)
     if (!variable) return
 
-    let newDefaultValue
+    let newDefaultValue: any
     switch (newType) {
       case 'number':
         newDefaultValue = 0
@@ -241,7 +250,7 @@ return Date.now() + 60 * 60 * 24 * 7 * 1000;`
     }
 
     // 更新本地变量
-    const localVar = localVariables.value.find(v => v.id === id)
+    const localVar = localVariables.value.find((v: VariableItem) => v.id === id)
     if (localVar) {
       localVar.defaultValue = newDefaultValue
     }
@@ -250,8 +259,8 @@ return Date.now() + 60 * 60 * 24 * 7 * 1000;`
   }
 
   // 更新变量
-  function handleUpdate(id, field, value) {
-    const variable = variableStore.variables.find(v => v.id === id)
+  function handleUpdate(id: string, field: string, value: any) {
+    const variable = variableStore.variables.find((v: VariableItem) => v.id === id)
     if (!variable) return
 
     // 检查值是否真的改变了
@@ -261,7 +270,7 @@ return Date.now() + 60 * 60 * 24 * 7 * 1000;`
   }
 
   // 打开 MonacoEditor 编辑器
-  function handleOpenEditor(variable) {
+  function handleOpenEditor(variable: VariableItem) {
     editingVariableId.value = variable.id
     editingVariableType.value = variable.type
 
@@ -320,7 +329,7 @@ return Date.now() + 60 * 60 * 24 * 7 * 1000;`
       }
 
       // 更新本地变量
-      const localVar = localVariables.value.find(v => v.id === editingVariableId.value)
+      const localVar = localVariables.value.find((v: VariableItem) => v.id === editingVariableId.value)
       if (localVar) {
         localVar.defaultValue = codeValue
       }
@@ -350,7 +359,7 @@ return Date.now() + 60 * 60 * 24 * 7 * 1000;`
       }
 
       // 更新本地变量
-      const localVar = localVariables.value.find(v => v.id === editingVariableId.value)
+      const localVar = localVariables.value.find((v: VariableItem) => v.id === editingVariableId.value)
       if (localVar) {
         localVar.defaultValue = parsedValue
       }
@@ -365,7 +374,7 @@ return Date.now() + 60 * 60 * 24 * 7 * 1000;`
   }
 
   // 删除变量
-  async function handleDeleteVariable(id) {
+  async function handleDeleteVariable(id: string) {
     try {
       await window.$confirm('确定要删除这个变量吗？', '提示', {
         confirmButtonText: '确定',

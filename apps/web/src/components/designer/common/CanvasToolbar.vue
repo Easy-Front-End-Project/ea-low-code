@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="canvas-toolbar">
     <ea-button
       text
@@ -36,19 +36,19 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed, onMounted, onBeforeUnmount } from 'vue'
   import { useSchemaStore } from '@/components/designer/stores/schema'
   import { usePagesStore } from '@/stores/pages'
   import { useRoute } from 'vue-router'
-  import { useSaveStatus } from '@/components/designer/composables/useSaveStatus.js'
+  import { useSaveStatus } from '@/components/designer/composables/useSaveStatus'
 
   const schemaStore = useSchemaStore()
   const pagesStore = usePagesStore()
   const route = useRoute()
   const saveStatus = useSaveStatus()
 
-  const currentPageId = computed(() => route.params.id)
+  const currentPageId = computed(() => route.params.id as string)
 
   async function handleSave() {
     if (!currentPageId.value || saveStatus.isSaving.value) return
@@ -62,14 +62,14 @@
       })
       saveStatus.markSaved()
       window.$message?.success('保存成功')
-    } catch (error) {
+    } catch (error: any) {
       window.$message?.error('保存失败: ' + (error.message || '未知错误'))
     } finally {
       saveStatus.setSaving(false)
     }
   }
 
-  function handleKeyDown(e) {
+  function handleKeyDown(e: KeyboardEvent) {
     if ((e.ctrlKey || e.metaKey) && e.key === 's') {
       e.preventDefault()
       handleSave()
