@@ -1,7 +1,21 @@
 /**
  * Schema 类型定义
  * 统一前后端 Schema 相关类型
+ *
+ * v2.0 变更说明：
+ * - 新增 SlotProps 类型，明确插槽属性传递语义
+ * - ComponentSchema.slots 类型从 Record<string, unknown> 改为 Record<string, SlotProps>
+ * - 新增 ComponentSchema.slotProps 字段，用于存储插槽作用域绑定的默认值
+ * - PageSchema.version 默认值从 '1.0' 升级为 '2.0'
  */
+
+// ==================== Schema 版本 ====================
+
+/** 当前 Schema 版本号 */
+export const SCHEMA_VERSION = '2.0' as const
+
+/** 旧版 Schema 版本号（用于迁移） */
+export const LEGACY_SCHEMA_VERSION = '1.0' as const
 
 // ==================== 变量类型 ====================
 
@@ -23,6 +37,24 @@ export interface VariableBinding {
   value: string
 }
 
+// ==================== 插槽类型 ====================
+
+/**
+ * 插槽属性配置
+ * 用于定义组件插槽的属性传递
+ *
+ * v1 中 slots 字段为 Record<string, unknown>，语义不清
+ * v2 明确为 Record<string, SlotProps>，每个插槽对应一组属性
+ */
+export interface SlotProps {
+  /** 插槽名称（如 default、header、footer） */
+  name: string
+  /** 传递给插槽的属性 */
+  props?: Record<string, unknown>
+  /** 插槽标签（设计时显示） */
+  label?: string
+}
+
 // ==================== 组件 Schema ====================
 
 /** 远程组件配置 */
@@ -33,7 +65,13 @@ export interface RemoteConfig {
   exportName: string
 }
 
-/** 组件 Schema 接口 */
+/**
+ * 组件 Schema 接口（v2）
+ *
+ * v2 变更：
+ * - slots 类型从 Record<string, unknown> 改为 Record<string, SlotProps>
+ * - 新增 slotProps 字段
+ */
 export interface ComponentSchema {
   id: string
   type: string
@@ -41,7 +79,10 @@ export interface ComponentSchema {
   style: Record<string, string>
   events: EventConfig[]
   children: ComponentSchema[]
-  slots: Record<string, unknown>
+  /** 插槽配置，v2 中每个插槽对应 SlotProps 对象 */
+  slots: Record<string, SlotProps>
+  /** 插槽作用域属性默认值（用于 scopeBindings 的初始值） */
+  slotProps?: Record<string, unknown>
   positionStyle?: Record<string, string>
   cssVariables?: Record<string, string>
   customCSS?: string
@@ -103,9 +144,9 @@ export interface PageMeta {
   viewport: Record<string, unknown>
 }
 
-/** 页面 Schema 接口 */
+/** 页面 Schema 接口（v2） */
 export interface PageSchema {
-  version: string
+  version: typeof SCHEMA_VERSION | string
   components: ComponentSchema[]
   layout: PageLayout
   meta: PageMeta

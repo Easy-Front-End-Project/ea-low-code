@@ -5,11 +5,8 @@
 
 // ==================== Schema 版本 ====================
 
-/** 当前 Schema 版本 */
-export const SCHEMA_VERSION = '1.0.0'
-
-/** 支持的 Schema 版本列表 */
-export const SCHEMA_VERSIONS = ['1.0.0'] as const
+/** 当前 Schema 版本（与 types/schema.ts 中的 SCHEMA_VERSION 保持一致） */
+export const SCHEMA_VERSIONS = ['1.0', '2.0'] as const
 
 // ==================== 默认页面配置 ====================
 
