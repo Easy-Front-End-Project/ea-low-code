@@ -76,23 +76,25 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.remote-component-panel {
+@import '@/styles/mixins/bem.scss';
+
+@include b(remote-component-panel) {
   display: flex;
   flex-direction: column;
   height: 100%;
   background-color: #fff;
 
-  &__search {
+  @include e(search) {
     padding: 0.75rem;
     border-bottom: 1px solid #e5e7eb;
   }
 
-  &__content {
+  @include e(content) {
     flex: 1;
     overflow-y: auto;
   }
 
-  &__footer {
+  @include e(footer) {
     padding: 0.75rem;
     border-top: 1px solid #e5e7eb;
     display: flex;
@@ -100,38 +102,38 @@ onMounted(() => {
   }
 }
 
-.panel-search {
+@include b(panel-search) {
   padding: 0.75rem;
   border-bottom: 1px solid #e5e7eb;
 }
 
-.panel-content {
+@include b(panel-content) {
   flex: 1;
   overflow-y: auto;
   padding: 0.75rem;
 }
 
-.panel-footer {
+@include b(panel-footer) {
   padding: 0.75rem;
   border-top: 1px solid #e5e7eb;
   display: flex;
   justify-content: center;
 }
 
-.empty-state {
+@include b(empty-state) {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 200px;
 }
 
-.component-grid {
+@include b(component-grid) {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0.5rem;
 }
 
-.component-item {
+@include b(component-item) {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -150,7 +152,7 @@ onMounted(() => {
     background-color: #f5f3ff;
   }
 
-  &--remote {
+  @include m(remote) {
     border-color: #8b5cf6;
     background-color: #f5f3ff;
 
@@ -160,13 +162,13 @@ onMounted(() => {
     }
   }
 
-  &__name {
+  @include e(name) {
     font-size: 0.75rem;
     color: #4b5563;
     text-align: center;
   }
 
-  &__badge {
+  @include e(badge) {
     font-size: 0.625rem;
     color: #8b5cf6;
     background-color: #ede9fe;

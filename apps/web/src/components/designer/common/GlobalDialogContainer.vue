@@ -123,17 +123,20 @@
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import '@/styles/mixins/bem.scss';
+
+@include b(global-dialog-container) {
   .editor-content {
     border: 1px solid #e4e7ed;
     border-radius: 4px;
     /* 确保 Monaco Editor 的 fixed 定位元素能正确计算位置 */
     position: relative;
-  }
 
-  /* 修复 Monaco Editor 代码提示框位置偏移 */
-  .editor-content :deep(.monaco-editor) {
-    position: relative;
+    /* 修复 Monaco Editor 代码提示框位置偏移 */
+    :deep(.monaco-editor) {
+      position: relative;
+    }
   }
 
   .dialog-footer {
@@ -176,11 +179,11 @@
   .api-help-category {
     font-size: 0.75rem;
     color: #0c4a6e;
-  }
 
-  .api-help-category strong {
-    color: #0369a1;
-    font-family: monospace;
+    strong {
+      color: #0369a1;
+      font-family: monospace;
+    }
   }
 
   .api-help-items {
@@ -189,14 +192,15 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
-  }
 
-  .api-help-items code {
-    background-color: #e0f2fe;
-    padding: 0.125rem 0.25rem;
-    border-radius: 0.25rem;
-    font-family: monospace;
-    font-size: 0.7rem;
-    color: #0369a1;
+    code {
+      background-color: #e0f2fe;
+      padding: 0.125rem 0.25rem;
+      border-radius: 0.25rem;
+      font-family: monospace;
+      font-size: 0.7rem;
+      color: #0369a1;
+    }
   }
+}
 </style>

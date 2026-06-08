@@ -107,15 +107,16 @@
 </script>
 
 <style lang="scss" scoped>
-  .canvas-toolbar {
-    display: flex;
-    gap: 0.5rem;
-    padding: 0.5rem;
-    background-color: #fff;
-    border-bottom: 1px solid #e5e7eb;
-    justify-content: center;
-    flex-shrink: 0;
-  }
+@import '@/styles/mixins/bem.scss';
+
+@include b(canvas-toolbar) {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  justify-content: center;
+  flex-shrink: 0;
 
   .toolbar-divider {
     width: 1px;
@@ -123,4 +124,5 @@
     background-color: #e5e7eb;
     margin: 0 0.25rem;
   }
+}
 </style>

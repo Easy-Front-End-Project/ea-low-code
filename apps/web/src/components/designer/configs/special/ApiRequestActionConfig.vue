@@ -219,103 +219,104 @@
 </script>
 
 <style lang="scss" scoped>
-  @use './styles/action-config.scss' as *;
+@use './styles/action-config.scss' as *;
+@import '@/styles/mixins/bem.scss';
 
-  .api-request-action-config {
-    @include action-config-base;
+@include b(api-request-action-config) {
+  @include action-config-base;
 
-    .config-item {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+  @include e(config-item) {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 
-      .config-label {
-        font-size: 12px;
-        color: #606266;
-        font-weight: 500;
-      }
-    }
-
-    .params-tabs {
-      display: flex;
-      border-bottom: 1px solid #e4e7ed;
-      margin-bottom: 12px;
-
-      .tab-item {
-        padding: 8px 16px;
-        font-size: 13px;
-        color: #606266;
-        cursor: pointer;
-        border-bottom: 2px solid transparent;
-        transition: all 0.2s;
-
-        &:hover {
-          color: #409eff;
-        }
-
-        &.active {
-          color: #409eff;
-          border-bottom-color: #409eff;
-        }
-      }
-    }
-
-    .params-list {
-      .param-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 8px;
-
-        .param-key,
-        .param-value {
-          flex: 1;
-        }
-      }
-    }
-
-    .data-bind-section {
-      .bind-toggle {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-
-        .bind-toggle-text {
-          font-size: 12px;
-          color: #606266;
-        }
-      }
-
-      .bind-config {
-        padding: 12px;
-        background-color: #f5f7fa;
-        border-radius: 4px;
-      }
-
-      .bind-hint {
-        display: flex;
-        align-items: flex-start;
-        gap: 6px;
-        font-size: 11px;
-        color: #909399;
-
-        .hint-icon {
-          flex-shrink: 0;
-          margin-top: 2px;
-        }
-
-        .hint-text {
-          line-height: 1.4;
-        }
-      }
-    }
-
-    .w-full {
-      width: 100%;
-    }
-
-    .mt-2 {
-      margin-top: 8px;
+    .config-label {
+      font-size: 12px;
+      color: #606266;
+      font-weight: 500;
     }
   }
+
+  @include e(params-tabs) {
+    display: flex;
+    border-bottom: 1px solid #e4e7ed;
+    margin-bottom: 12px;
+
+    .tab-item {
+      padding: 8px 16px;
+      font-size: 13px;
+      color: #606266;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+
+      &:hover {
+        color: #409eff;
+      }
+
+      &.active {
+        color: #409eff;
+        border-bottom-color: #409eff;
+      }
+    }
+  }
+
+  @include e(params-list) {
+    .param-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+
+      .param-key,
+      .param-value {
+        flex: 1;
+      }
+    }
+  }
+
+  @include e(data-bind-section) {
+    .bind-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .bind-toggle-text {
+        font-size: 12px;
+        color: #606266;
+      }
+    }
+
+    .bind-config {
+      padding: 12px;
+      background-color: #f5f7fa;
+      border-radius: 4px;
+    }
+
+    .bind-hint {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      font-size: 11px;
+      color: #909399;
+
+      .hint-icon {
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+
+      .hint-text {
+        line-height: 1.4;
+      }
+    }
+  }
+
+  @include e(w-full) {
+    width: 100%;
+  }
+
+  @include e(mt-2) {
+    margin-top: 8px;
+  }
+}
 </style>

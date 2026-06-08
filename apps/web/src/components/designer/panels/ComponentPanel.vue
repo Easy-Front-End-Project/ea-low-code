@@ -190,23 +190,25 @@
 </script>
 
 <style lang="scss" scoped>
-  .component-panel {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(component-panel) {
     display: flex;
     flex-direction: column;
     height: 100%;
     background-color: #fff;
 
-    &__search {
+    @include e(search) {
       padding: 0.75rem;
       border-bottom: 1px solid #e5e7eb;
     }
 
-    &__content {
+    @include e(content) {
       flex: 1;
       overflow-y: auto;
     }
 
-    &__footer {
+    @include e(footer) {
       padding: 0.75rem;
       border-top: 1px solid #e5e7eb;
       font-size: 0.75rem;
@@ -215,14 +217,14 @@
     }
   }
 
-  .component-groups {
+  @include b(component-groups) {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 0.5rem;
     padding: 0.75rem;
   }
 
-  .group-divider {
+  @include b(group-divider) {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -234,29 +236,29 @@
       margin-top: 0;
     }
 
-    &__line {
+    @include e(line) {
       flex: 1;
       height: 1px;
       background-color: #e5e7eb;
     }
 
-    &__name {
+    @include e(name) {
       font-size: 0.75rem;
       color: #6b7280;
       white-space: nowrap;
       padding: 0 0.25rem;
     }
 
-    &--bottom {
+    @include m(bottom) {
       margin-bottom: 0.25rem;
     }
   }
 
-  .component-grid {
+  @include b(component-grid) {
     display: contents;
   }
 
-  .component-item {
+  @include b(component-item) {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -275,7 +277,7 @@
       background-color: #eff6ff;
     }
 
-    &--child {
+    @include m(child) {
       border-color: #10b981;
       background-color: #ecfdf5;
 
@@ -285,7 +287,7 @@
       }
     }
 
-    &--remote {
+    @include m(remote) {
       border-color: #8b5cf6;
       background-color: #f5f3ff;
 
@@ -295,13 +297,13 @@
       }
     }
 
-    &__name {
+    @include e(name) {
       font-size: 0.75rem;
       color: #4b5563;
       text-align: center;
     }
 
-    &__badge {
+    @include e(badge) {
       font-size: 0.625rem;
       color: #8b5cf6;
       background-color: #ede9fe;
@@ -309,7 +311,7 @@
       border-radius: 0.25rem;
     }
 
-    &__tag {
+    @include e(tag) {
       --ea-tag-padding: 0 4px;
       --ea-tag-font-size: 10px;
     }

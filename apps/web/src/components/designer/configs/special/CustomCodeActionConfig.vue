@@ -96,19 +96,19 @@
 </script>
 
 <style lang="scss" scoped>
-  @use './styles/action-config.scss' as *;
+@use './styles/action-config.scss' as *;
+@import '@/styles/mixins/bem.scss';
 
-  .custom-code-action-config {
-    @include action-config-base;
-  }
+@include b(custom-code-action-config) {
+  @include action-config-base;
 
-  .code-preview-wrapper {
+  @include e(code-preview-wrapper) {
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
 
-  .code-preview {
+  @include e(code-preview) {
     min-height: 80px;
     max-height: 150px;
     overflow: auto;
@@ -134,4 +134,5 @@
       color: #909399;
     }
   }
+}
 </style>

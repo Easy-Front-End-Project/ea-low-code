@@ -218,35 +218,40 @@
   }
 </script>
 
-<style scoped>
-  @import './styles/config-styles.css';
+<style lang="scss" scoped>
+@import '@/styles/mixins/bem.scss';
+@import './styles/config-styles.css';
 
-  .prop-row {
+@include b(config-group) {
+  @include e(prop-row) {
     gap: 1rem;
   }
 
-  .font-style-buttons,
-  .align-buttons {
+  @include e(font-style-buttons) {
     display: flex;
     gap: 0.25rem;
   }
 
-  .style-tag,
-  .align-tag {
+  @include e(align-buttons) {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  @include e(style-tag) {
     --ea-check-tag-height: 32px;
     --ea-check-tag-padding: 0 12px;
     font-size: 14px;
-  }
-
-  .style-tag {
     font-weight: bold;
   }
 
-  .align-tag {
+  @include e(align-tag) {
+    --ea-check-tag-height: 32px;
+    --ea-check-tag-padding: 0 12px;
     font-size: 12px;
   }
 
-  .color-text-input {
+  @include e(color-text-input) {
     flex: 1;
   }
+}
 </style>

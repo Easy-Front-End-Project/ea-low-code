@@ -64,20 +64,20 @@
   @import '@/styles/mixins/bem.scss';
 
   @include b(designer-toolbar) {
-    &__extra {
+    @include e(extra) {
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
 
-    &__divider {
+    @include e(divider) {
       width: 1px;
       height: 1.5rem;
       background-color: var(--ea-border-light);
       margin: 0 0.5rem;
     }
 
-    &__save-hint {
+    @include e(save-hint) {
       font-size: 0.75rem;
       color: #67c23a;
       white-space: nowrap;

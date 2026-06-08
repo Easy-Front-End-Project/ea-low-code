@@ -17,7 +17,9 @@ withDefaults(defineProps<{
 </script>
 
 <style lang="scss" scoped>
-.component-label {
+@import '@/styles/mixins/bem.scss';
+
+@include b(component-label) {
   position: absolute;
   top: 0;
   left: 0;
@@ -31,7 +33,7 @@ withDefaults(defineProps<{
   transform: translate(-25%, -100%);
   z-index: 100;
 
-  &__slot {
+  @include e(slot) {
     position: absolute;
     bottom: 0;
     right: 0;

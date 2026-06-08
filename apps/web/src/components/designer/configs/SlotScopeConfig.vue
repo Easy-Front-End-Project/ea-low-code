@@ -85,27 +85,29 @@
   }
 </script>
 
-<style scoped>
-  .slot-scope-config-section {
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #e5e7eb;
-  }
+<style lang="scss" scoped>
+@import '@/styles/mixins/bem.scss';
 
-  .section-title {
+@include b(slot-scope-config-section) {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+
+  @include e(section-title) {
     font-size: 0.875rem;
     font-weight: 600;
     color: #374151;
     margin-bottom: 0.75rem;
   }
 
-  .scope-select {
+  @include e(scope-select) {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-  }
 
-  .scope-select EaSelect {
-    width: 100%;
+    EaSelect {
+      width: 100%;
+    }
   }
+}
 </style>

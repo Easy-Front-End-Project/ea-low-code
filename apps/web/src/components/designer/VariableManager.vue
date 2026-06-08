@@ -388,20 +388,22 @@ return Date.now() + 60 * 60 * 24 * 7 * 1000;`
   }
 </script>
 
-<style scoped>
-  .variable-manager {
+<style lang="scss" scoped>
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(variable-manager) {
     min-height: 300px;
     max-height: 500px;
     overflow-y: auto;
   }
 
-  .variable-form {
+  @include b(variable-form) {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
   }
 
-  .variable-header {
+  @include b(variable-header) {
     display: flex;
     align-items: center;
     padding: 0.5rem 0.75rem;
@@ -412,7 +414,7 @@ return Date.now() + 60 * 60 * 24 * 7 * 1000;`
     color: #4b5563;
   }
 
-  .variable-item {
+  @include b(variable-item) {
     display: flex;
     align-items: center;
     padding: 0.5rem 0.75rem;
@@ -420,44 +422,44 @@ return Date.now() + 60 * 60 * 24 * 7 * 1000;`
     border: 1px solid #e5e7eb;
     border-radius: 0.375rem;
     transition: all 0.2s;
+
+    &:hover {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
   }
 
-  .variable-item:hover {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-  }
-
-  .col-name {
+  @include b(col-name) {
     flex: 2;
     min-width: 120px;
     padding-right: 0.5rem;
   }
 
-  .col-type {
+  @include b(col-type) {
     flex: 1.5;
     min-width: 100px;
     padding-right: 0.5rem;
   }
 
-  .col-default {
+  @include b(col-default) {
     flex: 1.5;
     min-width: 100px;
     padding-right: 0.5rem;
   }
 
-  .col-remark {
+  @include b(col-remark) {
     flex: 2;
     min-width: 120px;
     padding-right: 0.5rem;
   }
 
-  .col-action {
+  @include b(col-action) {
     width: 50px;
     display: flex;
     justify-content: center;
   }
 
-  .empty-state {
+  @include b(empty-state) {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -467,7 +469,7 @@ return Date.now() + 60 * 60 * 24 * 7 * 1000;`
     border-radius: 0.5rem;
   }
 
-  .dialog-footer {
+  @include b(dialog-footer) {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -475,7 +477,7 @@ return Date.now() + 60 * 60 * 24 * 7 * 1000;`
     border-top: 1px solid #e5e7eb;
   }
 
-  .editor-content {
+  @include b(editor-content) {
     padding: 1rem;
   }
 </style>

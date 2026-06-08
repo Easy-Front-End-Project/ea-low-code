@@ -129,11 +129,12 @@
 </script>
 
 <style lang="scss" scoped>
-  @use './styles/action-config.scss' as *;
+@use './styles/action-config.scss' as *;
+@import '@/styles/mixins/bem.scss';
 
-  .call-method-action-config {
-    @include action-config-base;
-    @include target-selector;
-    @include component-selector-list;
-  }
+@include b(call-method-action-config) {
+  @include action-config-base;
+  @include target-selector;
+  @include component-selector-list;
+}
 </style>

@@ -51,7 +51,9 @@
 </script>
 
 <style lang="scss" scoped>
-  .special-config-renderer {
-    /* 容器样式 */
-  }
+@import '@/styles/mixins/bem.scss';
+
+@include b(special-config-renderer) {
+  /* 容器样式 */
+}
 </style>

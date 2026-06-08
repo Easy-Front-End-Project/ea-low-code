@@ -130,21 +130,23 @@
   }
 </script>
 
-<style scoped>
-  .page-settings-panel {
+<style lang="scss" scoped>
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(page-settings-panel) {
     background-color: #fff;
   }
 
-  .settings-section {
+  @include b(settings-section) {
     padding-bottom: 1rem;
     border-bottom: 1px solid #e5e7eb;
+
+    &:last-child {
+      border-bottom: none;
+    }
   }
 
-  .settings-section:last-child {
-    border-bottom: none;
-  }
-
-  .section-title {
+  @include b(section-title) {
     font-size: 0.875rem;
     font-weight: 600;
     color: #374151;
@@ -154,7 +156,7 @@
     gap: 0.5rem;
   }
 
-  .saving-hint {
+  @include b(saving-hint) {
     font-size: 0.75rem;
     font-weight: normal;
     color: #409eff;
@@ -171,52 +173,52 @@
     }
   }
 
-  .setting-item {
+  @include b(setting-item) {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
   }
 
-  .setting-label {
+  @include b(setting-label) {
     font-size: 0.75rem;
     color: #6b7280;
   }
 
-  .component-setting-item {
+  @include b(component-setting-item) {
     padding: 0.75rem;
     background-color: #f9fafb;
     border-radius: 0.375rem;
   }
 
-  .inherit-toggle {
+  @include b(inherit-toggle) {
     display: flex;
     align-items: center;
     gap: 0.5rem;
   }
 
-  .toggle-text {
+  @include b(toggle-text) {
     font-size: 0.75rem;
     color: #6b7280;
   }
 
-  .tag {
+  @include b(tag) {
     display: inline-block;
     padding: 0 0.375rem;
     font-size: 0.625rem;
     line-height: 1.25rem;
     border-radius: 0.25rem;
     font-weight: 500;
-  }
 
-  .tag-info {
-    background-color: #e6f7ff;
-    color: #1890ff;
-    border: 1px solid #91d5ff;
-  }
+    @include m(info) {
+      background-color: #e6f7ff;
+      color: #1890ff;
+      border: 1px solid #91d5ff;
+    }
 
-  .tag-success {
-    background-color: #f6ffed;
-    color: #52c41a;
-    border: 1px solid #b7eb8f;
+    @include m(success) {
+      background-color: #f6ffed;
+      color: #52c41a;
+      border: 1px solid #b7eb8f;
+    }
   }
 </style>

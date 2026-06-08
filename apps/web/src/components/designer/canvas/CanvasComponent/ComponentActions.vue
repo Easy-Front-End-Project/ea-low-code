@@ -25,7 +25,9 @@ defineEmits<{
 </script>
 
 <style lang="scss" scoped>
-.component-actions {
+@import '@/styles/mixins/bem.scss';
+
+@include b(component-actions) {
   position: absolute;
   top: 0;
   right: 0;

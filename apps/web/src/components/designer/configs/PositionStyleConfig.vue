@@ -241,10 +241,11 @@
   initLocalState()
 </script>
 
-<style scoped>
-  @import './styles/config-styles.css';
+<style lang="scss" scoped>
+@import '@/styles/mixins/bem.scss';
+@import './styles/config-styles.css';
 
-  .config-group {
-    margin-bottom: 1rem;
-  }
+@include b(config-group) {
+  margin-bottom: 1rem;
+}
 </style>

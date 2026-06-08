@@ -81,16 +81,20 @@
   })
 </script>
 
-<style scoped>
-  .config-item {
+<style lang="scss" scoped>
+@import '@/styles/mixins/bem.scss';
+
+@include b(message-action-config) {
+  @include e(config-item) {
     display: flex;
     flex-direction: column;
     gap: 4px;
   }
 
-  .config-label {
+  @include e(config-label) {
     font-size: 12px;
     color: #606266;
     font-weight: 500;
   }
+}
 </style>

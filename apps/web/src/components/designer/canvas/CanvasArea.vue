@@ -204,7 +204,9 @@
 </script>
 
 <style lang="scss" scoped>
-  .canvas-area {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(canvas-area) {
     flex: 1;
     background-color: #f5f7fa;
     display: flex;
@@ -212,7 +214,7 @@
     height: 100%;
     overflow: hidden;
 
-    &__scroll-wrapper {
+    @include e(scroll-wrapper) {
       flex: 1;
       overflow: auto;
       padding: 1.5rem;
@@ -223,7 +225,7 @@
       justify-content: flex-start;
     }
 
-    &__container {
+    @include e(container) {
       background-color: #fff;
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
       border-radius: 0.5rem;
@@ -232,7 +234,7 @@
       flex-shrink: 0;
     }
 
-    &__grid {
+    @include e(grid) {
       position: absolute;
       inset: 0;
       pointer-events: none;
@@ -243,14 +245,14 @@
       background-size: 20px 20px;
     }
 
-    &__content {
+    @include e(content) {
       position: relative;
       width: 100%;
       min-height: 100%;
       padding: 1rem;
     }
 
-    &__empty {
+    @include e(empty) {
       position: absolute;
       inset: 0;
       display: flex;
@@ -258,14 +260,14 @@
       align-items: center;
       color: #9ca3af;
       margin-top: 2rem;
+    }
 
-      &-icon {
-        margin: 2rem 0;
-      }
+    @include e(empty-icon) {
+      margin: 2rem 0;
+    }
 
-      &-text {
-        font-size: 0.875rem;
-      }
+    @include e(empty-text) {
+      font-size: 0.875rem;
     }
   }
 </style>

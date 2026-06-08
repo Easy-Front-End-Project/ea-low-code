@@ -374,9 +374,10 @@
 </script>
 
 <style lang="scss" scoped>
-  .variable-binding-input {
-    width: 100%;
-  }
+@import '@/styles/mixins/bem.scss';
+
+@include b(variable-binding-input) {
+  width: 100%;
 
   .input-wrapper {
     display: flex;
@@ -398,14 +399,14 @@
     padding: 0.25rem;
     color: #9ca3af;
     transition: color 0.2s;
-  }
 
-  .bind-btn:hover {
-    color: #3b82f6;
-  }
+    &:hover {
+      color: #3b82f6;
+    }
 
-  .bind-btn.is-bound {
-    color: #3b82f6;
+    @include when(bound) {
+      color: #3b82f6;
+    }
   }
 
   .variable-tag {
@@ -419,10 +420,10 @@
     border-radius: 0.25rem;
     font-size: 0.75rem;
     color: #1e40af;
-  }
 
-  .variable-tag span {
-    flex: 1;
+    span {
+      flex: 1;
+    }
   }
 
   .w-full {
@@ -432,4 +433,5 @@
   .text-center {
     text-align: center;
   }
+}
 </style>

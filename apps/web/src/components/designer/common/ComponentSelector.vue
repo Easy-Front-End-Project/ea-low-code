@@ -99,10 +99,11 @@
 </script>
 
 <style lang="scss" scoped>
-  .selector-list {
-    max-height: 400px;
-    overflow-y: auto;
-  }
+@import '@/styles/mixins/bem.scss';
+
+@include b(selector-list) {
+  max-height: 400px;
+  overflow-y: auto;
 
   .selector-item {
     display: flex;
@@ -128,4 +129,5 @@
       color: #909399;
     }
   }
+}
 </style>

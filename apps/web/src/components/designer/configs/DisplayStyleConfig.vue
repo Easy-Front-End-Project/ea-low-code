@@ -180,14 +180,17 @@
   }
 </script>
 
-<style scoped>
-  @import './styles/config-styles.css';
+<style lang="scss" scoped>
+@import '@/styles/mixins/bem.scss';
+@import './styles/config-styles.css';
 
-  .display-segmented {
+@include b(config-group) {
+  @include e(display-segmented) {
     width: 100%;
   }
 
-  .flex-segmented {
+  @include e(flex-segmented) {
     width: 100%;
   }
+}
 </style>

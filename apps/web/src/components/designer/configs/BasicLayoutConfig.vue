@@ -183,10 +183,13 @@
   initLocalState()
 </script>
 
-<style scoped>
-  @import './styles/config-styles.css';
+<style lang="scss" scoped>
+@import '@/styles/mixins/bem.scss';
+@import './styles/config-styles.css';
 
-  .opacity-control {
+@include b(config-group) {
+  @include e(opacity-control) {
     padding: 0.5rem 0;
   }
+}
 </style>

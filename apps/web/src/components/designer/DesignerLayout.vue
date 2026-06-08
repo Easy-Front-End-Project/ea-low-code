@@ -140,20 +140,22 @@
 </script>
 
 <style lang="scss" scoped>
-  .designer-layout {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(designer-layout) {
     height: 100vh;
     width: 100vw;
 
-    &__header {
+    @include e(header) {
       background-color: #fff;
       border-bottom: 1px solid #e5e7eb;
     }
 
-    &__toolbar {
+    @include e(toolbar) {
       height: 100%;
     }
 
-    &__sidebar {
+    @include e(sidebar) {
       background-color: #fff;
       display: flex;
       flex-direction: column;
@@ -161,52 +163,52 @@
       padding: 1rem 0;
       gap: 0.5rem;
       border-right: 1px solid #e5e7eb;
+    }
 
-      &-item {
-        width: 2.5rem;
-        height: 2.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        border-radius: 0.25rem;
-        font-size: 0.875rem;
-        font-weight: 500;
+    @include e(sidebar-item) {
+      width: 2.5rem;
+      height: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 0.25rem;
+      font-size: 0.875rem;
+      font-weight: 500;
 
-        &:hover {
-          background-color: #f3f4f6;
-        }
+      &:hover {
+        background-color: #f3f4f6;
+      }
 
-        &--active {
-          background-color: #eff6ff;
-          color: #2563eb;
-        }
+      @include m(active) {
+        background-color: #eff6ff;
+        color: #2563eb;
       }
     }
 
-    &__panel {
+    @include e(panel) {
       background-color: #fff;
       border-right: 1px solid #e5e7eb;
       position: relative;
       transition: all 0.3s;
 
-      &--right {
+      @include m(right) {
         border-right: none;
         border-left: 1px solid #e5e7eb;
       }
 
-      &--json {
+      @include m(json) {
         padding-bottom: 4.5rem;
-      }
-
-      &-content {
-        width: 100%;
-        height: 100%;
-        padding: 0 0.75rem;
       }
     }
 
-    &__toggle-btn {
+    @include e(panel-content) {
+      width: 100%;
+      height: 100%;
+      padding: 0 0.75rem;
+    }
+
+    @include e(toggle-btn) {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
@@ -214,27 +216,27 @@
       height: 3rem;
       z-index: 10;
 
-      &--left {
+      @include m(left) {
         right: 0;
         transform: translate(100%, -50%);
       }
 
-      &--right {
+      @include m(right) {
         left: 0;
         transform: translate(-100%, -50%);
       }
-
-      &-icon {
-        font-size: 0.75rem;
-        color: #6b7280;
-      }
     }
 
-    &__canvas {
+    @include e(toggle-btn-icon) {
+      font-size: 0.75rem;
+      color: #6b7280;
+    }
+
+    @include e(canvas) {
       background-color: #f3f4f6;
     }
 
-    &__props {
+    @include e(props) {
       background-color: #fff;
       border-left: 1px solid #e5e7eb;
     }

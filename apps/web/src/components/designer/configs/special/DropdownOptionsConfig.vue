@@ -318,37 +318,38 @@
 </script>
 
 <style lang="scss" scoped>
-  .dropdown-options-config {
-    margin-bottom: 1rem;
-  }
+@import '@/styles/mixins/bem.scss';
 
-  .config-header {
+@include b(dropdown-options-config) {
+  margin-bottom: 1rem;
+
+  @include e(config-header) {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0.5rem;
   }
 
-  .config-title {
+  @include e(config-title) {
     font-size: 0.875rem;
     font-weight: 600;
     color: #374151;
   }
 
-  .options-preview {
+  @include e(options-preview) {
     background-color: #f9fafb;
     border-radius: 0.375rem;
     padding: 0.5rem;
     min-height: 40px;
   }
 
-  .preview-list {
+  @include e(preview-list) {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
   }
 
-  .preview-item {
+  @include e(preview-item) {
     display: flex;
     align-items: center;
     gap: 0.25rem;
@@ -358,27 +359,27 @@
     background-color: #fff;
     border-radius: 0.25rem;
     border: 1px solid #e5e7eb;
+
+    @include when(divided) {
+      border-top: 2px solid #e5e7eb;
+    }
   }
 
-  .preview-item.is-divided {
-    border-top: 2px solid #e5e7eb;
-  }
-
-  .preview-label {
+  @include e(preview-label) {
     margin-right: 0.25rem;
   }
 
-  .preview-value {
+  @include e(preview-value) {
     color: #9ca3af;
   }
 
   /* 弹窗内容 */
-  .dialog-content {
+  @include e(dialog-content) {
     max-height: 400px;
     overflow-y: auto;
   }
 
-  .toolbar {
+  @include e(toolbar) {
     display: flex;
     gap: 0.5rem;
     margin-bottom: 1rem;
@@ -387,85 +388,85 @@
   }
 
   /* 列表结构 */
-  .list-container {
+  @include e(list-container) {
     min-height: 200px;
   }
 
-  .item-list {
+  @include e(item-list) {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
   }
 
-  .item-row {
+  @include e(item-row) {
     background-color: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 0.375rem;
+
+    @include when(divided) {
+      border-top: 2px solid #e5e7eb;
+    }
   }
 
-  .item-row.is-divided {
-    border-top: 2px solid #e5e7eb;
-  }
-
-  .item-content {
+  @include e(item-content) {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem;
   }
 
-  .item-icon {
+  @include e(item-icon) {
     color: #6b7280;
     flex-shrink: 0;
   }
 
-  .item-label {
+  @include e(item-label) {
     font-size: 0.875rem;
     color: #374151;
     flex: 1;
   }
 
-  .item-command {
+  @include e(item-command) {
     font-size: 0.75rem;
     color: #9ca3af;
     margin-right: 0.5rem;
   }
 
-  .item-badges {
+  @include e(item-badges) {
     display: flex;
     gap: 0.25rem;
     margin-right: 0.5rem;
   }
 
-  .item-actions {
+  @include e(item-actions) {
     display: flex;
     gap: 0.25rem;
   }
 
   /* 表单样式 */
-  .form-content {
+  @include e(form-content) {
     padding: 1rem 0;
   }
 
-  .form-item {
+  @include e(form-item) {
     margin-bottom: 1rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 
-  .form-item:last-child {
-    margin-bottom: 0;
-  }
-
-  .form-item-inline {
+  @include e(form-item-inline) {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+
+    .form-label {
+      margin-bottom: 0;
+    }
   }
 
-  .form-item-inline .form-label {
-    margin-bottom: 0;
-  }
-
-  .form-label {
+  @include e(form-label) {
     display: block;
     font-size: 0.875rem;
     font-weight: 500;
@@ -473,9 +474,10 @@
     margin-bottom: 0.5rem;
   }
 
-  .dialog-footer {
+  @include e(dialog-footer) {
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;
   }
+}
 </style>

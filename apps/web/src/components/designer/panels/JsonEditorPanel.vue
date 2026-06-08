@@ -82,13 +82,15 @@
 </script>
 
 <style lang="scss" scoped>
-  .json-editor-panel {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(json-editor-panel) {
     display: flex;
     flex-direction: column;
     height: 100%;
   }
 
-  .json-editor-toolbar {
+  @include b(json-editor-toolbar) {
     display: flex;
     gap: 8px;
     padding: 8px 0;
@@ -96,7 +98,7 @@
     margin-bottom: 8px;
   }
 
-  .json-editor-content {
+  @include b(json-editor-content) {
     flex: 1;
     overflow: hidden;
   }

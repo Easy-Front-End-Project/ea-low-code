@@ -136,7 +136,7 @@
   })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   /* 预览模式下组件样式 */
   :deep(*) {
     /* display: contents; */

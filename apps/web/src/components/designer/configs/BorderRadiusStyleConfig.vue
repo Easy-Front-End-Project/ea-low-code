@@ -274,6 +274,7 @@
   initLocalState()
 </script>
 
-<style scoped>
-  @import './styles/config-styles.css';
+<style lang="scss" scoped>
+@import '@/styles/mixins/bem.scss';
+@import './styles/config-styles.css';
 </style>

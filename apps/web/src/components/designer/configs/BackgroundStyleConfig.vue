@@ -235,27 +235,28 @@
   initLocalState()
 </script>
 
-<style scoped>
-  @import './styles/config-styles.css';
+<style lang="scss" scoped>
+@import '@/styles/mixins/bem.scss';
+@import './styles/config-styles.css';
 
-  .config-group {
-    margin-bottom: 1rem;
-  }
+@include b(config-group) {
+  margin-bottom: 1rem;
 
-  .bg-image-input {
+  @include e(bg-image-input) {
     width: 100%;
   }
 
-  .size-input-row {
+  @include e(size-input-row) {
     display: flex;
     gap: 0.25rem;
+
+    :deep(.unit-input) {
+      flex: 1;
+    }
   }
 
-  .size-input-row :deep(.unit-input) {
-    flex: 1;
-  }
-
-  .unit-select {
+  @include e(unit-select) {
     width: 70px;
   }
+}
 </style>

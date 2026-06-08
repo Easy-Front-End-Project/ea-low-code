@@ -84,17 +84,19 @@
   }
 </script>
 
-<style scoped>
-  @import './styles/config-styles.css';
+<style lang="scss" scoped>
+@import '@/styles/mixins/bem.scss';
+@import './styles/config-styles.css';
 
-  .editor-header {
+@include b(config-group) {
+  @include e(editor-header) {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0.5rem;
   }
 
-  .help-panel {
+  @include e(help-panel) {
     background-color: #f0f9ff;
     border: 1px solid #bae6fd;
     border-radius: 0.375rem;
@@ -102,20 +104,20 @@
     margin-bottom: 0.75rem;
   }
 
-  .help-text {
+  @include e(help-text) {
     font-size: 0.75rem;
     color: #0369a1;
     margin: 0 0 0.5rem 0;
+
+    code {
+      background-color: #e0f2fe;
+      padding: 0.125rem 0.25rem;
+      border-radius: 0.25rem;
+      font-family: monospace;
+    }
   }
 
-  .help-text code {
-    background-color: #e0f2fe;
-    padding: 0.125rem 0.25rem;
-    border-radius: 0.25rem;
-    font-family: monospace;
-  }
-
-  .help-example {
+  @include e(help-example) {
     font-size: 0.75rem;
     color: #0c4a6e;
     background-color: #e0f2fe;
@@ -127,13 +129,13 @@
     overflow-x: auto;
   }
 
-  .code-preview-wrapper {
+  @include e(code-preview-wrapper) {
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
 
-  .code-preview {
+  @include e(code-preview) {
     min-height: 80px;
     max-height: 150px;
     overflow: auto;
@@ -142,22 +144,23 @@
     border: 1px solid #e4e7ed;
     border-radius: 4px;
     cursor: pointer;
+
+    &:hover {
+      border-color: #409eff;
+    }
+
+    pre {
+      margin: 0;
+      font-family: monospace;
+      font-size: 0.875rem;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
   }
 
-  .code-preview:hover {
-    border-color: #409eff;
-  }
-
-  .code-preview pre {
-    margin: 0;
-    font-family: monospace;
-    font-size: 0.875rem;
-    white-space: pre-wrap;
-    word-break: break-all;
-  }
-
-  .placeholder {
+  @include e(placeholder) {
     color: #909399;
     font-size: 0.875rem;
   }
+}
 </style>

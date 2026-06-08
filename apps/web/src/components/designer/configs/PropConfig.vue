@@ -89,31 +89,33 @@
   }
 </script>
 
-<style scoped>
-  .props-section {
-    margin-bottom: 1.5rem;
-  }
+<style lang="scss" scoped>
+@import '@/styles/mixins/bem.scss';
 
-  .section-title {
+@include b(props-section) {
+  margin-bottom: 1.5rem;
+
+  @include e(section-title) {
     font-size: 0.875rem;
     font-weight: 600;
     color: #374151;
     margin-bottom: 0.75rem;
   }
 
-  .prop-item {
+  @include e(prop-item) {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
   }
 
-  .prop-label {
+  @include e(prop-label) {
     font-size: 0.75rem;
     font-weight: 500;
     color: #6b7280;
   }
 
-  .description-wrapper {
+  @include e(description-wrapper) {
     margin-bottom: 0.25rem;
   }
+}
 </style>

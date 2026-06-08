@@ -278,7 +278,9 @@
 </script>
 
 <style lang="scss" scoped>
-  .canvas-component {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(canvas-component) {
     position: relative;
     display: inline-flex;
     margin: 4px;
@@ -286,52 +288,7 @@
     min-height: 15px;
     transition: all 0.2s ease;
 
-    &--container,
-    &--non-container,
-    &--inline-block {
-      border: 1px dashed #d1d5db;
-      border-radius: 4px;
-
-      &:hover {
-        border-color: #3b82f6;
-        background-color: rgba(59, 130, 246, 0.05);
-      }
-    }
-
-    &--container {
-      display: block;
-      padding: 8px;
-    }
-
-    &--non-container {
-      display: block;
-      padding: 8px;
-      min-width: 120px;
-      min-height: 40px;
-    }
-
-    &--inline-block {
-      display: inline-flex;
-      padding: 4px;
-    }
-
-    &--drop-target {
-      border-color: #10b981;
-      background-color: rgba(16, 185, 129, 0.1);
-      border-style: solid;
-    }
-
-    &--non-selectable {
-      pointer-events: none;
-      display: contents;
-
-      .canvas-component__wrapper {
-        pointer-events: auto;
-        display: contents;
-      }
-    }
-
-    &__wrapper {
+    @include e(wrapper) {
       position: relative;
       cursor: pointer;
 
@@ -379,7 +336,7 @@
       }
     }
 
-    &__selection-border {
+    @include e(selection-border) {
       position: absolute;
       inset: -2px;
       border: 2px solid #3b82f6;
@@ -394,6 +351,52 @@
         border: 1px dashed rgba(59, 130, 246, 0.3);
         border-radius: 6px;
       }
+    }
+
+    @include m(container) {
+      display: block;
+      padding: 8px;
+    }
+
+    @include m(non-container) {
+      display: block;
+      padding: 8px;
+      min-width: 120px;
+      min-height: 40px;
+    }
+
+    @include m(inline-block) {
+      display: inline-flex;
+      padding: 4px;
+    }
+
+    @include m(drop-target) {
+      border-color: #10b981;
+      background-color: rgba(16, 185, 129, 0.1);
+      border-style: solid;
+    }
+
+    @include m(non-selectable) {
+      pointer-events: none;
+      display: contents;
+
+      .canvas-component__wrapper {
+        pointer-events: auto;
+        display: contents;
+      }
+    }
+  }
+
+  // Shared styles for container-type modifiers
+  .canvas-component--container,
+  .canvas-component--non-container,
+  .canvas-component--inline-block {
+    border: 1px dashed #d1d5db;
+    border-radius: 4px;
+
+    &:hover {
+      border-color: #3b82f6;
+      background-color: rgba(59, 130, 246, 0.05);
     }
   }
 

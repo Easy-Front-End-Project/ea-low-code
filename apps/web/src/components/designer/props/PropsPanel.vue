@@ -486,36 +486,38 @@
 </script>
 
 <style lang="scss" scoped>
-  .props-panel {
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(props-panel) {
     display: flex;
     flex-direction: column;
     height: 100%;
     background-color: #fff;
 
-    &__content {
+    @include e(content) {
       flex: 1;
       overflow-y: auto;
       padding-bottom: 8rem;
     }
 
-    &__section {
+    @include e(section) {
       padding: 1rem;
     }
   }
 
-  .info-card {
-    &__header {
+  @include b(info-card) {
+    @include e(header) {
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
 
-    &__title {
+    @include e(title) {
       font-weight: 500;
       color: #1f2937;
     }
 
-    &__content {
+    @include e(content) {
       font-size: 0.75rem;
       color: #6b7280;
 
@@ -525,40 +527,40 @@
     }
   }
 
-  .alias-editor {
+  @include b(alias-editor) {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     margin-top: 0.5rem;
 
-    &__value {
+    @include e(value) {
       color: #2563eb;
       width: 100%;
     }
 
-    &__input-group {
+    @include e(input-group) {
       display: flex;
       align-items: center;
       gap: 0.5rem;
       width: 100%;
     }
 
-    &__input {
+    @include e(input) {
       flex: 1;
     }
   }
 
-  .config-section {
+  @include b(config-section) {
     margin-bottom: 1.5rem;
 
-    &__title {
+    @include e(title) {
       font-size: 0.875rem;
       font-weight: 600;
       color: #374151;
       margin-bottom: 0.75rem;
     }
 
-    &__subsection-title {
+    @include e(subsection-title) {
       font-size: 0.75rem;
       font-weight: 600;
       color: #6b7280;
@@ -568,24 +570,24 @@
     }
   }
 
-  .prop-item {
+  @include b(prop-item) {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
 
-    &--inline {
+    @include m(inline) {
       flex-direction: row;
       align-items: center;
       gap: 0.5rem;
     }
 
-    &__label {
+    @include e(label) {
       font-size: 0.75rem;
       font-weight: 500;
       color: #6b7280;
     }
 
-    &__description {
+    @include e(description) {
       margin-bottom: 0.25rem;
     }
   }

@@ -136,26 +136,28 @@
   }
 </script>
 
-<style scoped>
-  .variable-selector {
+<style lang="scss" scoped>
+  @import '@/styles/mixins/bem.scss';
+
+  @include b(variable-selector) {
     min-height: 300px;
     max-height: 400px;
     display: flex;
     flex-direction: column;
   }
 
-  .search-box {
+  @include b(search-box) {
     padding-bottom: 1rem;
     border-bottom: 1px solid #e5e7eb;
   }
 
-  .variable-list {
+  @include b(variable-list) {
     flex: 1;
     overflow-y: auto;
     padding-top: 0.5rem;
   }
 
-  .variable-item {
+  @include b(variable-item) {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -163,19 +165,19 @@
     border-radius: 0.375rem;
     cursor: pointer;
     transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #f3f4f6;
+    }
   }
 
-  .variable-item:hover {
-    background-color: #f3f4f6;
-  }
-
-  .variable-info {
+  @include b(variable-info) {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
   }
 
-  .variable-name {
+  @include b(variable-name) {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -184,36 +186,36 @@
     color: #374151;
   }
 
-  .variable-meta {
+  @include b(variable-meta) {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     font-size: 0.75rem;
   }
 
-  .variable-type {
+  @include b(variable-type) {
     padding: 0.125rem 0.375rem;
     background-color: #dbeafe;
     color: #1e40af;
     border-radius: 0.25rem;
   }
 
-  .variable-remark {
+  @include b(variable-remark) {
     color: #6b7280;
   }
 
-  .variable-value {
+  @include b(variable-value) {
     font-size: 0.75rem;
     color: #6b7280;
+
+    code {
+      padding: 0.125rem 0.375rem;
+      background-color: #f3f4f6;
+      border-radius: 0.25rem;
+    }
   }
 
-  .variable-value code {
-    padding: 0.125rem 0.375rem;
-    background-color: #f3f4f6;
-    border-radius: 0.25rem;
-  }
-
-  .empty-state {
+  @include b(empty-state) {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -221,7 +223,7 @@
     padding: 3rem 1rem;
   }
 
-  .dialog-footer {
+  @include b(dialog-footer) {
     display: flex;
     justify-content: space-between;
     align-items: center;

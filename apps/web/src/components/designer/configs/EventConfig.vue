@@ -445,50 +445,51 @@
   }
 </script>
 
-<style scoped>
-  .props-section {
-    margin-bottom: 1.5rem;
-  }
+<style lang="scss" scoped>
+@import '@/styles/mixins/bem.scss';
 
-  .section-title {
+@include b(props-section) {
+  margin-bottom: 1.5rem;
+
+  @include e(section-title) {
     font-size: 14px;
     font-weight: 600;
     color: #303133;
     margin-bottom: 12px;
   }
 
-  .config-item {
+  @include e(config-item) {
     display: flex;
     flex-direction: column;
     gap: 4px;
   }
 
-  .config-label {
+  @include e(config-label) {
     font-size: 12px;
     color: #606266;
     font-weight: 500;
   }
 
-  .event-tag {
+  @include e(event-tag) {
     transition: all 0.2s;
   }
 
-  .event-item {
+  @include e(event-item) {
     transition: all 0.2s;
+
+    &:hover {
+      background-color: #f5f7fa;
+    }
   }
 
-  .event-item:hover {
-    background-color: #f5f7fa;
-  }
-
-  .dialog-footer {
+  @include e(dialog-footer) {
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
 
   /* 标签徽章样式 */
-  .label-badge {
+  @include e(label-badge) {
     display: inline-block;
     padding: 1px 6px;
     border-radius: 3px;
@@ -496,29 +497,29 @@
     font-weight: 500;
     margin-left: 6px;
     vertical-align: middle;
-  }
 
-  .label-badge.static {
-    background-color: #e6f7ff;
-    color: #1890ff;
-    border: 1px solid #91d5ff;
-  }
+    @include m(static) {
+      background-color: #e6f7ff;
+      color: #1890ff;
+      border: 1px solid #91d5ff;
+    }
 
-  .label-badge.dynamic {
-    background-color: #f6ffed;
-    color: #52c41a;
-    border: 1px solid #b7eb8f;
+    @include m(dynamic) {
+      background-color: #f6ffed;
+      color: #52c41a;
+      border: 1px solid #b7eb8f;
+    }
   }
 
   /* 动态配置区域样式 */
-  .dynamic-config-section {
+  @include e(dynamic-config-section) {
     border: 1px dashed #d9d9d9;
     border-radius: 6px;
     padding: 12px;
     background-color: #fafafa;
   }
 
-  .dynamic-config-header {
+  @include e(dynamic-config-header) {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -527,9 +528,10 @@
     border-bottom: 1px solid #e8e8e8;
   }
 
-  .dynamic-config-title {
+  @include e(dynamic-config-title) {
     font-size: 12px;
     font-weight: 600;
     color: #595959;
   }
+}
 </style>

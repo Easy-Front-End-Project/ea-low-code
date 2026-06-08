@@ -318,21 +318,22 @@
 </script>
 
 <style lang="scss" scoped>
-  @use './styles/action-config.scss' as *;
+@use './styles/action-config.scss' as *;
+@import '@/styles/mixins/bem.scss';
 
-  .set-prop-action-config {
-    @include action-config-base;
-    @include target-selector;
-    @include component-selector-list;
-  }
+@include b(set-prop-action-config) {
+  @include action-config-base;
+  @include target-selector;
+  @include component-selector-list;
 
-  .variable-selector-wrapper {
+  @include e(variable-selector-wrapper) {
     display: flex;
     gap: 8px;
     align-items: center;
   }
 
-  .flex-1 {
+  @include e(flex-1) {
     flex: 1;
   }
+}
 </style>

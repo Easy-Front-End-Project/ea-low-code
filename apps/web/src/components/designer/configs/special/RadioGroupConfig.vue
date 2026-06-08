@@ -273,37 +273,38 @@
 </script>
 
 <style lang="scss" scoped>
-  .radio-group-config {
-    margin-bottom: 1rem;
-  }
+@import '@/styles/mixins/bem.scss';
 
-  .config-header {
+@include b(radio-group-config) {
+  margin-bottom: 1rem;
+
+  @include e(config-header) {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0.5rem;
   }
 
-  .config-title {
+  @include e(config-title) {
     font-size: 0.875rem;
     font-weight: 600;
     color: #374151;
   }
 
-  .options-preview {
+  @include e(options-preview) {
     background-color: #f9fafb;
     border-radius: 0.375rem;
     padding: 0.5rem;
     min-height: 40px;
   }
 
-  .preview-list {
+  @include e(preview-list) {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
   }
 
-  .preview-item {
+  @include e(preview-item) {
     display: flex;
     align-items: center;
     gap: 0.25rem;
@@ -313,37 +314,37 @@
     background-color: #fff;
     border-radius: 0.25rem;
     border: 1px solid #e5e7eb;
+
+    @include when(disabled) {
+      background-color: #f3f4f6;
+      color: #9ca3af;
+
+      .preview-icon {
+        color: #9ca3af;
+      }
+    }
   }
 
-  .preview-item.is-disabled {
-    background-color: #f3f4f6;
-    color: #9ca3af;
-  }
-
-  .preview-icon {
+  @include e(preview-icon) {
     color: #3b82f6;
     flex-shrink: 0;
   }
 
-  .preview-item.is-disabled .preview-icon {
-    color: #9ca3af;
-  }
-
-  .preview-label {
+  @include e(preview-label) {
     margin-right: 0.25rem;
   }
 
-  .preview-value {
+  @include e(preview-value) {
     color: #9ca3af;
   }
 
   /* 弹窗内容 */
-  .dialog-content {
+  @include e(dialog-content) {
     max-height: 400px;
     overflow-y: auto;
   }
 
-  .toolbar {
+  @include e(toolbar) {
     display: flex;
     gap: 0.5rem;
     margin-bottom: 1rem;
@@ -352,69 +353,69 @@
   }
 
   /* 选项列表 */
-  .options-container {
+  @include e(options-container) {
     min-height: 200px;
   }
 
-  .options-list {
+  @include e(options-list) {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
   }
 
-  .option-item {
+  @include e(option-item) {
     background-color: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 0.375rem;
     padding: 0.5rem;
+
+    @include when(disabled) {
+      background-color: #f9fafb;
+    }
   }
 
-  .option-item.is-disabled {
-    background-color: #f9fafb;
-  }
-
-  .option-content {
+  @include e(option-content) {
     display: flex;
     align-items: center;
     gap: 0.5rem;
   }
 
-  .option-icon {
+  @include e(option-icon) {
     color: #3b82f6;
     flex-shrink: 0;
   }
 
-  .option-label {
+  @include e(option-label) {
     font-size: 0.875rem;
     color: #374151;
     flex: 1;
   }
 
-  .option-value {
+  @include e(option-value) {
     font-size: 0.75rem;
     color: #9ca3af;
     margin-right: 0.5rem;
   }
 
-  .option-actions {
+  @include e(option-actions) {
     display: flex;
     gap: 0.25rem;
   }
 
   /* 表单样式 */
-  .form-content {
+  @include e(form-content) {
     padding: 1rem 0;
   }
 
-  .form-item {
+  @include e(form-item) {
     margin-bottom: 1rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 
-  .form-item:last-child {
-    margin-bottom: 0;
-  }
-
-  .form-label {
+  @include e(form-label) {
     display: block;
     font-size: 0.875rem;
     font-weight: 500;
@@ -422,9 +423,10 @@
     margin-bottom: 0.5rem;
   }
 
-  .dialog-footer {
+  @include e(dialog-footer) {
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;
   }
+}
 </style>
