@@ -145,7 +145,7 @@
     &::part(original) {
       &::-webkit-inner-spin-button,
       &::-webkit-outer-spin-button {
-        -webkit-appearance: none;
+        appearance: none;
         margin: 0;
       }
 
@@ -153,9 +153,7 @@
         display: none;
       }
 
-      -webkit-appearance: none;
-      -moz-appearance: textfield;
-      appearance: none;
+      appearance: textfield;
     }
   }
 </style>

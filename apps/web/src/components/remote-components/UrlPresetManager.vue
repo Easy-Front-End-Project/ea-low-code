@@ -188,14 +188,14 @@
       display: flex;
       align-items: center;
       padding: 0.5rem 0.75rem;
-      background-color: #ffffff;
+      background-color: #fff;
       border: 1px solid #e5e7eb;
       border-radius: 0.375rem;
       transition: all 0.2s;
 
       &:hover {
         border-color: #3b82f6;
-        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        box-shadow: 0 0 0 2px rgb(59 130 246 / 10%);
       }
     }
 

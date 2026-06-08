@@ -240,6 +240,7 @@
   @include e(style-tag) {
     --ea-check-tag-height: 32px;
     --ea-check-tag-padding: 0 12px;
+
     font-size: 14px;
     font-weight: bold;
   }
@@ -247,6 +248,7 @@
   @include e(align-tag) {
     --ea-check-tag-height: 32px;
     --ea-check-tag-padding: 0 12px;
+
     font-size: 12px;
   }
 

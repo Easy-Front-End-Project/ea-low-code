@@ -107,7 +107,7 @@
     }
 
     @include e(presets-title) {
-      margin: 0 0 0.5rem 0;
+      margin: 0 0 0.5rem;
       font-size: 0.875rem;
       font-weight: 600;
       color: #374151;

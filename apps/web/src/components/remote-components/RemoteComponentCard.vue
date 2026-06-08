@@ -117,7 +117,7 @@
     @include e(title) {
       font-size: 16px;
       font-weight: 600;
-      color: #ffffff;
+      color: #fff;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;

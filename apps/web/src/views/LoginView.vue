@@ -548,7 +548,7 @@
       position: relative;
       overflow: hidden;
 
-      @media (max-width: 768px) {
+      @media (width <= 768px) {
         display: none;
       }
     }
@@ -563,7 +563,7 @@
       position: absolute;
       border-radius: 8px;
       background: linear-gradient(135deg, #409eff 0%, #337ecc 100%);
-      box-shadow: 0 8px 32px rgba(64, 158, 255, 0.3);
+      box-shadow: 0 8px 32px rgb(64 158 255 / 30%);
 
       @include m(1) {
         width: 80px;
@@ -621,7 +621,7 @@
       background: #fff;
       border-radius: 16px;
       padding: 48px 40px;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 24px rgb(0 0 0 / 8%);
     }
 
     @include e(title) {

@@ -68,7 +68,7 @@
       color: white;
 
       .text-sm {
-        color: rgba(255, 255, 255, 0.95);
+        color: rgb(255 255 255 / 95%);
         font-weight: 500;
         letter-spacing: 0.3px;
       }
@@ -82,15 +82,15 @@
 
     @include e(item) {
       padding: 1.25rem;
-      background: linear-gradient(145deg, #ffffff 0%, #f0fdfa 100%);
+      background: linear-gradient(145deg, #fff 0%, #f0fdfa 100%);
       border-radius: 12px;
       border: 1px solid #99f6e4;
-      box-shadow: 0 2px 8px rgba(79, 172, 254, 0.08);
+      box-shadow: 0 2px 8px rgb(79 172 254 / 8%);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(79, 172, 254, 0.15);
+        box-shadow: 0 8px 24px rgb(79 172 254 / 15%);
         border-color: #5eead4;
       }
     }

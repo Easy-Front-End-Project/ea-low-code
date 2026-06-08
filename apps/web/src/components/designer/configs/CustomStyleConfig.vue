@@ -107,7 +107,7 @@
   @include e(help-text) {
     font-size: 0.75rem;
     color: #0369a1;
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 0.5rem;
 
     code {
       background-color: #e0f2fe;

@@ -105,7 +105,7 @@
     flex-direction: column;
     gap: 0.25rem;
 
-    EaSelect {
+    easelect {
       width: 100%;
     }
   }

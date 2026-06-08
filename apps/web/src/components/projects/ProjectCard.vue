@@ -139,7 +139,7 @@
     @include e(title) {
       font-size: 16px;
       font-weight: 600;
-      color: #ffffff;
+      color: #fff;
       flex: 1;
       overflow: hidden;
       text-overflow: ellipsis;

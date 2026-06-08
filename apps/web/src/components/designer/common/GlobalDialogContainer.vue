@@ -130,6 +130,7 @@
   .editor-content {
     border: 1px solid #e4e7ed;
     border-radius: 4px;
+
     /* 确保 Monaco Editor 的 fixed 定位元素能正确计算位置 */
     position: relative;
 
@@ -167,7 +168,7 @@
   .api-help-text {
     font-size: 0.75rem;
     color: #0369a1;
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 0.5rem;
   }
 
   .api-help-list {

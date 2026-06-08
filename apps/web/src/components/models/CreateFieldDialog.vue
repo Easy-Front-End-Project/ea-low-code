@@ -214,7 +214,7 @@
       align-items: center;
       gap: 8px;
 
-      EaInput {
+      eainput {
         flex: 1;
       }
     }

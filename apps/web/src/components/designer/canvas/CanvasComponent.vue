@@ -348,7 +348,7 @@
         content: '';
         position: absolute;
         inset: -4px;
-        border: 1px dashed rgba(59, 130, 246, 0.3);
+        border: 1px dashed rgb(59 130 246 / 30%);
         border-radius: 6px;
       }
     }
@@ -372,7 +372,7 @@
 
     @include m(drop-target) {
       border-color: #10b981;
-      background-color: rgba(16, 185, 129, 0.1);
+      background-color: rgb(16 185 129 / 10%);
       border-style: solid;
     }
 
@@ -396,7 +396,7 @@
 
     &:hover {
       border-color: #3b82f6;
-      background-color: rgba(59, 130, 246, 0.05);
+      background-color: rgb(59 130 246 / 5%);
     }
   }
 
@@ -418,7 +418,7 @@
     color: #9ca3af;
     font-size: 12px;
     padding: 4px 8px;
-    background-color: rgba(0, 0, 0, 0.02);
+    background-color: rgb(0 0 0 / 2%);
     border-radius: 3px;
     display: inline-block;
   }

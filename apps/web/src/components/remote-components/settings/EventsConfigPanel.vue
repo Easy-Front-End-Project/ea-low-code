@@ -66,7 +66,7 @@ defineEmits<{
       color: white;
 
       .text-sm {
-        color: rgba(255, 255, 255, 0.95);
+        color: rgb(255 255 255 / 95%);
         font-weight: 500;
         letter-spacing: 0.3px;
       }
@@ -80,15 +80,15 @@ defineEmits<{
 
     @include e(item) {
       padding: 1.25rem;
-      background: linear-gradient(145deg, #ffffff 0%, #fef2f2 100%);
+      background: linear-gradient(145deg, #fff 0%, #fef2f2 100%);
       border-radius: 12px;
       border: 1px solid #fecaca;
-      box-shadow: 0 2px 8px rgba(245, 87, 108, 0.08);
+      box-shadow: 0 2px 8px rgb(245 87 108 / 8%);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(245, 87, 108, 0.15);
+        box-shadow: 0 8px 24px rgb(245 87 108 / 15%);
         border-color: #fda4af;
       }
     }

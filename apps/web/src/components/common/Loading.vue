@@ -32,6 +32,7 @@
 
     @include e(content) {
       height: 100%;
+
       @include when(loading) {
         pointer-events: none;
       }
@@ -45,7 +46,7 @@
       align-items: center;
       justify-content: center;
       gap: 12px;
-      background-color: rgba(255, 255, 255, 0.95);
+      background-color: rgb(255 255 255 / 95%);
       z-index: 100;
 
       &[style*='display: none'] {

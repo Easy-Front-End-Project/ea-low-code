@@ -117,7 +117,7 @@
     @include e(title) {
       font-size: 16px;
       font-weight: 600;
-      color: #ffffff;
+      color: #fff;
       flex: 1;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -203,8 +203,8 @@
     font-size: 12px;
     padding: 2px 8px;
     border-radius: 10px;
-    background-color: rgba(255, 255, 255, 0.2);
-    color: #ffffff;
+    background-color: rgb(255 255 255 / 20%);
+    color: #fff;
 
     ea-icon {
       width: 6px;
