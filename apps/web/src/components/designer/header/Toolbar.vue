@@ -23,14 +23,14 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useSchemaStore } from '@/components/designer/stores/schema'
   import ComponentTree from '../ComponentTree.vue'
   import VariableManager from '../VariableManager.vue'
   import EaLogo from '@/components/common/EaLogo.vue'
-  import { useSaveStatus } from '@/components/designer/composables/useSaveStatus.js'
+  import { useSaveStatus } from '@/components/designer/composables/useSaveStatus'
 
   const router = useRouter()
   const schemaStore = useSchemaStore()

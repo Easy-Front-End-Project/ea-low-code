@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <component
     :is="componentTag"
     ref="componentRef"
@@ -25,22 +25,33 @@
   </component>
 </template>
 
-<script setup>
-  import { computed, ref, onMounted, shallowRef, toRef } from 'vue'
+<script setup lang="ts">
+  import { computed, ref, onMounted, shallowRef, toRef, type Ref } from 'vue'
   import { getRemoteComponentMetaList } from '@/components/designer/constants/componentMeta'
   import { loadRemoteComponent } from '@/utils/loadRemoteComponent'
   import { useComponentInstance } from '@/components/designer/composables/useComponentInstance'
   import { useComponentRender } from '@/components/designer/composables/useComponentRender'
 
-  const props = defineProps({
-    component: {
-      type: Object,
-      required: true,
-    },
-  })
+  interface ComponentChild {
+    id: string
+    type: string
+    props?: Record<string, any> & { slot?: string }
+    events?: any[]
+    children?: ComponentChild[]
+    childrenText?: string
+    style?: Record<string, string>
+    isRemote?: boolean
+    remoteConfig?: { url: string; exportName?: string; styleUrl?: string }
+  }
 
-  const componentRef = ref(null)
-  const componentRefWrapper = toRef(() => props.component)
+  interface PreviewComponentProps {
+    component: ComponentChild
+  }
+
+  const props = defineProps<PreviewComponentProps>()
+
+  const componentRef = ref<HTMLElement | null>(null)
+  const componentRefWrapper = toRef(() => props.component) as Ref<ComponentChild>
 
   // 使用公共的组件渲染逻辑
   const { resolvedChildrenText, hasChildrenText, componentProps, componentEventListeners } =
@@ -58,11 +69,11 @@
     }
     // 从本地存储查找
     const remoteMetaList = getRemoteComponentMetaList()
-    const remoteMeta = remoteMetaList.find(m => m.type === props.component.type)
+    const remoteMeta = remoteMetaList.find((m: any) => m.type === props.component.type)
     return remoteMeta?.remoteConfig
   })
 
-  const remoteComponentLoader = shallowRef(null)
+  const remoteComponentLoader = shallowRef<any>(null)
 
   // 组件标签名（Web Components 或远程组件）
   const componentTag = computed(() => {
@@ -73,7 +84,7 @@
   })
 
   // 加载远程组件样式
-  function loadRemoteComponentStyle(styleUrl) {
+  function loadRemoteComponentStyle(styleUrl: string) {
     if (!styleUrl) return
     // 检查样式是否已加载
     const existingLink = document.querySelector(`link[data-remote-style="${styleUrl}"]`)

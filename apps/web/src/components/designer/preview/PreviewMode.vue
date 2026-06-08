@@ -41,17 +41,24 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed, onMounted, onUnmounted, ref, nextTick } from 'vue'
   import { useSchemaStore } from '@/components/designer/stores/schema'
   import PreviewComponent from './PreviewComponent.vue'
   import { executeEvent } from '@/utils/eventExecutor'
   import Loading from '@/components/common/Loading.vue'
 
+  interface EventConfig {
+    eventType?: string
+    [key: string]: any
+  }
+
   const schemaStore = useSchemaStore()
   const isReady = ref(false)
 
-  const emit = defineEmits(['close'])
+  const emit = defineEmits<{
+    close: []
+  }>()
 
   const components = computed(() => schemaStore.components)
 
@@ -59,7 +66,7 @@
   const pageSettings = computed(() => schemaStore.pageSchema.settings || {})
   const pageStyle = computed(() => pageSettings.value.style || {})
   const pageCustomCSS = computed(() => pageSettings.value.customCSS || '')
-  const pageEvents = computed(() => pageSettings.value.events || [])
+  const pageEvents = computed(() => (pageSettings.value.events || []) as EventConfig[])
 
   // 画布样式
   const canvasStyle = computed(() => {
@@ -78,7 +85,7 @@
   })
 
   // 退出预览
-  function handleExitPreview(event) {
+  function handleExitPreview(event?: Event) {
     // 如果按钮被禁用，阻止事件并返回
     if (!isReady.value) {
       event?.preventDefault()
@@ -89,11 +96,11 @@
   }
 
   // 页面事件处理函数映射
-  const eventHandlers = new Map()
+  const eventHandlers = new Map<string, EventListener>()
 
   // 创建事件处理函数
-  function createEventHandler(eventConfig) {
-    return async event => {
+  function createEventHandler(eventConfig: EventConfig): EventListener {
+    return async (event: Event) => {
       await executeEvent(eventConfig, event)
     }
   }
