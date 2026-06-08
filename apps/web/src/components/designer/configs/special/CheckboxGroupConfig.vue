@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="checkbox-group-config">
     <div class="config-header">
       <span class="config-title">选项配置</span>
@@ -114,25 +114,25 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, computed, watch } from 'vue'
   import { generateComponentId, generateUniqueId } from '@/utils/schemaHelper'
+  import type { ComponentSchema } from '@/utils/schemaHelper'
   import { useSchemaStore } from '@/components/designer/stores/schema'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaCheckbox from '@/components/ea-ui-wrap/EaCheckbox.vue'
 
-  const props = defineProps({
-    // 当前选中的组件
-    component: {
-      type: Object,
-      default: null,
-    },
-    // 配置属性名
-    propName: {
-      type: String,
-      default: 'optionsConfig',
-    },
-  })
+  interface CheckboxOption {
+    id: string
+    label: string
+    value: string
+    disabled: boolean
+  }
+
+  const props = defineProps<{
+    component: ComponentSchema | null
+    propName?: string
+  }>()
 
   const schemaStore = useSchemaStore()
 
@@ -141,10 +141,10 @@
   const optionDialogVisible = ref(false)
 
   // 选项数据
-  const optionsData = ref([])
+  const optionsData = ref<CheckboxOption[]>([])
 
   // 编辑中的选项
-  const editingOption = ref({ label: '', value: '', disabled: false, id: '' })
+  const editingOption = ref<CheckboxOption>({ label: '', value: '', disabled: false, id: '' })
   const editingIndex = ref(-1)
   const optionDialogTitle = ref('添加选项')
 
@@ -159,9 +159,9 @@
 
   // 监听外部数据变化
   watch(
-    () => props.component?.props?.[props.propName],
+    () => props.component?.props?.[props.propName ?? 'optionsConfig'],
     newVal => {
-      if (newVal && newVal.length > 0) {
+      if (newVal && (newVal as CheckboxOption[]).length > 0) {
         optionsData.value = JSON.parse(JSON.stringify(newVal))
       } else {
         optionsData.value = []
@@ -199,7 +199,7 @@
   }
 
   // 编辑选项
-  function editOption(option) {
+  function editOption(option: CheckboxOption) {
     editingOption.value = { ...option }
     editingIndex.value = optionsData.value.findIndex(item => item.id === option.id)
     optionDialogTitle.value = '编辑选项'
@@ -212,7 +212,7 @@
       return
     }
 
-    const newOption = {
+    const newOption: CheckboxOption = {
       id: editingOption.value.id,
       label: editingOption.value.label,
       value: editingOption.value.value,
@@ -231,7 +231,7 @@
   }
 
   // 删除选项
-  function removeOption(index) {
+  function removeOption(index: number) {
     optionsData.value.splice(index, 1)
   }
 
@@ -243,7 +243,7 @@
 
     // 更新组件 props
     schemaStore.updateComponentProps(props.component.id, {
-      [props.propName]: data,
+      [props.propName ?? 'optionsConfig']: data,
     })
 
     // 更新子组件
@@ -253,7 +253,7 @@
   }
 
   // 更新复选框组的子组件
-  function updateCheckboxGroupChildren(optionsData) {
+  function updateCheckboxGroupChildren(optionsData: CheckboxOption[]) {
     if (!props.component) return
 
     // 移除现有的 ea-checkbox 子组件

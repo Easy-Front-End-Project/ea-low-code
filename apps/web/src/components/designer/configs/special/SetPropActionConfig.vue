@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="set-prop-action-config space-y-3">
     <!-- 目标组件选择 -->
     <div class="config-item">
@@ -88,7 +88,8 @@
       <!-- 字符串/数字类型使用 EaInput -->
       <EaInput
         v-else
-        v-model="modelValue.propValue"
+        :model-value="String(modelValue.propValue)"
+        @update:model-value="modelValue.propValue = valueType === 'number' ? Number($event) : $event"
         size="small"
         :placeholder="valueType === 'number' ? '输入数字' : '输入字符串'"
         class="w-full"
@@ -97,28 +98,36 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed, ref, watch } from 'vue'
-  import { useGlobalDialogs } from '@/components/designer/composables/useGlobalDialogs.js'
+  import { useGlobalDialogs } from '@/components/designer/composables/useGlobalDialogs'
   import { isAliasFormat, extractAlias } from '@/utils/schemaHelper'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
   import EaRadioGroup from '@/components/ea-ui-wrap/EaRadioGroup.vue'
   import EaRadio from '@/components/ea-ui-wrap/EaRadio.vue'
 
-  const props = defineProps({
-    modelValue: {
-      type: Object,
-      required: true,
-    },
-  })
+  type ValueType = 'string' | 'number' | 'boolean' | 'array' | 'object' | 'variable'
 
-  const emit = defineEmits(['update:modelValue'])
+  interface SetPropModel {
+    targetComponentId: string
+    targetComponentAlias: string
+    propName: string
+    propValue: string | number | boolean | object | unknown[]
+  }
+
+  const props = defineProps<{
+    modelValue: SetPropModel
+  }>()
+
+  const emit = defineEmits<{
+    'update:modelValue': [value: SetPropModel]
+  }>()
 
   const { openComponentSelector, openVariableSelector, openEditor } = useGlobalDialogs()
 
   // 目标模式：alias 或 id
-  const targetMode = ref('id')
+  const targetMode = ref<'id' | 'alias'>('id')
 
   // 别名值
   const aliasValue = ref('')
@@ -127,7 +136,7 @@
   const idValue = ref('')
 
   // 值类型
-  const valueType = ref('boolean')
+  const valueType = ref<ValueType>('boolean')
 
   // 标记是否为用户主动选择的类型（用于区分自动推断）
   const isUserSelectedType = ref(false)
@@ -208,12 +217,12 @@
   }
 
   // 类型改变处理
-  function handleTypeChange(newType) {
+  function handleTypeChange(newType: string | number | boolean | object | unknown[]) {
     // 标记为用户主动选择
     isUserSelectedType.value = true
 
     // 根据新类型设置默认值
-    let newValue
+    let newValue: string | number | boolean | object | unknown[]
     switch (newType) {
       case 'boolean':
         newValue = true
@@ -273,7 +282,7 @@
 
       if (isAliasFormat(targetId)) {
         targetMode.value = 'alias'
-        aliasValue.value = extractAlias(targetId)
+        aliasValue.value = extractAlias(targetId) ?? ''
       } else {
         targetMode.value = 'id'
         idValue.value = targetId

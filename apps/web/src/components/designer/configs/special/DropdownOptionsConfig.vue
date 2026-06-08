@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="dropdown-options-config">
     <div class="config-header">
       <span class="config-title">菜单项配置</span>
@@ -121,25 +121,26 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, computed, watch } from 'vue'
   import { generateComponentId, generateUniqueId } from '@/utils/schemaHelper'
+  import type { ComponentSchema } from '@/utils/schemaHelper'
   import { useSchemaStore } from '@/components/designer/stores/schema'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSwitch from '@/components/ea-ui-wrap/EaSwitch.vue'
 
-  const props = defineProps({
-    // 当前选中的组件
-    component: {
-      type: Object,
-      default: null,
-    },
-    // 配置属性名
-    propName: {
-      type: String,
-      default: 'optionsConfig',
-    },
-  })
+  interface DropdownItem {
+    id: string
+    label: string
+    command: string
+    disabled: boolean
+    divided: boolean
+  }
+
+  const props = defineProps<{
+    component: ComponentSchema | null
+    propName?: string
+  }>()
 
   const schemaStore = useSchemaStore()
 
@@ -148,10 +149,10 @@
   const itemDialogVisible = ref(false)
 
   // 列表数据
-  const itemsData = ref([])
+  const itemsData = ref<DropdownItem[]>([])
 
   // 编辑中的菜单项
-  const editingItem = ref({ label: '', command: '', disabled: false, divided: false, id: '' })
+  const editingItem = ref<DropdownItem>({ label: '', command: '', disabled: false, divided: false, id: '' })
   const editingIndex = ref(-1)
   const itemDialogTitle = ref('添加菜单项')
 
@@ -164,9 +165,9 @@
 
   // 监听外部数据变化
   watch(
-    () => props.component?.props?.[props.propName],
+    () => props.component?.props?.[props.propName ?? 'optionsConfig'],
     newVal => {
-      if (newVal && newVal.length > 0) {
+      if (newVal && (newVal as DropdownItem[]).length > 0) {
         itemsData.value = JSON.parse(JSON.stringify(newVal))
       } else {
         itemsData.value = []
@@ -210,7 +211,7 @@
   }
 
   // 编辑菜单项
-  function editItem(item) {
+  function editItem(item: DropdownItem) {
     editingItem.value = { ...item }
     editingIndex.value = itemsData.value.findIndex(i => i.id === item.id)
     itemDialogTitle.value = '编辑菜单项'
@@ -223,7 +224,7 @@
       return
     }
 
-    const newItem = {
+    const newItem: DropdownItem = {
       id: editingItem.value.id,
       label: editingItem.value.label,
       command: editingItem.value.command || '',
@@ -241,7 +242,7 @@
   }
 
   // 删除菜单项
-  function removeItem(index) {
+  function removeItem(index: number) {
     itemsData.value.splice(index, 1)
   }
 
@@ -253,7 +254,7 @@
 
     // 更新组件 props
     schemaStore.updateComponentProps(props.component.id, {
-      [props.propName]: data,
+      [props.propName ?? 'optionsConfig']: data,
     })
 
     // 更新子组件
@@ -263,7 +264,7 @@
   }
 
   // 更新 Dropdown 的子组件
-  function updateDropdownChildren(itemsData) {
+  function updateDropdownChildren(itemsData: DropdownItem[]) {
     if (!props.component) return
 
     const existingChildren = props.component.children || []
@@ -279,23 +280,23 @@
     }
 
     // 创建 dropdown-item 组件
-    const createDropdownItemComponent = item => {
-      const props = {
+    const createDropdownItemComponent = (item: DropdownItem) => {
+      const itemProps: Record<string, unknown> = {
         slot: 'default',
       }
       if (item.command) {
-        props.command = item.command
+        itemProps.command = item.command
       }
       if (item.disabled) {
-        props.disabled = true
+        itemProps.disabled = true
       }
       if (item.divided) {
-        props.divided = true
+        itemProps.divided = true
       }
       return {
         id: createComponentId(),
         type: 'ea-dropdown-item',
-        props,
+        props: itemProps,
         childrenText: item.label,
       }
     }

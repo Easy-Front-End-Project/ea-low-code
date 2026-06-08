@@ -64,21 +64,34 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed } from 'vue'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaInputNumber from '@/components/ea-ui-wrap/EaInputNumber.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
   import EaSwitch from '@/components/ea-ui-wrap/EaSwitch.vue'
 
-  const props = defineProps({
-    modelValue: {
-      type: Object,
-      required: true,
-    },
-  })
+  interface NotificationModel {
+    dangerouslyUseHTMLString: boolean
+    type: string
+    title: string
+    message: string
+    placement: string
+    duration: number
+    showClose: boolean
+    closeIcon: string
+    icon: string
+    zIndex: number
+    appendTo: string
+  }
 
-  const emit = defineEmits(['update:modelValue'])
+  const props = defineProps<{
+    modelValue: NotificationModel
+  }>()
+
+  const emit = defineEmits<{
+    'update:modelValue': [value: NotificationModel]
+  }>()
 
   const modelValue = computed({
     get: () => props.modelValue,

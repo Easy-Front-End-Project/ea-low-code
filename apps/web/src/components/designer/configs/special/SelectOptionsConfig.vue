@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="select-options-config">
     <div class="config-header">
       <span class="config-title">选项配置</span>
@@ -167,24 +167,39 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { ref, computed, watch } from 'vue'
   import { generateComponentId, generateUniqueId } from '@/utils/schemaHelper'
+  import type { ComponentSchema } from '@/utils/schemaHelper'
   import { useSchemaStore } from '@/components/designer/stores/schema'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
 
-  const props = defineProps({
-    // 当前选中的组件
-    component: {
-      type: Object,
-      default: null,
-    },
-    // 配置属性名
-    propName: {
-      type: String,
-      default: 'optionsConfig',
-    },
-  })
+  interface SelectOption {
+    id: string
+    type: 'option'
+    label: string
+    value: string
+  }
+
+  interface SelectOptionGroup {
+    id: string
+    type: 'group'
+    label: string
+    children: SelectOption[]
+  }
+
+  type TreeNode = SelectOption | SelectOptionGroup
+
+  interface FlatOption {
+    type: 'group' | 'option'
+    label: string
+    value: string
+  }
+
+  const props = defineProps<{
+    component: ComponentSchema | null
+    propName?: string
+  }>()
 
   const schemaStore = useSchemaStore()
 
@@ -194,27 +209,27 @@
   const groupDialogVisible = ref(false)
 
   // 树形数据
-  const treeData = ref([])
+  const treeData = ref<TreeNode[]>([])
 
   // 编辑中的选项
-  const editingOption = ref({ label: '', value: '', id: '' })
-  const editingGroup = ref({ label: '', id: '' })
-  const editingParent = ref(null)
+  const editingOption = ref<SelectOption>({ label: '', value: '', id: '', type: 'option' })
+  const editingGroup = ref<SelectOptionGroup>({ label: '', id: '', type: 'group', children: [] })
+  const editingParent = ref<SelectOptionGroup | null>(null)
   const optionDialogTitle = ref('添加选项')
 
   // 计算分组节点
   const groupNodes = computed(() => {
-    return treeData.value.filter(n => n.type === 'group')
+    return treeData.value.filter((n): n is SelectOptionGroup => n.type === 'group')
   })
 
   // 计算普通选项节点
   const optionNodes = computed(() => {
-    return treeData.value.filter(n => n.type !== 'group')
+    return treeData.value.filter((n): n is SelectOption => n.type !== 'group')
   })
 
   // 计算扁平化的选项列表用于预览
   const flatOptions = computed(() => {
-    const result = []
+    const result: FlatOption[] = []
     treeData.value.forEach(node => {
       if (node.type === 'group') {
         result.push({ type: 'group', label: node.label, value: '-' })
@@ -232,9 +247,9 @@
 
   // 监听外部数据变化
   watch(
-    () => props.component?.props?.[props.propName],
+    () => props.component?.props?.[props.propName ?? 'optionsConfig'],
     newVal => {
-      if (newVal && newVal.length > 0) {
+      if (newVal && (newVal as TreeNode[]).length > 0) {
         treeData.value = JSON.parse(JSON.stringify(newVal))
       } else {
         treeData.value = []
@@ -270,15 +285,15 @@
 
   // 添加选项
   function addOption() {
-    editingOption.value = { label: '', value: '', id: generateId() }
+    editingOption.value = { label: '', value: '', id: generateId(), type: 'option' }
     editingParent.value = null
     optionDialogTitle.value = '添加选项'
     optionDialogVisible.value = true
   }
 
   // 添加选项到分组
-  function addOptionToGroup(group) {
-    editingOption.value = { label: '', value: '', id: generateId() }
+  function addOptionToGroup(group: SelectOptionGroup) {
+    editingOption.value = { label: '', value: '', id: generateId(), type: 'option' }
     editingParent.value = group
     optionDialogTitle.value = '添加选项'
     optionDialogVisible.value = true
@@ -286,12 +301,12 @@
 
   // 添加分组
   function addOptionGroup() {
-    editingGroup.value = { label: '', id: generateId(), children: [] }
+    editingGroup.value = { label: '', id: generateId(), type: 'group', children: [] }
     groupDialogVisible.value = true
   }
 
   // 编辑选项
-  function editOption(option, parent = null) {
+  function editOption(option: SelectOption, parent: SelectOptionGroup | null = null) {
     editingOption.value = { ...option }
     editingParent.value = parent
     optionDialogTitle.value = '编辑选项'
@@ -299,7 +314,7 @@
   }
 
   // 编辑分组
-  function editGroup(group) {
+  function editGroup(group: SelectOptionGroup) {
     editingGroup.value = { ...group, children: group.children || [] }
     groupDialogVisible.value = true
   }
@@ -310,7 +325,7 @@
       return
     }
 
-    const newOption = {
+    const newOption: SelectOption = {
       id: editingOption.value.id,
       type: 'option',
       label: editingOption.value.label,
@@ -347,7 +362,7 @@
       return
     }
 
-    const newGroup = {
+    const newGroup: SelectOptionGroup = {
       id: editingGroup.value.id,
       type: 'group',
       label: editingGroup.value.label,
@@ -365,7 +380,7 @@
   }
 
   // 通过ID删除节点
-  function removeNodeById(id) {
+  function removeNodeById(id: string) {
     const index = treeData.value.findIndex(item => item.id === id)
     if (index > -1) {
       treeData.value.splice(index, 1)
@@ -373,7 +388,7 @@
   }
 
   // 删除子节点
-  function removeChildNode(parent, childIndex) {
+  function removeChildNode(parent: SelectOptionGroup, childIndex: number) {
     parent.children?.splice(childIndex, 1)
   }
 
@@ -385,7 +400,7 @@
 
     // 更新组件 props
     schemaStore.updateComponentProps(props.component.id, {
-      [props.propName]: data,
+      [props.propName ?? 'optionsConfig']: data,
     })
 
     // 更新子组件
@@ -395,7 +410,7 @@
   }
 
   // 更新 Select 的子组件
-  function updateSelectChildren(optionsData) {
+  function updateSelectChildren(optionsData: TreeNode[]) {
     if (!props.component) return
 
     const existingChildren = props.component.children || []
@@ -409,7 +424,7 @@
     }
 
     // 创建 option 组件
-    const createOptionComponent = (value, label) => {
+    const createOptionComponent = (value: string, label: string) => {
       return {
         id: createComponentId(),
         type: 'ea-option',
@@ -422,7 +437,7 @@
     }
 
     // 创建 option-group 组件
-    const createOptionGroupComponent = (label, children) => {
+    const createOptionGroupComponent = (label: string, children: SelectOption[]) => {
       return {
         id: createComponentId(),
         type: 'ea-option-group',
@@ -436,8 +451,8 @@
 
     const newChildren = optionsData.map(item =>
       item.type === 'group'
-        ? createOptionGroupComponent(item.label, item.children || [])
-        : createOptionComponent(item.value, item.label)
+        ? createOptionGroupComponent(item.label, (item as SelectOptionGroup).children || [])
+        : createOptionComponent((item as SelectOption).value, item.label)
     )
 
     schemaStore.updateComponentChildren(props.component.id, [...nonOptionChildren, ...newChildren])

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="api-request-action-config space-y-4">
     <!-- URL 配置 -->
     <div class="config-item">
@@ -145,24 +145,37 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed, ref } from 'vue'
   import { useVariableStore } from '@/components/designer/stores/variable'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
   import EaSwitch from '@/components/ea-ui-wrap/EaSwitch.vue'
 
-  const props = defineProps({
-    modelValue: {
-      type: Object,
-      required: true,
-    },
-  })
+  interface ParamItem {
+    key: string
+    value: string
+  }
 
-  const emit = defineEmits(['update:modelValue'])
+  interface ApiRequestModel {
+    url: string
+    method: string
+    params: ParamItem[]
+    body: ParamItem[]
+    enableDataBinding: boolean
+    targetVariable: string
+  }
+
+  const props = defineProps<{
+    modelValue: ApiRequestModel
+  }>()
+
+  const emit = defineEmits<{
+    'update:modelValue': [value: ApiRequestModel]
+  }>()
 
   const variableStore = useVariableStore()
-  const activeTab = ref('params')
+  const activeTab = ref<'params' | 'body'>('params')
 
   const modelValue = computed({
     get: () => props.modelValue,
@@ -183,7 +196,7 @@
   }
 
   // 删除 params 参数
-  function handleRemoveParam(index) {
+  function handleRemoveParam(index: number) {
     if (modelValue.value.params) {
       modelValue.value.params.splice(index, 1)
     }
@@ -198,7 +211,7 @@
   }
 
   // 删除 body 参数
-  function handleRemoveBodyParam(index) {
+  function handleRemoveBodyParam(index: number) {
     if (modelValue.value.body) {
       modelValue.value.body.splice(index, 1)
     }

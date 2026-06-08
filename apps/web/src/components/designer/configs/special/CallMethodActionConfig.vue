@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="call-method-action-config space-y-3">
     <!-- 目标组件选择 -->
     <div class="config-item">
@@ -39,27 +39,32 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed, ref, watch } from 'vue'
-  import { useGlobalDialogs } from '@/components/designer/composables/useGlobalDialogs.js'
+  import { useGlobalDialogs } from '@/components/designer/composables/useGlobalDialogs'
   import { isAliasFormat, extractAlias } from '@/utils/schemaHelper'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaRadioGroup from '@/components/ea-ui-wrap/EaRadioGroup.vue'
   import EaRadio from '@/components/ea-ui-wrap/EaRadio.vue'
 
-  const props = defineProps({
-    modelValue: {
-      type: Object,
-      required: true,
-    },
-  })
+  interface CallMethodModel {
+    targetComponentId: string
+    targetComponentAlias: string
+    methodName: string
+  }
 
-  const emit = defineEmits(['update:modelValue'])
+  const props = defineProps<{
+    modelValue: CallMethodModel
+  }>()
+
+  const emit = defineEmits<{
+    'update:modelValue': [value: CallMethodModel]
+  }>()
 
   const { openComponentSelector } = useGlobalDialogs()
 
   // 目标模式：alias 或 id
-  const targetMode = ref('id')
+  const targetMode = ref<'id' | 'alias'>('id')
 
   // 别名值
   const aliasValue = ref('')
@@ -113,7 +118,7 @@
 
       if (isAliasFormat(targetId)) {
         targetMode.value = 'alias'
-        aliasValue.value = extractAlias(targetId)
+        aliasValue.value = extractAlias(targetId) ?? ''
       } else {
         targetMode.value = 'id'
         idValue.value = targetId

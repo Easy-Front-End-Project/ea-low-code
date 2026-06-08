@@ -50,21 +50,30 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed } from 'vue'
   import EaInput from '@/components/ea-ui-wrap/EaInput.vue'
   import EaInputNumber from '@/components/ea-ui-wrap/EaInputNumber.vue'
   import EaSelect from '@/components/ea-ui-wrap/EaSelect.vue'
   import EaSwitch from '@/components/ea-ui-wrap/EaSwitch.vue'
 
-  const props = defineProps({
-    modelValue: {
-      type: Object,
-      required: true,
-    },
-  })
+  interface MessageModel {
+    message: string
+    type: string
+    duration: number
+    showClose: boolean
+    dangerouslyUseHTMLString: boolean
+    placement: string
+    offset: number
+  }
 
-  const emit = defineEmits(['update:modelValue'])
+  const props = defineProps<{
+    modelValue: MessageModel
+  }>()
+
+  const emit = defineEmits<{
+    'update:modelValue': [value: MessageModel]
+  }>()
 
   const modelValue = computed({
     get: () => props.modelValue,

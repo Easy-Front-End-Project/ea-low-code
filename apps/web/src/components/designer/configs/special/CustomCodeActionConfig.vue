@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="custom-code-action-config">
     <div class="config-item">
       <label class="config-label">自定义代码</label>
@@ -18,22 +18,22 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
   import { computed } from 'vue'
-  import { useGlobalDialogs } from '@/components/designer/composables/useGlobalDialogs.js'
+  import { useGlobalDialogs } from '@/components/designer/composables/useGlobalDialogs'
 
-  const props = defineProps({
-    modelValue: {
-      type: Object,
-      required: true,
-    },
-    visible: {
-      type: Boolean,
-      default: true,
-    },
-  })
+  interface CustomCodeModel {
+    code: string
+  }
 
-  const emit = defineEmits(['update:modelValue'])
+  const props = defineProps<{
+    modelValue: CustomCodeModel
+    visible?: boolean
+  }>()
+
+  const emit = defineEmits<{
+    'update:modelValue': [value: CustomCodeModel]
+  }>()
 
   const { openEditor } = useGlobalDialogs()
 
