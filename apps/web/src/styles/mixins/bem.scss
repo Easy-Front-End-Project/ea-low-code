@@ -27,3 +27,11 @@
     }
   }
 }
+
+// When - 状态类
+// 生成 .block.is-state 或 .block__element.is-state
+@mixin when($state) {
+  &.is-#{$state} {
+    @content;
+  }
+}
