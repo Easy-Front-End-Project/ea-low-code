@@ -33,7 +33,7 @@
           ></ea-icon>
           <p class="text-gray-600 mt-2">{{ loadError }}</p>
           <div class="error-actions mt-4 flex gap-3 justify-center">
-            <ea-button type="primary" @click="loadProjectData(route.params.id)"> 重试 </ea-button>
+            <ea-button type="primary" @click="loadProjectData(route.params.id as string)"> 重试 </ea-button>
             <ea-button @click="goBack"> 返回列表 </ea-button>
           </div>
         </div>
@@ -128,7 +128,7 @@
           </ea-tab-panel>
 
           <!-- 创建页面弹窗 -->
-          <CreatePageDialog v-model:visible="showCreatePageDialog" :project-id="route.params.id" />
+          <CreatePageDialog v-model:visible="showCreatePageDialog" :project-id="route.params.id as string" />
 
           <!-- 编辑页面弹窗 -->
           <EditPageDialog v-model:visible="showEditDialog" :page="editingPage" />
@@ -172,7 +172,7 @@
     router.push({ name: 'projects' })
   }
 
-  async function initProject(id) {
+  async function initProject(id: string) {
     await loadProjectData(id)
     if (activeMenu.value === 'pages') {
       await loadPagesData(id)
@@ -196,7 +196,7 @@
         showEditDialog.value = false
         editingPage.value = null
 
-        await initProject(newId)
+        await initProject(newId as string)
       }
     }
   )
@@ -208,7 +208,7 @@
     }
   })
 
-  async function loadProjectData(id) {
+  async function loadProjectData(id: string) {
     loading.value = true
     loadError.value = ''
     projectNotFound.value = false
@@ -236,7 +236,7 @@
     }
   }
 
-  async function loadPagesData(projectId) {
+  async function loadPagesData(projectId: string | string[]) {
     const id = Number(projectId)
     if (!id || isNaN(id)) return
 
@@ -260,14 +260,14 @@
     }
   }
 
-  function handlePageChange(page) {
+  function handlePageChange(page: number) {
     pagesStore.setPage(page)
     if (route.params.id) {
       loadPagesData(route.params.id)
     }
   }
 
-  function handlePageSizeChange(size) {
+  function handlePageSizeChange(size: number) {
     pagesStore.setPageSize(size)
     if (route.params.id) {
       loadPagesData(route.params.id)
@@ -278,27 +278,27 @@
     router.push({ name: 'designer', params: { id: page.id } })
   }
 
-  async function handleClonePage(page) {
+  async function handleClonePage(page: any) {
     try {
       await pagesStore.clonePage(page.id)
       window.$message?.success(`页面「${page.name || page.id}」复制成功`)
-    } catch (error) {
+    } catch (error: any) {
       window.$message?.error(error.message || '复制失败')
     }
   }
 
-  async function handleDeletePage(page) {
+  async function handleDeletePage(page: any) {
     if (!confirm(`确定要删除页面「${page.name || page.id}」吗？此操作不可恢复。`)) return
 
     try {
       await pagesStore.removePage(page.id)
       window.$message?.success('页面已删除')
-    } catch (error) {
+    } catch (error: any) {
       window.$message?.error(error.message || '删除失败')
     }
   }
 
-  function handlePreviewPage(page) {
+  function handlePreviewPage(page: any) {
     const url = router.resolve({ name: 'preview', params: { pageId: page.id } }).href
     window.open(url, '_blank')
   }

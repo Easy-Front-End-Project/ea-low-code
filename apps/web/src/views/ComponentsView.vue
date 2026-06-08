@@ -143,14 +143,14 @@
     router.push({ name: 'component-settings', params: { id: component.id } })
   }
 
-  async function handleDelete(id: number) {
+  async function handleDelete(id: string | number) {
     if (!confirm('确定要删除这个远程组件吗？')) return
-    await remoteStore.removeComponent(id)
+    await remoteStore.removeComponent(Number(id))
     window.$message?.success('删除成功')
   }
 
-  async function handleToggleEnabled(id: number, enabled: boolean) {
-    await remoteStore.toggleComponentEnabled(id, enabled)
+  async function handleToggleEnabled(id: string | number, enabled: boolean) {
+    await remoteStore.toggleComponentEnabled(Number(id), enabled)
   }
 </script>
 

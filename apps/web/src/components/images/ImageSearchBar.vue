@@ -83,7 +83,7 @@
   watch(
     () => props.groupId,
     (val: number | string | null) => {
-      localGroupId.value = val
+      localGroupId.value = val ?? undefined
     }
   )
 

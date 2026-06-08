@@ -40,7 +40,7 @@
   const pageSettings = computed(() => schemaStore.pageSchema.settings || {})
   const pageStyle = computed(() => pageSettings.value.style || {})
   const pageCustomCSS = computed(() => pageSettings.value.customCSS || '')
-  const pageEvents = computed(() => pageSettings.value.events || [])
+  const pageEvents = computed(() => (pageSettings.value.events || []) as any[])
 
   // 画布样式 - 与 PreviewMode 保持一致
   const canvasStyle = computed(() => {
@@ -53,9 +53,9 @@
       minHeight: hasViewport ? '600px' : 'auto',
       maxWidth: '100%',
       maxHeight: '100%',
-      overflow: viewport?.overflow || 'auto',
+      overflow: (viewport?.overflow || 'auto') as string,
       ...pageStyle.value,
-    }
+    } as any
   })
 
   onMounted(async () => {

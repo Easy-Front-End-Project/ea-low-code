@@ -73,7 +73,7 @@
         :visible="showPresetSelector"
         :model-value="form.urlPresetId"
         :close-on-click-modal="false"
-        @update:model-value="form.urlPresetId = $event"
+        @update:model-value="form.urlPresetId = String($event)"
         @close="showPresetSelector = false"
         @manage="handleOpenPresetManager"
       />
@@ -170,7 +170,7 @@
         form.value = {
           name: component.name || '',
           url: component.url || '',
-          urlPresetId: component.urlPresetId || '',
+          urlPresetId: String(component.urlPresetId || ''),
           exportName: component.exportName || '',
           type: component.type || '',
           icon: component.icon || 'crown',
@@ -189,7 +189,7 @@
       } else {
         loadError.value = '组件不存在'
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('加载组件数据失败:', error)
       const status = error?.response?.status
       if (status === 401) {

@@ -221,7 +221,7 @@
     eventType: string
     customEventType: string
     action: string
-    actionConfig: Record<string, any>
+    actionConfig: any
   }
 
   interface Props {
@@ -305,7 +305,7 @@
           dangerouslyUseHTMLString: false,
           placement: 'top',
           offset: 16,
-        }
+        } as any
       case 'notification':
         return {
           title: '通知',
@@ -319,18 +319,18 @@
           icon: '',
           zIndex: 0,
           appendTo: 'body',
-        }
+        } as any
       case 'setProp':
         return {
           targetComponentId: '',
           propName: '',
           propValue: true,
-        }
+        } as any
       case 'callMethod':
         return {
           targetComponentId: '',
           methodName: '',
-        }
+        } as any
       case 'apiRequest':
         return {
           url: '',
@@ -339,11 +339,11 @@
           body: [],
           enableDataBinding: false,
           targetVariable: '',
-        }
+        } as any
       case 'custom':
         return {
           code: `// 使用 $component 操作其他组件\n// 示例：设置按钮 loading\n$component.setProp('button_123', 'loading', true);`,
-        }
+        } as any
       default:
         return {}
     }

@@ -258,15 +258,15 @@
   const currentStyleConfig = computed(() => {
     if (selectedComponent.value) {
       return {
-        style: selectedComponent.value.style || {},
-        positionStyle: selectedComponent.value.positionStyle || {},
+        style: (selectedComponent.value.style || {}) as Record<string, string>,
+        positionStyle: (selectedComponent.value.positionStyle || {}) as Record<string, string>,
         customCSS: selectedComponent.value.customCSS || '',
       }
     }
     return {
-      style: pageStyle.value,
-      positionStyle: {},
-      customCSS: pageCustomCSS.value,
+      style: pageStyle.value as Record<string, string>,
+      positionStyle: {} as Record<string, string>,
+      customCSS: (pageCustomCSS.value || '') as string,
     }
   })
 
@@ -280,7 +280,7 @@
     }
     return {
       events: pageEventMeta.value,
-      componentEvents: pageEvents.value,
+      componentEvents: pageEvents.value as any[],
     }
   })
 
@@ -419,7 +419,7 @@
   }
 
   /** 样式变更处理 */
-  function handleStyleChange(styleName: string, value: any, styleType = 'inline') {
+  function handleStyleChange(styleName: string, value: any, styleType: string = 'inline') {
     if (selectedComponent.value) {
       if (styleType === 'customCSS') {
         schemaStore.updateComponentStyle(selectedComponent.value.id, value, 'customCSS')
@@ -427,7 +427,7 @@
         schemaStore.updateComponentStyle(
           selectedComponent.value.id,
           { [styleName]: value },
-          styleType
+          styleType as any
         )
       }
     } else {

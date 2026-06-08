@@ -51,7 +51,7 @@
   const props = defineProps<PreviewComponentProps>()
 
   const componentRef = ref<HTMLElement | null>(null)
-  const componentRefWrapper = toRef(() => props.component) as Ref<ComponentChild>
+  const componentRefWrapper = toRef(() => props.component) as any
 
   // 使用公共的组件渲染逻辑
   const { resolvedChildrenText, hasChildrenText, componentProps, componentEventListeners } =

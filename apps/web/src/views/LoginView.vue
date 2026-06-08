@@ -338,7 +338,7 @@
   // 显示警告对话框
   function showAlert(message: string, title: string = '提示') {
     if (window.$alert) {
-      return (window.$alert as any)(message, title, {
+      return window.$alert(message, title, {
         confirmButtonText: '确定',
       })
     } else {

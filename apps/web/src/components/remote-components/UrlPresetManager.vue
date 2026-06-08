@@ -147,7 +147,7 @@
 
   async function handleDeletePreset(id: string | number) {
     try {
-      await window.$confirm('确定要删除这个 URL 预设吗？', '提示', {
+      await window.$confirm!('确定要删除这个 URL 预设吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',

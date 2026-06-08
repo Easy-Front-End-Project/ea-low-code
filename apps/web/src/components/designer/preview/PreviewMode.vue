@@ -79,9 +79,9 @@
       minHeight: hasViewport ? '600px' : 'auto',
       maxWidth: '100%',
       maxHeight: '100%',
-      overflow: viewport?.overflow || 'auto',
+      overflow: (viewport?.overflow || 'auto') as string,
       ...pageStyle.value,
-    }
+    } as any
   })
 
   // 退出预览

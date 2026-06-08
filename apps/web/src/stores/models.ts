@@ -112,7 +112,7 @@ export const useModelsStore = defineStore('models', () => {
 
   async function addField(data: Record<string, any>) {
     const result = await createFieldApi(data)
-    if (selectedModelId.value === data.modelId) {
+    if (selectedModelId.value !== null && selectedModelId.value === data.modelId) {
       await fetchFields(selectedModelId.value)
     }
     return result

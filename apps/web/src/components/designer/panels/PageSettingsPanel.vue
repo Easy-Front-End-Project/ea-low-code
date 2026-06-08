@@ -50,7 +50,6 @@
 
 <script setup lang="ts">
   import { ref, watch, computed } from 'vue'
-  // @ts-expect-error JS module without type declarations
   import { useSchemaStore } from '@/components/designer/stores/schema'
   import { usePagesStore } from '@/stores/pages'
   import { useRoute } from 'vue-router'

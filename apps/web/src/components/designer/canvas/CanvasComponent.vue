@@ -62,16 +62,13 @@
 
 <script setup lang="ts">
   import { computed, ref, toRef } from 'vue'
-  // @ts-expect-error JS module without type declarations
   import { useSchemaStore } from '@/components/designer/stores/schema'
   import { getComponentMeta } from '@/components/designer/constants/componentMeta'
   import { processCustomCSS } from '@/utils/cssProcessor'
   import { cloneComponentSchema } from '@/utils/schemaHelper'
   import type { ComponentSchema } from '@/utils/schemaHelper'
   import { useRemoteComponent } from '@/components/designer/composables/useRemoteComponent'
-  // @ts-expect-error JS module without type declarations
   import { useComponentInstance } from '@/components/designer/composables/useComponentInstance'
-  // @ts-expect-error JS module without type declarations
   import { useComponentRender } from '@/components/designer/composables/useComponentRender'
   import { CONTAINER_TYPES, NON_CONTAINER_TYPES, INLINE_BLOCK_TYPES, NON_SELECTABLE_TYPES, NON_SELECTABLE_IN_PARENT } from '@/components/designer/constants/componentTypes'
   import ComponentLabel from './CanvasComponent/ComponentLabel.vue'

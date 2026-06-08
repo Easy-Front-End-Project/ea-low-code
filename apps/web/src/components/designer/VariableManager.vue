@@ -264,7 +264,7 @@ return Date.now() + 60 * 60 * 24 * 7 * 1000;`
     if (!variable) return
 
     // 检查值是否真的改变了
-    if (variable[field] !== value) {
+    if ((variable as any)[field] !== value) {
       variableStore.updateVariable(id, { [field]: value })
     }
   }
@@ -376,7 +376,7 @@ return Date.now() + 60 * 60 * 24 * 7 * 1000;`
   // 删除变量
   async function handleDeleteVariable(id: string) {
     try {
-      await window.$confirm('确定要删除这个变量吗？', '提示', {
+      await window.$confirm!('确定要删除这个变量吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',

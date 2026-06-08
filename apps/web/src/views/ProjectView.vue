@@ -91,28 +91,28 @@ function handlePageChange(page: number) {
 }
 
 // 每页条数变化
-function handleSizeChange(size) {
+function handleSizeChange(size: number) {
   projectsStore.setPageSize(size)
   projectsStore.fetchProjects()
 }
 
 // 点击卡片进入项目设置
-function handleCardClick(project) {
+function handleCardClick(project: any) {
   router.push({ name: 'project-settings', params: { id: project.id } })
 }
 
 // 进入项目设置页
-function handleSettings(project) {
+function handleSettings(project: any) {
   router.push({ name: 'project-settings', params: { id: project.id } })
 }
 
 // 删除项目
-async function handleDelete(project) {
+async function handleDelete(project: any) {
   try {
     await projectsStore.remove(project.id)
     window.$message?.success('删除成功')
     projectsStore.fetchProjects()
-  } catch (error) {
+  } catch (error: any) {
     window.$message?.error(error.message || '删除失败')
   }
 }

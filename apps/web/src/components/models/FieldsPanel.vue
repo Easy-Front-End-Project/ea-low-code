@@ -138,7 +138,7 @@
       emit('edit-field', rawField)
     } else if (action === 'delete') {
       try {
-        await window.$confirm(
+        await window.$confirm!(
           `确定要删除字段「${rawField.fieldLabel}」吗？此操作不可撤销。`,
           '提示',
           { confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning' }

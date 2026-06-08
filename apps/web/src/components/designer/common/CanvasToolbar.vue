@@ -94,7 +94,7 @@
 
   async function handleClear() {
     try {
-      await window.$confirm('确定要清空画布吗？此操作不可恢复。', '提示', {
+      await window.$confirm!('确定要清空画布吗？此操作不可恢复。', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',

@@ -50,7 +50,6 @@
 
 <script setup lang="ts">
   import { ref, computed, onMounted } from 'vue'
-  // @ts-expect-error JS module without type declarations
   import { useSchemaStore } from '@/components/designer/stores/schema'
   import type { ComponentSchema } from '@/utils/schemaHelper'
   import CanvasComponent from './CanvasComponent.vue'
@@ -89,7 +88,7 @@
   })
 
   const pageSettings = computed(() => schemaStore.pageSchema.settings || {})
-  const pageStyle = computed(() => pageSettings.value.style || {})
+  const pageStyle = computed(() => (pageSettings.value.style || {}) as Record<string, any>)
   const pageCustomCSS = computed(() => pageSettings.value.customCSS || '')
 
   const canvasStyle = computed(() => {

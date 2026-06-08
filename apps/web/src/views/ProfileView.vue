@@ -143,7 +143,7 @@ function cancelEditName() {
 }
 
 // 格式化日期
-function formatDate(dateStr) {
+function formatDate(dateStr: string) {
   if (!dateStr) return '-'
   const date = new Date(dateStr)
   return date.toLocaleString('zh-CN', {
@@ -188,7 +188,7 @@ async function handleChangePassword() {
     window.$message?.success('密码修改成功')
     showPasswordDialog.value = false
     passwordForm.value = { oldPassword: '', newPassword: '', confirmPassword: '' }
-  } catch (error) {
+  } catch (error: any) {
     window.$message?.error(error.message || '密码修改失败')
   } finally {
     changingPassword.value = false

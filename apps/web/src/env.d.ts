@@ -35,4 +35,6 @@ interface NotifyFunction {
 interface Window {
   $message?: MessageFunction
   $notify?: NotifyFunction
+  $confirm?: (message: string, title: string, options?: Record<string, unknown>) => Promise<void>
+  $alert?: (message: string, title: string, options?: Record<string, unknown>) => Promise<void>
 }
