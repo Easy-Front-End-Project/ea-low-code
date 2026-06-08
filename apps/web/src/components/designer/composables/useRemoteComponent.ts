@@ -1,16 +1,18 @@
-﻿import { ref, computed, shallowRef, onMounted } from 'vue'
+import { ref, computed, shallowRef, onMounted } from 'vue'
 import { loadRemoteComponent } from '@/utils/loadRemoteComponent'
 import { getRemoteComponentMetaList } from '@/components/designer/constants/componentMeta'
+import type { ComponentSchema } from '@/utils/schemaHelper'
+import type { RemoteConfig } from '@/components/designer/constants/types'
 
 /**
  * 远程组件加载 Composable
- * @param {Object} component - 组件配置对象
- * @returns {Object} 远程组件相关状态和方法
+ * @param component - 组件配置对象
+ * @returns 远程组件相关状态和方法
  */
-export function useRemoteComponent(component) {
-  const remoteComponentLoader = shallowRef(null)
+export function useRemoteComponent(component: ComponentSchema) {
+  const remoteComponentLoader = shallowRef<any>(null)
   const isLoading = ref(false)
-  const error = ref(null)
+  const error = ref<unknown>(null)
 
   /** 是否为远程组件 */
   const isRemoteComponent = computed(() => {
@@ -18,14 +20,14 @@ export function useRemoteComponent(component) {
   })
 
   /** 远程组件配置 */
-  const remoteConfig = computed(() => {
-    if (component.remoteConfig) return component.remoteConfig
+  const remoteConfig = computed<RemoteConfig | undefined>(() => {
+    if (component.remoteConfig) return component.remoteConfig as RemoteConfig
     const remoteMetaList = getRemoteComponentMetaList()
     return remoteMetaList.find(m => m.type === component.type)?.remoteConfig
   })
 
   /** 加载远程组件样式 */
-  function loadRemoteComponentStyle(styleUrl) {
+  function loadRemoteComponentStyle(styleUrl: string): void {
     if (!styleUrl) return
     const existingLink = document.querySelector(`link[data-remote-style="${styleUrl}"]`)
     if (existingLink) return
@@ -38,7 +40,7 @@ export function useRemoteComponent(component) {
   }
 
   /** 异步加载远程组件 */
-  async function loadRemoteComponentAsync() {
+  async function loadRemoteComponentAsync(): Promise<void> {
     if (!isRemoteComponent.value || !remoteConfig.value) return
 
     isLoading.value = true

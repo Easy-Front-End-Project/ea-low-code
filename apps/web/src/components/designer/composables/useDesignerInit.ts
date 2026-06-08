@@ -1,9 +1,10 @@
 import { ref, computed } from 'vue'
+import type { NavigationGuardNext } from 'vue-router'
 import { useSchemaStore } from '@/components/designer/stores/schema'
 import { getPageDetail } from '@/api/projects'
 import { useAutoSave } from '@/components/designer/composables/useAutoSave'
 
-export function useDesignerInit(pageId) {
+export function useDesignerInit(pageId: number | string) {
   const schemaStore = useSchemaStore()
   const isLoading = ref(true)
 
@@ -16,7 +17,7 @@ export function useDesignerInit(pageId) {
     enabled: !!pageId,
   })
 
-  async function loadPageSchema() {
+  async function loadPageSchema(): Promise<void> {
     if (!pageId) {
       isLoading.value = false
       return
@@ -27,16 +28,16 @@ export function useDesignerInit(pageId) {
       if (res?.schema && typeof res.schema === 'object') {
         schemaStore.importSchema(res.schema)
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('[DesignerView] 加载页面失败:', error)
-      window.$message?.error('加载页面数据失败: ' + (error.message || '未知错误'))
+      ;(window as any).$message?.error('加载页面数据失败: ' + (error.message || '未知错误'))
     } finally {
       isLoading.value = false
     }
   }
 
   function getLeaveGuard() {
-    return (to, from, next) => {
+    return (_to: any, _from: any, next: NavigationGuardNext) => {
       if (isDirty.value && !confirm('您有未保存的更改，确定要离开吗？')) {
         next(false)
         return

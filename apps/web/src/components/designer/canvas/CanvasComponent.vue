@@ -68,7 +68,6 @@
   import { processCustomCSS } from '@/utils/cssProcessor'
   import { cloneComponentSchema } from '@/utils/schemaHelper'
   import type { ComponentSchema } from '@/utils/schemaHelper'
-  // @ts-expect-error JS module without type declarations
   import { useRemoteComponent } from '@/components/designer/composables/useRemoteComponent'
   // @ts-expect-error JS module without type declarations
   import { useComponentInstance } from '@/components/designer/composables/useComponentInstance'
