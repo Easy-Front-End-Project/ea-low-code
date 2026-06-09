@@ -24,6 +24,9 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
       '@ea-low-code/shared': fileURLToPath(new URL('../../packages/shared/src/index.ts', import.meta.url)),
     },
+    extensionAlias: {
+      '.js': ['.ts', '.js'],
+    },
   },
   optimizeDeps: {
     include: ['sortablejs', 'lodash-es'],
