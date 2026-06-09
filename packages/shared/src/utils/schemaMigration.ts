@@ -16,7 +16,10 @@ import type {
   SlotProps,
   ValidationResult,
 } from '../types/index.js'
-import { SCHEMA_VERSION, LEGACY_SCHEMA_VERSION } from '../constants/index.js'
+
+// 内联版本常量，避免通过 constants/index.js 导入时与 Node.js 内置 constants 模块冲突
+const SCHEMA_VERSION = '2.0' as const
+const LEGACY_SCHEMA_VERSION = '1.0' as const
 
 // ==================== 类型守卫 ====================
 
