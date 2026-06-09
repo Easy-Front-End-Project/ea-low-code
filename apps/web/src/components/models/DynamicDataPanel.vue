@@ -191,8 +191,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(dynamic-data-panel) {
     display: flex;
     flex-direction: column;

@@ -85,7 +85,6 @@
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins/bem.scss';
 @import './styles/config-styles.css';
 
 @include b(config-group) {

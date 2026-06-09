@@ -130,8 +130,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(sort-fields-panel) {
     display: flex;
     flex-direction: column;

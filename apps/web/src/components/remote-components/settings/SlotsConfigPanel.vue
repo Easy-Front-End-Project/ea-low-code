@@ -52,8 +52,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(slots-config-panel) {
     max-width: 800px;
 

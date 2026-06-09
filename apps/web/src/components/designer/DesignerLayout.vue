@@ -140,8 +140,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(designer-layout) {
     height: 100vh;
     width: 100vw;

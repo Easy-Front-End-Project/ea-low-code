@@ -1,6 +1,6 @@
 ---
-name: "bem-mixin"
-description: "Provides BEM (Block Element Modifier) SCSS mixins for consistent CSS naming. Invoke when writing component styles or when user asks about BEM naming conventions."
+name: 'bem-mixin'
+description: 'Provides BEM (Block Element Modifier) SCSS mixins for consistent CSS naming. Invoke when writing component styles or when user asks about BEM naming conventions.'
 ---
 
 # BEM Mixin Skill
@@ -86,7 +86,7 @@ Defines state classes (like disabled, active, etc.).
 
 ```vue
 <template>
-  <div class="user-card" :class="{ 'disabled': isDisabled }">
+  <div class="user-card" :class="{ disabled: isDisabled }">
     <div class="user-card__avatar">
       <img src="avatar.jpg" />
     </div>
@@ -94,15 +94,11 @@ Defines state classes (like disabled, active, etc.).
       <h3 class="user-card__name">{{ name }}</h3>
       <p class="user-card__email">{{ email }}</p>
     </div>
-    <button class="user-card__action user-card__action--primary">
-      关注
-    </button>
+    <button class="user-card__action user-card__action--primary">关注</button>
   </div>
 </template>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins/bem.scss';
-
 @include b(user-card) {
   display: flex;
   align-items: center;
@@ -169,12 +165,10 @@ Defines state classes (like disabled, active, etc.).
 
 ## Usage Guidelines
 
-1. **Always import the mixin file** at the top of your style block:
-   ```scss
-   @import '@/styles/mixins/bem.scss';
-   ```
+1. **BEM mixins are auto-injected** via Vite `additionalData` (`@use '@/styles/mixins/bem.scss' as *;`), **no manual import needed** in Vue components.
 
 2. **Start with `@include b()`** to define the block:
+
    ```scss
    @include b(component-name) { ... }
    ```

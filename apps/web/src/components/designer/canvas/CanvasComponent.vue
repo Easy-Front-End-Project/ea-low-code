@@ -278,8 +278,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(canvas-component) {
     position: relative;
     display: inline-flex;

@@ -486,8 +486,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(props-panel) {
     display: flex;
     flex-direction: column;

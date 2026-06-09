@@ -99,8 +99,6 @@ defineEmits<{
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(basic-info-panel) {
     display: flex;
     flex-direction: column;

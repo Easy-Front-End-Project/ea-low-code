@@ -99,8 +99,6 @@
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins/bem.scss';
-
 @include b(selector-list) {
   max-height: 400px;
   overflow-y: auto;

@@ -202,8 +202,6 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins/bem.scss';
-
 @include b(create-project-dialog) {
   @include e(types) {
     display: flex;

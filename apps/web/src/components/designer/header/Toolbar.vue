@@ -61,8 +61,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(designer-toolbar) {
     @include e(extra) {
       display: flex;

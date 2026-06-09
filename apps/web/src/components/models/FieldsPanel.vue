@@ -171,8 +171,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   ea-table {
     width: 100%;
 

@@ -197,8 +197,6 @@ async function handleChangePassword() {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins/bem.scss';
-
 @include b(profile-view) {
   max-width: 800px;
   margin: 0 auto;

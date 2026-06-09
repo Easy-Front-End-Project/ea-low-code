@@ -100,8 +100,6 @@
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins/bem.scss';
-
 @include b(notification-action-config) {
   @include e(config-item) {
     display: flex;

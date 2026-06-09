@@ -160,8 +160,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(url-preset-manager) {
     min-height: 300px;
     max-height: 500px;

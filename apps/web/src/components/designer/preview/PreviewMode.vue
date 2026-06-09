@@ -168,8 +168,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(preview-mode) {
     background-color: #f5f7fa;
   }

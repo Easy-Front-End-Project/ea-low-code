@@ -8,8 +8,6 @@
 </template>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins/bem.scss';
-
 @include b(placeholder-view) {
   display: flex;
   justify-content: center;

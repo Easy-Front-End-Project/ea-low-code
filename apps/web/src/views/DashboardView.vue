@@ -311,8 +311,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(dashboard) {
     padding: 24px;
     max-width: 1440px;

@@ -128,8 +128,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   ea-menu {
     width: 100%;
 

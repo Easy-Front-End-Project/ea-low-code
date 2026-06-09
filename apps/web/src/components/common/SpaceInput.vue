@@ -285,8 +285,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(space-input-wrapper) {
     display: flex;
     align-items: center;

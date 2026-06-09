@@ -155,8 +155,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(page-preview-view) {
     height: 100vh;
     background-color: #f5f7fa;

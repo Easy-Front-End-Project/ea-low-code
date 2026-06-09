@@ -97,7 +97,6 @@
 
 <style lang="scss" scoped>
 @use './styles/action-config.scss' as *;
-@import '@/styles/mixins/bem.scss';
 
 @include b(custom-code-action-config) {
   @include action-config-base;

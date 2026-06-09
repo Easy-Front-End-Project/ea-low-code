@@ -17,8 +17,6 @@ withDefaults(defineProps<{
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins/bem.scss';
-
 @include b(component-label) {
   position: absolute;
   top: 0;

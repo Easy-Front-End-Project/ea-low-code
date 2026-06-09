@@ -318,8 +318,6 @@
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins/bem.scss';
-
 @include b(dropdown-options-config) {
   margin-bottom: 1rem;
 

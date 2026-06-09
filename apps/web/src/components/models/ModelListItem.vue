@@ -43,8 +43,6 @@ defineEmits<{
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins/bem.scss';
-
 @include b(model-list-item) {
   display: flex;
   align-items: center;

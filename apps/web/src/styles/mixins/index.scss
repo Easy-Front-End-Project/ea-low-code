@@ -1,4 +1,4 @@
 // Mixins 入口文件
 // 导入所有 mixin 工具
 
-@import './bem.scss';
+@forward './bem.scss';

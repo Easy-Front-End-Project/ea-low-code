@@ -131,8 +131,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(page-settings-panel) {
     background-color: #fff;
   }

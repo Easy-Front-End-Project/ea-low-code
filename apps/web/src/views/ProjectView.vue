@@ -135,8 +135,6 @@ function handleCreateSuccess() {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins/bem.scss';
-
 @include b(project-view) {
   height: 100%;
 

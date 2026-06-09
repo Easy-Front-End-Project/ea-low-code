@@ -209,8 +209,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(model-view) {
     height: 100%;
 

@@ -111,8 +111,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(create-page-dialog) {
     @include e(form-item) {
       margin-bottom: 20px;

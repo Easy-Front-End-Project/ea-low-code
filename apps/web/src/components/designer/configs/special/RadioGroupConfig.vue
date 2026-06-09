@@ -273,8 +273,6 @@
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins/bem.scss';
-
 @include b(radio-group-config) {
   margin-bottom: 1rem;
 

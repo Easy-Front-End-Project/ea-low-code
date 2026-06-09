@@ -155,8 +155,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(components-view) {
     height: 100%;
 

@@ -76,8 +76,6 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins/bem.scss';
-
 @include b(remote-component-panel) {
   display: flex;
   flex-direction: column;

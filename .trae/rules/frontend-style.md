@@ -17,11 +17,9 @@
 
 ### 2.2 BEM Mixin 工具（推荐）
 
-项目提供了 BEM mixin 工具，位于 `src/styles/mixins/bem.scss`：
+项目提供了 BEM mixin 工具，位于 `src/styles/mixins/bem.scss`，通过 Vite `additionalData` 自动注入，**无需手动导入**：
 
 ```scss
-@import '@/styles/mixins/bem.scss';
-
 @include b(component-panel) {
   @include e(search) {
     /* .component-panel__search */

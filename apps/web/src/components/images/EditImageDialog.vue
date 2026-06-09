@@ -191,8 +191,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(edit-image-dialog) {
     @include e(preview) {
       display: flex;

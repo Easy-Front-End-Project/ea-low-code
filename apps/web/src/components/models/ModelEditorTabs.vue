@@ -92,8 +92,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(model-editor-tabs) {
     @include e(placeholder) {
       display: flex;

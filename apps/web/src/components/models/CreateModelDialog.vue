@@ -121,8 +121,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(create-model-dialog) {
     @include e(form) {
       display: flex;

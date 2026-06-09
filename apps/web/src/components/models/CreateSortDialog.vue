@@ -162,8 +162,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(create-sort-dialog) {
     @include e(form) {
       display: flex;

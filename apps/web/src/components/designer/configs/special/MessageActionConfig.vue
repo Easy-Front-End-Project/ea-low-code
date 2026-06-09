@@ -82,8 +82,6 @@
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins/bem.scss';
-
 @include b(message-action-config) {
   @include e(config-item) {
     display: flex;

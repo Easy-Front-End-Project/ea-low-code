@@ -81,8 +81,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(remote-component-card) {
     transition: all 0.2s;
 

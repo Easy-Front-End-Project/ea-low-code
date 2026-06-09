@@ -149,8 +149,6 @@
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins/bem.scss';
-
 @include b(props-section) {
   margin-bottom: 1.5rem;
 

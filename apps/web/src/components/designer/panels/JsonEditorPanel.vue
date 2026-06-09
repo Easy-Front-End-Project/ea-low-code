@@ -82,8 +82,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(json-editor-panel) {
     display: flex;
     flex-direction: column;

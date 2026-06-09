@@ -71,8 +71,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(components-search-bar) {
     @include e(main) {
       display: flex;

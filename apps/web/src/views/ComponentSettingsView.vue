@@ -286,8 +286,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(component-settings-view) {
     height: 100%;
     padding: 1rem;

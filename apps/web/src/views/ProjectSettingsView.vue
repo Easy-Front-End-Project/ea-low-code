@@ -326,8 +326,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   ea-empty::part(container) {
     height: 100%;
   }

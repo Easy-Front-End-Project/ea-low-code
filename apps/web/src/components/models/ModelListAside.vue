@@ -47,8 +47,6 @@ defineEmits<{
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins/bem.scss';
-
 @include b(model-list-aside) {
   display: flex;
   flex-direction: column;

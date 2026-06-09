@@ -107,8 +107,6 @@
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins/bem.scss';
-
 @include b(canvas-toolbar) {
   display: flex;
   gap: 0.5rem;

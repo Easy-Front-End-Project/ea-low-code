@@ -533,8 +533,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(login-page) {
     display: flex;
     min-height: 100vh;

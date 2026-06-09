@@ -50,8 +50,6 @@ defineEmits<{
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(events-config-panel) {
     max-width: 800px;
 

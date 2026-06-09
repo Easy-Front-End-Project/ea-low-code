@@ -86,8 +86,6 @@
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins/bem.scss';
-
 @include b(slot-scope-config-section) {
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;

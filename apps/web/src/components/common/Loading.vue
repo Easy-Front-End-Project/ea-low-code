@@ -24,8 +24,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(loading-wrapper) {
     position: relative;
     height: 100%;

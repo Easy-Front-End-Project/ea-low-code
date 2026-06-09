@@ -118,8 +118,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(project-card) {
     cursor: pointer;
 

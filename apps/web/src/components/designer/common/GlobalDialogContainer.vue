@@ -124,8 +124,6 @@
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/mixins/bem.scss';
-
 @include b(global-dialog-container) {
   .editor-content {
     border: 1px solid #e4e7ed;

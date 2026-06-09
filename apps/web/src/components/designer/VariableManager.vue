@@ -389,8 +389,6 @@ return Date.now() + 60 * 60 * 24 * 7 * 1000;`
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(variable-manager) {
     min-height: 300px;
     max-height: 500px;

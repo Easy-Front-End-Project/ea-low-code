@@ -204,8 +204,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import '@/styles/mixins/bem.scss';
-
   @include b(canvas-area) {
     flex: 1;
     background-color: #f5f7fa;
