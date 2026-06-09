@@ -11,7 +11,7 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
         type: 'absolute',
         config: {},
       },
-      version: '1.0',
+      version: '2.0',
       settings: {
         style: {
           width: '',
@@ -1401,7 +1401,7 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
         type: 'absolute',
         config: {},
       },
-      version: '1.0',
+      version: '2.0',
       components: [
         {
           id: 'comp_1776532057997_731bkk04',
@@ -1831,7 +1831,7 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
         type: 'absolute',
         config: {},
       },
-      version: '1.0',
+      version: '2.0',
       components: [
         {
           id: 'comp_1776535005883_se01s39u',
@@ -2313,7 +2313,7 @@ export const TEMPLATES: Record<string, { name: string; schema: any }> = {
         type: 'absolute',
         config: {},
       },
-      version: '1.0',
+      version: '2.0',
       settings: {
         style: {
           width: '',

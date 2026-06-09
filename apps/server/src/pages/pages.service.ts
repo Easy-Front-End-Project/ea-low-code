@@ -145,8 +145,12 @@ export class PagesService {
     const savedProject = await this.projectRepository.save(project)
 
     let schema: any = {
+      version: '2.0',
       components: [],
-      config: {},
+      layout: { type: 'default', config: {} },
+      meta: { title: defaultPageName, description: '', viewport: {} },
+      settings: {},
+      variables: [],
     }
 
     if (createProjectDto.createType === 'template' && createProjectDto.templateId) {
@@ -189,10 +193,12 @@ export class PagesService {
       name: createPageDto.name,
       description: createPageDto.description,
       schema: {
-        version: '1.0',
+        version: '2.0',
         components: [],
         layout: { type: 'default', config: {} },
         meta: { title: createPageDto.name, description: '', viewport: {} },
+        settings: {},
+        variables: [],
       },
       sortOrder: (parseInt(maxSortOrder?.maxSort) || 0) + 1,
       projectId: createPageDto.projectId,

@@ -9,7 +9,7 @@ import {
 } from 'typeorm'
 import { ApiProperty } from '@nestjs/swagger'
 import { Project } from './project.entity'
-import type { PageSchema as PageSchemaType } from '@ea-low-code/shared'
+import type { StorePageSchema as PageSchemaType } from '@ea-low-code/shared'
 
 @Entity('page_schemas')
 export class PageSchema {
