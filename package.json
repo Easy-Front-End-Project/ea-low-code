@@ -21,17 +21,20 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "deploy": "npm run deploy -w apps/web",
+    "migrate:schema": "tsx scripts/migrate-schema-v2.ts",
     "prepare": "husky"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "dotenv": "^17.4.2",
     "eslint": "^10.4.1",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.6.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.7",
     "npm-run-all2": "^8.0.4",
-    "prettier": "^3.8.3"
+    "prettier": "^3.8.3",
+    "tsx": "^4.22.4"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
