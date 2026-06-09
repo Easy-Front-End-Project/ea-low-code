@@ -16,7 +16,7 @@ import type {
   SlotProps,
   ValidationResult,
 } from '../types/index.js'
-import { SCHEMA_VERSION, LEGACY_SCHEMA_VERSION } from '../types/schema.js'
+import { SCHEMA_VERSION, LEGACY_SCHEMA_VERSION } from '../constants/index.js'
 
 // ==================== 类型守卫 ====================
 

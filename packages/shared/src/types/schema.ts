@@ -11,11 +11,8 @@
 
 // ==================== Schema 版本 ====================
 
-/** 当前 Schema 版本号 */
-export const SCHEMA_VERSION = '2.0' as const
-
-/** 旧版 Schema 版本号（用于迁移） */
-export const LEGACY_SCHEMA_VERSION = '1.0' as const
+// 从 constants 重新导出，保持向后兼容
+export { SCHEMA_VERSION, LEGACY_SCHEMA_VERSION } from '../constants/index.js'
 
 // ==================== 变量类型 ====================
 
@@ -146,7 +143,7 @@ export interface PageMeta {
 
 /** 页面 Schema 接口（v2） */
 export interface PageSchema {
-  version: typeof SCHEMA_VERSION | string
+  version: '2.0' | string
   components: ComponentSchema[]
   layout: PageLayout
   meta: PageMeta

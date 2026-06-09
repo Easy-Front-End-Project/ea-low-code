@@ -5,7 +5,13 @@
 
 // ==================== Schema 版本 ====================
 
-/** 当前 Schema 版本（与 types/schema.ts 中的 SCHEMA_VERSION 保持一致） */
+/** 当前 Schema 版本号 */
+export const SCHEMA_VERSION = '2.0' as const
+
+/** 旧版 Schema 版本号（用于迁移） */
+export const LEGACY_SCHEMA_VERSION = '1.0' as const
+
+/** 所有支持的 Schema 版本 */
 export const SCHEMA_VERSIONS = ['1.0', '2.0'] as const
 
 // ==================== 默认页面配置 ====================
