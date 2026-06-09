@@ -47,11 +47,7 @@
   import PreviewComponent from './PreviewComponent.vue'
   import { executeEvent } from '@/utils/eventExecutor'
   import Loading from '@/components/common/Loading.vue'
-
-  interface EventConfig {
-    eventType?: string
-    [key: string]: any
-  }
+  import type { EventConfig } from '@/utils/schemaHelper'
 
   const schemaStore = useSchemaStore()
   const isReady = ref(false)
@@ -111,7 +107,7 @@
     unbindPageEvents()
 
     pageEvents.value.forEach(eventConfig => {
-      const eventType = eventConfig.eventType
+      const eventType = eventConfig.eventType as string
       if (!eventType) return
 
       const handler = createEventHandler(eventConfig)

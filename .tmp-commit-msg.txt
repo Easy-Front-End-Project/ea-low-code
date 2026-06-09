@@ -1,0 +1,6 @@
+refactor(web): 更新 Canvas 组件适配 Schema v2
+
+- CanvasComponent.vue 和 ChildComponents.vue 的类型已通过 schemaHelper 重新导出自动适配 v2
+- ComponentSchema.slots 类型从 Record<string, unknown> 变为 Record<string, SlotProps>
+- 新增 slotProps 可选字段，不影响现有渲染逻辑
+- 确认画布组件与 v2 Schema 完全兼容

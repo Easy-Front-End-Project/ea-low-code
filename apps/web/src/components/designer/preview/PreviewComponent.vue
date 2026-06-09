@@ -31,24 +31,11 @@
   import { loadRemoteComponent } from '@/utils/loadRemoteComponent'
   import { useComponentInstance } from '@/components/designer/composables/useComponentInstance'
   import { useComponentRender } from '@/components/designer/composables/useComponentRender'
+  import type { ComponentSchema } from '@/utils/schemaHelper'
 
-  interface ComponentChild {
-    id: string
-    type: string
-    props?: Record<string, any> & { slot?: string }
-    events?: any[]
-    children?: ComponentChild[]
-    childrenText?: string
-    style?: Record<string, string>
-    isRemote?: boolean
-    remoteConfig?: { url: string; exportName?: string; styleUrl?: string }
-  }
-
-  interface PreviewComponentProps {
-    component: ComponentChild
-  }
-
-  const props = defineProps<PreviewComponentProps>()
+  const props = defineProps<{
+    component: ComponentSchema
+  }>()
 
   const componentRef = ref<HTMLElement | null>(null)
   const componentRefWrapper = toRef(() => props.component) as any
